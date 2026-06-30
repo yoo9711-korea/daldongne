@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>무료 체험 — 달동네 출판사</title>
+<link rel="icon" href="assets/brand/favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/brand/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header" id="siteHeader">
+    <div class="site-header__inner">
+      <a href="index.html" class="brand">
+        <img src="assets/brand/icon-mark.png" alt="" class="brand__icon" width="32" height="32">
+        달동네 출판사<small>DAL-DONG-NE PUBLISHING</small>
+      </a>
+      <nav class="site-nav">
+        <div class="site-nav__links">
+          <a href="about.html">소개</a>
+          <a href="products.html">작품</a>
+          <a href="process.html">출판 과정</a>
+          <a href="compare.html">다른 점</a>
+          <a href="trial.html" class="is-active">체험하기</a>
+          <a href="pricing.html">가격</a>
+        </div>
+        <a href="trial.html" class="btn btn--gold btn--sm">무료체험 시작</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+    <div class="mobile-panel" id="mobilePanel">
+      <a href="about.html">소개</a>
+      <a href="products.html">작품</a>
+      <a href="process.html">출판 과정</a>
+      <a href="compare.html">다른 점</a>
+      <a href="trial.html" class="is-active">체험하기</a>
+      <a href="pricing.html">가격</a>
+      <a href="b2b.html">단체·기업</a>
+      <a href="apply.html">출판 신청</a>
+      <a href="trial.html" class="btn btn--gold btn--sm" style="width:fit-content;">무료체험 시작</a>
+    </div>
+  </header>
+  <main id="top">
+    <section class="page page--shade" id="trial" data-folio="Chapter 6 · 07">
+      <div class="page__inner">
+        <div class="deckle deckle--shade" aria-hidden="true" style="margin-bottom:0;">
+          <svg viewBox="0 0 1200 24" preserveAspectRatio="none"><path d="M0,24 L0,8 L50,14 L100,4 L150,16 L200,8 L250,18 L300,5 L350,15 L400,9 L450,17 L500,4 L550,13 L600,8 L650,18 L700,6 L750,14 L800,3 L850,16 L900,9 L950,18 L1000,5 L1050,14 L1100,8 L1150,16 L1200,8 L1200,24 Z"/></svg>
+        </div>
+        <div class="runninghead reveal">
+          <span class="runninghead__chapter">CHAPTER 6</span>
+          <span class="runninghead__rule"></span>
+          <span class="runninghead__title">직접 써보는 첫 페이지</span>
+        </div>
+        <div class="section-head reveal">
+          <h2>사진 한 장으로, 책의 첫 페이지를 만들어보세요</h2>
+          <p>사진을 올리고 AI의 질문에 답해보세요. 답을 적용할 때마다, 오른쪽 페이지에 초안이 바로 만들어집니다.</p>
+        </div>
+
+        <div class="trial__grid">
+          <!-- Controls -->
+          <div class="trial__panel reveal">
+
+            <div class="trial-progressbar" aria-hidden="true"><div class="trial-progressbar__fill" id="progressFill"></div></div>
+
+            <p class="trial-step__label">STEP 1 · 사진 올리기</p>
+            <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="사진 업로드">
+              <div class="dropzone__icon">⌬</div>
+              <p class="dropzone__text">사진을 끌어다 놓거나, 클릭하여 올려보세요</p>
+              <p class="dropzone__hint">JPG · PNG, 여러 장 선택 가능 · 약 2분이면 충분해요</p>
+              <input type="file" id="fileInput" accept="image/*" multiple>
+            </div>
+            <div class="thumbs" id="thumbs"></div>
+
+            <div class="qcard" id="qcard">
+              <div class="qcard__head" style="margin-top:28px;">
+                <p class="trial-step__label" style="margin:0;">STEP 2 · AI 질문에 답하기</p>
+                <span class="qcard__toast" id="qToast">답변이 적용되었습니다 ✓</span>
+              </div>
+              <div class="qcard__progress" id="qProgress"></div>
+              <p class="qcard__encourage" id="qEncourage"></p>
+              <p class="qcard__question" id="qQuestion"></p>
+              <div class="preset-buttons" id="qPresets">
+                <span class="preset-buttons__label">AI 추천 답변으로 채우기</span>
+                <button type="button" class="preset-btn" data-tone="warm">따뜻하게</button>
+                <button type="button" class="preset-btn" data-tone="plain">담백하게</button>
+                <button type="button" class="preset-btn" data-tone="detailed">자세히</button>
+              </div>
+              <textarea class="qcard__textarea" id="qAnswer" placeholder=""></textarea>
+              <div class="qcard__actions">
+                <button class="btn btn--ghost-light btn--sm" id="qPrev">이전 질문</button>
+                <button class="btn btn--gold btn--sm" id="qNext">답변 적용하기</button>
+              </div>
+            </div>
+
+            <div class="refine" id="refine">
+              <p class="trial-step__label">STEP 3 · 다듬기</p>
+              <p class="refine__label">초안이 완성되었습니다</p>
+              <p class="refine__hint">오른쪽 페이지의 글을 직접 클릭해서, 당신의 말투로 다듬어보세요.</p>
+              <button class="btn btn--ghost-light btn--sm" id="restartTrial">처음부터 다시 쓰기</button>
+
+              <p class="trial-step__label" style="margin-top:24px;">STEP 4 · 표지 제목 짓기 &amp; 공유하기</p>
+              <input type="text" id="bookTitle" placeholder="이 챕터의 제목을 지어보세요 (예: 그 여름, 우리)">
+              <button class="btn btn--gold btn--sm" id="makeShareCard">공유 카드 만들기</button>
+
+              <div class="share-card" id="shareCard" style="display:none;">
+                <img class="share-card__img" id="shareCardImg" alt="공유용 표지 미리보기">
+                <div class="share-card__actions">
+                  <button class="btn btn--ghost-light btn--sm" id="downloadCard">이미지로 저장</button>
+                  <button class="btn btn--gold btn--sm" id="shareCardBtn">SNS에 공유하기</button>
+                </div>
+                <p class="share-card__note" id="shareNote">#달동네출판사 #첫페이지 와 함께 공유해보세요</p>
+              </div>
+              <canvas id="shareCanvas" width="800" height="1000" style="display:none;" aria-hidden="true"></canvas>
+            </div>
+          </div>
+
+          <!-- Live preview -->
+          <div class="preview reveal">
+            <p class="preview__badge"><span>LIFE BOOK · DRAFT</span><span id="previewProgress">0 / 4</span></p>
+            <div class="preview__spread">
+              <div class="preview__photo-page" id="previewPhotoPage">
+                <p class="preview__photo-placeholder">사진을 올리면<br>이 페이지에 담깁니다</p>
+              </div>
+              <div class="preview__text-page">
+                <p class="is-placeholder" id="previewText" contenteditable="false">사진을 올리고 질문에 답하면, 이 곳에 당신의 이야기가 쓰여집니다.</p>
+                <span class="preview__pagenum">p. 01</span>
+              </div>
+            </div>
+            <div class="preview__footer">
+              <p>이 페이지는 실시간으로 만들어지는 체험용 초안입니다.</p>
+              <a href="apply.html" class="btn btn--ghost-light btn--sm">이 초안으로 출판 신청하기 →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <div class="colophon__inner">
+      <div class="colophon__top">
+        <div>
+          <div class="colophon__brand">
+            <img src="assets/brand/icon-mark-light.png" alt="" class="colophon__brand-icon" width="28" height="28">
+            <span>달동네 출판사<small>DAL-DONG-NE PUBLISHING</small></span>
+          </div>
+          <p class="colophon__tagline">라이프픽스 홈케어 부설 달동네 출판사</p>
+        </div>
+        <div>
+          <h4>작품</h4>
+          <ul>
+            <li>Life Book</li>
+            <li>Family Book</li>
+            <li>Couple Book</li>
+            <li>Baby Book</li>
+            <li>Travel Book</li>
+            <li>Club Book</li>
+            <li>Heritage Edition</li>
+            <li>달동네 인생영화</li>
+          </ul>
+        </div>
+        <div>
+          <h4>회사</h4>
+          <ul>
+            <li><a href="about.html">소개</a></li>
+            <li><a href="process.html">출판 과정</a></li>
+            <li><a href="compare.html">다른 점</a></li>
+            <li><a href="b2b.html">단체·기업 문의</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>시작하기</h4>
+          <ul>
+            <li><a href="trial.html">무료 체험</a></li>
+            <li><a href="pricing.html">가격 정책</a></li>
+            <li><a href="apply.html">출판 신청</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="colophon__bottom">
+        <span>© 2026 라이프픽스 홈케어 부설 달동네 출판사</span>
+        <span>초판 발행 · 2026 · PRINTED IN THE CLOUD</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="folio" id="folio" aria-hidden="true">Chapter 6 · 07</div>
+
+<script src="assets/main.js"></script>
+</body>
+</html>

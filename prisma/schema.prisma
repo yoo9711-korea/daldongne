@@ -1,0 +1,177 @@
+// prisma/schema.prisma
+// 1단계(기반 구축) 스키마.
+// Auth.js가 요구하는 표준 모델(User/Account/Session/VerificationToken)은
+// 절대 임의로 필드명을 바꾸지 않습니다 — PrismaAdapter가 정확히 이 구조를 기대합니다.
+// 그 아래, 서비스 도메인의 최소 골격(Family/FamilyMember/Memory)을 함께 둡니다.
+// Book, TimeCapsule, AI 작업 큐 등은 이후 단계에서 이 스키마를 확장합니다.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===================== Auth.js 표준 모델 =====================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  // 도메인 관계: 한 사용자는 여러 가족 공간(Family)에 속할 수 있다.
+  familyMemberships FamilyMember[]
+
+  // 본인이 직접 만든 Memory (가족 소속과 무관하게도 개인 기록 가능)
+  memories Memory[]
+
+  // 출판/제작된 책·영상 (Life Library에서 조회)
+  books Book[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ===================== 도메인 모델 (1단계 골격) =====================
+
+// 가족 공간. 추후 Family Space, Family Tree, Memorial 기능의 기반이 됩니다.
+model Family {
+  id        String   @id @default(cuid())
+  name      String // 예: "김씨네 가족"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members  FamilyMember[]
+  memories Memory[]
+
+  @@map("families")
+}
+
+enum FamilyRole {
+  OWNER // 가족 공간 생성자 — 전체 권한
+  EDITOR // 기록 작성/수정 가능
+  VIEWER // 열람만 가능
+}
+
+model FamilyMember {
+  id       String     @id @default(cuid())
+  familyId String
+  userId   String
+  role     FamilyRole @default(VIEWER)
+  joinedAt DateTime   @default(now())
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([familyId, userId])
+  @@map("family_members")
+}
+
+enum MemoryType {
+  PHOTO
+  VIDEO
+  AUDIO
+  TEXT // AI 인터뷰 답변, 일기 등
+}
+
+// 가장 기초 단위의 기록. Memory Timeline, Album, AI Interview 결과가 모두 이 모델을 사용합니다.
+model Memory {
+  id          String     @id @default(cuid())
+  type        MemoryType
+  title       String?
+  description String?    @db.Text
+  fileUrl     String? // Cloud Storage 경로 (이후 단계에서 업로드 붙일 때 사용)
+  occurredAt  DateTime? // 기록이 가리키는 실제 시점 (연도별 정렬에 사용)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  authorId String
+  author   User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  familyId String?
+  family   Family? @relation(fields: [familyId], references: [id], onDelete: SetNull)
+
+  @@index([authorId, occurredAt])
+  @@map("memories")
+}
+
+// ===================== Life Library =====================
+
+enum BookType {
+  LIFE_BOOK
+  FAMILY_BOOK
+  COUPLE_BOOK
+  BABY_BOOK
+  TRAVEL_BOOK
+  AI_MOVIE
+}
+
+enum BookStatus {
+  DRAFT // 작성 중
+  IN_PRODUCTION // 출판/제작 진행 중
+  PUBLISHED // 완성됨
+}
+
+model Book {
+  id        String     @id @default(cuid())
+  authorId  String
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  type      BookType
+  title     String
+  status    BookStatus @default(DRAFT)
+  pageCount Int?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([authorId])
+  @@map("books")
+}
