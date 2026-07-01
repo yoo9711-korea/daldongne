@@ -16,7 +16,7 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "next": "15.0.3",
+    "next": "15.4.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "next-auth": "5.0.0-beta.25",
