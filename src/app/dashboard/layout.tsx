@@ -9,6 +9,8 @@ const NAV = [
   { href: '/dashboard/library', label: 'Life Library' },
   { href: '/dashboard/family', label: 'Family Space' },
   { href: '/dashboard/interview', label: 'AI Interview' },
+  { href: '/dashboard/capsule', label: '⏰ Time Capsule' },
+  { href: '/dashboard/movie', label: '🎬 AI Movie' },
 ];
 
 export default async function DashboardLayout({

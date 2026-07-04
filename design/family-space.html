@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Space (디자인 목업) — 달동네 출판사</title>
+<link rel="icon" href="assets/brand/favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/brand/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/mockup.css">
+</head>
+<body>
+  <header class="site-header" id="siteHeader">
+    <div class="site-header__inner">
+      <a href="index.html" class="brand">
+        <img src="assets/brand/icon-mark.png" alt="" class="brand__icon" width="32" height="32">
+        달동네 출판사<small>DAL-DONG-NE PUBLISHING</small>
+      </a>
+      <nav class="site-nav">
+        <div class="site-nav__links">
+          <a href="about.html">소개</a>
+          <a href="products.html">작품</a>
+          <a href="roadmap.html" class="is-active">다음 단계</a>
+          <a href="trial.html">체험하기</a>
+          <a href="pricing.html">가격</a>
+        </div>
+        <a href="trial.html" class="btn btn--gold btn--sm">무료체험 시작</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+    <div class="mobile-panel" id="mobilePanel">
+      <a href="about.html">소개</a>
+      <a href="products.html">작품</a>
+      <a href="roadmap.html">다음 단계</a>
+      <a href="trial.html">체험하기</a>
+      <a href="pricing.html">가격</a>
+      <a href="trial.html" class="btn btn--gold btn--sm" style="width:fit-content;">무료체험 시작</a>
+    </div>
+  </header>
+  <main id="top">
+    <section class="page" style="padding-top:calc(var(--header-h) + 48px);">
+      <div class="page__inner">
+        <div class="mockup-banner reveal">
+          <span class="mockup-banner__badge">DESIGN MOCKUP</span>
+          <p>이 화면은 디자인 시안입니다. 실제 데이터베이스·로그인과는 아직 연결되어 있지 않습니다.
+          버튼을 눌러도 동작하지 않는 부분이 있을 수 있어요. (연동 예정: 초대 메일, 권한관리(Owner/Editor/Viewer))</p>
+        </div>
+        <div class="runninghead reveal">
+          <span class="runninghead__chapter">MOCKUP · 03</span>
+          <span class="runninghead__rule"></span>
+          <span class="runninghead__title">가족과 함께 — Family Space</span>
+        </div>
+
+        <div class="section-head">
+          <h2>가족이 함께 기록하고, 함께 추억합니다</h2>
+          <p>초대받은 가족은 권한에 따라 기록을 보거나, 직접 보태거나, 댓글로 함께할 수 있어요.</p>
+        </div>
+
+        <div class="family-grid">
+          <div class="family-members reveal">
+            <p class="trial-step__label">가족 구성원</p>
+            <div class="family-member">
+              <div class="family-member__avatar">김</div>
+              <div>
+                <p class="family-member__name">김민준 <span class="family-role family-role--owner">OWNER</span></p>
+                <p class="family-member__sub">본인</p>
+              </div>
+            </div>
+            <div class="family-member">
+              <div class="family-member__avatar">이</div>
+              <div>
+                <p class="family-member__name">이서연 <span class="family-role family-role--editor">EDITOR</span></p>
+                <p class="family-member__sub">배우자</p>
+              </div>
+            </div>
+            <div class="family-member">
+              <div class="family-member__avatar">김</div>
+              <div>
+                <p class="family-member__name">김하윤 <span class="family-role family-role--viewer">VIEWER</span></p>
+                <p class="family-member__sub">자녀 · 8세</p>
+              </div>
+            </div>
+            <button class="btn btn--ghost-light btn--sm" style="margin-top:8px;">+ 가족 초대하기</button>
+          </div>
+
+          <div class="family-feed reveal">
+            <p class="trial-step__label">최근 가족 활동</p>
+            <div class="family-feed__item">
+              <p class="family-feed__text"><strong>이서연</strong>님이 사진 5장을 추가했어요 — "하윤이 생일파티"</p>
+              <p class="family-feed__meta">2시간 전 · ❤️ 3 · 댓글 2</p>
+            </div>
+            <div class="family-feed__item">
+              <p class="family-feed__text"><strong>김하윤</strong>님이 댓글을 남겼어요 — "아빠 여기 나 너무 웃기게 나왔어 ㅋㅋ"</p>
+              <p class="family-feed__meta">어제</p>
+            </div>
+            <div class="family-feed__item">
+              <p class="family-feed__text"><strong>김민준</strong>님이 Life Book 초안을 공유했어요</p>
+              <p class="family-feed__meta">3일 전 · ❤️ 5</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <div class="colophon__inner">
+      <div class="colophon__bottom" style="padding-top:0;border-top:none;">
+        <span>© 2026 라이프픽스 홈케어 부설 달동네 출판사</span>
+        <span>이 페이지들은 디자인 목업입니다 · 실제 데이터와 연동되지 않습니다</span>
+      </div>
+    </div>
+  </footer>
+
+<script src="assets/main.js"></script>
+</body>
+</html>

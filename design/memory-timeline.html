@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Timeline (디자인 목업) — 달동네 출판사</title>
+<link rel="icon" href="assets/brand/favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/brand/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/mockup.css">
+</head>
+<body>
+  <header class="site-header" id="siteHeader">
+    <div class="site-header__inner">
+      <a href="index.html" class="brand">
+        <img src="assets/brand/icon-mark.png" alt="" class="brand__icon" width="32" height="32">
+        달동네 출판사<small>DAL-DONG-NE PUBLISHING</small>
+      </a>
+      <nav class="site-nav">
+        <div class="site-nav__links">
+          <a href="about.html">소개</a>
+          <a href="products.html">작품</a>
+          <a href="roadmap.html" class="is-active">다음 단계</a>
+          <a href="trial.html">체험하기</a>
+          <a href="pricing.html">가격</a>
+        </div>
+        <a href="trial.html" class="btn btn--gold btn--sm">무료체험 시작</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+    <div class="mobile-panel" id="mobilePanel">
+      <a href="about.html">소개</a>
+      <a href="products.html">작품</a>
+      <a href="roadmap.html">다음 단계</a>
+      <a href="trial.html">체험하기</a>
+      <a href="pricing.html">가격</a>
+      <a href="trial.html" class="btn btn--gold btn--sm" style="width:fit-content;">무료체험 시작</a>
+    </div>
+  </header>
+  <main id="top">
+    <section class="page" style="padding-top:calc(var(--header-h) + 48px);">
+      <div class="page__inner">
+        <div class="mockup-banner reveal">
+          <span class="mockup-banner__badge">DESIGN MOCKUP</span>
+          <p>이 화면은 디자인 시안입니다. 실제 데이터베이스·로그인과는 아직 연결되어 있지 않습니다.
+          버튼을 눌러도 동작하지 않는 부분이 있을 수 있어요. (연동 예정: Cloud Storage, 자동 연도 분류)</p>
+        </div>
+        <div class="runninghead reveal">
+          <span class="runninghead__chapter">MOCKUP · 01</span>
+          <span class="runninghead__rule"></span>
+          <span class="runninghead__title">연도별 기억 — Memory Timeline</span>
+        </div>
+
+        <div class="section-head">
+          <h2>당신의 시간이, 한 줄로 이어집니다</h2>
+          <p>사진·영상·인터뷰 기록이 연도별로 자동 정렬됩니다.</p>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline__year-group">
+            <div class="timeline__year">2024</div>
+            <div class="timeline__rail"></div>
+            <div class="timeline__items">
+              <div class="timeline__card">
+                <div class="timeline__thumb timeline__thumb--photo">📷</div>
+                <p class="timeline__card-title">가족 여행 — 제주도</p>
+                <p class="timeline__card-meta">사진 12장 · 8월</p>
+              </div>
+              <div class="timeline__card">
+                <div class="timeline__thumb timeline__thumb--video">🎬</div>
+                <p class="timeline__card-title">아이의 첫 발표회</p>
+                <p class="timeline__card-meta">영상 1편 · 5월</p>
+              </div>
+              <div class="timeline__card">
+                <div class="timeline__thumb timeline__thumb--audio">🎙</div>
+                <p class="timeline__card-title">AI 인터뷰: 결혼 전날</p>
+                <p class="timeline__card-meta">음성 8분 · 2월</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline__year-group">
+            <div class="timeline__year">2019</div>
+            <div class="timeline__rail"></div>
+            <div class="timeline__items">
+              <div class="timeline__card">
+                <div class="timeline__thumb timeline__thumb--photo">📷</div>
+                <p class="timeline__card-title">신혼집 입주</p>
+                <p class="timeline__card-meta">사진 24장 · 11월</p>
+              </div>
+              <div class="timeline__card">
+                <div class="timeline__thumb timeline__thumb--photo">📷</div>
+                <p class="timeline__card-title">친구들과의 졸업식</p>
+                <p class="timeline__card-meta">사진 9장 · 2월</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline__year-group">
+            <div class="timeline__year">1998</div>
+            <div class="timeline__rail"></div>
+            <div class="timeline__items">
+              <div class="timeline__card">
+                <div class="timeline__thumb timeline__thumb--photo">📷</div>
+                <p class="timeline__card-title">초등학교 입학식</p>
+                <p class="timeline__card-meta">사진 3장 (스캔)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <div class="colophon__inner">
+      <div class="colophon__bottom" style="padding-top:0;border-top:none;">
+        <span>© 2026 라이프픽스 홈케어 부설 달동네 출판사</span>
+        <span>이 페이지들은 디자인 목업입니다 · 실제 데이터와 연동되지 않습니다</span>
+      </div>
+    </div>
+  </footer>
+
+<script src="assets/main.js"></script>
+</body>
+</html>

@@ -1,4 +1,3 @@
-// src/app/layout.tsx
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { auth, signOut } from '@/auth';
@@ -30,30 +29,42 @@ export default async function RootLayout({
         <header className="site-header">
           <div className="site-header__inner">
             <Link href="/" className="brand">
+              <img src="/brand/icon-mark.png" alt="" className="brand__icon" width={32} height={32} />
               달동네 출판사<small>DAL-DONG-NE PUBLISHING</small>
             </Link>
-            <nav style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              {session?.user ? (
-                <>
-                  <Link href="/dashboard" className="btn btn--ghost-light" style={{ padding: '9px 16px', fontSize: 13.5 }}>
-                    내 서재
-                  </Link>
-                  <form
-                    action={async () => {
-                      'use server';
-                      await signOut({ redirectTo: '/' });
-                    }}
-                  >
-                    <button type="submit" className="btn btn--ghost-light" style={{ padding: '9px 16px', fontSize: 13.5 }}>
-                      로그아웃
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <Link href="/login" className="btn btn--gold" style={{ padding: '9px 16px', fontSize: 13.5 }}>
-                  로그인
-                </Link>
-              )}
+            <nav className="site-nav">
+              <div className="site-nav__links">
+                <Link href="/about">소개</Link>
+                <Link href="/products">작품</Link>
+                <Link href="/process">출판 과정</Link>
+                <Link href="/compare">다른 점</Link>
+                <Link href="/trial">체험하기</Link>
+                <Link href="/pricing">가격</Link>
+              </div>
+             {session?.user ? (
+  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+    {session.user.email === process.env.ADMIN_EMAIL && (
+      <Link href="/admin" className="btn btn--ghost-light" style={{ padding: '9px 16px', fontSize: 13.5 }}>
+        관리자
+      </Link>
+    )}
+    <Link href="/dashboard" className="btn btn--ghost-light" style={{ padding: '9px 16px', fontSize: 13.5 }}>
+      내 서재
+    </Link>
+    <form action={async () => {
+      'use server';
+      await signOut({ redirectTo: '/' });
+    }}>
+      <button type="submit" className="btn btn--ghost-light" style={{ padding: '9px 16px', fontSize: 13.5 }}>
+        로그아웃
+      </button>
+    </form>
+  </div>
+) : (
+  <Link href="/login" className="btn btn--gold" style={{ padding: '9px 16px', fontSize: 13.5 }}>
+    로그인
+  </Link>
+)}
             </nav>
           </div>
         </header>
