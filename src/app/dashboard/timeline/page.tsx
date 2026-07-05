@@ -18,6 +18,15 @@ const TYPE_CLASS: Record<string, string> = {
   TEXT: 'timeline__thumb--text',
 };
 
+function isInterviewMemory(title: string | null) {
+  const normalizedTitle = String(title || '').trim();
+
+  return (
+    normalizedTitle.startsWith('AI 인터뷰') ||
+    normalizedTitle.startsWith('AI Interview')
+  );
+}
+
 export default async function TimelinePage() {
   const session = await auth();
 
@@ -25,12 +34,14 @@ export default async function TimelinePage() {
     redirect('/login');
   }
 
-  const memories = await prisma.memory.findMany({
+  const allMemories = await prisma.memory.findMany({
     where: {
       authorId: session.user.id,
     },
     orderBy: [{ occurredAt: 'desc' }, { createdAt: 'desc' }],
   });
+
+  const memories = allMemories.filter((memory) => !isInterviewMemory(memory.title));
 
   const groups = new Map<number, typeof memories>();
 

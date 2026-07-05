@@ -66,7 +66,7 @@ export default function InterviewClient({
         <div className="dash-card">
           <p style={{ color: 'var(--ink-soft)' }}>
             모든 질문에 답해주셨습니다 🎉<br />
-            이 답변들은 Memory Timeline에서도 확인할 수 있어요.
+            이 답변들은 AI Interview에서도 확인할 수 있어요.
           </p>
         </div>
       ) : (
