@@ -407,3 +407,12 @@ body:has(.dash-shell) .site-header {
 body:has(.dash-shell) {
   overflow-x: hidden;
 }
+
+/* Admin 화면에서는 일반 홈페이지 헤더를 숨긴다 */
+body:has(.admin-shell) .site-header {
+  display: none;
+}
+
+body:has(.admin-shell) {
+  overflow-x: hidden;
+}
