@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
+import { useRouter } from 'next/navigation';
 interface LockedCapsule {
   id: string;
   title: string;
@@ -25,17 +25,24 @@ export default function CapsuleClient({ locked, opened, createCapsule }: {
   createCapsule: (formData: FormData) => Promise<void>;
 }) {
   const [showForm, setShowForm] = useState(false);
+  const router = useRouter();
   const [selectedCapsule, setSelectedCapsule] = useState<OpenedCapsule | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setSubmitting(true);
+  e.preventDefault();
+
+  setSubmitting(true);
+
+  try {
     const formData = new FormData(e.currentTarget);
     await createCapsule(formData);
-    setSubmitting(false);
     setShowForm(false);
+    router.refresh();
+  } finally {
+    setSubmitting(false);
   }
+}
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
