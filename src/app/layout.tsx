@@ -158,7 +158,7 @@ export default async function RootLayout({
               <span style={brandNameStyle}>달동네 출판사</span>
             </Link>
 
-            <nav style={navStyle} aria-label="상단 메뉴">
+            <nav className="top-desktop-nav" style={navStyle} aria-label="상단 메뉴">
               {isLoggedIn ? (
                 <>
                   <Link href="/dashboard" style={navLinkStyle}>
@@ -228,6 +228,60 @@ export default async function RootLayout({
         </header>
 
         {children}
+
+        <nav className="mobile-bottom-nav" aria-label="모바일 하단 메뉴">
+          {isLoggedIn ? (
+            <>
+              <Link href="/dashboard" className="mobile-bottom-nav__item">
+                작업실
+              </Link>
+
+              <Link href="/dashboard/book" className="mobile-bottom-nav__item">
+                인생책
+              </Link>
+
+              <Link href="/dashboard/library" className="mobile-bottom-nav__item">
+                책장
+              </Link>
+
+              {isAdmin ? (
+                <Link href="/admin" className="mobile-bottom-nav__item">
+                  관리자
+                </Link>
+              ) : null}
+
+              <form
+                action={async () => {
+                  'use server';
+                  await signOut({ redirectTo: '/' });
+                }}
+                className="mobile-bottom-nav__form"
+              >
+                <button type="submit" className="mobile-bottom-nav__item">
+                  로그아웃
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link href="/" className="mobile-bottom-nav__item">
+                홈
+              </Link>
+
+              <Link href="/guide" className="mobile-bottom-nav__item">
+                가이드
+              </Link>
+
+              <Link href="/pricing" className="mobile-bottom-nav__item">
+                상품
+              </Link>
+
+              <Link href="/login" className="mobile-bottom-nav__item mobile-bottom-nav__item--dark">
+                로그인
+              </Link>
+            </>
+          )}
+        </nav>
       </body>
     </html>
   );

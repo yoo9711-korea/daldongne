@@ -1046,3 +1046,105 @@ body > header img {
     white-space: nowrap !important;
   }
 }
+
+/* ================================
+   모바일 앱 하단 메뉴 최종 안정화
+   ================================ */
+
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  body {
+    padding-bottom: 72px !important;
+  }
+
+  body > header {
+    height: 58px !important;
+    min-height: 58px !important;
+  }
+
+  body > header > div {
+    min-height: 58px !important;
+    height: 58px !important;
+    justify-content: center !important;
+  }
+
+  body > header .top-desktop-nav {
+    display: none !important;
+  }
+
+  body > header a {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    writing-mode: horizontal-tb !important;
+  }
+
+  body > header span {
+    display: inline-block !important;
+    width: auto !important;
+    min-width: max-content !important;
+    white-space: nowrap !important;
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+  }
+
+  .mobile-bottom-nav {
+    position: fixed !important;
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    z-index: 1000 !important;
+    height: 56px !important;
+    padding: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    gap: 4px !important;
+    border: 1px solid #dfcda9 !important;
+    border-radius: 999px !important;
+    background: rgba(255, 250, 240, 0.96) !important;
+    box-shadow: 0 12px 32px rgba(45, 26, 11, 0.18) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+
+  .mobile-bottom-nav__form {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: contents !important;
+  }
+
+  .mobile-bottom-nav__item {
+    height: 42px !important;
+    min-width: 0 !important;
+    flex: 1 1 0 !important;
+    padding: 0 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: #2d1a0b !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.04em !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    writing-mode: horizontal-tb !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+    cursor: pointer !important;
+  }
+
+  .mobile-bottom-nav__item--dark {
+    background: #2d1a0b !important;
+    color: #fffaf0 !important;
+  }
+}
