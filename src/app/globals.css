@@ -959,3 +959,90 @@ header a[role='button'] {
     font-size: 13px !important;
   }
 }
+
+/* ================================
+   모바일 상단 메뉴 세로 글자 강제 수정
+   ================================ */
+
+body > header,
+body > header * {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+}
+
+body > header a,
+body > header button,
+body > header span,
+body > header nav,
+body > header form {
+  white-space: nowrap !important;
+}
+
+body > header nav {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex-wrap: nowrap !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  min-width: 0 !important;
+  width: auto !important;
+}
+
+body > header nav a,
+body > header nav button {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  writing-mode: horizontal-tb !important;
+}
+
+body > header form {
+  display: inline-flex !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+  min-width: max-content !important;
+}
+
+body > header img {
+  flex-shrink: 0 !important;
+}
+
+@media (max-width: 760px) {
+  body > header > div {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+  }
+
+  body > header nav {
+    flex: 1 1 auto !important;
+    max-width: calc(100vw - 150px) !important;
+  }
+
+  body > header nav a,
+  body > header nav button {
+    height: 34px !important;
+    padding: 0 9px !important;
+    font-size: 13px !important;
+  }
+
+  body > header span {
+    font-size: 17px !important;
+    white-space: nowrap !important;
+  }
+}
