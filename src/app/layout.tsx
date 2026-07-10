@@ -28,7 +28,7 @@ export const viewport: Viewport = {
   themeColor: '#6b3f18',
 };
 
-const topbarStyle: CSSProperties = {
+const headerStyle: CSSProperties = {
   width: '100%',
   position: 'sticky',
   top: 0,
@@ -37,16 +37,16 @@ const topbarStyle: CSSProperties = {
   borderBottom: '1px solid #e2d4bb',
 };
 
-const topbarInnerStyle: CSSProperties = {
+const innerStyle: CSSProperties = {
   width: '100%',
-  maxWidth: 1420,
-  minHeight: 68,
+  maxWidth: 1500,
+  minHeight: 74,
   margin: '0 auto',
-  padding: '10px 28px',
+  padding: '10px 30px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: 28,
+  gap: 24,
   boxSizing: 'border-box',
 };
 
@@ -55,8 +55,8 @@ const brandStyle: CSSProperties = {
   alignItems: 'center',
   gap: 10,
   flexShrink: 0,
-  textDecoration: 'none',
   color: '#2d1a0b',
+  textDecoration: 'none',
   whiteSpace: 'nowrap',
 };
 
@@ -69,12 +69,11 @@ const brandNameStyle: CSSProperties = {
   lineHeight: 1,
   letterSpacing: '-0.06em',
   whiteSpace: 'nowrap',
-  wordBreak: 'keep-all',
 };
 
 const brandDescStyle: CSSProperties = {
   display: 'inline-block',
-  maxWidth: 180,
+  width: 170,
   color: '#a56518',
   fontSize: 14,
   fontWeight: 800,
@@ -83,28 +82,28 @@ const brandDescStyle: CSSProperties = {
   wordBreak: 'keep-all',
 };
 
-const menuStyle: CSSProperties = {
+const navStyle: CSSProperties = {
+  minWidth: 0,
+  flex: 1,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
   gap: 18,
-  flex: 1,
-  minWidth: 0,
   overflowX: 'auto',
   overflowY: 'hidden',
   whiteSpace: 'nowrap',
 };
 
-const menuLinkStyle: CSSProperties = {
+const linkStyle: CSSProperties = {
   height: 40,
-  padding: '0 10px',
+  padding: '0 8px',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
-  color: '#2d1a0b',
+  color: '#3a2414',
   fontSize: 15,
-  fontWeight: 800,
+  fontWeight: 750,
   lineHeight: 1,
   letterSpacing: '-0.04em',
   textDecoration: 'none',
@@ -112,9 +111,9 @@ const menuLinkStyle: CSSProperties = {
   wordBreak: 'keep-all',
 };
 
-const menuButtonStyle: CSSProperties = {
-  height: 42,
-  minWidth: 92,
+const buttonStyle: CSSProperties = {
+  minWidth: 86,
+  height: 44,
   padding: '0 18px',
   display: 'inline-flex',
   alignItems: 'center',
@@ -135,7 +134,7 @@ const menuButtonStyle: CSSProperties = {
 };
 
 const darkButtonStyle: CSSProperties = {
-  ...menuButtonStyle,
+  ...buttonStyle,
   background: '#2d1a0b',
   color: '#fffaf0',
   borderColor: '#2d1a0b',
@@ -160,9 +159,9 @@ export default async function RootLayout({
       </head>
 
       <body>
-        <div role="banner" style={topbarStyle}>
-          <div style={topbarInnerStyle}>
-            <Link href={isLoggedIn ? '/dashboard' : '/'} style={brandStyle}>
+        <div role="banner" style={headerStyle}>
+          <div style={innerStyle}>
+            <Link href="/" style={brandStyle}>
               <img
                 src="/brand/icon-mark.png"
                 alt=""
@@ -177,33 +176,51 @@ export default async function RootLayout({
 
               <span style={brandNameStyle}>달동네 출판사</span>
 
-              {!isLoggedIn ? (
-                <small style={brandDescStyle}>
-                  가치있는 삶의 인생책 제작 서비스
-                </small>
-              ) : null}
+              <small style={brandDescStyle}>
+                가치있는 삶의 인생책 제작 서비스
+              </small>
             </Link>
 
-            <nav aria-label="상단 메뉴" style={menuStyle}>
+            <nav aria-label="상단 메뉴" style={navStyle}>
+              <Link href="/" style={linkStyle}>
+                홈
+              </Link>
+
+              <Link href="/guide" style={linkStyle}>
+                이용 가이드
+              </Link>
+
+              <Link href="/dashboard/book" style={linkStyle}>
+                인생책 만들기
+              </Link>
+
+              <Link href="/pricing" style={linkStyle}>
+                상품안내
+              </Link>
+
+              <Link href="/process" style={linkStyle}>
+                제작 과정
+              </Link>
+
+              <Link href="/trial" style={linkStyle}>
+                제작 사례
+              </Link>
+
+              <Link href="/dashboard/book" style={linkStyle}>
+                신청하기
+              </Link>
+
               {isLoggedIn ? (
                 <>
-                  <Link href="/dashboard" style={menuLinkStyle}>
-                    내 작업실
-                  </Link>
-
-                  <Link href="/dashboard/book" style={menuLinkStyle}>
-                    인생책 만들기
-                  </Link>
-
-                  <Link href="/dashboard/library" style={menuLinkStyle}>
-                    내 책장
-                  </Link>
-
                   {isAdmin ? (
-                    <Link href="/admin" style={menuButtonStyle}>
+                    <Link href="/admin" style={buttonStyle}>
                       관리자
                     </Link>
                   ) : null}
+
+                  <Link href="/dashboard/library" style={buttonStyle}>
+                    내 책장
+                  </Link>
 
                   <form
                     action={async () => {
@@ -217,37 +234,15 @@ export default async function RootLayout({
                       flexShrink: 0,
                     }}
                   >
-                    <button type="submit" style={menuButtonStyle}>
+                    <button type="submit" style={buttonStyle}>
                       로그아웃
                     </button>
                   </form>
                 </>
               ) : (
-                <>
-                  <Link href="/" style={menuLinkStyle}>
-                    홈
-                  </Link>
-
-                  <Link href="/guide" style={menuLinkStyle}>
-                    이용 가이드
-                  </Link>
-
-                  <Link href="/pricing" style={menuLinkStyle}>
-                    상품안내
-                  </Link>
-
-                  <Link href="/process" style={menuLinkStyle}>
-                    제작 과정
-                  </Link>
-
-                  <Link href="/trial" style={menuLinkStyle}>
-                    제작 사례
-                  </Link>
-
-                  <Link href="/login" style={darkButtonStyle}>
-                    로그인
-                  </Link>
-                </>
+                <Link href="/login" style={darkButtonStyle}>
+                  로그인
+                </Link>
               )}
             </nav>
           </div>
