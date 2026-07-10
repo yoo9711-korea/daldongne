@@ -1148,3 +1148,106 @@ body > header img {
     color: #fffaf0 !important;
   }
 }
+
+/* ================================
+   상단 메뉴 가로폭 확장 최종 수정
+   ================================ */
+
+.site-header,
+.site-header * {
+  box-sizing: border-box !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+}
+
+.site-header {
+  width: 100% !important;
+}
+
+.site-header__inner {
+  width: 100% !important;
+  max-width: 1480px !important;
+  margin: 0 auto !important;
+  padding-left: 36px !important;
+  padding-right: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 28px !important;
+}
+
+.site-header .brand {
+  min-width: 360px !important;
+  width: 360px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  white-space: nowrap !important;
+}
+
+.site-header .brand span {
+  min-width: max-content !important;
+  white-space: nowrap !important;
+}
+
+.site-header .brand small {
+  min-width: 170px !important;
+  max-width: 190px !important;
+  white-space: normal !important;
+  line-height: 1.35 !important;
+}
+
+.site-nav {
+  flex: 1 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 22px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  white-space: nowrap !important;
+  scrollbar-width: none !important;
+}
+
+.site-nav::-webkit-scrollbar {
+  display: none !important;
+}
+
+.site-nav__links {
+  display: flex !important;
+  align-items: center !important;
+  gap: 28px !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.site-nav a,
+.site-nav button,
+.site-nav__links a {
+  min-width: max-content !important;
+  width: auto !important;
+  max-width: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  line-height: 1.1 !important;
+  writing-mode: horizontal-tb !important;
+}
+
+.site-nav .btn,
+.site-nav button.btn,
+.site-nav a.btn {
+  min-width: 96px !important;
+  height: 48px !important;
+  padding-left: 22px !important;
+  padding-right: 22px !important;
+  font-size: 14px !important;
+  white-space: nowrap !important;
+}
