@@ -8,6 +8,38 @@ export const metadata: Metadata = {
   description: '사진과 글을 모아, 가족의 삶을 한 권의 책으로 만들어드립니다.',
 };
 
+const navLinkStyle: React.CSSProperties = {
+  color: '#3a2414',
+  fontSize: 15,
+  fontWeight: 700,
+  lineHeight: 1.2,
+  letterSpacing: '-0.04em',
+  textDecoration: 'none',
+  whiteSpace: 'nowrap',
+  wordBreak: 'keep-all',
+};
+
+const headerButtonStyle: React.CSSProperties = {
+  minWidth: 78,
+  height: 42,
+  padding: '0 16px',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  border: '1px solid #cdbb9c',
+  borderRadius: 3,
+  background: '#f9f1e3',
+  color: '#2d1a0b',
+  fontSize: 14,
+  fontWeight: 800,
+  lineHeight: 1,
+  letterSpacing: '-0.04em',
+  textDecoration: 'none',
+  whiteSpace: 'nowrap',
+  wordBreak: 'keep-all',
+  cursor: 'pointer',
+};
+
 export default async function RootLayout({
   children,
 }: {
@@ -27,65 +59,144 @@ export default async function RootLayout({
       </head>
 
       <body>
-        <header className="site-header">
-          <div className="site-header__inner">
-            <Link href="/" className="brand" style={{ marginLeft: '-24px' }}>
+                <header
+          style={{
+            width: '100%',
+            borderBottom: '1px solid #e6dcc8',
+            background: '#f7efe0',
+            position: 'sticky',
+            top: 0,
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 1280,
+              margin: '0 auto',
+              minHeight: 74,
+              padding: '10px 28px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 24,
+            }}
+          >
+            <Link
+              href="/"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                minWidth: 300,
+                flexShrink: 0,
+                textDecoration: 'none',
+                color: '#2d1a0b',
+                wordBreak: 'keep-all',
+                whiteSpace: 'nowrap',
+              }}
+            >
               <img
                 src="/brand/icon-mark.png"
                 alt=""
-                className="brand__icon"
-                width={37}
-                height={37}
-                style={{ width: 37, height: 37 }}
+                width={42}
+                height={42}
+                style={{
+                  width: 42,
+                  height: 42,
+                  flexShrink: 0,
+                }}
               />
 
-              <span style={{ fontSize: '115%', lineHeight: 1 }}>
+              <span
+                style={{
+                  fontSize: 22,
+                  fontWeight: 900,
+                  lineHeight: 1.05,
+                  letterSpacing: '-0.05em',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 달동네 출판사
               </span>
 
               <small
                 style={{
-                  fontSize: '80%',
-                  fontWeight: 800,
-                  lineHeight: 1.25,
                   display: 'inline-block',
+                  fontSize: 13,
+                  fontWeight: 800,
+                  lineHeight: 1.35,
+                  letterSpacing: '0.08em',
+                  color: '#a56518',
+                  whiteSpace: 'normal',
+                  wordBreak: 'keep-all',
+                  maxWidth: 150,
                 }}
               >
-                가치있는 삶의
-                <br />
-                인생책 제작 서비스
+                가치있는 삶의 인생책 제작 서비스
               </small>
             </Link>
 
-            <nav className="site-nav">
-           
-            <div className="site-nav__links">
-               <Link href="/">홈</Link>
-               <Link href="/guide">이용 가이드</Link>
-               <Link href="/dashboard/book">인생책 만들기</Link>
-               <Link href="/pricing">상품안내</Link>
-               <Link href="/process">제작 과정</Link>
-               <Link href="/trial">제작 사례</Link>
-               <Link href="/dashboard/book">신청하기</Link>
-            </div>
+            <nav
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: 18,
+                flex: 1,
+                minWidth: 0,
+                overflowX: 'auto',
+                scrollbarWidth: 'none',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 22,
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <Link href="/" style={navLinkStyle}>
+                  홈
+                </Link>
+                <Link href="/guide" style={navLinkStyle}>
+                  이용 가이드
+                </Link>
+                <Link href="/dashboard/book" style={navLinkStyle}>
+                  인생책 만들기
+                </Link>
+                <Link href="/pricing" style={navLinkStyle}>
+                  상품안내
+                </Link>
+                <Link href="/process" style={navLinkStyle}>
+                  제작 과정
+                </Link>
+                <Link href="/trial" style={navLinkStyle}>
+                  제작 사례
+                </Link>
+                <Link href="/dashboard/book" style={navLinkStyle}>
+                  신청하기
+                </Link>
+              </div>
 
               {session?.user ? (
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  {session.user.email === process.env.ADMIN_EMAIL ? (
-                    <Link
-                      href="/admin"
-                      className="btn btn--ghost-light"
-                      style={{ padding: '9px 16px', fontSize: 13.5 }}
-                    >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    flexShrink: 0,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {(session.user as { role?: string }).role === 'ADMIN' ? (
+                    <Link href="/admin" style={headerButtonStyle}>
                       관리자
                     </Link>
                   ) : null}
 
-                  <Link
-                    href="/dashboard"
-                    className="btn btn--ghost-light"
-                    style={{ padding: '9px 16px', fontSize: 13.5 }}
-                  >
+                  <Link href="/dashboard" style={headerButtonStyle}>
                     내 책장
                   </Link>
 
@@ -94,12 +205,9 @@ export default async function RootLayout({
                       'use server';
                       await signOut({ redirectTo: '/' });
                     }}
+                    style={{ margin: 0 }}
                   >
-                    <button
-                      type="submit"
-                      className="btn btn--ghost-light"
-                      style={{ padding: '9px 16px', fontSize: 13.5 }}
-                    >
+                    <button type="submit" style={headerButtonStyle}>
                       로그아웃
                     </button>
                   </form>
@@ -107,8 +215,12 @@ export default async function RootLayout({
               ) : (
                 <Link
                   href="/login"
-                  className="btn btn--gold"
-                  style={{ padding: '9px 16px', fontSize: 13.5 }}
+                  style={{
+                    ...headerButtonStyle,
+                    background: '#2d1a0b',
+                    color: '#fffaf0',
+                    borderColor: '#2d1a0b',
+                  }}
                 >
                   로그인
                 </Link>
