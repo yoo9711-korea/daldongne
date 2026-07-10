@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
+
 import { auth, signOut } from '@/auth';
 import './globals.css';
 
@@ -8,7 +10,7 @@ export const metadata: Metadata = {
   description: '사진과 글을 모아, 가족의 삶을 한 권의 책으로 만들어드립니다.',
 };
 
-const navLinkStyle: React.CSSProperties = {
+const navLinkStyle: CSSProperties = {
   color: '#3a2414',
   fontSize: 15,
   fontWeight: 700,
@@ -19,15 +21,15 @@ const navLinkStyle: React.CSSProperties = {
   wordBreak: 'keep-all',
 };
 
-const headerButtonStyle: React.CSSProperties = {
-  minWidth: 78,
-  height: 42,
-  padding: '0 16px',
+const headerButtonStyle: CSSProperties = {
+  minWidth: 76,
+  height: 40,
+  padding: '0 14px',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   border: '1px solid #cdbb9c',
-  borderRadius: 3,
+  borderRadius: 4,
   background: '#f9f1e3',
   color: '#2d1a0b',
   fontSize: 14,
@@ -46,20 +48,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
+  const isAdmin = (session?.user as { role?: string } | undefined)?.role === 'ADMIN';
 
   return (
     <html lang="ko">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
           rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
         />
       </head>
 
       <body>
-                <header
+        <header
           style={{
             width: '100%',
             borderBottom: '1px solid #e6dcc8',
@@ -73,12 +74,12 @@ export default async function RootLayout({
             style={{
               maxWidth: 1280,
               margin: '0 auto',
-              minHeight: 74,
-              padding: '10px 28px',
+              minHeight: 72,
+              padding: '10px 24px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: 24,
+              gap: 18,
             }}
           >
             <Link
@@ -87,7 +88,7 @@ export default async function RootLayout({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                minWidth: 300,
+                minWidth: session?.user ? 230 : 300,
                 flexShrink: 0,
                 textDecoration: 'none',
                 color: '#2d1a0b',
@@ -98,18 +99,18 @@ export default async function RootLayout({
               <img
                 src="/brand/icon-mark.png"
                 alt=""
-                width={42}
-                height={42}
+                width={40}
+                height={40}
                 style={{
-                  width: 42,
-                  height: 42,
+                  width: 40,
+                  height: 40,
                   flexShrink: 0,
                 }}
               />
 
               <span
                 style={{
-                  fontSize: 22,
+                  fontSize: 21,
                   fontWeight: 900,
                   lineHeight: 1.05,
                   letterSpacing: '-0.05em',
@@ -119,21 +120,23 @@ export default async function RootLayout({
                 달동네 출판사
               </span>
 
-              <small
-                style={{
-                  display: 'inline-block',
-                  fontSize: 13,
-                  fontWeight: 800,
-                  lineHeight: 1.35,
-                  letterSpacing: '0.08em',
-                  color: '#a56518',
-                  whiteSpace: 'normal',
-                  wordBreak: 'keep-all',
-                  maxWidth: 150,
-                }}
-              >
-                가치있는 삶의 인생책 제작 서비스
-              </small>
+              {!session?.user ? (
+                <small
+                  style={{
+                    display: 'inline-block',
+                    fontSize: 13,
+                    fontWeight: 800,
+                    lineHeight: 1.35,
+                    letterSpacing: '0.08em',
+                    color: '#a56518',
+                    whiteSpace: 'normal',
+                    wordBreak: 'keep-all',
+                    maxWidth: 150,
+                  }}
+                >
+                  가치있는 삶의 인생책 제작 서비스
+                </small>
+              ) : null}
             </Link>
 
             <nav
@@ -141,7 +144,7 @@ export default async function RootLayout({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-end',
-                gap: 18,
+                gap: session?.user ? 14 : 18,
                 flex: 1,
                 minWidth: 0,
                 overflowX: 'auto',
@@ -152,7 +155,7 @@ export default async function RootLayout({
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 22,
+                  gap: session?.user ? 18 : 22,
                   flexShrink: 0,
                   whiteSpace: 'nowrap',
                 }}
@@ -160,24 +163,31 @@ export default async function RootLayout({
                 <Link href="/" style={navLinkStyle}>
                   홈
                 </Link>
+
                 <Link href="/guide" style={navLinkStyle}>
                   이용 가이드
                 </Link>
+
                 <Link href="/dashboard/book" style={navLinkStyle}>
                   인생책 만들기
                 </Link>
-                <Link href="/pricing" style={navLinkStyle}>
-                  상품안내
-                </Link>
-                <Link href="/process" style={navLinkStyle}>
-                  제작 과정
-                </Link>
-                <Link href="/trial" style={navLinkStyle}>
-                  제작 사례
-                </Link>
-                <Link href="/dashboard/book" style={navLinkStyle}>
-                  신청하기
-                </Link>
+
+                {!session?.user ? (
+                  <>
+                    <Link href="/pricing" style={navLinkStyle}>
+                      상품안내
+                    </Link>
+                    <Link href="/process" style={navLinkStyle}>
+                      제작 과정
+                    </Link>
+                    <Link href="/trial" style={navLinkStyle}>
+                      제작 사례
+                    </Link>
+                    <Link href="/dashboard/book" style={navLinkStyle}>
+                      신청하기
+                    </Link>
+                  </>
+                ) : null}
               </div>
 
               {session?.user ? (
@@ -185,12 +195,12 @@ export default async function RootLayout({
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 10,
+                    gap: 8,
                     flexShrink: 0,
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {(session.user as { role?: string }).role === 'ADMIN' ? (
+                  {isAdmin ? (
                     <Link href="/admin" style={headerButtonStyle}>
                       관리자
                     </Link>
