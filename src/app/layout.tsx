@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { auth, signOut } from '@/auth';
 import './globals.css';
@@ -37,14 +37,13 @@ const headerStyle: CSSProperties = {
   background: '#f7efe0',
 };
 
-const headerInnerStyle: CSSProperties = {
+const innerStyle: CSSProperties = {
   width: '100%',
-  maxWidth: 1240,
+  maxWidth: 1180,
   minHeight: 64,
   margin: '0 auto',
   padding: '8px 14px',
   display: 'flex',
-  flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: 12,
@@ -53,7 +52,6 @@ const headerInnerStyle: CSSProperties = {
 
 const brandStyle: CSSProperties = {
   display: 'flex',
-  flexDirection: 'row',
   alignItems: 'center',
   gap: 8,
   flexShrink: 0,
@@ -63,19 +61,17 @@ const brandStyle: CSSProperties = {
 };
 
 const brandNameStyle: CSSProperties = {
-  display: 'inline-block',
   color: '#2d1a0b',
-  fontSize: 19,
+  fontSize: 20,
   fontWeight: 900,
   lineHeight: 1,
   letterSpacing: '-0.06em',
   whiteSpace: 'nowrap',
 };
 
-const navStyle: CSSProperties = {
+const menuStyle: CSSProperties = {
   minWidth: 0,
   display: 'flex',
-  flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'flex-end',
   gap: 8,
@@ -85,33 +81,14 @@ const navStyle: CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
-const navLinkStyle: CSSProperties = {
-  height: 36,
-  padding: '0 10px',
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
-  color: '#2d1a0b',
-  fontSize: 14,
-  fontWeight: 800,
-  lineHeight: 1,
-  letterSpacing: '-0.04em',
-  textDecoration: 'none',
-  whiteSpace: 'nowrap',
-  borderRadius: 999,
-};
-
-const navButtonStyle: CSSProperties = {
-  height: 36,
+const linkStyle: CSSProperties = {
+  height: 38,
   padding: '0 12px',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
-  border: '1px solid #d6c3a2',
   borderRadius: 999,
-  background: '#fff8eb',
   color: '#2d1a0b',
   fontSize: 14,
   fontWeight: 850,
@@ -119,13 +96,26 @@ const navButtonStyle: CSSProperties = {
   letterSpacing: '-0.04em',
   textDecoration: 'none',
   whiteSpace: 'nowrap',
+};
+
+const buttonStyle: CSSProperties = {
+  ...linkStyle,
+  border: '1px solid #d6c3a2',
+  background: '#fff8eb',
   cursor: 'pointer',
+};
+
+const darkButtonStyle: CSSProperties = {
+  ...buttonStyle,
+  background: '#2d1a0b',
+  color: '#fffaf0',
+  borderColor: '#2d1a0b',
 };
 
 export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const session = await auth();
   const isLoggedIn = Boolean(session?.user);
@@ -141,8 +131,8 @@ export default async function RootLayout({
       </head>
 
       <body>
-        <header style={headerStyle}>
-          <div style={headerInnerStyle}>
+        <header className="dd-safe-header" style={headerStyle}>
+          <div className="dd-safe-header__inner" style={innerStyle}>
             <Link href={isLoggedIn ? '/dashboard' : '/'} style={brandStyle}>
               <img
                 src="/brand/icon-mark.png"
@@ -155,26 +145,27 @@ export default async function RootLayout({
                   flexShrink: 0,
                 }}
               />
+
               <span style={brandNameStyle}>달동네 출판사</span>
             </Link>
 
-            <nav className="top-desktop-nav" style={navStyle} aria-label="상단 메뉴">
+            <div className="dd-safe-menu" style={menuStyle}>
               {isLoggedIn ? (
                 <>
-                  <Link href="/dashboard" style={navLinkStyle}>
+                  <Link href="/dashboard" style={linkStyle}>
                     내 작업실
                   </Link>
 
-                  <Link href="/dashboard/book" style={navLinkStyle}>
+                  <Link href="/dashboard/book" style={linkStyle}>
                     인생책 만들기
                   </Link>
 
-                  <Link href="/dashboard/library" style={navLinkStyle}>
+                  <Link href="/dashboard/library" style={linkStyle}>
                     내 책장
                   </Link>
 
                   {isAdmin ? (
-                    <Link href="/admin" style={navLinkStyle}>
+                    <Link href="/admin" style={linkStyle}>
                       관리자
                     </Link>
                   ) : null}
@@ -191,97 +182,35 @@ export default async function RootLayout({
                       flexShrink: 0,
                     }}
                   >
-                    <button type="submit" style={navButtonStyle}>
+                    <button type="submit" style={buttonStyle}>
                       로그아웃
                     </button>
                   </form>
                 </>
               ) : (
                 <>
-                  <Link href="/" style={navLinkStyle}>
+                  <Link href="/" style={linkStyle}>
                     홈
                   </Link>
 
-                  <Link href="/guide" style={navLinkStyle}>
+                  <Link href="/guide" style={linkStyle}>
                     이용 가이드
                   </Link>
 
-                  <Link href="/pricing" style={navLinkStyle}>
+                  <Link href="/pricing" style={linkStyle}>
                     상품안내
                   </Link>
 
-                  <Link
-                    href="/login"
-                    style={{
-                      ...navButtonStyle,
-                      background: '#2d1a0b',
-                      color: '#fffaf0',
-                      borderColor: '#2d1a0b',
-                    }}
-                  >
+                  <Link href="/login" style={darkButtonStyle}>
                     로그인
                   </Link>
                 </>
               )}
-            </nav>
+            </div>
           </div>
         </header>
 
         {children}
-
-        <nav className="mobile-bottom-nav" aria-label="모바일 하단 메뉴">
-          {isLoggedIn ? (
-            <>
-              <Link href="/dashboard" className="mobile-bottom-nav__item">
-                작업실
-              </Link>
-
-              <Link href="/dashboard/book" className="mobile-bottom-nav__item">
-                인생책
-              </Link>
-
-              <Link href="/dashboard/library" className="mobile-bottom-nav__item">
-                책장
-              </Link>
-
-              {isAdmin ? (
-                <Link href="/admin" className="mobile-bottom-nav__item">
-                  관리자
-                </Link>
-              ) : null}
-
-              <form
-                action={async () => {
-                  'use server';
-                  await signOut({ redirectTo: '/' });
-                }}
-                className="mobile-bottom-nav__form"
-              >
-                <button type="submit" className="mobile-bottom-nav__item">
-                  로그아웃
-                </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <Link href="/" className="mobile-bottom-nav__item">
-                홈
-              </Link>
-
-              <Link href="/guide" className="mobile-bottom-nav__item">
-                가이드
-              </Link>
-
-              <Link href="/pricing" className="mobile-bottom-nav__item">
-                상품
-              </Link>
-
-              <Link href="/login" className="mobile-bottom-nav__item mobile-bottom-nav__item--dark">
-                로그인
-              </Link>
-            </>
-          )}
-        </nav>
       </body>
     </html>
   );
