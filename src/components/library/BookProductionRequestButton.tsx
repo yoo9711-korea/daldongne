@@ -74,7 +74,7 @@ export default function BookProductionRequestButton({
       return;
     }
 
-        if (!phone.trim() && !email.trim()) {
+         if (!phone.trim() && !email.trim()) {
       alert('연락처 또는 이메일 중 하나는 입력해 주세요.');
       return;
     }
@@ -84,7 +84,7 @@ export default function BookProductionRequestButton({
       return;
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true);  
 
     try {
       const response = await fetch('/api/book/production-request', {
@@ -425,7 +425,55 @@ export default function BookProductionRequestButton({
               }}
             />
 
-                       <label
+                        <label
+              style={{
+                marginTop: 18,
+                padding: 16,
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 12,
+                borderRadius: 16,
+                border: '1px solid #ead7b4',
+                background: '#fff8eb',
+                color: '#4a3828',
+                fontSize: 14,
+                lineHeight: 1.7,
+                cursor: 'pointer',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={privacyAgreed}
+                onChange={(event) => setPrivacyAgreed(event.target.checked)}
+                style={{
+                  marginTop: 4,
+                  width: 18,
+                  height: 18,
+                  flexShrink: 0,
+                }}
+              />
+
+              <span>
+                제작 상담 접수를 위해 이름, 연락처, 이메일, 요청 내용을 수집·이용하는
+                것에 동의합니다. 상담 정보는 제작 상담 및 고객 연락 목적으로 사용됩니다.{' '}
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    color: '#6b3f18',
+                    fontWeight: 900,
+                    textDecoration: 'underline',
+                    textUnderlineOffset: 3,
+                  }}
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  개인정보처리방침 보기
+                </a>
+              </span>
+            </label> 
+
+              <label
               style={{
                 marginTop: 18,
                 padding: 16,
