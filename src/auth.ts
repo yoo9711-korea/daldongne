@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   debug: false,
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma as never),
 
   providers: [
     Kakao({

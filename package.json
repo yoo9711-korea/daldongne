@@ -22,7 +22,8 @@
     "openai": "^6.45.0",
     "react": "19.2.1",
     "react-dom": "19.2.1",
-    "resend": "^6.16.0"
+    "resend": "^6.16.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "22.7.5",
