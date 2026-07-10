@@ -248,7 +248,57 @@ export default async function RootLayout({
           </div>
         </div>
 
-        {children}
+                {children}
+
+        <footer
+          style={{
+            padding: '34px 20px 42px',
+            borderTop: '1px solid #e2d4bb',
+            background: '#f7efe0',
+            color: '#6a4a2b',
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: 1500,
+              margin: '0 auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 16,
+              flexWrap: 'wrap',
+              fontSize: 13,
+              lineHeight: 1.7,
+            }}
+          >
+            <p style={{ margin: 0 }}>
+              © 달동네 출판사. 사진과 이야기를 모아 삶의 기록을 만듭니다.
+            </p>
+
+            <nav
+              aria-label="하단 정책 메뉴"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                flexWrap: 'wrap',
+              }}
+            >
+              <Link
+                href="/privacy"
+                style={{
+                  color: '#5a3510',
+                  fontWeight: 900,
+                  textDecoration: 'underline',
+                  textUnderlineOffset: 3,
+                }}
+              >
+                개인정보처리방침
+              </Link>
+            </nav>
+          </div>
+        </footer>
       </body>
     </html>
   );
