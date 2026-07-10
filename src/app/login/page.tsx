@@ -43,8 +43,29 @@ export default async function LoginPage({
           </form>
         </div>
 
-        <p style={{ marginTop: 24, fontSize: 12, color: 'var(--ink-faint)' }}>
+                <p
+          style={{
+            marginTop: 24,
+            fontSize: 12,
+            lineHeight: 1.7,
+            color: 'var(--ink-faint)',
+          }}
+        >
           로그인하면 실제 데이터베이스에 계정이 생성됩니다.
+          <br />
+          계속 진행하면{' '}
+          <a
+            href="/privacy"
+            style={{
+              color: '#6b3f18',
+              fontWeight: 900,
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+            }}
+          >
+            개인정보처리방침
+          </a>
+          에 동의한 것으로 봅니다.
         </p>
       </div>
     </main>
