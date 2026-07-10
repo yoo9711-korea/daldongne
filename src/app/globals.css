@@ -815,3 +815,147 @@ header a[role='button'] {
     flex-shrink: 0;
   }
 }
+
+/* ================================
+   달동네 최종 상단 메뉴 안정화
+   ================================ */
+
+.dd-header,
+.dd-header * {
+  box-sizing: border-box !important;
+  word-break: keep-all !important;
+}
+
+.dd-header {
+  width: 100% !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 999 !important;
+  border-bottom: 1px solid #e6dcc8 !important;
+  background: #f7efe0 !important;
+}
+
+.dd-header-inner {
+  width: 100% !important;
+  max-width: 1240px !important;
+  min-height: 66px !important;
+  margin: 0 auto !important;
+  padding: 10px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+}
+
+.dd-brand {
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  flex-shrink: 0 !important;
+  color: #2d1a0b !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.dd-brand-icon {
+  width: 38px !important;
+  height: 38px !important;
+  flex-shrink: 0 !important;
+}
+
+.dd-brand-name {
+  display: inline-block !important;
+  color: #2d1a0b !important;
+  font-size: 21px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.06em !important;
+  white-space: nowrap !important;
+}
+
+.dd-nav {
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex: 1 !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: none !important;
+  white-space: nowrap !important;
+}
+
+.dd-nav::-webkit-scrollbar {
+  display: none !important;
+}
+
+.dd-nav-link,
+.dd-nav-button {
+  height: 38px !important;
+  min-width: auto !important;
+  padding: 0 13px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  border-radius: 999px !important;
+  border: 1px solid #d6c3a2 !important;
+  background: #fff8eb !important;
+  color: #2d1a0b !important;
+  font-size: 14px !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.04em !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+
+.dd-nav-link {
+  border-color: transparent !important;
+  background: transparent !important;
+}
+
+.dd-nav-button-dark {
+  background: #2d1a0b !important;
+  color: #fffaf0 !important;
+  border-color: #2d1a0b !important;
+}
+
+.dd-logout-form {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  flex-shrink: 0 !important;
+}
+
+@media (max-width: 760px) {
+  .dd-header-inner {
+    min-height: 60px !important;
+    padding: 8px 10px !important;
+    gap: 8px !important;
+  }
+
+  .dd-brand-icon {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .dd-brand-name {
+    font-size: 17px !important;
+  }
+
+  .dd-nav {
+    gap: 6px !important;
+    justify-content: flex-start !important;
+  }
+
+  .dd-nav-link,
+  .dd-nav-button {
+    height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 13px !important;
+  }
+}

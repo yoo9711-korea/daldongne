@@ -46,157 +46,72 @@ export default async function RootLayout({
       </head>
 
       <body>
-        <header className="app-header">
-          <div className="app-header__inner">
-            <Link href="/" className="app-brand">
+        <header className="dd-header">
+          <div className="dd-header-inner">
+            <Link href={isLoggedIn ? '/dashboard' : '/'} className="dd-brand">
               <img
                 src="/brand/icon-mark.png"
                 alt=""
-                width={40}
-                height={40}
-                className="app-brand__icon"
+                width={38}
+                height={38}
+                className="dd-brand-icon"
               />
-
-              <span className="app-brand__name">달동네 출판사</span>
-
-              {!isLoggedIn ? (
-                <small className="app-brand__desc">
-                  가치있는 삶의 인생책 제작 서비스
-                </small>
-              ) : null}
+              <span className="dd-brand-name">달동네 출판사</span>
             </Link>
 
-            <nav className="app-nav app-nav--desktop" aria-label="상단 메뉴">
-              <Link href="/" className="app-nav__link">
-                홈
-              </Link>
-
-              <Link href="/guide" className="app-nav__link">
-                이용 가이드
-              </Link>
-
-              <Link href="/dashboard/book" className="app-nav__link">
-                인생책 만들기
-              </Link>
-
-              {!isLoggedIn ? (
-                <>
-                  <Link href="/pricing" className="app-nav__link">
-                    상품안내
-                  </Link>
-                  <Link href="/process" className="app-nav__link">
-                    제작 과정
-                  </Link>
-                  <Link href="/trial" className="app-nav__link">
-                    제작 사례
-                  </Link>
-                  <Link href="/dashboard/book" className="app-nav__link">
-                    신청하기
-                  </Link>
-                </>
-              ) : null}
-
+            <nav className="dd-nav" aria-label="상단 메뉴">
               {isLoggedIn ? (
                 <>
+                  <Link href="/dashboard" className="dd-nav-link">
+                    내 작업실
+                  </Link>
+
+                  <Link href="/dashboard/book" className="dd-nav-link">
+                    인생책 만들기
+                  </Link>
+
+                  <Link href="/dashboard/library" className="dd-nav-link">
+                    내 책장
+                  </Link>
+
                   {isAdmin ? (
-                    <Link href="/admin" className="app-nav__button">
+                    <Link href="/admin" className="dd-nav-link">
                       관리자
                     </Link>
                   ) : null}
-
-                  <Link href="/dashboard" className="app-nav__button">
-                    내 책장
-                  </Link>
 
                   <form
                     action={async () => {
                       'use server';
                       await signOut({ redirectTo: '/' });
                     }}
+                    className="dd-logout-form"
                   >
-                    <button type="submit" className="app-nav__button">
+                    <button type="submit" className="dd-nav-button">
                       로그아웃
                     </button>
                   </form>
                 </>
               ) : (
-                <Link href="/login" className="app-nav__button app-nav__button--dark">
-                  로그인
-                </Link>
+                <>
+                  <Link href="/" className="dd-nav-link">
+                    홈
+                  </Link>
+
+                  <Link href="/guide" className="dd-nav-link">
+                    이용 가이드
+                  </Link>
+
+                  <Link href="/pricing" className="dd-nav-link">
+                    상품안내
+                  </Link>
+
+                  <Link href="/login" className="dd-nav-button dd-nav-button-dark">
+                    로그인
+                  </Link>
+                </>
               )}
             </nav>
-
-            <details className="mobile-menu">
-              <summary className="mobile-menu__button">
-                <span>메뉴</span>
-                <strong>☰</strong>
-              </summary>
-
-              <div className="mobile-menu__panel">
-                <Link href="/" className="mobile-menu__link">
-                  홈
-                </Link>
-
-                <Link href="/guide" className="mobile-menu__link">
-                  이용 가이드
-                </Link>
-
-                <Link href="/dashboard/book" className="mobile-menu__link">
-                  인생책 만들기
-                </Link>
-
-                {isLoggedIn ? (
-                  <>
-                    <Link href="/dashboard" className="mobile-menu__link">
-                      내 작업실
-                    </Link>
-
-                    <Link href="/dashboard/library" className="mobile-menu__link">
-                      내 책장
-                    </Link>
-
-                    <Link href="/dashboard/interview" className="mobile-menu__link">
-                      사진·이야기
-                    </Link>
-
-                    {isAdmin ? (
-                      <Link href="/admin" className="mobile-menu__link">
-                        관리자
-                      </Link>
-                    ) : null}
-
-                    <form
-                      action={async () => {
-                        'use server';
-                        await signOut({ redirectTo: '/' });
-                      }}
-                    >
-                      <button type="submit" className="mobile-menu__logout">
-                        로그아웃
-                      </button>
-                    </form>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/pricing" className="mobile-menu__link">
-                      상품안내
-                    </Link>
-
-                    <Link href="/process" className="mobile-menu__link">
-                      제작 과정
-                    </Link>
-
-                    <Link href="/trial" className="mobile-menu__link">
-                      제작 사례
-                    </Link>
-
-                    <Link href="/login" className="mobile-menu__login">
-                      로그인
-                    </Link>
-                  </>
-                )}
-              </div>
-            </details>
           </div>
         </header>
 
