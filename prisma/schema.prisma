@@ -26,6 +26,24 @@ model User {
   @@map("users")
 }
 
+model BookProductionRequest {
+  id        String                  @id @default(cuid())
+  bookId    String
+  authorId  String
+  name      String?
+  phone     String?
+  email     String?
+  message   String?
+  status    ProductionRequestStatus @default(REQUESTED)
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+
+  @@index([bookId])
+  @@index([authorId])
+  @@index([status])
+  @@map("book_production_requests")
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -103,24 +121,49 @@ model Memory {
   familyId    String?
   author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   family      Family?    @relation(fields: [familyId], references: [id])
+  bookMemories BookMemory[]
 
   @@index([authorId, occurredAt])
   @@map("memories")
 }
 
 model Book {
-  id        String     @id @default(cuid())
-  authorId  String
-  type      BookType
-  title     String
-  status    BookStatus @default(DRAFT)
-  pageCount Int?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id              String       @id @default(cuid())
+  authorId        String
+  type            BookType
+  title           String
+  subtitle        String?
+  summary         String?
+  content         String?
+  coverText       String?
+  status          BookStatus   @default(DRAFT)
+  pageCount       Int?
+  basedPhotoCount Int?
+  basedStoryCount Int?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  author          User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  bookMemories    BookMemory[]
 
   @@index([authorId])
   @@map("books")
+}
+
+model BookMemory {
+  id        String   @id @default(cuid())
+  bookId    String
+  memoryId  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  memory    Memory   @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, memoryId])
+  @@index([bookId])
+  @@index([memoryId])
+  @@map("book_memories")
 }
 
 model FamilyInvitation {
@@ -184,6 +227,14 @@ enum BookStatus {
   DRAFT
   IN_PRODUCTION
   PUBLISHED
+}
+
+enum ProductionRequestStatus {
+  REQUESTED
+  CONTACTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
 }
 
 enum CapsuleStatus {

@@ -8,6 +8,7 @@ const NAV = [
   { href: '/admin', label: '대시보드' },
   { href: '/admin/users', label: '회원 관리' },
   { href: '/admin/inquiries', label: '가족 공간 관리' },
+  { href: '/admin/production-requests', label: '제작 상담' },
 ];
 
 export default async function AdminLayout({

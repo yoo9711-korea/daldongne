@@ -19,13 +19,38 @@ export default async function AdminDashboard() {
     redirect('/dashboard');
   }
 
-  const [totalUsers, totalMemories, totalFamilies, totalBooks, recentUsers] =
-    await Promise.all([
-      prisma.user.count(),
-      prisma.memory.count(),
-      prisma.family.count(),
-      prisma.book.count(),
-      prisma.user.findMany({
+    const [
+    totalUsers,
+    totalMemories,
+    totalFamilies,
+    totalBooks,
+    totalProductionRequests,
+    requestedProductionRequests,
+    inProgressProductionRequests,
+    completedProductionRequests,
+    recentUsers,
+  ] = await Promise.all([
+    prisma.user.count(),
+    prisma.memory.count(),
+    prisma.family.count(),
+    prisma.book.count(),
+    prisma.bookProductionRequest.count(),
+    prisma.bookProductionRequest.count({
+      where: {
+        status: 'REQUESTED',
+      },
+    }),
+    prisma.bookProductionRequest.count({
+      where: {
+        status: 'IN_PROGRESS',
+      },
+    }),
+    prisma.bookProductionRequest.count({
+      where: {
+        status: 'COMPLETED',
+      },
+    }),
+    prisma.user.findMany({
         orderBy: { createdAt: 'desc' },
         take: 5,
         select: {
@@ -38,11 +63,35 @@ export default async function AdminDashboard() {
       }),
     ]);
 
-  const stats = [
+    const stats = [
     { label: '전체 회원', value: totalUsers, unit: '명', color: 'var(--wine)' },
     { label: '저장된 기록', value: totalMemories, unit: '개', color: 'var(--gold)' },
     { label: '가족 공간', value: totalFamilies, unit: '개', color: '#2E3F52' },
-    { label: '출판된 작품', value: totalBooks, unit: '권', color: '#5C6B4F' },
+    { label: '책 원고', value: totalBooks, unit: '권', color: '#7B4F2A' },
+    {
+      label: '제작 상담',
+      value: totalProductionRequests,
+      unit: '건',
+      color: '#6D3B1F',
+    },
+    {
+      label: '상담 접수',
+      value: requestedProductionRequests,
+      unit: '건',
+      color: '#9A6A24',
+    },
+    {
+      label: '상담 진행',
+      value: inProgressProductionRequests,
+      unit: '건',
+      color: '#2E3F52',
+    },
+    {
+      label: '상담 완료',
+      value: completedProductionRequests,
+      unit: '건',
+      color: '#3E5F3A',
+    },
   ];
 
   return (
@@ -58,6 +107,35 @@ export default async function AdminDashboard() {
       <p style={{ color: 'var(--ink-soft)', marginBottom: 40 }}>
         달동네 출판사 플랫폼의 회원, 기록, 가족 공간, 작품 현황을 확인합니다.
       </p>
+
+             <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 10,
+          marginBottom: 28,
+        }}
+      >
+        <a
+          href="/admin/production-requests"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 42,
+            padding: '0 18px',
+            borderRadius: 999,
+            border: '1px solid var(--wine)',
+            background: 'var(--wine)',
+            color: 'var(--cream)',
+            fontSize: 14,
+            fontWeight: 900,
+            textDecoration: 'none',
+          }}
+        >
+          제작 상담 신청 보기
+        </a>
+      </div>
 
       <div
         style={{
