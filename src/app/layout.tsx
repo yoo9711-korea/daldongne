@@ -28,85 +28,114 @@ export const viewport: Viewport = {
   themeColor: '#6b3f18',
 };
 
-const headerStyle: CSSProperties = {
+const topbarStyle: CSSProperties = {
   width: '100%',
   position: 'sticky',
   top: 0,
-  zIndex: 999,
-  borderBottom: '1px solid #e6dcc8',
+  zIndex: 9999,
   background: '#f7efe0',
+  borderBottom: '1px solid #e2d4bb',
 };
 
-const innerStyle: CSSProperties = {
+const topbarInnerStyle: CSSProperties = {
   width: '100%',
-  maxWidth: 1180,
-  minHeight: 64,
+  maxWidth: 1420,
+  minHeight: 68,
   margin: '0 auto',
-  padding: '8px 14px',
+  padding: '10px 28px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: 12,
+  gap: 28,
   boxSizing: 'border-box',
 };
 
 const brandStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: 8,
+  gap: 10,
   flexShrink: 0,
-  color: '#2d1a0b',
   textDecoration: 'none',
+  color: '#2d1a0b',
   whiteSpace: 'nowrap',
 };
 
 const brandNameStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
   color: '#2d1a0b',
-  fontSize: 20,
+  fontSize: 22,
   fontWeight: 900,
   lineHeight: 1,
   letterSpacing: '-0.06em',
   whiteSpace: 'nowrap',
+  wordBreak: 'keep-all',
+};
+
+const brandDescStyle: CSSProperties = {
+  display: 'inline-block',
+  maxWidth: 180,
+  color: '#a56518',
+  fontSize: 14,
+  fontWeight: 800,
+  lineHeight: 1.35,
+  letterSpacing: '0.08em',
+  wordBreak: 'keep-all',
 };
 
 const menuStyle: CSSProperties = {
-  minWidth: 0,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
-  gap: 8,
+  gap: 18,
   flex: 1,
+  minWidth: 0,
   overflowX: 'auto',
   overflowY: 'hidden',
   whiteSpace: 'nowrap',
 };
 
-const linkStyle: CSSProperties = {
-  height: 38,
-  padding: '0 12px',
+const menuLinkStyle: CSSProperties = {
+  height: 40,
+  padding: '0 10px',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
-  borderRadius: 999,
   color: '#2d1a0b',
-  fontSize: 14,
-  fontWeight: 850,
+  fontSize: 15,
+  fontWeight: 800,
   lineHeight: 1,
   letterSpacing: '-0.04em',
   textDecoration: 'none',
   whiteSpace: 'nowrap',
+  wordBreak: 'keep-all',
 };
 
-const buttonStyle: CSSProperties = {
-  ...linkStyle,
-  border: '1px solid #d6c3a2',
+const menuButtonStyle: CSSProperties = {
+  height: 42,
+  minWidth: 92,
+  padding: '0 18px',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  border: '1px solid #cdbb9c',
+  borderRadius: 4,
   background: '#fff8eb',
+  color: '#2d1a0b',
+  fontSize: 15,
+  fontWeight: 900,
+  lineHeight: 1,
+  letterSpacing: '-0.04em',
+  textDecoration: 'none',
+  whiteSpace: 'nowrap',
+  wordBreak: 'keep-all',
   cursor: 'pointer',
 };
 
 const darkButtonStyle: CSSProperties = {
-  ...buttonStyle,
+  ...menuButtonStyle,
   background: '#2d1a0b',
   color: '#fffaf0',
   borderColor: '#2d1a0b',
@@ -131,41 +160,47 @@ export default async function RootLayout({
       </head>
 
       <body>
-        <header className="dd-safe-header" style={headerStyle}>
-          <div className="dd-safe-header__inner" style={innerStyle}>
+        <div role="banner" style={topbarStyle}>
+          <div style={topbarInnerStyle}>
             <Link href={isLoggedIn ? '/dashboard' : '/'} style={brandStyle}>
               <img
                 src="/brand/icon-mark.png"
                 alt=""
-                width={36}
-                height={36}
+                width={42}
+                height={42}
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 42,
+                  height: 42,
                   flexShrink: 0,
                 }}
               />
 
               <span style={brandNameStyle}>달동네 출판사</span>
+
+              {!isLoggedIn ? (
+                <small style={brandDescStyle}>
+                  가치있는 삶의 인생책 제작 서비스
+                </small>
+              ) : null}
             </Link>
 
-            <div className="dd-safe-menu" style={menuStyle}>
+            <nav aria-label="상단 메뉴" style={menuStyle}>
               {isLoggedIn ? (
                 <>
-                  <Link href="/dashboard" style={linkStyle}>
+                  <Link href="/dashboard" style={menuLinkStyle}>
                     내 작업실
                   </Link>
 
-                  <Link href="/dashboard/book" style={linkStyle}>
+                  <Link href="/dashboard/book" style={menuLinkStyle}>
                     인생책 만들기
                   </Link>
 
-                  <Link href="/dashboard/library" style={linkStyle}>
+                  <Link href="/dashboard/library" style={menuLinkStyle}>
                     내 책장
                   </Link>
 
                   {isAdmin ? (
-                    <Link href="/admin" style={linkStyle}>
+                    <Link href="/admin" style={menuButtonStyle}>
                       관리자
                     </Link>
                   ) : null}
@@ -182,23 +217,31 @@ export default async function RootLayout({
                       flexShrink: 0,
                     }}
                   >
-                    <button type="submit" style={buttonStyle}>
+                    <button type="submit" style={menuButtonStyle}>
                       로그아웃
                     </button>
                   </form>
                 </>
               ) : (
                 <>
-                  <Link href="/" style={linkStyle}>
+                  <Link href="/" style={menuLinkStyle}>
                     홈
                   </Link>
 
-                  <Link href="/guide" style={linkStyle}>
+                  <Link href="/guide" style={menuLinkStyle}>
                     이용 가이드
                   </Link>
 
-                  <Link href="/pricing" style={linkStyle}>
+                  <Link href="/pricing" style={menuLinkStyle}>
                     상품안내
+                  </Link>
+
+                  <Link href="/process" style={menuLinkStyle}>
+                    제작 과정
+                  </Link>
+
+                  <Link href="/trial" style={menuLinkStyle}>
+                    제작 사례
                   </Link>
 
                   <Link href="/login" style={darkButtonStyle}>
@@ -206,9 +249,9 @@ export default async function RootLayout({
                   </Link>
                 </>
               )}
-            </div>
+            </nav>
           </div>
-        </header>
+        </div>
 
         {children}
       </body>
