@@ -584,3 +584,234 @@ header a[role='button'] {
     font-size: 14px;
   }
 }
+
+/* ================================
+   달동네 앱 상단 메뉴
+   ================================ */
+
+.app-header {
+  width: 100%;
+  border-bottom: 1px solid #e6dcc8;
+  background: #f7efe0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.app-header * {
+  box-sizing: border-box;
+  word-break: keep-all;
+}
+
+.app-header__inner {
+  max-width: 1280px;
+  min-height: 72px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 260px;
+  flex-shrink: 0;
+  color: #2d1a0b;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app-brand__icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.app-brand__name {
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+}
+
+.app-brand__desc {
+  display: inline-block;
+  max-width: 150px;
+  color: #a56518;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  white-space: normal;
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.app-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.app-nav form {
+  margin: 0;
+}
+
+.app-nav__link {
+  color: #3a2414;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app-nav__button {
+  min-width: 76px;
+  height: 40px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cdbb9c;
+  border-radius: 4px;
+  background: #f9f1e3;
+  color: #2d1a0b;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.app-nav__button--dark {
+  background: #2d1a0b;
+  color: #fffaf0;
+  border-color: #2d1a0b;
+}
+
+.mobile-menu {
+  display: none;
+  position: relative;
+}
+
+.mobile-menu__button {
+  width: 84px;
+  height: 40px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid #cdbb9c;
+  border-radius: 999px;
+  background: #fff8eb;
+  color: #2d1a0b;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mobile-menu__button::-webkit-details-marker {
+  display: none;
+}
+
+.mobile-menu__panel {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: min(86vw, 320px);
+  padding: 14px;
+  border: 1px solid #dfcda9;
+  border-radius: 18px;
+  background: #fffaf0;
+  box-shadow: 0 18px 50px rgba(45, 26, 11, 0.18);
+}
+
+.mobile-menu__link,
+.mobile-menu__login,
+.mobile-menu__logout {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  color: #2d1a0b;
+  font-size: 15px;
+  font-weight: 850;
+  line-height: 1.2;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.mobile-menu__link:hover {
+  background: #f7efe0;
+}
+
+.mobile-menu__login {
+  margin-top: 8px;
+  justify-content: center;
+  background: #2d1a0b;
+  color: #fffaf0;
+}
+
+.mobile-menu__logout {
+  margin-top: 8px;
+  justify-content: center;
+  background: #f3e4cb;
+  border: 1px solid #d7bd8e;
+}
+
+@media (max-width: 900px) {
+  .app-header__inner {
+    min-height: 64px;
+    padding: 8px 14px;
+  }
+
+  .app-brand {
+    min-width: 0;
+    max-width: calc(100vw - 120px);
+  }
+
+  .app-brand__icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .app-brand__name {
+    font-size: 19px;
+  }
+
+  .app-brand__desc {
+    display: none;
+  }
+
+  .app-nav--desktop {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: block;
+    flex-shrink: 0;
+  }
+}
