@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 
@@ -15,6 +14,8 @@ const ALLOWED_STATUSES = [
 
 type ProductionRequestStatus = (typeof ALLOWED_STATUSES)[number];
 
+type BookStatus = 'DRAFT' | 'IN_PRODUCTION' | 'PUBLISHED';
+
 type RouteContext = {
   params: Promise<{
     id: string;
@@ -28,6 +29,20 @@ function isProductionRequestStatus(
     typeof value === 'string' &&
     ALLOWED_STATUSES.includes(value as ProductionRequestStatus)
   );
+}
+
+function getBookStatusFromProductionStatus(
+  status: ProductionRequestStatus,
+): BookStatus {
+  if (status === 'COMPLETED') {
+    return 'PUBLISHED';
+  }
+
+  if (status === 'CANCELED') {
+    return 'DRAFT';
+  }
+
+  return 'IN_PRODUCTION';
 }
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
@@ -99,6 +114,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       },
       select: {
         id: true,
+        bookId: true,
       },
     });
 
@@ -112,24 +128,42 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const updatedRequest = await prisma.bookProductionRequest.update({
-      where: {
-        id: requestId,
-      },
-      data: {
-        status: nextStatus,
-      },
-      select: {
-        id: true,
-        status: true,
-      },
+    const nextBookStatus = getBookStatusFromProductionStatus(nextStatus);
+
+    const updatedRequest = await prisma.$transaction(async (tx) => {
+      const productionRequest = await tx.bookProductionRequest.update({
+        where: {
+          id: requestId,
+        },
+        data: {
+          status: nextStatus,
+        },
+        select: {
+          id: true,
+          status: true,
+          bookId: true,
+        },
+      });
+
+      await tx.book.updateMany({
+        where: {
+          id: existingRequest.bookId,
+        },
+        data: {
+          status: nextBookStatus,
+        },
+      });
+
+      return productionRequest;
     });
 
     return NextResponse.json({
       ok: true,
       requestId: updatedRequest.id,
       status: updatedRequest.status,
-      message: '상담 상태를 변경했습니다.',
+      bookId: updatedRequest.bookId,
+      bookStatus: nextBookStatus,
+      message: '상담 상태와 책 상태를 함께 변경했습니다.',
     });
   } catch (error) {
     console.error('ADMIN_PRODUCTION_REQUEST_STATUS_ERROR', error);
