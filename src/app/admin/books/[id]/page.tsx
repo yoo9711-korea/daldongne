@@ -44,6 +44,20 @@ type ProductionRequestRecord = {
   updatedAt: Date;
 };
 
+type LinkedMemoryRecord = {
+  id: string;
+  order: number;
+  memory: {
+    id: string;
+    type: string;
+    title: string | null;
+    description: string | null;
+    fileUrl: string | null;
+    occurredAt: Date | null;
+    createdAt: Date;
+  };
+};
+
 export default async function AdminBookDetailPage({ params }: PageProps) {
   const session = await auth();
 
@@ -76,7 +90,7 @@ export default async function AdminBookDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const [author, productionRequest] = await Promise.all([
+    const [author, productionRequest, linkedMemories] = await Promise.all([
     prisma.user.findUnique({
       where: {
         id: book.authorId,
@@ -105,7 +119,29 @@ export default async function AdminBookDetailPage({ params }: PageProps) {
         createdAt: true,
         updatedAt: true,
       },
-    }) as Promise<ProductionRequestRecord | null>,
+       }) as Promise<ProductionRequestRecord | null>,
+
+    prisma.bookMemory.findMany({
+      where: {
+        bookId: book.id,
+      },
+      orderBy: {
+        order: 'asc',
+      },
+      include: {
+        memory: {
+          select: {
+            id: true,
+            type: true,
+            title: true,
+            description: true,
+            fileUrl: true,
+            occurredAt: true,
+            createdAt: true,
+          },
+        },
+      },
+    }) as Promise<LinkedMemoryRecord[]>,
   ]);
 
   return (
@@ -288,6 +324,102 @@ export default async function AdminBookDetailPage({ params }: PageProps) {
           </section>
         </section>
 
+                <section style={panelStyle()}>
+          <p style={smallLabelStyle()}>선택 자료</p>
+
+          <h2 style={sectionTitleStyle()}>원고에 사용된 사진과 이야기</h2>
+
+          {linkedMemories.length > 0 ? (
+            <div
+              style={{
+                marginTop: 20,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: 16,
+              }}
+            >
+              {linkedMemories.map((item, index) => {
+                const memory = item.memory;
+                const isPhoto = memory.type === 'PHOTO' && memory.fileUrl;
+
+                return (
+                  <article
+                    key={item.id}
+                    style={{
+                      borderRadius: 22,
+                      border: '1px solid #ead7b7',
+                      background: '#fffdf6',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {isPhoto ? (
+                      <img
+                        src={`/api/blob/${memory.id}`}
+                        alt={memory.title || '선택된 사진'}
+                        style={{
+                          width: '100%',
+                          height: 170,
+                          objectFit: 'cover',
+                          display: 'block',
+                          background: '#ead7b7',
+                        }}
+                      />
+                    ) : null}
+
+                    <div style={{ padding: 16 }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: 12,
+                          fontWeight: 900,
+                          color: '#9a6a24',
+                        }}
+                      >
+                        {index + 1}. {getMemoryTypeLabel(memory.type)}
+                      </p>
+
+                      <h3
+                        style={{
+                          margin: '8px 0 0',
+                          fontSize: 17,
+                          lineHeight: 1.45,
+                          color: '#20130d',
+                        }}
+                      >
+                        {memory.title || '제목 없는 기록'}
+                      </h3>
+
+                      <p
+                        style={{
+                          margin: '10px 0 0',
+                          whiteSpace: 'pre-line',
+                          fontSize: 14,
+                          lineHeight: 1.7,
+                          color: '#5f442a',
+                        }}
+                      >
+                        {memory.description || '설명이 없습니다.'}
+                      </p>
+
+                      <p
+                        style={{
+                          margin: '12px 0 0',
+                          fontSize: 12,
+                          color: '#8a806f',
+                        }}
+                      >
+                        기록일: {formatDate(memory.occurredAt || memory.createdAt)}
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <EmptyBox text="이 책에 연결된 사진과 이야기 자료가 없습니다. 이전 방식으로 만든 책일 수 있습니다." />
+          )}
+        </section>
+
         <section style={panelStyle()}>
           <p style={smallLabelStyle()}>원고 본문</p>
 
@@ -465,4 +597,25 @@ function getPageCountLabel(pageCount: number | null | undefined) {
   }
 
   return `${pageCount}쪽`;
+}
+
+function getMemoryTypeLabel(type: string) {
+  if (type === 'PHOTO') return '사진';
+  if (type === 'TEXT') return '이야기';
+  if (type === 'AUDIO') return '음성';
+  if (type === 'VIDEO') return '영상';
+
+  return '기록';
+}
+
+function formatDate(value: Date | string | null | undefined) {
+  if (!value) return '-';
+
+  const date = value instanceof Date ? value : new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return '-';
+  }
+
+  return date.toLocaleDateString('ko-KR');
 }
