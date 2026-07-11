@@ -1,3 +1,4 @@
+import { del } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
 import { auth } from '@/auth';
@@ -20,6 +21,40 @@ export async function POST() {
   }
 
   try {
+    const [memoriesWithFiles, timeCapsulesWithFiles] = await Promise.all([
+      prisma.memory.findMany({
+        where: {
+          authorId: userId,
+          fileUrl: {
+            not: null,
+          },
+        },
+        select: {
+          fileUrl: true,
+        },
+      }),
+
+      prisma.timeCapsule.findMany({
+        where: {
+          authorId: userId,
+          fileUrl: {
+            not: null,
+          },
+        },
+        select: {
+          fileUrl: true,
+        },
+      }),
+    ]);
+
+    const fileUrls = Array.from(
+      new Set(
+        [...memoriesWithFiles, ...timeCapsulesWithFiles]
+          .map((item) => item.fileUrl)
+          .filter((fileUrl): fileUrl is string => Boolean(fileUrl)),
+      ),
+    );
+
     await prisma.$transaction(async (tx) => {
       await tx.bookProductionRequest.deleteMany({
         where: {
@@ -33,6 +68,14 @@ export async function POST() {
         },
       });
     });
+
+    if (fileUrls.length > 0) {
+      try {
+        await del(fileUrls);
+      } catch (blobError) {
+        console.error('ACCOUNT_DELETE_BLOB_ERROR', blobError);
+      }
+    }
 
     return NextResponse.json({
       ok: true,
