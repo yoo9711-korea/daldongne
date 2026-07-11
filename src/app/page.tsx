@@ -61,19 +61,19 @@ export default function HomePage() {
     <main style={{ background: '#fffaf3', color: '#2f241c' }}>
       <section
         style={{
-          minHeight: '86vh',
+          minHeight: '76vh',
           display: 'grid',
           gridTemplateColumns: '1.05fr 0.95fr',
-          gap: 48,
+          gap: 34,
           alignItems: 'center',
           maxWidth: 1180,
           margin: '0 auto',
-          padding: '80px 24px',
+          padding: '52px 24px',
           animation: 'daldongneFadeUp 0.7s ease-out both',
         }}
       >
         <div>
-          <p style={{ fontSize: 18, marginBottom: 18, color: '#9b6a3d' }}>
+          <p style={{ fontSize: 18, marginBottom: 12, color: '#9b6a3d' }}>
             달동네 출판사
           </p>
 
@@ -96,7 +96,7 @@ export default function HomePage() {
             style={{
               fontSize: 21,
               lineHeight: 1.75,
-              marginTop: 28,
+              marginTop: 18,
               color: '#5f5146',
               maxWidth: 660,
             }}
@@ -106,7 +106,7 @@ export default function HomePage() {
             인생책 원고로 만들어 드립니다.
           </p>
 
-          <div style={{ display: 'flex', gap: 14, marginTop: 34, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 14, marginTop: 24, flexWrap: 'wrap' }}>
             <Link
               href="/pricing"
               style={{
@@ -142,7 +142,7 @@ export default function HomePage() {
           style={{
             background: '#f3e3cf',
             borderRadius: 36,
-            padding: 34,
+            padding: 26,
             boxShadow: '0 24px 70px rgba(83, 55, 31, 0.16)',
           }}
         >
@@ -152,7 +152,7 @@ export default function HomePage() {
               overflow: 'hidden',
               background: '#fffaf6',
               borderRadius: 28,
-              minHeight: 420,
+              minHeight: 360,
               border: '1px solid #ead8c3',
               animation: 'daldongneImageFloat 0.9s ease-out both',
             }}
@@ -255,7 +255,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ maxWidth: 1180, margin: '0 auto', padding: '70px 24px',
+      <section style={{ maxWidth: 1180, margin: '0 auto', padding: '52px 24px',
         animation: 'daldongneFadeUp 0.7s ease-out both', }}>
         <p style={{ color: '#9b6a3d', fontWeight: 700 }}>왜 달동네인가요?</p>
         <h2 style={{ fontSize: 42, lineHeight: 1.3, marginTop: 12 }}>
@@ -269,7 +269,7 @@ export default function HomePage() {
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 20,
-            marginTop: 34,
+            marginTop: 24,
           }}
         >
           {[
@@ -296,7 +296,7 @@ export default function HomePage() {
       </section>
 
       <section style={{ background: '#3a2a1f', color: '#fff' }}>
-        <div style={{ maxWidth: 1180, margin: '0 auto', padding: '76px 24px',animation: 'daldongneFadeUp 0.7s ease-out both', }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto', padding: '56px 24px',animation: 'daldongneFadeUp 0.7s ease-out both', }}>
           <p style={{ color: '#e8c69f', fontWeight: 700 }}>
             이런 책을 만들 수 있습니다
           </p>
@@ -311,7 +311,7 @@ export default function HomePage() {
               display: 'grid',
               gridTemplateColumns: 'repeat(3, 1fr)',
               gap: 16,
-              marginTop: 34,
+              marginTop: 24,
             }}
           >
             {bookTypes.map((type) => (
@@ -341,7 +341,7 @@ export default function HomePage() {
           쉽게 따라갈 수 있게 만들었습니다.
         </h2>
 
-        <div style={{ display: 'grid', gap: 14, marginTop: 34 }}>
+        <div style={{ display: 'grid', gap: 14, marginTop: 22 }}>
           {steps.map((step, index) => (
             <div
               key={step}
@@ -378,7 +378,7 @@ export default function HomePage() {
           style={{
             maxWidth: 1180,
             margin: '0 auto',
-            padding: '80px 24px',
+            padding: '52px 24px',
             textAlign: 'center',
           }}
         >
@@ -396,7 +396,7 @@ export default function HomePage() {
             href="/pricing"
             style={{
               display: 'inline-block',
-              marginTop: 28,
+              marginTop: 20,
               padding: '16px 28px',
               borderRadius: 999,
               background: '#3a2a1f',
