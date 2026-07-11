@@ -453,9 +453,24 @@ export default function BookProductionRequestButton({
                 }}
               />
 
-              <span>
+                          <span>
                 제작 상담 접수를 위해 이름, 연락처, 이메일, 요청 내용을 수집·이용하는
-                것에 동의합니다. 상담 정보는 제작 상담 및 고객 연락 목적으로 사용됩니다.{' '}
+                것에 동의하며, 달동네 출판사의{' '}
+                <a
+                  href="/terms"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    color: '#6b3f18',
+                    fontWeight: 900,
+                    textDecoration: 'underline',
+                    textUnderlineOffset: 3,
+                  }}
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  이용약관
+                </a>
+                {' '}및{' '}
                 <a
                   href="/privacy"
                   target="_blank"
@@ -468,10 +483,11 @@ export default function BookProductionRequestButton({
                   }}
                   onClick={(event) => event.stopPropagation()}
                 >
-                  개인정보처리방침 보기
+                  개인정보처리방침
                 </a>
+                을 확인했습니다. 상담 정보는 제작 상담 및 고객 연락 목적으로 사용됩니다.
               </span>
-            </label> 
+              </label> 
 
               <label
               style={{
