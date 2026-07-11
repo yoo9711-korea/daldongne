@@ -285,7 +285,7 @@ export default async function RootLayout({
                 flexWrap: 'wrap',
               }}
             >
-                            <Link
+                           <Link
                 href="/terms"
                 style={{
                   color: '#5a3510',
@@ -309,6 +309,20 @@ export default async function RootLayout({
                 }}
               >
                 개인정보처리방침
+              </Link>
+
+              <span style={{ color: '#b99b73' }}>|</span>
+
+              <Link
+                href="/data-deletion"
+                style={{
+                  color: '#5a3510',
+                  fontWeight: 900,
+                  textDecoration: 'underline',
+                  textUnderlineOffset: 3,
+                }}
+              >
+                데이터 삭제 요청
               </Link>
             </nav>
           </div>
