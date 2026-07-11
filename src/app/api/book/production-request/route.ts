@@ -195,7 +195,7 @@ async function sendProductionRequestEmail(payload: ProductionRequestEmailPayload
     const adminBookUrl = `${cleanAppUrl}/admin/books/${payload.bookId}`;
 
     await resend.emails.send({
-      from: '달동네 출판사 <onboarding@resend.dev>',
+      from: process.env.EMAIL_FROM || '달동네 출판사 <onboarding@resend.dev>',
       to: adminEmail,
       subject: `[달동네] 제작 상담 신청이 접수되었습니다 - ${payload.bookTitle}`,
       html: `

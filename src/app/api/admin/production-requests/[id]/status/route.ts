@@ -247,7 +247,7 @@ async function sendProductionStatusEmail(payload: StatusEmailPayload) {
     const bookUrl = `${cleanAppUrl}/dashboard/library/${payload.bookId}`;
 
     await resend.emails.send({
-      from: '달동네 출판사 <onboarding@resend.dev>',
+      from: process.env.EMAIL_FROM || '달동네 출판사 <onboarding@resend.dev>',
       to: payload.to,
       subject: `[달동네] 제작 상담 상태가 변경되었습니다 - ${payload.bookTitle}`,
       html: `
