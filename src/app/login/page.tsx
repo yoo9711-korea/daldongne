@@ -53,7 +53,20 @@ export default async function LoginPage({
         >
           로그인하면 실제 데이터베이스에 계정이 생성됩니다.
           <br />
-          계속 진행하면{' '}
+        
+            계속 진행하면{' '}
+          <a
+            href="/terms"
+            style={{
+              color: '#6b3f18',
+              fontWeight: 900,
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+            }}
+          >
+            이용약관
+          </a>
+          {' '}및{' '}
           <a
             href="/privacy"
             style={{
@@ -66,6 +79,7 @@ export default async function LoginPage({
             개인정보처리방침
           </a>
           에 동의한 것으로 봅니다.
+
         </p>
       </div>
     </main>
