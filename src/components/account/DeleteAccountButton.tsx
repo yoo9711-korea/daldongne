@@ -29,7 +29,24 @@ export default function DeleteAccountButton() {
       ].join('\n'),
     );
 
-    if (!secondConfirm) return;
+        if (!secondConfirm) return;
+
+    const typedConfirm = window.prompt(
+      [
+        '계정 삭제를 계속하려면 아래 문구를 정확히 입력해 주세요.',
+        '',
+        '계정삭제',
+        '',
+        '입력하지 않거나 다르게 입력하면 삭제가 진행되지 않습니다.',
+      ].join('\n'),
+    );
+
+    if (typedConfirm !== '계정삭제') {
+      alert('확인 문구가 일치하지 않아 계정 삭제를 취소했습니다.');
+      return;
+    }
+
+    setIsDeleting(true);
 
     setIsDeleting(true);
 
