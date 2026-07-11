@@ -491,8 +491,28 @@ export default async function DashboardPage() {
               }}
             >
               관리자 화면 보기
-            </Link>
+            
+                         </Link>
           ) : null}
+
+          <Link
+            href="/dashboard/account"
+            style={{
+              marginTop: 14,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '12px 18px',
+              borderRadius: 999,
+              border: '1px solid #d6b778',
+              background: '#fff8eb',
+              color: '#5a3510',
+              fontWeight: 900,
+              textDecoration: 'none',
+            }}
+          >
+            계정 관리
+          </Link>
 
           <div
             style={{
