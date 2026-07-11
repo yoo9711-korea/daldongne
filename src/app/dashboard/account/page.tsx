@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
-
 import { auth } from '@/auth';
 import DeleteAccountButton from '@/components/account/DeleteAccountButton';
+import { prisma } from '@/lib/prisma';
 
 export default async function AccountPage() {
   const session = await auth();
@@ -10,11 +10,20 @@ export default async function AccountPage() {
     redirect('/login?callbackUrl=/dashboard/account');
   }
 
-  const user = session.user as {
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  };
+    const userId = session.user.id;
+
+  if (!userId) {
+    redirect('/login?callbackUrl=/dashboard/account');
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      name: true,
+      email: true,
+      image: true,
+    },
+  });
 
   return (
     <main
@@ -107,12 +116,12 @@ export default async function AccountPage() {
           >
             <p style={{ margin: 0 }}>
               <strong style={{ color: '#2d1a0b' }}>이름:</strong>{' '}
-              {user.name || '이름 정보 없음'}
+              {user?.name || '이름 정보 없음'}
             </p>
 
             <p style={{ margin: 0 }}>
               <strong style={{ color: '#2d1a0b' }}>이메일:</strong>{' '}
-              {user.email || '이메일 정보 없음'}
+              {user?.email || '이메일 정보 없음'}
             </p>
           </div>
         </section>
