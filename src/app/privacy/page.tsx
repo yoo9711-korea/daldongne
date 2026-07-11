@@ -219,12 +219,27 @@ export default function PrivacyPage() {
             이용자는 언제든지 본인의 개인정보에 대해 열람, 정정, 삭제,
             처리정지, 동의 철회를 요청할 수 있습니다.
           </p>
-          <ul style={listStyle}>
+       </section>
+          
+                   <ul style={listStyle}>
             <li>사진 및 이야기 삭제: 서비스 내 삭제 기능 이용</li>
-            <li>회원 정보 및 전체 데이터 삭제 요청: 운영자에게 이메일 문의</li>
+            <li>
+              회원 정보 및 전체 데이터 삭제 요청:{' '}
+              <a
+                href="/data-deletion"
+                style={{
+                  color: '#6b3f18',
+                  fontWeight: 900,
+                  textDecoration: 'underline',
+                  textUnderlineOffset: 3,
+                }}
+              >
+                데이터 삭제 요청 안내
+              </a>
+              를 통해 확인
+            </li>
             <li>제작 상담 정보 정정 또는 삭제 요청: 운영자에게 이메일 문의</li>
           </ul>
-        </section>
 
         <section style={sectionStyle}>
           <h2 style={h2Style}>9. 쿠키 및 자동 수집 정보</h2>
