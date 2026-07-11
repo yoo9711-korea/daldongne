@@ -2,6 +2,8 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
 type RouteContext = {
   params: Promise<{
     id: string;
@@ -20,8 +22,9 @@ export async function PATCH(_request: Request, context: RouteContext) {
     }
 
     const { id } = await context.params;
+    const requestId = id.trim();
 
-    if (!id) {
+    if (!requestId) {
       return NextResponse.json(
         { ok: false, message: '취소할 상담 신청을 찾을 수 없습니다.' },
         { status: 400 },
@@ -30,7 +33,7 @@ export async function PATCH(_request: Request, context: RouteContext) {
 
     const productionRequest = await prisma.bookProductionRequest.findFirst({
       where: {
-        id,
+        id: requestId,
         authorId: session.user.id,
       },
       select: {
@@ -61,12 +64,13 @@ export async function PATCH(_request: Request, context: RouteContext) {
     if (productionRequest.status === 'CANCELED') {
       return NextResponse.json({
         ok: true,
+        request: productionRequest,
         message: '이미 취소된 상담 신청입니다.',
       });
     }
 
-    const [updatedRequest] = await prisma.$transaction([
-      prisma.bookProductionRequest.update({
+    const updatedRequest = await prisma.$transaction(async (tx) => {
+      const canceledRequest = await tx.bookProductionRequest.update({
         where: {
           id: productionRequest.id,
         },
@@ -78,21 +82,20 @@ export async function PATCH(_request: Request, context: RouteContext) {
           status: true,
           updatedAt: true,
         },
-      }),
+      });
 
-      prisma.book.update({
+      await tx.book.updateMany({
         where: {
           id: productionRequest.bookId,
+          authorId: session.user.id,
         },
         data: {
           status: 'DRAFT',
         },
-        select: {
-          id: true,
-          status: true,
-        },
-      }),
-    ]);
+      });
+
+      return canceledRequest;
+    });
 
     return NextResponse.json({
       ok: true,
