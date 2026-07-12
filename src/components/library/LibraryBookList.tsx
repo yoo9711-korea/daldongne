@@ -17,8 +17,9 @@ type LibraryBook = {
   pageCount: number | null;
   basedPhotoCount: number | null;
   basedStoryCount: number | null;
-  createdAt?: string | null;
+    createdAt?: string | null;
   hasProductionRequest?: boolean;
+  productionRequestStatus?: string | null;
 };
 
 type Props = {
@@ -824,6 +825,9 @@ function statusBadgeStyle(
 function productionBadgeStyle(
   book: LibraryBook,
 ): CSSProperties {
+  const colors =
+    getProductionBadgeColors(book);
+
   return {
     display: 'inline-flex',
     alignItems: 'center',
@@ -831,19 +835,98 @@ function productionBadgeStyle(
     padding: '0 9px',
     borderRadius: 999,
     background:
-      book.hasProductionRequest ||
-      book.status ===
-        'IN_PRODUCTION'
-        ? '#e4f2ff'
-        : 'rgba(255,255,255,0.12)',
-    color:
-      book.hasProductionRequest ||
-      book.status ===
-        'IN_PRODUCTION'
-        ? '#245d8c'
-        : '#d7c8b3',
+      colors.background,
+    color: colors.color,
     fontSize: 10,
     fontWeight: 900,
+  };
+}
+
+function getProductionBadgeColors(
+  book: LibraryBook,
+) {
+  if (
+    book.status === 'PUBLISHED'
+  ) {
+    return {
+      background: '#e3f4e5',
+      color: '#2f6b38',
+    };
+  }
+
+  if (
+    book.status ===
+    'IN_PRODUCTION'
+  ) {
+    return {
+      background: '#efe6ff',
+      color: '#62438a',
+    };
+  }
+
+  if (
+    book.productionRequestStatus ===
+    'REQUESTED'
+  ) {
+    return {
+      background: '#fff1c7',
+      color: '#83540d',
+    };
+  }
+
+  if (
+    book.productionRequestStatus ===
+    'CONTACTED'
+  ) {
+    return {
+      background: '#e4f2ff',
+      color: '#245d8c',
+    };
+  }
+
+  if (
+    book.productionRequestStatus ===
+    'IN_PROGRESS'
+  ) {
+    return {
+      background: '#efe6ff',
+      color: '#62438a',
+    };
+  }
+
+  if (
+    book.productionRequestStatus ===
+    'COMPLETED'
+  ) {
+    return {
+      background: '#e3f4e5',
+      color: '#2f6b38',
+    };
+  }
+
+  if (
+    book.productionRequestStatus ===
+    'CANCELED'
+  ) {
+    return {
+      background: '#f2eeee',
+      color: '#776868',
+    };
+  }
+
+  if (
+    book.hasProductionRequest
+  ) {
+    return {
+      background: '#e4f2ff',
+      color: '#245d8c',
+    };
+  }
+
+  return {
+    background:
+      'rgba(255,255,255,0.12)',
+    color: '#d7c8b3',
   };
 }
 
@@ -953,6 +1036,41 @@ function getProductionLabel(
   }
 
   if (
+    book.productionRequestStatus ===
+    'REQUESTED'
+  ) {
+    return '상담 신청 접수';
+  }
+
+  if (
+    book.productionRequestStatus ===
+    'CONTACTED'
+  ) {
+    return '고객 연락 완료';
+  }
+
+  if (
+    book.productionRequestStatus ===
+    'IN_PROGRESS'
+  ) {
+    return '제작 상담 진행 중';
+  }
+
+  if (
+    book.productionRequestStatus ===
+    'COMPLETED'
+  ) {
+    return '상담 완료';
+  }
+
+  if (
+    book.productionRequestStatus ===
+    'CANCELED'
+  ) {
+    return '상담 취소';
+  }
+
+  if (
     book.hasProductionRequest
   ) {
     return '상담 신청됨';
@@ -960,6 +1078,7 @@ function getProductionLabel(
 
   return '제작 상담 가능';
 }
+
 
 function getPageCountLabel(
   pageCount:
