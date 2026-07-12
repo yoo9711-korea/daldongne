@@ -32,6 +32,7 @@ export default async function AdminDashboard() {
     requestedProductionRequests,
     activeProductionRequests,
     completedProductionRequests,
+    canceledProductionRequests,
     inProductionBookCount,
     familyHealthRows,
     pendingProductionRequests,
@@ -44,7 +45,7 @@ export default async function AdminDashboard() {
 
     prisma.book.count(),
 
-    prisma.bookProductionRequest.count(),
+       prisma.bookProductionRequest.count(),
 
     prisma.bookProductionRequest.count({
       where: {
@@ -55,7 +56,10 @@ export default async function AdminDashboard() {
     prisma.bookProductionRequest.count({
       where: {
         status: {
-          in: ['CONTACTED', 'IN_PROGRESS'],
+          in: [
+            'CONTACTED',
+            'IN_PROGRESS',
+          ],
         },
       },
     }),
@@ -66,7 +70,13 @@ export default async function AdminDashboard() {
       },
     }),
 
-    prisma.book.count({
+    prisma.bookProductionRequest.count({
+      where: {
+        status: 'CANCELED',
+      },
+    }),
+
+        prisma.book.count({
       where: {
         status: 'IN_PRODUCTION',
       },
@@ -300,11 +310,23 @@ export default async function AdminDashboard() {
       unit: '건',
       color: '#9a4b24',
     },
-    {
+       {
       label: '상담 처리 중',
       value: activeProductionRequests,
       unit: '건',
       color: '#2e3f52',
+    },
+    {
+      label: '상담 완료',
+      value: completedProductionRequests,
+      unit: '건',
+      color: '#2f6b38',
+    },
+    {
+      label: '상담 취소',
+      value: canceledProductionRequests,
+      unit: '건',
+      color: '#776868',
     },
     {
       label: '제작 중인 책',
