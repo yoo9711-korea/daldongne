@@ -1,22 +1,22 @@
-import Image from 'next/image';
-import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import Image from 'next/image';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import type { CSSProperties } from 'react';
 import UploadForm from './UploadForm';
 
+const REQUIRED_PHOTO_COUNT = 3;
+
 function isInterviewMemory(title: string | null) {
-  if (!title) return false;
+  if (!title) {
+    return false;
+  }
 
-  return title.startsWith('AI 인터뷰') || title.startsWith('AI Interview');
-}
-
-function getTypeLabel(type: string) {
-  if (type === 'PHOTO') return '사진';
-  if (type === 'VIDEO') return '영상';
-  if (type === 'AUDIO') return '음성';
-  if (type === 'TEXT') return '이야기';
-
-  return '기록';
+  return (
+    title.startsWith('AI 인터뷰') ||
+    title.startsWith('AI Interview')
+  );
 }
 
 export default async function TimelinePage() {
@@ -38,443 +38,1216 @@ export default async function TimelinePage() {
         createdAt: 'desc',
       },
     ],
-    take: 100,
+    take: 200,
     select: {
       id: true,
       title: true,
+      description: true,
       type: true,
       fileUrl: true,
       occurredAt: true,
       createdAt: true,
+      updatedAt: true,
     },
   });
 
-  const visibleMemories = memories.filter((memory) => !isInterviewMemory(memory.title));
-
-  const photoCount = visibleMemories.filter((memory) => memory.type === 'PHOTO').length;
-  const textCount = visibleMemories.filter((memory) => memory.type === 'TEXT').length;
-  const mediaCount = visibleMemories.filter(
-    (memory) => memory.type === 'VIDEO' || memory.type === 'AUDIO',
-  ).length;
-
-  const grouped = visibleMemories.reduce<Record<string, typeof visibleMemories>>(
-    (acc, memory) => {
-      const date = memory.occurredAt ?? memory.createdAt;
-      const year = String(date.getFullYear());
-
-      if (!acc[year]) {
-        acc[year] = [];
-      }
-
-      acc[year].push(memory);
-
-      return acc;
-    },
-    {},
+  const visibleMemories = memories.filter(
+    (memory) =>
+      !isInterviewMemory(memory.title),
   );
 
-  const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
+  const photos = visibleMemories.filter(
+    (memory) => memory.type === 'PHOTO',
+  );
+
+  const storyCount = visibleMemories.filter(
+    (memory) => memory.type === 'TEXT',
+  ).length;
+
+  const mediaCount = visibleMemories.filter(
+    (memory) =>
+      memory.type === 'VIDEO' ||
+      memory.type === 'AUDIO',
+  ).length;
+
+  const describedPhotoCount = photos.filter(
+    (photo) =>
+      Boolean(photo.description?.trim()),
+  ).length;
+
+  const datedPhotoCount = photos.filter(
+    (photo) => Boolean(photo.occurredAt),
+  ).length;
+
+  const completePhotoCount = photos.filter(
+    (photo) =>
+      Boolean(photo.title?.trim()) &&
+      Boolean(photo.description?.trim()) &&
+      Boolean(photo.occurredAt),
+  ).length;
+
+  const groupedPhotos = photos.reduce<
+    Record<string, typeof photos>
+  >((groups, photo) => {
+    const date =
+      photo.occurredAt ?? photo.createdAt;
+
+    const year = String(
+      date.getFullYear(),
+    );
+
+    if (!groups[year]) {
+      groups[year] = [];
+    }
+
+    groups[year].push(photo);
+
+    return groups;
+  }, {});
+
+  const years = Object.keys(
+    groupedPhotos,
+  ).sort(
+    (first, second) =>
+      Number(second) - Number(first),
+  );
+
+  const remainingPhotoCount = Math.max(
+    REQUIRED_PHOTO_COUNT - photos.length,
+    0,
+  );
+
+  const photoReady =
+    photos.length >= REQUIRED_PHOTO_COUNT;
 
   return (
-    <main style={{ padding: 28 }}>
-      <section
-        style={{
-          borderRadius: 34,
-          padding: 38,
-          background:
-            'linear-gradient(135deg, #33271d 0%, #5b422c 52%, #8a6238 100%)',
-          color: '#fff8ec',
-          boxShadow: '0 22px 60px rgba(51, 39, 29, 0.18)',
-        }}
+    <main
+      style={{
+        padding: 28,
+      }}
+    >
+      <style>{`
+        .photo-page-container {
+          max-width: 1380px;
+          margin: 0 auto;
+        }
+
+        .photo-upload-grid {
+          display: grid;
+          grid-template-columns:
+            minmax(0, 1.05fr)
+            minmax(300px, 0.95fr);
+          gap: 24px;
+          align-items: start;
+        }
+
+        .photo-list-grid {
+          display: grid;
+          grid-template-columns:
+            repeat(auto-fit, minmax(245px, 1fr));
+          gap: 16px;
+        }
+
+        .photo-card-status {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+
+        @media (max-width: 920px) {
+          .photo-upload-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .photo-page-main {
+            padding: 16px !important;
+          }
+
+          .photo-hero {
+            padding: 26px 20px !important;
+            border-radius: 24px !important;
+          }
+
+          .photo-hero-actions {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+          }
+
+          .photo-hero-actions a {
+            width: 100%;
+          }
+
+          .photo-upload-section,
+          .photo-tip-section,
+          .photo-list-section {
+            padding: 20px 16px !important;
+            border-radius: 24px !important;
+          }
+
+          .photo-list-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .photo-card-image {
+            height: 225px !important;
+          }
+        }
+      `}</style>
+
+      <div
+        className="photo-page-main photo-page-container"
       >
-        <p
+        <section
+          className="photo-hero"
           style={{
-            margin: '0 0 14px',
-            color: '#f0c36a',
-            fontWeight: 900,
-            letterSpacing: '0.08em',
+            borderRadius: 34,
+            padding: 38,
+            background:
+              'linear-gradient(135deg, #33271d 0%, #5b422c 52%, #8a6238 100%)',
+            color: '#fff8ec',
+            boxShadow:
+              '0 22px 60px rgba(51, 39, 29, 0.18)',
           }}
         >
-          사진 모으기
-        </p>
+          <p
+            style={{
+              margin: '0 0 13px',
+              color: '#f0c36a',
+              fontSize: 13,
+              fontWeight: 900,
+              letterSpacing: '0.08em',
+            }}
+          >
+            책 만들기 1단계
+          </p>
 
-        <h1
+          <h1
+            style={{
+              margin: 0,
+              maxWidth: 900,
+              fontFamily:
+                'Noto Serif KR, serif',
+              fontSize:
+                'clamp(34px, 5vw, 56px)',
+              lineHeight: 1.2,
+              letterSpacing: '-0.05em',
+            }}
+          >
+            부모님의 사진과
+            <br />
+            가족의 시간을 모읍니다.
+          </h1>
+
+          <p
+            style={{
+              margin: '22px 0 0',
+              maxWidth: 800,
+              fontSize: 18,
+              lineHeight: 1.8,
+              color:
+                'rgba(255, 248, 236, 0.86)',
+            }}
+          >
+            오래된 앨범 사진부터 최근의
+            가족사진까지 차례로 올려주세요.
+            사진의 제목, 날짜와 기억나는
+            설명을 함께 남기면 책의 중요한
+            장면으로 활용할 수 있습니다.
+          </p>
+
+          <div
+            style={{
+              marginTop: 26,
+              padding: '18px 20px',
+              borderRadius: 20,
+              border:
+                '1px solid rgba(255,255,255,0.2)',
+              background:
+                'rgba(255,255,255,0.08)',
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                color: '#f0c36a',
+                fontSize: 12,
+                fontWeight: 900,
+              }}
+            >
+              현재 준비 상태
+            </p>
+
+            <strong
+              style={{
+                display: 'block',
+                marginTop: 7,
+                fontSize: 21,
+                lineHeight: 1.45,
+              }}
+            >
+              {photoReady
+                ? `사진 ${photos.length}장이 모였습니다.`
+                : `사진을 ${remainingPhotoCount}장 더 모아보세요.`}
+            </strong>
+
+            <p
+              style={{
+                margin: '6px 0 0',
+                color:
+                  'rgba(255, 248, 236, 0.75)',
+                fontSize: 14,
+                lineHeight: 1.7,
+              }}
+            >
+              {photoReady
+                ? '책 원고를 시작할 기본 사진 수가 준비되었습니다. 이제 사진 속 이야기를 남겨보세요.'
+                : '사진 3장부터 책 원고 만들기의 기본 재료로 사용할 수 있습니다.'}
+            </p>
+          </div>
+
+          <div
+            className="photo-hero-actions"
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 10,
+              marginTop: 22,
+            }}
+          >
+            <a
+              href="#photo-upload"
+              style={heroPrimaryButtonStyle()}
+            >
+              사진 올리기
+            </a>
+
+            <Link
+              href="/dashboard/interview"
+              style={heroSecondaryButtonStyle()}
+            >
+              이야기 남기기
+            </Link>
+
+            <Link
+              href="/dashboard"
+              style={heroSecondaryButtonStyle()}
+            >
+              작업실로 돌아가기
+            </Link>
+          </div>
+        </section>
+
+        <section
           style={{
-            margin: 0,
-            fontFamily: 'Noto Serif KR, serif',
-            fontSize: 'clamp(36px, 5vw, 58px)',
-            lineHeight: 1.18,
-            letterSpacing: '-0.05em',
+            display: 'grid',
+            gridTemplateColumns:
+              'repeat(auto-fit, minmax(165px, 1fr))',
+            gap: 14,
+            marginTop: 24,
           }}
         >
-          부모님의 사진과
-          <br />
-          가족의 시간을 모읍니다.
-        </h1>
+          <SummaryCard
+            label="모은 사진"
+            value={photos.length}
+            unit="장"
+            description="현재 책의 재료로 모아 둔 사진"
+            color="#7b4f2a"
+          />
 
-        <p
+          <SummaryCard
+            label="설명 작성"
+            value={describedPhotoCount}
+            unit="장"
+            description="사진 속 기억을 설명한 사진"
+            color="#9b6d2f"
+          />
+
+          <SummaryCard
+            label="날짜 입력"
+            value={datedPhotoCount}
+            unit="장"
+            description="촬영 시기를 입력한 사진"
+            color="#2e3f52"
+          />
+
+          <SummaryCard
+            label="준비 완료"
+            value={completePhotoCount}
+            unit="장"
+            description="제목·설명·날짜가 모두 준비된 사진"
+            color="#3e5f3a"
+          />
+
+          <SummaryCard
+            label="남긴 이야기"
+            value={storyCount}
+            unit="개"
+            description="책의 문장이 되는 이야기 기록"
+            color="#62438a"
+          />
+
+          <SummaryCard
+            label="영상·음성"
+            value={mediaCount}
+            unit="개"
+            description="함께 보관 중인 영상과 음성"
+            color="#245d8c"
+          />
+        </section>
+
+        <section
           style={{
             marginTop: 24,
-            maxWidth: 780,
-            fontSize: 21,
-            lineHeight: 1.75,
-            color: 'rgba(255, 248, 236, 0.86)',
+            padding: '20px 22px',
+            borderRadius: 22,
+            border: photoReady
+              ? '1px solid #9dcca4'
+              : '1px solid #e3bd7a',
+            background: photoReady
+              ? '#edf8ee'
+              : '#fff4df',
           }}
         >
-          오래된 앨범 사진, 부모님의 젊은 시절 사진, 가족사진을 올려주세요.
-          사진 한 장이 부모님의 삶을 책으로 만드는 첫 번째 단서가 됩니다.
-        </p>
-      </section>
-
-      <section
-        style={{
-          marginTop: 24,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-          gap: 16,
-        }}
-      >
-        {[
-          {
-            label: '모은 사진',
-            value: photoCount,
-            text: '인생책의 장면이 되는 사진입니다.',
-          },
-          {
-            label: '남긴 이야기',
-            value: textCount,
-            text: '사진에 얽힌 기억과 설명입니다.',
-          },
-          {
-            label: '영상·음성',
-            value: mediaCount,
-            text: '함께 보관된 가족 기록입니다.',
-          },
-        ].map((card) => (
-          <article
-            key={card.label}
+          <div
             style={{
-              padding: 24,
-              borderRadius: 26,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent:
+                'space-between',
+              flexWrap: 'wrap',
+              gap: 14,
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: 0,
+                  color: photoReady
+                    ? '#2f6b38'
+                    : '#83540d',
+                  fontSize: 12,
+                  fontWeight: 900,
+                }}
+              >
+                다음 단계 안내
+              </p>
+
+              <strong
+                style={{
+                  display: 'block',
+                  marginTop: 6,
+                  color: '#33271d',
+                  fontSize: 19,
+                  lineHeight: 1.5,
+                }}
+              >
+                {photoReady
+                  ? '사진이 준비되었습니다. 사진 속 이야기를 남겨주세요.'
+                  : '먼저 사진 3장 이상을 모아주세요.'}
+              </strong>
+            </div>
+
+            {photoReady ? (
+              <Link
+                href="/dashboard/interview"
+                style={nextStepButtonStyle()}
+              >
+                이야기 남기기로 이동
+              </Link>
+            ) : (
+              <a
+                href="#photo-upload"
+                style={nextStepButtonStyle()}
+              >
+                사진 더 올리기
+              </a>
+            )}
+          </div>
+        </section>
+
+        <section
+          id="photo-upload"
+          className="photo-upload-grid"
+          style={{
+            marginTop: 24,
+          }}
+        >
+          <article
+            className="photo-upload-section"
+            style={{
+              padding: 28,
+              borderRadius: 30,
               background: '#fffaf1',
-              border: '1px solid rgba(91, 66, 43, 0.12)',
-              boxShadow: '0 12px 30px rgba(91, 66, 43, 0.08)',
+              border:
+                '1px solid rgba(91, 66, 43, 0.12)',
+              boxShadow:
+                '0 12px 30px rgba(91, 66, 43, 0.08)',
             }}
           >
             <p
               style={{
                 margin: 0,
                 color: '#9b6d2f',
+                fontSize: 12,
                 fontWeight: 900,
+                letterSpacing: '0.08em',
               }}
             >
-              {card.label}
+              새 사진 올리기
             </p>
 
-            <strong
+            <h2
               style={{
-                display: 'block',
-                marginTop: 10,
-                fontSize: 38,
-                lineHeight: 1,
+                margin: '9px 0 0',
+                fontFamily:
+                  'Noto Serif KR, serif',
+                fontSize: 31,
+                lineHeight: 1.4,
+                letterSpacing: '-0.04em',
                 color: '#33271d',
               }}
             >
-              {card.value}
-            </strong>
+              한 번에 한 장씩
+              <br />
+              천천히 기록해보세요.
+            </h2>
 
             <p
               style={{
                 margin: '14px 0 0',
                 color: '#6b5845',
-                fontSize: 16,
-                lineHeight: 1.6,
+                fontSize: 15,
+                lineHeight: 1.75,
               }}
             >
-              {card.text}
+              사진을 올릴 때 제목, 설명과
+              촬영 날짜를 함께 입력하면 나중에
+              책의 시간 순서를 정리하기
+              쉬워집니다.
             </p>
+
+            <div
+              style={{
+                marginTop: 22,
+              }}
+            >
+              <UploadForm />
+            </div>
           </article>
-        ))}
-      </section>
 
-      <section
-        style={{
-          marginTop: 28,
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 0.95fr) minmax(320px, 1.05fr)',
-          gap: 24,
-          alignItems: 'start',
-        }}
-      >
-        <div
-          style={{
-            padding: 30,
-            borderRadius: 30,
-            background: '#fffaf1',
-            border: '1px solid rgba(91, 66, 43, 0.12)',
-            boxShadow: '0 12px 30px rgba(91, 66, 43, 0.08)',
-          }}
-        >
-          <p
+          <aside
+            className="photo-tip-section"
             style={{
-              margin: '0 0 12px',
-              color: '#9b6d2f',
-              fontWeight: 900,
-              letterSpacing: '0.08em',
+              padding: 28,
+              borderRadius: 30,
+              background: '#f4ead8',
+              border:
+                '1px solid rgba(91, 66, 43, 0.12)',
+              boxShadow:
+                '0 12px 30px rgba(91, 66, 43, 0.08)',
             }}
           >
-            사진 올리기
-          </p>
+            <p
+              style={{
+                margin: 0,
+                color: '#9b6d2f',
+                fontSize: 12,
+                fontWeight: 900,
+                letterSpacing: '0.08em',
+              }}
+            >
+              어떤 사진이 좋을까요?
+            </p>
 
-          <h2
-            style={{
-              margin: 0,
-              fontFamily: 'Noto Serif KR, serif',
-              fontSize: 34,
-              lineHeight: 1.35,
-              letterSpacing: '-0.04em',
-              color: '#33271d',
-            }}
-          >
-            부모님의 사진 10장부터
-            <br />
-            시작해 보세요.
-          </h2>
+            <h2
+              style={{
+                margin: '9px 0 0',
+                fontFamily:
+                  'Noto Serif KR, serif',
+                fontSize: 28,
+                lineHeight: 1.4,
+                letterSpacing: '-0.04em',
+                color: '#33271d',
+              }}
+            >
+              잘 찍은 사진보다
+              이야기가 있는 사진이 좋습니다.
+            </h2>
 
-          <p
-            style={{
-              marginTop: 16,
-              fontSize: 18,
-              lineHeight: 1.75,
-              color: '#6b5845',
-            }}
-          >
-            사진이 선명하지 않아도 괜찮습니다. 오래된 사진일수록 그 안에는
-            가족이 잊고 있던 이야기가 남아 있을 수 있습니다.
-          </p>
-
-          <div style={{ marginTop: 24 }}>
-            <UploadForm />
-          </div>
-        </div>
-
-        <aside
-          style={{
-            padding: 30,
-            borderRadius: 30,
-            background: '#f4ead8',
-            border: '1px solid rgba(91, 66, 43, 0.12)',
-            boxShadow: '0 12px 30px rgba(91, 66, 43, 0.08)',
-          }}
-        >
-          <p
-            style={{
-              margin: '0 0 12px',
-              color: '#9b6d2f',
-              fontWeight: 900,
-              letterSpacing: '0.08em',
-            }}
-          >
-            어떤 사진이 좋을까요?
-          </p>
-
-          <h2
-            style={{
-              margin: 0,
-              fontFamily: 'Noto Serif KR, serif',
-              fontSize: 30,
-              lineHeight: 1.35,
-              letterSpacing: '-0.04em',
-              color: '#33271d',
-            }}
-          >
-            특별한 사진보다,
-            이야기가 있는 사진이 좋습니다.
-          </h2>
-
-          <div
-            style={{
-              marginTop: 22,
-              display: 'grid',
-              gap: 14,
-            }}
-          >
-            {[
-              '부모님의 젊은 시절 사진',
-              '가족이 함께 찍은 사진',
-              '일터, 가게, 집 앞에서 찍은 사진',
-              '칠순·팔순·퇴직과 관련된 사진',
-              '왜 찍었는지 궁금한 오래된 사진',
-            ].map((item) => (
-              <div
-                key={item}
-                style={{
-                  padding: 18,
-                  borderRadius: 20,
-                  background: '#fffaf1',
-                  color: '#4c3a2a',
-                  fontSize: 17,
-                  lineHeight: 1.6,
-                  fontWeight: 800,
-                }}
-              >
-                ✓ {item}
-              </div>
-            ))}
-          </div>
-        </aside>
-      </section>
-
-      <section
-        style={{
-          marginTop: 28,
-          padding: 30,
-          borderRadius: 30,
-          background: '#fffaf1',
-          border: '1px solid rgba(91, 66, 43, 0.12)',
-          boxShadow: '0 12px 30px rgba(91, 66, 43, 0.08)',
-        }}
-      >
-        <p
-          style={{
-            margin: '0 0 12px',
-            color: '#9b6d2f',
-            fontWeight: 900,
-            letterSpacing: '0.08em',
-          }}
-        >
-          모아둔 기록
-        </p>
-
-        <h2
-          style={{
-            margin: 0,
-            fontFamily: 'Noto Serif KR, serif',
-            fontSize: 34,
-            lineHeight: 1.35,
-            letterSpacing: '-0.04em',
-            color: '#33271d',
-          }}
-        >
-          인생책의 재료가 될 사진과 기록
-        </h2>
-
-        {years.length > 0 ? (
-          <div style={{ marginTop: 28, display: 'grid', gap: 32 }}>
-            {years.map((year) => (
-              <div key={year}>
-                <h3
-                  style={{
-                    margin: '0 0 16px',
-                    fontFamily: 'Noto Serif KR, serif',
-                    fontSize: 28,
-                    color: '#33271d',
-                  }}
-                >
-                  {year}년
-                </h3>
-
+            <div
+              style={{
+                display: 'grid',
+                gap: 10,
+                marginTop: 20,
+              }}
+            >
+              {[
+                '부모님의 어린 시절이나 학창 시절 사진',
+                '가족이 함께 찍은 명절과 여행 사진',
+                '직장, 가게 또는 일터에서 찍은 사진',
+                '결혼, 출산, 이사와 관련된 사진',
+                '언제 찍었는지 궁금한 오래된 사진',
+              ].map((item, index) => (
                 <div
+                  key={item}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                    gap: 16,
+                    gridTemplateColumns:
+                      '30px minmax(0, 1fr)',
+                    gap: 10,
+                    alignItems: 'start',
+                    padding: 14,
+                    borderRadius: 16,
+                    background: '#fffaf1',
+                    color: '#4c3a2a',
+                    fontSize: 14,
+                    lineHeight: 1.65,
+                    fontWeight: 800,
                   }}
                 >
-                  {grouped[year].map((memory) => {
-                    const date = memory.occurredAt ?? memory.createdAt;
+                  <span
+                    style={{
+                      width: 30,
+                      height: 30,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent:
+                        'center',
+                      borderRadius: 999,
+                      background: '#33271d',
+                      color: '#fff8ec',
+                      fontSize: 11,
+                      fontWeight: 900,
+                    }}
+                  >
+                    {index + 1}
+                  </span>
 
-                    return (
-                      <article
-                        key={memory.id}
-                        style={{
-                          overflow: 'hidden',
-                          borderRadius: 24,
-                          background: '#ffffff',
-                          border: '1px solid rgba(91, 66, 43, 0.1)',
-                          boxShadow: '0 10px 26px rgba(91, 66, 43, 0.06)',
-                        }}
-                      >
-                        <div
-                          style={{
-                            position: 'relative',
-                            height: 180,
-                            background:
-                              'linear-gradient(135deg, rgba(91,66,43,0.14), rgba(240,195,106,0.28))',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#8a6b4d',
-                            fontWeight: 900,
-                          }}
-                        >
-                          {memory.type === 'PHOTO' && memory.fileUrl ? (
-                   <Image
-                          unoptimized
-                          src={`/api/blob/${memory.id}`}
-                          alt={memory.title || '가족 사진'}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 520px"
-                            style={{
-                         objectFit: 'contain',
-                         padding: 0,
-                         transform: 'scale(1.2)',
-                          }}
-                           />
-                          ) : (
-                            <span>{getTypeLabel(memory.type)}</span>
-                          )}
-                        </div>
-
-                        <div style={{ padding: 20 }}>
-                          <p
-                            style={{
-                              margin: 0,
-                              color: '#9b6d2f',
-                              fontSize: 14,
-                              fontWeight: 900,
-                            }}
-                          >
-                            {getTypeLabel(memory.type)} · {date.toLocaleDateString('ko-KR')}
-                          </p>
-
-                          <h4
-                            style={{
-                              margin: '10px 0 0',
-                              fontSize: 20,
-                              lineHeight: 1.4,
-                              color: '#33271d',
-                              letterSpacing: '-0.03em',
-                            }}
-                          >
-                            {memory.title || '제목 없는 기록'}
-                          </h4>
-                        </div>
-                      </article>
-                    );
-                  })}
+                  <span>{item}</span>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
+              ))}
+            </div>
+          </aside>
+        </section>
+
+        <section
+          className="photo-list-section"
+          style={{
+            marginTop: 24,
+            padding: 28,
+            borderRadius: 30,
+            background: '#fffaf1',
+            border:
+              '1px solid rgba(91, 66, 43, 0.12)',
+            boxShadow:
+              '0 12px 30px rgba(91, 66, 43, 0.08)',
+          }}
+        >
           <div
             style={{
-              marginTop: 24,
-              padding: 34,
-              borderRadius: 24,
-              background: '#ffffff',
-              border: '1px dashed rgba(91, 66, 43, 0.28)',
-              color: '#6b5845',
-              fontSize: 18,
-              lineHeight: 1.75,
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent:
+                'space-between',
+              flexWrap: 'wrap',
+              gap: 12,
             }}
           >
-            아직 모아둔 사진이나 기록이 없습니다. 부모님의 사진 한 장부터 올려보세요.
-            그 사진이 인생책의 첫 장면이 될 수 있습니다.
+            <div>
+              <p
+                style={{
+                  margin: 0,
+                  color: '#9b6d2f',
+                  fontSize: 12,
+                  fontWeight: 900,
+                  letterSpacing: '0.08em',
+                }}
+              >
+                모아 둔 사진
+              </p>
+
+              <h2
+                style={{
+                  margin: '9px 0 0',
+                  fontFamily:
+                    'Noto Serif KR, serif',
+                  fontSize: 31,
+                  lineHeight: 1.4,
+                  letterSpacing:
+                    '-0.04em',
+                  color: '#33271d',
+                }}
+              >
+                책의 장면이 될 사진
+              </h2>
+
+              <p
+                style={{
+                  margin: '8px 0 0',
+                  color: '#6b5845',
+                  fontSize: 14,
+                  lineHeight: 1.7,
+                }}
+              >
+                사진마다 제목·설명·날짜가
+                준비됐는지 확인할 수 있습니다.
+              </p>
+            </div>
+
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                minHeight: 35,
+                padding: '0 13px',
+                borderRadius: 999,
+                background: '#f4ead8',
+                color: '#6b5845',
+                fontSize: 12,
+                fontWeight: 900,
+              }}
+            >
+              전체 {photos.length}장
+            </span>
           </div>
-        )}
-      </section>
+
+          {years.length > 0 ? (
+            <div
+              style={{
+                display: 'grid',
+                gap: 30,
+                marginTop: 26,
+              }}
+            >
+              {years.map((year) => (
+                <section key={year}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      marginBottom: 14,
+                    }}
+                  >
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontFamily:
+                          'Noto Serif KR, serif',
+                        fontSize: 25,
+                        color: '#33271d',
+                      }}
+                    >
+                      {year}년
+                    </h3>
+
+                    <span
+                      style={{
+                        color: '#8b7a67',
+                        fontSize: 12,
+                      }}
+                    >
+                      {groupedPhotos[year].length}
+                      장
+                    </span>
+                  </div>
+
+                  <div className="photo-list-grid">
+                    {groupedPhotos[year].map(
+                      (photo) => {
+                        const displayDate =
+                          photo.occurredAt ??
+                          photo.createdAt;
+
+                        const hasTitle =
+                          Boolean(
+                            photo.title?.trim(),
+                          );
+
+                        const hasDescription =
+                          Boolean(
+                            photo.description?.trim(),
+                          );
+
+                        const hasOccurredAt =
+                          Boolean(
+                            photo.occurredAt,
+                          );
+
+                        const complete =
+                          hasTitle &&
+                          hasDescription &&
+                          hasOccurredAt;
+
+                        return (
+                          <article
+                            key={photo.id}
+                            style={{
+                              overflow: 'hidden',
+                              borderRadius: 22,
+                              background: '#ffffff',
+                              border: complete
+                                ? '1px solid #9dcca4'
+                                : '1px solid rgba(91, 66, 43, 0.12)',
+                              boxShadow:
+                                '0 10px 26px rgba(91, 66, 43, 0.06)',
+                            }}
+                          >
+                            <div
+                              className="photo-card-image"
+                              style={{
+                                position:
+                                  'relative',
+                                height: 205,
+                                overflow:
+                                  'hidden',
+                                background:
+                                  'linear-gradient(135deg, rgba(91,66,43,0.14), rgba(240,195,106,0.28))',
+                              }}
+                            >
+                              {photo.fileUrl ? (
+                                <Image
+                                  unoptimized
+                                  src={`/api/blob/${photo.id}`}
+                                  alt={
+                                    photo.title ||
+                                    '가족 사진'
+                                  }
+                                  fill
+                                  sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                                  style={{
+                                    objectFit:
+                                      'contain',
+                                    transform:
+                                      'scale(1.08)',
+                                  }}
+                                />
+                              ) : (
+                                <div
+                                  style={{
+                                    height: '100%',
+                                    display:
+                                      'flex',
+                                    alignItems:
+                                      'center',
+                                    justifyContent:
+                                      'center',
+                                    color:
+                                      '#8a6b4d',
+                                    fontSize: 13,
+                                    fontWeight: 900,
+                                  }}
+                                >
+                                  사진 파일 없음
+                                </div>
+                              )}
+
+                              <span
+                                style={{
+                                  position:
+                                    'absolute',
+                                  top: 12,
+                                  right: 12,
+                                  display:
+                                    'inline-flex',
+                                  padding:
+                                    '5px 9px',
+                                  borderRadius: 999,
+                                  background:
+                                    complete
+                                      ? '#3e5f3a'
+                                      : 'rgba(51,39,29,0.82)',
+                                  color:
+                                    '#fff8ec',
+                                  fontSize: 10,
+                                  fontWeight: 900,
+                                }}
+                              >
+                                {complete
+                                  ? '준비 완료'
+                                  : '정보 보완 필요'}
+                              </span>
+                            </div>
+
+                            <div
+                              style={{
+                                padding: 18,
+                              }}
+                            >
+                              <p
+                                style={{
+                                  margin: 0,
+                                  color:
+                                    '#9b6d2f',
+                                  fontSize: 11,
+                                  fontWeight: 900,
+                                }}
+                              >
+                                {photo.occurredAt
+                                  ? `촬영일 ${formatDate(displayDate)}`
+                                  : `등록일 ${formatDate(displayDate)}`}
+                              </p>
+
+                              <h4
+                                style={{
+                                  margin:
+                                    '8px 0 0',
+                                  color:
+                                    '#33271d',
+                                  fontSize: 18,
+                                  lineHeight: 1.45,
+                                  letterSpacing:
+                                    '-0.03em',
+                                  wordBreak:
+                                    'break-word',
+                                }}
+                              >
+                                {photo.title ||
+                                  '제목 없는 사진'}
+                              </h4>
+
+                              <p
+                                style={{
+                                  margin:
+                                    '8px 0 0',
+                                  minHeight: 44,
+                                  color:
+                                    '#6b5845',
+                                  fontSize: 13,
+                                  lineHeight: 1.65,
+                                  wordBreak:
+                                    'break-word',
+                                }}
+                              >
+                                {photo.description ||
+                                  '아직 이 사진에 대한 설명이 없습니다.'}
+                              </p>
+
+                              <div
+                                className="photo-card-status"
+                                style={{
+                                  marginTop: 14,
+                                }}
+                              >
+                                <ReadinessBadge
+                                  label="제목"
+                                  ready={hasTitle}
+                                />
+
+                                <ReadinessBadge
+                                  label="설명"
+                                  ready={
+                                    hasDescription
+                                  }
+                                />
+
+                                <ReadinessBadge
+                                  label="날짜"
+                                  ready={
+                                    hasOccurredAt
+                                  }
+                                />
+                              </div>
+
+                              <p
+                                style={{
+                                  margin:
+                                    '12px 0 0',
+                                  paddingTop: 11,
+                                  borderTop:
+                                    '1px solid rgba(91, 66, 43, 0.09)',
+                                  color:
+                                    '#8b7a67',
+                                  fontSize: 10,
+                                }}
+                              >
+                                최근 수정{' '}
+                                {formatDate(
+                                  photo.updatedAt,
+                                )}
+                              </p>
+                            </div>
+                          </article>
+                        );
+                      },
+                    )}
+                  </div>
+                </section>
+              ))}
+            </div>
+          ) : (
+            <div
+              style={{
+                marginTop: 22,
+                padding: 32,
+                borderRadius: 22,
+                background: '#ffffff',
+                border:
+                  '1px dashed rgba(91, 66, 43, 0.28)',
+                color: '#6b5845',
+                fontSize: 15,
+                lineHeight: 1.75,
+                textAlign: 'center',
+              }}
+            >
+              아직 모아 둔 사진이 없습니다.
+              <br />
+              첫 번째 사진을 올리면 이곳에
+              시간 순서대로 표시됩니다.
+
+              <div
+                style={{
+                  marginTop: 16,
+                }}
+              >
+                <a
+                  href="#photo-upload"
+                  style={nextStepButtonStyle()}
+                >
+                  첫 사진 올리기
+                </a>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {photoReady ? (
+          <section
+            style={{
+              marginTop: 24,
+              padding: '22px 24px',
+              borderRadius: 24,
+              border: '1px solid #9dcca4',
+              background: '#edf8ee',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent:
+                  'space-between',
+                flexWrap: 'wrap',
+                gap: 14,
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    margin: 0,
+                    color: '#2f6b38',
+                    fontSize: 12,
+                    fontWeight: 900,
+                  }}
+                >
+                  사진 모으기 완료
+                </p>
+
+                <strong
+                  style={{
+                    display: 'block',
+                    marginTop: 6,
+                    color: '#33271d',
+                    fontSize: 19,
+                  }}
+                >
+                  다음은 사진 속 이야기를
+                  남길 차례입니다.
+                </strong>
+              </div>
+
+              <Link
+                href="/dashboard/interview"
+                style={nextStepButtonStyle()}
+              >
+                이야기 남기기
+              </Link>
+            </div>
+          </section>
+        ) : null}
+      </div>
     </main>
   );
+}
+
+function SummaryCard({
+  label,
+  value,
+  unit,
+  description,
+  color,
+}: {
+  label: string;
+  value: number;
+  unit: string;
+  description: string;
+  color: string;
+}) {
+  return (
+    <article
+      style={{
+        padding: 21,
+        borderRadius: 23,
+        background: '#fffaf1',
+        border:
+          '1px solid rgba(91, 66, 43, 0.12)',
+        boxShadow:
+          '0 10px 25px rgba(91, 66, 43, 0.07)',
+      }}
+    >
+      <p
+        style={{
+          margin: 0,
+          color: '#9b6d2f',
+          fontSize: 12,
+          fontWeight: 900,
+        }}
+      >
+        {label}
+      </p>
+
+      <strong
+        style={{
+          display: 'block',
+          marginTop: 8,
+          color,
+          fontSize: 33,
+          lineHeight: 1.1,
+        }}
+      >
+        {value.toLocaleString()}
+
+        <span
+          style={{
+            marginLeft: 4,
+            color: '#6b5845',
+            fontSize: 13,
+          }}
+        >
+          {unit}
+        </span>
+      </strong>
+
+      <p
+        style={{
+          margin: '11px 0 0',
+          color: '#6b5845',
+          fontSize: 12,
+          lineHeight: 1.55,
+        }}
+      >
+        {description}
+      </p>
+    </article>
+  );
+}
+
+function ReadinessBadge({
+  label,
+  ready,
+}: {
+  label: string;
+  ready: boolean;
+}) {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        minHeight: 25,
+        padding: '0 9px',
+        borderRadius: 999,
+        background: ready
+          ? '#e3f4e5'
+          : '#fff1c7',
+        color: ready
+          ? '#2f6b38'
+          : '#83540d',
+        fontSize: 10,
+        fontWeight: 900,
+      }}
+    >
+      {label} {ready ? '완료' : '필요'}
+    </span>
+  );
+}
+
+function heroPrimaryButtonStyle(): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 46,
+    padding: '0 21px',
+    borderRadius: 999,
+    background: '#f0c36a',
+    color: '#2b2118',
+    fontSize: 14,
+    fontWeight: 900,
+    textDecoration: 'none',
+    textAlign: 'center',
+  };
+}
+
+function heroSecondaryButtonStyle(): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 46,
+    padding: '0 21px',
+    borderRadius: 999,
+    border:
+      '1px solid rgba(255,255,255,0.42)',
+    background: 'transparent',
+    color: '#fff8ec',
+    fontSize: 14,
+    fontWeight: 900,
+    textDecoration: 'none',
+    textAlign: 'center',
+  };
+}
+
+function nextStepButtonStyle(): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 40,
+    padding: '0 15px',
+    borderRadius: 999,
+    border: '1px solid #33271d',
+    background: '#33271d',
+    color: '#fff8ec',
+    fontSize: 12,
+    fontWeight: 900,
+    textDecoration: 'none',
+    whiteSpace: 'nowrap',
+  };
+}
+
+function formatDate(
+  value: Date | string,
+) {
+  const date =
+    value instanceof Date
+      ? value
+      : new Date(value);
+
+  if (
+    Number.isNaN(date.getTime())
+  ) {
+    return '-';
+  }
+
+  return new Intl.DateTimeFormat(
+    'ko-KR',
+    {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    },
+  ).format(date);
 }
