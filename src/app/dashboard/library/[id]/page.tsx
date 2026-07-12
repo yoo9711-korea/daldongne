@@ -1,13 +1,17 @@
 import { auth } from '@/auth';
-import { prisma } from '@/lib/prisma';
-import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
-import RefreshBookDraftButton from '@/components/library/RefreshBookDraftButton';
-import DeleteBookButton from '@/components/library/DeleteBookButton';
-import EditMemoryButton from '@/components/memory/EditMemoryButton';
-import DeleteMemoryButton from '@/components/memory/DeleteMemoryButton';
-import Image from 'next/image';
 import BookProductionRequestButton from '@/components/library/BookProductionRequestButton';
+import DeleteBookButton from '@/components/library/DeleteBookButton';
+import RefreshBookDraftButton from '@/components/library/RefreshBookDraftButton';
+import DeleteMemoryButton from '@/components/memory/DeleteMemoryButton';
+import EditMemoryButton from '@/components/memory/EditMemoryButton';
+import { prisma } from '@/lib/prisma';
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  notFound,
+  redirect,
+} from 'next/navigation';
+import type { CSSProperties } from 'react';
 
 type PageProps = {
   params: Promise<{
@@ -15,72 +19,86 @@ type PageProps = {
   }>;
 };
 
-type MemoryRecord = Record<string, unknown>;
+type MemoryRecord =
+  Record<string, unknown>;
 
 type ParsedBookBlock = {
-  type: 'title' | 'heading' | 'numbered' | 'paragraph';
+  type:
+    | 'title'
+    | 'heading'
+    | 'numbered'
+    | 'paragraph';
   text: string;
 };
 
-export default async function BookDetailPage({ params }: PageProps) {
+export default async function BookDetailPage({
+  params,
+}: PageProps) {
   const { id } = await params;
 
   const session = await auth();
-  const userId = (session?.user as { id?: string } | undefined)?.id;
+  const userId = session?.user?.id;
 
   if (!userId) {
     redirect('/login');
   }
 
-  const book = await prisma.book.findFirst({
-    where: {
-      id,
-      authorId: userId,
-    } as any,
-  });
+  const book =
+    await prisma.book.findFirst({
+      where: {
+        id,
+        authorId: userId,
+      },
+    });
 
   if (!book) {
     notFound();
   }
 
-      const productionRequest = await prisma.bookProductionRequest.findFirst({
-    where: {
-      bookId: book.id,
-      authorId: userId,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    select: {
-      id: true,
-      name: true,
-      phone: true,
-      email: true,
-      message: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
-
-    const linkedBookMemories = await prisma.bookMemory.findMany({
-    where: {
-      bookId: book.id,
-      memory: {
+  const [
+    productionRequest,
+    linkedBookMemories,
+  ] = await Promise.all([
+    prisma.bookProductionRequest.findFirst({
+      where: {
+        bookId: book.id,
         authorId: userId,
       },
-    },
-    orderBy: {
-      order: 'asc',
-    },
-    select: {
-      memory: true,
-    },
-  });
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        message: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    }),
 
-  const linkedMemories = linkedBookMemories.map((item) => {
-    return item.memory;
-  }) as unknown as MemoryRecord[];
+    prisma.bookMemory.findMany({
+      where: {
+        bookId: book.id,
+        memory: {
+          authorId: userId,
+        },
+      },
+      orderBy: {
+        order: 'asc',
+      },
+      select: {
+        memory: true,
+      },
+    }),
+  ]);
+
+  const linkedMemories =
+    linkedBookMemories.map(
+      (item) => item.memory,
+    ) as unknown as MemoryRecord[];
 
   const fallbackMemories =
     linkedMemories.length > 0
@@ -88,7 +106,7 @@ export default async function BookDetailPage({ params }: PageProps) {
       : await prisma.memory.findMany({
           where: {
             authorId: userId,
-          } as any,
+          },
           orderBy: {
             createdAt: 'desc',
           },
@@ -100,19 +118,45 @@ export default async function BookDetailPage({ params }: PageProps) {
       ? linkedMemories
       : (fallbackMemories as unknown as MemoryRecord[]);
 
-  const photoMemories = allMemories.filter(isPhotoMemory);
-  const photos = photoMemories.slice(0, 6);
-  const photoStories = photoMemories.filter(hasStoryDescription).slice(0, 8);
-  const stories = allMemories.filter(isStoryMemory).slice(0, 8);
-  const selectedMemoryIdsForRefresh = allMemories
-    .map((memory) => {
-      return typeof memory.id === 'string' ? memory.id : '';
-    })
-    .filter((id) => id.length > 0);
+  const photoMemories =
+    allMemories.filter(
+      isPhotoMemory,
+    );
 
-  const bookRecord = book as unknown as MemoryRecord;
-  const content = cleanText(bookRecord.content);
-  const parsedContent = parseBookContent(content);
+  const photos =
+    photoMemories.slice(0, 8);
+
+  const photoStories =
+    photoMemories
+      .filter(hasStoryDescription)
+      .slice(0, 8);
+
+  const stories =
+    allMemories
+      .filter(isStoryMemory)
+      .slice(0, 8);
+
+  const selectedMemoryIdsForRefresh =
+    allMemories
+      .map((memory) =>
+        typeof memory.id === 'string'
+          ? memory.id
+          : '',
+      )
+      .filter(
+        (memoryId) =>
+          memoryId.length > 0,
+      );
+
+  const bookRecord =
+    book as unknown as MemoryRecord;
+
+  const content = cleanText(
+    bookRecord.content,
+  );
+
+  const parsedContent =
+    parseBookContent(content);
 
   const coverText =
     cleanText(bookRecord.coverText) ||
@@ -120,63 +164,290 @@ export default async function BookDetailPage({ params }: PageProps) {
 
   const summary =
     cleanText(bookRecord.summary) ||
-    '사진과 이야기를 바탕으로 정리한 인생책 원고 초안입니다.';
+    '사진과 이야기를 바탕으로 정리한 책 원고 초안입니다.';
+
+  const displayedPhotoCount =
+    book.basedPhotoCount ??
+    photos.length;
+
+  const displayedStoryCount =
+    book.basedStoryCount ??
+    stories.length +
+      photoStories.length;
 
   return (
-      <main
-         style={{
-         minHeight: '100vh',
-         ...gridPaperPageStyle(),
-         color: '#24170f',
-         padding: '34px 28px 80px',
-           }}
-      >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 1180,
-          margin: '0 auto',
-        }}
-      >
+    <main
+      style={{
+        minHeight: '100vh',
+        ...gridPaperPageStyle(),
+        color: '#24170f',
+      }}
+    >
+      <style>{`
+        .book-detail-container {
+          width: 100%;
+          max-width: 1240px;
+          margin: 0 auto;
+          padding: 28px 28px 80px;
+        }
+
+        .book-detail-header {
+          display: grid;
+          grid-template-columns:
+            minmax(0, 1fr) auto;
+          gap: 24px;
+          align-items: start;
+        }
+
+        .book-detail-actions {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+          gap: 8px;
+          max-width: 620px;
+        }
+
+        .book-overview-grid {
+          display: grid;
+          grid-template-columns:
+            minmax(280px, 0.9fr)
+            minmax(360px, 1.35fr);
+          gap: 24px;
+        }
+
+        .book-info-grid {
+          display: grid;
+          grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .book-section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          flex-wrap: wrap;
+          gap: 14px;
+        }
+
+        .book-preview-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .book-photo-grid {
+          display: grid;
+          grid-template-columns:
+            repeat(auto-fit, minmax(220px, 1fr));
+          gap: 16px;
+        }
+
+        .book-story-grid {
+          display: grid;
+          grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+          gap: 24px;
+        }
+
+        .photo-story-card {
+          display: grid;
+          grid-template-columns:
+            140px minmax(0, 1fr);
+        }
+
+        .book-next-section {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 20px;
+        }
+
+        .book-next-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        @media (max-width: 1000px) {
+          .book-detail-header {
+            grid-template-columns: 1fr;
+          }
+
+          .book-detail-actions {
+            justify-content: flex-start;
+            max-width: none;
+          }
+
+          .book-overview-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .book-story-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .book-detail-container {
+            padding: 16px 16px 60px;
+          }
+
+          .book-detail-panel {
+            padding: 20px 16px !important;
+            border-radius: 24px !important;
+          }
+
+          .book-detail-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            width: 100%;
+          }
+
+          .book-detail-actions > * {
+            width: 100%;
+          }
+
+          .book-info-grid {
+            grid-template-columns:
+              repeat(2, minmax(0, 1fr));
+          }
+
+          .book-preview-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            width: 100%;
+          }
+
+          .book-preview-actions a {
+            width: 100%;
+          }
+
+          .book-photo-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .photo-story-card {
+            grid-template-columns: 1fr;
+          }
+
+          .photo-story-image {
+            min-height: 220px !important;
+          }
+
+          .photo-story-content {
+            padding: 18px !important;
+          }
+
+          .book-content-paper {
+            padding: 24px 18px !important;
+          }
+
+          .book-next-section {
+            display: grid;
+            grid-template-columns: 1fr;
+          }
+
+          .book-next-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+          }
+
+          .book-next-actions a {
+            width: 100%;
+          }
+        }
+      `}</style>
+
+      <div className="book-detail-container">
         <section
+          className="book-detail-panel"
           style={{
-            border: '1px solid #e4cda3',
-            background: '#fffaf0',
+            padding: 30,
             borderRadius: 30,
-            padding: 32,
-            boxShadow: '0 18px 45px rgba(80, 55, 20, 0.10)',
-            marginBottom: 28,
+            border:
+              '1px solid #e4cda3',
+            background: '#fffaf0',
+            boxShadow:
+              '0 18px 45px rgba(80, 55, 20, 0.10)',
+            marginBottom: 24,
           }}
         >
           <p
             style={{
               margin: 0,
-              fontSize: 14,
-              fontWeight: 900,
               color: '#9a6a24',
+              fontSize: 12,
+              fontWeight: 900,
+              letterSpacing: '0.06em',
             }}
           >
             내 책장 / 책 상세 보기
           </p>
 
           <div
+            className="book-detail-header"
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1fr) auto',
-              gap: 24,
-              alignItems: 'start',
               marginTop: 12,
             }}
           >
             <div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 7,
+                  marginBottom: 12,
+                }}
+              >
+                <span
+                  style={bookTypeBadgeStyle()}
+                >
+                  {getBookTypeLabel(
+                    String(book.type),
+                  )}
+                </span>
+
+                <span
+                  style={bookStatusBadgeStyle(
+                    String(book.status),
+                  )}
+                >
+                  {getStatusLabel(
+                    String(book.status),
+                  )}
+                </span>
+
+                <span
+                  style={productionStatusBadgeStyle(
+                    productionRequest
+                      ? String(
+                          productionRequest.status,
+                        )
+                      : null,
+                  )}
+                >
+                  {productionRequest
+                    ? getProductionRequestStatusLabel(
+                        String(
+                          productionRequest.status,
+                        ),
+                      )
+                    : '제작 상담 미신청'}
+                </span>
+              </div>
+
               <h1
                 style={{
                   margin: 0,
-                  fontFamily: 'Noto Serif KR, serif',
-                  fontSize: 42,
+                  color: '#20130d',
+                  fontFamily:
+                    'Noto Serif KR, serif',
+                  fontSize:
+                    'clamp(34px, 5vw, 46px)',
                   lineHeight: 1.25,
                   letterSpacing: '-0.05em',
-                  color: '#20130d',
+                  wordBreak: 'break-word',
                 }}
               >
                 {book.title}
@@ -185,115 +456,135 @@ export default async function BookDetailPage({ params }: PageProps) {
               {book.subtitle ? (
                 <p
                   style={{
-                    margin: '14px 0 0',
-                    fontSize: 18,
-                    lineHeight: 1.7,
+                    margin: '13px 0 0',
                     color: '#6b5a46',
+                    fontSize: 17,
+                    lineHeight: 1.7,
                   }}
                 >
                   {book.subtitle}
                 </p>
               ) : null}
+
+              <p
+                style={{
+                  margin: '12px 0 0',
+                  color: '#8a806f',
+                  fontSize: 12,
+                }}
+              >
+                생성일{' '}
+                {formatDate(
+                  book.createdAt,
+                )}
+                {' · '}
+                마지막 정리일{' '}
+                {formatDate(
+                  book.updatedAt,
+                )}
+              </p>
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 8,
-                justifyContent: 'flex-end',
-              }}
-            >
+            <div className="book-detail-actions">
               <RefreshBookDraftButton
                 bookId={book.id}
-                selectedMemoryIds={selectedMemoryIdsForRefresh}
+                selectedMemoryIds={
+                  selectedMemoryIdsForRefresh
+                }
               />
-
-              <DeleteBookButton bookId={book.id} redirectTo="/dashboard/library" />
 
               <BookProductionRequestButton
                 bookId={book.id}
                 defaultName={
                   productionRequest?.name ||
                   cleanText(
-                    (session?.user as { name?: unknown } | undefined)?.name,
+                    session.user.name,
                   )
                 }
-                defaultPhone={productionRequest?.phone || ''}
+                defaultPhone={
+                  productionRequest?.phone ||
+                  ''
+                }
                 defaultEmail={
                   productionRequest?.email ||
                   cleanText(
-                    (session?.user as { email?: unknown } | undefined)?.email,
+                    session.user.email,
                   )
                 }
-                defaultMessage={productionRequest?.message || ''}
+                defaultMessage={
+                  productionRequest?.message ||
+                  ''
+                }
                 existingRequestId={
-                  productionRequest ? String(productionRequest.id) : null
+                  productionRequest
+                    ? String(
+                        productionRequest.id,
+                      )
+                    : null
                 }
                 existingStatus={
-                  productionRequest ? String(productionRequest.status) : null
+                  productionRequest
+                    ? String(
+                        productionRequest.status,
+                      )
+                    : null
                 }
               />
 
-                              <Link
-                href={`/dashboard/library/${book.id}/ebook`}
-                style={buttonStyle('#fff4df', '#5a3510')}
-              >
-                전자책 보기
-              </Link>
-
               <Link
-                href={`/dashboard/library/${book.id}/print`}
-                style={buttonStyle('#f3d28a', '#6d4512')}
+                href="/dashboard/library"
+                style={buttonStyle(
+                  '#fffaf0',
+                  '#4a3828',
+                )}
               >
-                인쇄용 원고 보기
+                내 책장으로
               </Link>
 
-               <Link href="/dashboard/library" style={buttonStyle('#fffaf0', '#4a3828')}>
-                내 책장으로 돌아가기
-              </Link>
-
-              <Link href="/dashboard/book" style={buttonStyle('#24170f', '#fffaf0')}>
-                책 원고 만들기
-              </Link>
+              <DeleteBookButton
+                bookId={book.id}
+                redirectTo="/dashboard/library"
+              />
             </div>
           </div>
         </section>
 
         <section
+          className="book-overview-grid"
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(280px, 0.95fr) minmax(320px, 1.3fr)',
-            gap: 24,
-            marginBottom: 28,
+            marginBottom: 24,
           }}
         >
-          <div
+          <article
+            className="book-detail-panel"
             style={{
-              borderRadius: 30,
+              minHeight: 350,
               padding: 34,
+              borderRadius: 30,
               background:
                 'linear-gradient(135deg, #21150f 0%, #332016 58%, #6e3c22 100%)',
               color: '#fffaf0',
-              minHeight: 330,
-              boxShadow: '0 18px 40px rgba(70, 45, 20, 0.18)',
+              boxShadow:
+                '0 18px 40px rgba(70, 45, 20, 0.18)',
             }}
           >
             <p
               style={{
                 margin: 0,
                 color: '#f3d28a',
-                fontSize: 14,
-                fontWeight: 800,
+                fontSize: 12,
+                fontWeight: 900,
+                letterSpacing: '0.06em',
               }}
             >
-              Daldongne Life Book
+              DALDONGNE MEMORY BOOK
             </p>
 
             <h2
               style={{
                 margin: '18px 0 0',
-                fontFamily: 'Noto Serif KR, serif',
+                fontFamily:
+                  'Noto Serif KR, serif',
                 fontSize: 34,
                 lineHeight: 1.32,
                 letterSpacing: '-0.05em',
@@ -304,10 +595,10 @@ export default async function BookDetailPage({ params }: PageProps) {
 
             <p
               style={{
-                margin: '42px 0 0',
-                fontSize: 19,
-                lineHeight: 1.85,
+                margin: '38px 0 0',
                 color: '#fff2d8',
+                fontSize: 18,
+                lineHeight: 1.85,
                 wordBreak: 'keep-all',
               }}
             >
@@ -316,33 +607,31 @@ export default async function BookDetailPage({ params }: PageProps) {
 
             <p
               style={{
-                margin: '42px 0 0',
-                paddingTop: 18,
-                borderTop: '1px solid rgba(255,255,255,0.18)',
+                margin: '38px 0 0',
+                paddingTop: 17,
+                borderTop:
+                  '1px solid rgba(255,255,255,0.18)',
                 color: '#f3d28a',
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: 800,
               }}
             >
-              사진과 이야기로 엮은 우리 가족의 기록
+              사진과 이야기로 엮은
+              우리들의 기록
             </p>
-          </div>
+          </article>
 
-          <div
-            style={{
-              borderRadius: 30,
-              padding: 30,
-              background: '#fffaf0',
-              border: '1px solid #e4cda3',
-              boxShadow: '0 18px 45px rgba(80, 55, 20, 0.08)',
-            }}
+          <article
+            className="book-detail-panel"
+            style={panelStyle()}
           >
             <p
               style={{
                 margin: 0,
-                fontSize: 14,
-                fontWeight: 900,
                 color: '#9a6a24',
+                fontSize: 12,
+                fontWeight: 900,
+                letterSpacing: '0.06em',
               }}
             >
               책 소개
@@ -351,9 +640,9 @@ export default async function BookDetailPage({ params }: PageProps) {
             <p
               style={{
                 margin: '12px 0 0',
-                fontSize: 18,
-                lineHeight: 1.85,
                 color: '#4a3828',
+                fontSize: 17,
+                lineHeight: 1.85,
                 wordBreak: 'keep-all',
               }}
             >
@@ -361,98 +650,180 @@ export default async function BookDetailPage({ params }: PageProps) {
             </p>
 
             <div
+              className="book-info-grid"
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
-                gap: 12,
-                marginTop: 28,
+                marginTop: 24,
               }}
             >
-                            <InfoCard title="책 상태" value={getStatusLabel(String(book.status))} />
+              <InfoCard
+                title="책 종류"
+                value={getBookTypeLabel(
+                  String(book.type),
+                )}
+              />
+
+              <InfoCard
+                title="책 상태"
+                value={getStatusLabel(
+                  String(book.status),
+                )}
+              />
 
               <InfoCard
                 title="제작 상담"
                 value={
                   productionRequest
                     ? getProductionRequestStatusLabel(
-                        String(productionRequest.status),
+                        String(
+                          productionRequest.status,
+                        ),
                       )
-                    : '상담 미신청'
+                    : '미신청'
                 }
               />
 
-              <InfoCard title="예상 분량" value={getPageCountLabel(book.pageCount)} />
-
               <InfoCard
-                title="사진"
-                value={`${book.basedPhotoCount ?? photos.length}장`}
+                title="예상 분량"
+                value={getPageCountLabel(
+                  book.pageCount,
+                )}
               />
 
               <InfoCard
-                title="이야기"
-                value={`${book.basedStoryCount ?? stories.length}개`}
+                title="사용 사진"
+                value={`${displayedPhotoCount}장`}
+              />
+
+              <InfoCard
+                title="사용 이야기"
+                value={`${displayedStoryCount}개`}
               />
             </div>
 
+            {productionRequest ? (
+              <div
+                style={{
+                  marginTop: 20,
+                  padding: 16,
+                  borderRadius: 18,
+                  border:
+                    '1px solid #b9d5e9',
+                  background: '#eef7ff',
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    color: '#245d8c',
+                    fontSize: 12,
+                    fontWeight: 900,
+                  }}
+                >
+                  제작 상담 현황
+                </p>
+
+                <strong
+                  style={{
+                    display: 'block',
+                    marginTop: 6,
+                    color: '#33271d',
+                    fontSize: 15,
+                    lineHeight: 1.55,
+                  }}
+                >
+                  {getProductionRequestStatusLabel(
+                    String(
+                      productionRequest.status,
+                    ),
+                  )}
+                </strong>
+
+                <p
+                  style={{
+                    margin: '7px 0 0',
+                    color: '#5f7180',
+                    fontSize: 12,
+                    lineHeight: 1.65,
+                  }}
+                >
+                  신청일{' '}
+                  {formatDate(
+                    productionRequest.createdAt,
+                  )}
+                  {' · '}
+                  최근 변경{' '}
+                  {formatDate(
+                    productionRequest.updatedAt,
+                  )}
+                </p>
+              </div>
+            ) : (
+              <div
+                style={{
+                  marginTop: 20,
+                  padding: 16,
+                  borderRadius: 18,
+                  border:
+                    '1px solid #e3bd7a',
+                  background: '#fff4df',
+                  color: '#83540d',
+                  fontSize: 13,
+                  lineHeight: 1.7,
+                  fontWeight: 800,
+                }}
+              >
+                이 책은 아직 제작 상담을
+                신청하지 않았습니다. 상단의
+                제작 상담 버튼에서 실제 책
+                제작을 문의할 수 있습니다.
+              </div>
+            )}
+
             <p
               style={{
-                margin: '22px 0 0',
-                fontSize: 14,
-                color: '#8a806f',
-              }}
-            >
-              마지막 정리일: {formatDate(book.updatedAt)}
-            </p>
-
-             <p
-              style={{
-                margin: '12px 0 0',
+                margin: '18px 0 0',
                 padding: '12px 14px',
                 borderRadius: 16,
-                background: linkedMemories.length > 0 ? '#f3fbf5' : '#fff9e8',
+                background:
+                  linkedMemories.length > 0
+                    ? '#f3fbf5'
+                    : '#fff9e8',
                 border:
                   linkedMemories.length > 0
                     ? '1px solid #9ec9a8'
                     : '1px solid #e1bd67',
-                color: linkedMemories.length > 0 ? '#2f6b3f' : '#7a4b00',
-                fontSize: 13,
+                color:
+                  linkedMemories.length > 0
+                    ? '#2f6b3f'
+                    : '#7a4b00',
+                fontSize: 12,
                 lineHeight: 1.7,
                 fontWeight: 800,
               }}
             >
               {linkedMemories.length > 0
                 ? '이 책은 원고를 만들 때 선택한 사진과 이야기를 기준으로 표시됩니다.'
-                : '이전 방식으로 만든 책이라 연결된 자료 정보가 아직 없습니다. 원고 다시 정리하기를 누르면 선택한 자료가 이 책에 정확히 연결됩니다.'}
+                : '이전 방식으로 만든 책이라 연결된 자료가 없습니다. 원고 다시 정리하기를 실행하면 현재 자료가 책에 다시 연결됩니다.'}
             </p>
-          </div>
+          </article>
         </section>
 
         <section
+          className="book-detail-panel"
           style={{
-            borderRadius: 30,
-            padding: 32,
-            background: '#fffaf0',
-            border: '1px solid #e4cda3',
-            boxShadow: '0 18px 45px rgba(80, 55, 20, 0.08)',
-            marginBottom: 28,
+            ...panelStyle(),
+            marginBottom: 24,
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: 18,
-              alignItems: 'center',
-              marginBottom: 22,
-            }}
-          >
+          <div className="book-section-header">
             <div>
               <p
                 style={{
                   margin: 0,
-                  fontSize: 14,
-                  fontWeight: 900,
                   color: '#9a6a24',
+                  fontSize: 12,
+                  fontWeight: 900,
+                  letterSpacing: '0.06em',
                 }}
               >
                 책 원고 미리보기
@@ -461,180 +832,258 @@ export default async function BookDetailPage({ params }: PageProps) {
               <h2
                 style={{
                   margin: '8px 0 0',
-                  fontFamily: 'Noto Serif KR, serif',
+                  color: '#20130d',
+                  fontFamily:
+                    'Noto Serif KR, serif',
                   fontSize: 30,
                   lineHeight: 1.35,
                   letterSpacing: '-0.04em',
-                  color: '#20130d',
                 }}
               >
                 한 권의 책처럼 읽히는 원고
               </h2>
+
+              <p
+                style={{
+                  margin: '9px 0 0',
+                  maxWidth: 720,
+                  color: '#6b5a46',
+                  fontSize: 14,
+                  lineHeight: 1.75,
+                }}
+              >
+                전자책 화면에서는 실제 책처럼
+                읽고, 인쇄용 원고에서는 표지와
+                목차를 포함한 출력 형태를
+                확인할 수 있습니다.
+              </p>
             </div>
 
-             <Link
-              href={`/dashboard/library/${book.id}/ebook`}
-              style={buttonStyle('#fff4df', '#5a3510')}
-            >
-              전자책 보기
-            </Link>
+            <div className="book-preview-actions">
+              <Link
+                href={`/dashboard/library/${book.id}/ebook`}
+                style={buttonStyle(
+                  '#fff4df',
+                  '#5a3510',
+                )}
+              >
+                전자책 보기
+              </Link>
 
-            <Link
-              href={`/dashboard/library/${book.id}/print`}
-              style={buttonStyle('#f3d28a', '#6d4512')}
-            >
-              인쇄용 원고 보기
-            </Link>
+              <Link
+                href={`/dashboard/library/${book.id}/print`}
+                style={buttonStyle(
+                  '#f3d28a',
+                  '#6d4512',
+                )}
+              >
+                인쇄용 원고
+              </Link>
+            </div>
           </div>
 
-          <p
+          <div
             style={{
-              margin: '0 0 26px',
-              fontSize: 15,
-              lineHeight: 1.75,
-              color: '#6b5a46',
+              marginTop: 24,
             }}
           >
-            사진과 이야기를 단순 목록이 아니라 서문, 장면, 가족의 기억,
-            앞으로 채워갈 원고 흐름으로 정리했습니다.
-          </p>
-
-          <BookContentPreview blocks={parsedContent} />
+            <BookContentPreview
+              blocks={parsedContent}
+            />
+          </div>
         </section>
 
         <section
+          className="book-detail-panel"
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
-            gap: 24,
-            marginBottom: 28,
+            ...panelStyle(),
+            marginBottom: 24,
           }}
         >
-          <div style={panelStyle()}>
-            <SectionTitle label="이 책에 들어갈 사진" title="사진에서 시작된 기억" />
+          <SectionTitle
+            label="이 책에 들어간 사진"
+            title="사진에서 시작된 기억"
+            description={`현재 화면에는 최대 8장까지 표시합니다. 전체 연결 사진은 ${photoMemories.length}장입니다.`}
+          />
 
-            {photos.length > 0 ? (
+          {photos.length > 0 ? (
+            <div
+              className="book-photo-grid"
+              style={{
+                marginTop: 20,
+              }}
+            >
+              {photos.map(
+                (photo, index) => (
+                  <PhotoCard
+                    key={String(
+                      photo.id ?? index,
+                    )}
+                    photo={photo}
+                  />
+                ),
+              )}
+            </div>
+          ) : (
+            <EmptyBox text="아직 이 책에 연결된 사진이 없습니다." />
+          )}
+        </section>
+
+        <section
+          className="book-story-grid"
+          style={{
+            marginBottom: 24,
+          }}
+        >
+          <article
+            className="book-detail-panel"
+            style={panelStyle()}
+          >
+            <SectionTitle
+              label="사진에 붙인 이야기"
+              title="사진 한 장에 담긴 기억"
+              description="사진의 제목과 설명으로 남긴 이야기입니다."
+            />
+
+            {photoStories.length > 0 ? (
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                  gap: 16,
-                  marginTop: 20,
-                }}
-              >
-                {photos.map((photo, index) => (
-                  <PhotoCard key={String(photo.id ?? index)} photo={photo} />
-                ))}
-              </div>
-            ) : (
-              <EmptyBox text="아직 이 책에 넣을 사진이 없습니다." />
-            )}
-          </div>
-       
-          <div style={panelStyle()}>
-  <SectionTitle
-    label="사진에 붙인 이야기"
-    title="사진 한 장에 담긴 기억"
-  />
-
-  {photoStories.length > 0 ? (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 14,
-        marginTop: 20,
-      }}
-    >
-      {photoStories.map((story, index) => (
-        <PhotoStoryCard key={String(story.id ?? index)} story={story} />
-      ))}
-    </div>
-  ) : (
-    <EmptyBox text="아직 사진에 붙인 이야기가 없습니다." />
-  )}
-</div>
-
-          <div style={panelStyle()}>
-            <SectionTitle label="자유 이야기" title="글로 남긴 우리들의 시간" />
-
-            {stories.length > 0 ? (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
                   gap: 14,
                   marginTop: 20,
                 }}
               >
-                {stories.map((story, index) => (
-                  <StoryCard key={String(story.id ?? index)} story={story} />
-                ))}
+                {photoStories.map(
+                  (story, index) => (
+                    <PhotoStoryCard
+                      key={String(
+                        story.id ??
+                          index,
+                      )}
+                      story={story}
+                    />
+                  ),
+                )}
               </div>
             ) : (
-              <EmptyBox text="아직 이 책에 넣을 이야기가 없습니다." />
+              <EmptyBox text="아직 사진에 붙인 이야기가 없습니다." />
             )}
-          </div>
+          </article>
+
+          <article
+            className="book-detail-panel"
+            style={panelStyle()}
+          >
+            <SectionTitle
+              label="직접 남긴 이야기"
+              title="글로 남긴 우리들의 시간"
+              description="이야기 남기기 화면에서 직접 작성한 기록입니다."
+            />
+
+            {stories.length > 0 ? (
+              <div
+                style={{
+                  display: 'grid',
+                  gap: 14,
+                  marginTop: 20,
+                }}
+              >
+                {stories.map(
+                  (story, index) => (
+                    <StoryCard
+                      key={String(
+                        story.id ??
+                          index,
+                      )}
+                      story={story}
+                    />
+                  ),
+                )}
+              </div>
+            ) : (
+              <EmptyBox text="아직 이 책에 연결된 이야기가 없습니다." />
+            )}
+          </article>
         </section>
 
-        <section style={panelStyle()}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: 20,
-              alignItems: 'center',
-            }}
-          >
-            <div>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: 14,
-                  fontWeight: 900,
-                  color: '#9a6a24',
-                }}
-              >
-                다음 작업
-              </p>
+        <section
+          className="book-detail-panel book-next-section"
+          style={panelStyle()}
+        >
+          <div>
+            <p
+              style={{
+                margin: 0,
+                color: '#9a6a24',
+                fontSize: 12,
+                fontWeight: 900,
+                letterSpacing: '0.06em',
+              }}
+            >
+              다음 작업
+            </p>
 
-              <h2
-                style={{
-                  margin: '8px 0 0',
-                  fontFamily: 'Noto Serif KR, serif',
-                  fontSize: 30,
-                  lineHeight: 1.35,
-                  letterSpacing: '-0.04em',
-                  color: '#20130d',
-                }}
-              >
-                이 원고는 계속 좋아질 수 있습니다
-              </h2>
+            <h2
+              style={{
+                margin: '8px 0 0',
+                color: '#20130d',
+                fontFamily:
+                  'Noto Serif KR, serif',
+                fontSize: 28,
+                lineHeight: 1.4,
+                letterSpacing: '-0.04em',
+              }}
+            >
+              사진과 이야기를 보완하면
+              원고를 더 풍부하게 만들 수
+              있습니다.
+            </h2>
 
-              <p
-                style={{
-                  margin: '10px 0 0',
-                  fontSize: 15,
-                  lineHeight: 1.75,
-                  color: '#6b5a46',
-                }}
-              >
-                사진과 이야기를 더 추가한 뒤 원고를 다시 정리하면 책의 내용이
-                더 깊어집니다.
-              </p>
-            </div>
+            <p
+              style={{
+                margin: '9px 0 0',
+                maxWidth: 720,
+                color: '#6b5a46',
+                fontSize: 14,
+                lineHeight: 1.75,
+              }}
+            >
+              자료를 추가한 다음 상단의
+              원고 다시 정리하기 버튼을
+              사용하세요.
+            </p>
+          </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              <Link href="/dashboard/timeline" style={buttonStyle('#fffaf0', '#4a3828')}>
-                사진 더 모으기
-              </Link>
+          <div className="book-next-actions">
+            <Link
+              href="/dashboard/timeline"
+              style={buttonStyle(
+                '#fffaf0',
+                '#4a3828',
+              )}
+            >
+              사진 더 모으기
+            </Link>
 
-              <Link href="/dashboard/interview" style={buttonStyle('#fffaf0', '#4a3828')}>
-                이야기 더 남기기
-              </Link>
+            <Link
+              href="/dashboard/interview"
+              style={buttonStyle(
+                '#fffaf0',
+                '#4a3828',
+              )}
+            >
+              이야기 더 남기기
+            </Link>
 
-              <RefreshBookDraftButton />
-            </div>
+            <Link
+              href="/dashboard/library"
+              style={buttonStyle(
+                '#24170f',
+                '#fffaf0',
+              )}
+            >
+              내 책장으로
+            </Link>
           </div>
         </section>
       </div>
@@ -642,235 +1091,183 @@ export default async function BookDetailPage({ params }: PageProps) {
   );
 }
 
-function buttonStyle(background: string, color: string) {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 42,
-    padding: '0 18px',
-    borderRadius: 999,
-    border: '1px solid #d6b778',
-    background,
-    color,
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap' as const,
-  };
-}
-
-function panelStyle() {
-  return {
-    borderRadius: 30,
-    padding: 30,
-    background: '#fffaf0',
-    border: '1px solid #e4cda3',
-    boxShadow: '0 18px 45px rgba(80, 55, 20, 0.08)',
-  };
-}
-
-function InfoCard({ title, value }: { title: string; value: string }) {
-  return (
-    <div
-      style={{
-        borderRadius: 18,
-        background: '#f7eddc',
-        border: '1px solid #ead7b7',
-        padding: 16,
-      }}
-    >
-      <p
-        style={{
-          margin: 0,
-          fontSize: 12,
-          fontWeight: 900,
-          color: '#8a806f',
-        }}
-      >
-        {title}
-      </p>
-      <p
-        style={{
-          margin: '8px 0 0',
-          fontSize: 18,
-          fontWeight: 900,
-          color: '#20130d',
-        }}
-      >
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function SectionTitle({ label, title }: { label: string; title: string }) {
-  return (
-    <div>
-      <p
-        style={{
-          margin: 0,
-          fontSize: 14,
-          fontWeight: 900,
-          color: '#9a6a24',
-        }}
-      >
-        {label}
-      </p>
-      <h2
-        style={{
-          margin: '8px 0 0',
-          fontFamily: 'Noto Serif KR, serif',
-          fontSize: 28,
-          lineHeight: 1.35,
-          letterSpacing: '-0.04em',
-          color: '#20130d',
-        }}
-      >
-        {title}
-      </h2>
-    </div>
-  );
-}
-
-function BookContentPreview({ blocks }: { blocks: ParsedBookBlock[] }) {
+function BookContentPreview({
+  blocks,
+}: {
+  blocks: ParsedBookBlock[];
+}) {
   if (blocks.length === 0) {
     return (
-      <EmptyBox text="아직 원고가 없습니다. 원고 다시 정리하기를 누르면 이곳에 책 원고가 표시됩니다." />
+      <EmptyBox text="아직 원고 내용이 없습니다. 상단의 원고 다시 정리하기 버튼을 누르면 이곳에 원고가 표시됩니다." />
     );
   }
 
   return (
     <article
+      className="book-content-paper"
       style={{
-        background: '#fffdf6',
-        borderRadius: 24,
-        border: '1px solid #ead7b7',
         padding: '34px 42px',
+        borderRadius: 24,
+        border:
+          '1px solid #ead7b7',
+        background: '#fffdf6',
       }}
     >
-      {blocks.map((block, index) => {
-        if (block.type === 'title') {
-          return (
-            <h1
-              key={`${block.type}-${index}`}
-              style={{
-                margin: '0 0 28px',
-                paddingBottom: 22,
-                borderBottom: '1px solid #ead7b7',
-                fontFamily: 'Noto Serif KR, serif',
-                fontSize: 34,
-                lineHeight: 1.35,
-                letterSpacing: '-0.05em',
-                color: '#20130d',
-              }}
-            >
-              {block.text}
-            </h1>
-          );
-        }
+      {blocks.map(
+        (block, index) => {
+          if (
+            block.type === 'title'
+          ) {
+            return (
+              <h1
+                key={`${block.type}-${index}`}
+                style={{
+                  margin: '0 0 28px',
+                  paddingBottom: 22,
+                  borderBottom:
+                    '1px solid #ead7b7',
+                  color: '#20130d',
+                  fontFamily:
+                    'Noto Serif KR, serif',
+                  fontSize: 34,
+                  lineHeight: 1.35,
+                  letterSpacing:
+                    '-0.05em',
+                }}
+              >
+                {block.text}
+              </h1>
+            );
+          }
 
-        if (block.type === 'heading') {
-          return (
-            <h2
-              key={`${block.type}-${index}`}
-              style={{
-                margin: '34px 0 14px',
-                fontFamily: 'Noto Serif KR, serif',
-                fontSize: 26,
-                lineHeight: 1.45,
-                letterSpacing: '-0.04em',
-                color: '#2d1c12',
-              }}
-            >
-              {block.text}
-            </h2>
-          );
-        }
+          if (
+            block.type === 'heading'
+          ) {
+            return (
+              <h2
+                key={`${block.type}-${index}`}
+                style={{
+                  margin:
+                    '34px 0 14px',
+                  color: '#2d1c12',
+                  fontFamily:
+                    'Noto Serif KR, serif',
+                  fontSize: 26,
+                  lineHeight: 1.45,
+                  letterSpacing:
+                    '-0.04em',
+                }}
+              >
+                {block.text}
+              </h2>
+            );
+          }
 
-        if (block.type === 'numbered') {
+          if (
+            block.type ===
+            'numbered'
+          ) {
+            return (
+              <p
+                key={`${block.type}-${index}`}
+                style={{
+                  margin: '14px 0',
+                  padding:
+                    '14px 18px',
+                  borderRadius: 16,
+                  background:
+                    '#f7eddc',
+                  color: '#4a3828',
+                  fontSize: 16,
+                  lineHeight: 1.8,
+                }}
+              >
+                {block.text}
+              </p>
+            );
+          }
+
           return (
             <p
               key={`${block.type}-${index}`}
               style={{
-                margin: '14px 0',
-                padding: '14px 18px',
-                borderRadius: 16,
-                background: '#f7eddc',
-                fontSize: 16,
-                lineHeight: 1.8,
-                color: '#4a3828',
+                margin: '0 0 18px',
+                color: '#3b2b1d',
+                fontSize: 17,
+                lineHeight: 2,
+                wordBreak: 'keep-all',
               }}
             >
               {block.text}
             </p>
           );
-        }
-
-        return (
-          <p
-            key={`${block.type}-${index}`}
-            style={{
-              margin: '0 0 18px',
-              fontSize: 17,
-              lineHeight: 2,
-              color: '#3b2b1d',
-              wordBreak: 'keep-all',
-            }}
-          >
-            {block.text}
-          </p>
-        );
-      })}
+        },
+      )}
     </article>
   );
 }
 
-function PhotoCard({ photo }: { photo: MemoryRecord }) {
+function PhotoCard({
+  photo,
+}: {
+  photo: MemoryRecord;
+}) {
   const title =
-    pickText(photo, ['title', 'name', 'caption', 'originalName', 'filename']) ||
-    '기억 속 사진';
+    pickText(photo, [
+      'title',
+      'name',
+      'caption',
+      'originalName',
+      'filename',
+    ]) || '기억 속 사진';
 
-  const rawDescription = pickText(photo, [
-    'description',
-    'content',
-    'summary',
-    'memo',
-    'text',
-  ]);
+  const rawDescription =
+    pickText(photo, [
+      'description',
+      'content',
+      'summary',
+      'memo',
+      'text',
+    ]);
 
-  const description = rawDescription || '아직 사진 설명이 없습니다.';
+  const description =
+    rawDescription ||
+    '아직 사진 설명이 없습니다.';
 
   const id = cleanText(photo.id);
-  const imageUrl = id ? `/api/blob/${id}` : '';
-  const occurredAt = getDateInputValue(photo.occurredAt);
+  const occurredAt =
+    getDateInputValue(
+      photo.occurredAt,
+    );
 
   return (
-    <div
+    <article
       style={{
         overflow: 'hidden',
         borderRadius: 22,
-        border: '1px solid #ead7b7',
+        border:
+          '1px solid #ead7b7',
         background: '#ffffff',
       }}
     >
       <div
         style={{
+          position: 'relative',
           width: '100%',
-          height: 190,
-          background: '#f3e6cf',
+          height: 210,
           overflow: 'hidden',
+          background: '#f3e6cf',
         }}
       >
-        {imageUrl ? (
-          <img
-            src={imageUrl}
+        {id ? (
+          <Image
+            src={`/api/blob/${id}`}
             alt={title}
+            fill
+            unoptimized
+            sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
             style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block',
+              objectFit: 'contain',
             }}
           />
         ) : (
@@ -879,10 +1276,11 @@ function PhotoCard({ photo }: { photo: MemoryRecord }) {
               height: '100%',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent:
+                'center',
               color: '#9a6a24',
+              fontSize: 13,
               fontWeight: 900,
-              fontSize: 14,
             }}
           >
             사진을 불러오지 못했습니다
@@ -890,7 +1288,11 @@ function PhotoCard({ photo }: { photo: MemoryRecord }) {
         )}
       </div>
 
-      <div style={{ padding: 16 }}>
+      <div
+        style={{
+          padding: 16,
+        }}
+      >
         <h3
           style={{
             margin: 0,
@@ -899,25 +1301,34 @@ function PhotoCard({ photo }: { photo: MemoryRecord }) {
             fontWeight: 900,
           }}
         >
-          {makeShortText(title, 42)}
+          {makeShortText(
+            title,
+            42,
+          )}
         </h3>
 
         <p
           style={{
             margin: '8px 0 0',
-            fontSize: 14,
-            lineHeight: 1.65,
+            minHeight: 45,
             color: '#6b5a46',
+            fontSize: 13,
+            lineHeight: 1.65,
           }}
         >
-          {makeShortText(description, 80)}
+          {makeShortText(
+            description,
+            90,
+          )}
         </p>
 
         {id ? (
           <div
             style={{
               display: 'flex',
-              justifyContent: 'flex-end',
+              justifyContent:
+                'flex-end',
+              flexWrap: 'wrap',
               gap: 8,
               marginTop: 12,
             }}
@@ -925,61 +1336,81 @@ function PhotoCard({ photo }: { photo: MemoryRecord }) {
             <EditMemoryButton
               memoryId={id}
               initialTitle={title}
-              initialDescription={rawDescription}
-              initialOccurredAt={occurredAt}
+              initialDescription={
+                rawDescription
+              }
+              initialOccurredAt={
+                occurredAt
+              }
               label="사진 수정"
             />
 
-            <DeleteMemoryButton memoryId={id} label="사진 삭제" />
+            <DeleteMemoryButton
+              memoryId={id}
+              label="사진 삭제"
+            />
           </div>
         ) : null}
       </div>
-    </div>
+    </article>
   );
 }
 
-function PhotoStoryCard({ story }: { story: MemoryRecord }) {
+function PhotoStoryCard({
+  story,
+}: {
+  story: MemoryRecord;
+}) {
   const title =
-    pickText(story, ['title', 'name', 'caption', 'originalName', 'filename']) ||
-    '사진에 담긴 이야기';
+    pickText(story, [
+      'title',
+      'name',
+      'caption',
+      'originalName',
+      'filename',
+    ]) || '사진에 담긴 이야기';
 
-  const rawDescription = pickText(story, [
-    'description',
-    'content',
-    'summary',
-    'memo',
-    'text',
-  ]);
+  const rawDescription =
+    pickText(story, [
+      'description',
+      'content',
+      'summary',
+      'memo',
+      'text',
+    ]);
 
-  const description = rawDescription || '아직 사진에 대한 이야기가 없습니다.';
+  const description =
+    rawDescription ||
+    '아직 사진에 대한 이야기가 없습니다.';
 
   const id = cleanText(story.id);
-  const imageUrl = id ? `/api/blob/${id}` : '';
-  const occurredAt = getDateInputValue(story.occurredAt);
+  const occurredAt =
+    getDateInputValue(
+      story.occurredAt,
+    );
 
   return (
-    <div
+    <article
+      className="photo-story-card"
       style={{
-        display: 'grid',
-        gridTemplateColumns: '140px minmax(0, 1fr)',
-        gap: 16,
-        alignItems: 'stretch',
-        borderRadius: 22,
-        border: '1px solid #ead7b7',
-        background: '#f7eddc',
         overflow: 'hidden',
+        borderRadius: 22,
+        border:
+          '1px solid #ead7b7',
+        background: '#f7eddc',
       }}
     >
       <div
+        className="photo-story-image"
         style={{
           position: 'relative',
-          minHeight: 130,
+          minHeight: 145,
           background: '#eadcc5',
         }}
       >
-        {imageUrl ? (
+        {id ? (
           <Image
-            src={imageUrl}
+            src={`/api/blob/${id}`}
             alt={title}
             fill
             unoptimized
@@ -992,38 +1423,48 @@ function PhotoStoryCard({ story }: { story: MemoryRecord }) {
       </div>
 
       <div
+        className="photo-story-content"
         style={{
-          padding: '18px 18px 18px 0',
+          padding:
+            '18px 18px 18px 0',
         }}
       >
         <p
           style={{
             margin: 0,
-            fontSize: 14,
-            fontWeight: 900,
             color: '#9a6a24',
+            fontSize: 13,
+            fontWeight: 900,
           }}
         >
-          {makeShortText(title, 80)}
+          {makeShortText(
+            title,
+            80,
+          )}
         </p>
 
         <p
           style={{
             margin: '10px 0 0',
             whiteSpace: 'pre-line',
-            fontSize: 15,
-            lineHeight: 1.8,
             color: '#4a3828',
+            fontSize: 14,
+            lineHeight: 1.8,
           }}
         >
-          {makeShortText(description, 180)}
+          {makeShortText(
+            description,
+            190,
+          )}
         </p>
 
         {id ? (
           <div
             style={{
               display: 'flex',
-              justifyContent: 'flex-end',
+              justifyContent:
+                'flex-end',
+              flexWrap: 'wrap',
               gap: 8,
               marginTop: 14,
             }}
@@ -1031,71 +1472,98 @@ function PhotoStoryCard({ story }: { story: MemoryRecord }) {
             <EditMemoryButton
               memoryId={id}
               initialTitle={title}
-              initialDescription={rawDescription}
-              initialOccurredAt={occurredAt}
+              initialDescription={
+                rawDescription
+              }
+              initialOccurredAt={
+                occurredAt
+              }
               label="이야기 수정"
             />
 
-            <DeleteMemoryButton memoryId={id} label="사진 삭제" />
+            <DeleteMemoryButton
+              memoryId={id}
+              label="사진 삭제"
+            />
           </div>
         ) : null}
       </div>
-    </div>
+    </article>
   );
 }
 
-function StoryCard({ story }: { story: MemoryRecord }) {
+function StoryCard({
+  story,
+}: {
+  story: MemoryRecord;
+}) {
   const question =
-    pickText(story, ['question', 'title', 'prompt']) || '남겨진 이야기';
+    pickText(story, [
+      'question',
+      'title',
+      'prompt',
+    ]) || '남겨진 이야기';
 
-  const rawAnswer = pickText(story, [
-    'answer',
-    'content',
-    'description',
-    'summary',
-    'memo',
-  ]);
+  const rawAnswer =
+    pickText(story, [
+      'answer',
+      'content',
+      'description',
+      'summary',
+      'memo',
+    ]);
 
-  const answer = rawAnswer || '아직 이야기 내용이 없습니다.';
+  const answer =
+    rawAnswer ||
+    '아직 이야기 내용이 없습니다.';
 
   const id = cleanText(story.id);
 
   return (
-    <div
+    <article
       style={{
-        borderRadius: 22,
-        border: '1px solid #ead7b7',
-        background: '#fffdf6',
         padding: 18,
+        borderRadius: 22,
+        border:
+          '1px solid #ead7b7',
+        background: '#fffdf6',
       }}
     >
       <p
         style={{
           margin: 0,
-          fontSize: 14,
-          fontWeight: 900,
           color: '#9a6a24',
+          fontSize: 13,
+          fontWeight: 900,
         }}
       >
-        {makeShortText(question, 80)}
+        {makeShortText(
+          question,
+          80,
+        )}
       </p>
 
       <p
         style={{
           margin: '10px 0 0',
-          fontSize: 15,
-          lineHeight: 1.75,
           color: '#4a3828',
+          fontSize: 14,
+          lineHeight: 1.75,
         }}
       >
-        {makeShortText(answer, 150)}
+        {makeShortText(
+          answer,
+          170,
+        )}
       </p>
 
       {id ? (
         <div
           style={{
             display: 'flex',
-            justifyContent: 'flex-end',
+            justifyContent:
+              'flex-end',
+            flexWrap: 'wrap',
             gap: 8,
             marginTop: 14,
           }}
@@ -1103,27 +1571,135 @@ function StoryCard({ story }: { story: MemoryRecord }) {
           <EditMemoryButton
             memoryId={id}
             initialTitle={question}
-            initialDescription={rawAnswer}
+            initialDescription={
+              rawAnswer
+            }
             label="이야기 수정"
           />
 
-          <DeleteMemoryButton memoryId={id} label="이야기 삭제" />
+          <DeleteMemoryButton
+            memoryId={id}
+            label="이야기 삭제"
+          />
         </div>
+      ) : null}
+    </article>
+  );
+}
+
+function InfoCard({
+  title,
+  value,
+}: {
+  title: string;
+  value: string;
+}) {
+  return (
+    <div
+      style={{
+        padding: 15,
+        borderRadius: 18,
+        border:
+          '1px solid #ead7b7',
+        background: '#f7eddc',
+      }}
+    >
+      <p
+        style={{
+          margin: 0,
+          color: '#8a806f',
+          fontSize: 11,
+          fontWeight: 900,
+        }}
+      >
+        {title}
+      </p>
+
+      <p
+        style={{
+          margin: '7px 0 0',
+          color: '#20130d',
+          fontSize: 15,
+          lineHeight: 1.4,
+          fontWeight: 900,
+          wordBreak: 'break-word',
+        }}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function SectionTitle({
+  label,
+  title,
+  description,
+}: {
+  label: string;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div>
+      <p
+        style={{
+          margin: 0,
+          color: '#9a6a24',
+          fontSize: 12,
+          fontWeight: 900,
+          letterSpacing: '0.06em',
+        }}
+      >
+        {label}
+      </p>
+
+      <h2
+        style={{
+          margin: '8px 0 0',
+          color: '#20130d',
+          fontFamily:
+            'Noto Serif KR, serif',
+          fontSize: 28,
+          lineHeight: 1.4,
+          letterSpacing: '-0.04em',
+        }}
+      >
+        {title}
+      </h2>
+
+      {description ? (
+        <p
+          style={{
+            margin: '8px 0 0',
+            color: '#6b5a46',
+            fontSize: 13,
+            lineHeight: 1.7,
+          }}
+        >
+          {description}
+        </p>
       ) : null}
     </div>
   );
 }
 
-function EmptyBox({ text }: { text: string }) {
+function EmptyBox({
+  text,
+}: {
+  text: string;
+}) {
   return (
     <div
       style={{
-        borderRadius: 22,
-        border: '1px dashed #d6b778',
-        background: '#f7eddc',
+        marginTop: 20,
         padding: 26,
+        borderRadius: 22,
+        border:
+          '1px dashed #d6b778',
+        background: '#f7eddc',
         color: '#6b5a46',
-        fontSize: 15,
+        fontSize: 14,
         lineHeight: 1.75,
         textAlign: 'center',
       }}
@@ -1133,185 +1709,568 @@ function EmptyBox({ text }: { text: string }) {
   );
 }
 
-function isPhotoMemory(memory: MemoryRecord) {
-  const type = String(memory.type ?? '').toUpperCase();
-  const fileUrl = pickText(memory, ['fileUrl', 'imageUrl', 'photoUrl', 'url']);
-
-  return type === 'PHOTO' || Boolean(fileUrl);
+function panelStyle(): CSSProperties {
+  return {
+    padding: 30,
+    borderRadius: 30,
+    border:
+      '1px solid #e4cda3',
+    background: '#fffaf0',
+    boxShadow:
+      '0 18px 45px rgba(80, 55, 20, 0.08)',
+  };
 }
 
-function hasStoryDescription(memory: MemoryRecord) {
-  const description = pickText(memory, [
-    'description',
-    'content',
-    'summary',
-    'memo',
-    'text',
-  ]);
-
-  return description.length >= 10;
+function buttonStyle(
+  background: string,
+  color: string,
+): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 42,
+    padding: '0 17px',
+    borderRadius: 999,
+    border:
+      '1px solid #d6b778',
+    background,
+    color,
+    fontSize: 13,
+    fontWeight: 900,
+    textDecoration: 'none',
+    textAlign: 'center',
+    whiteSpace: 'nowrap',
+  };
 }
 
-function isStoryMemory(memory: MemoryRecord) {
-  if (isPhotoMemory(memory)) return false;
-  if (isLegacyAiInterviewMemory(memory)) return false;
+function bookTypeBadgeStyle(): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 26,
+    padding: '0 9px',
+    borderRadius: 999,
+    background: '#f4ead8',
+    color: '#7b4f2a',
+    fontSize: 10,
+    fontWeight: 900,
+  };
+}
 
-  const type = String(memory.type ?? '').toUpperCase();
+function bookStatusBadgeStyle(
+  status: string,
+): CSSProperties {
+  const base: CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 26,
+    padding: '0 9px',
+    borderRadius: 999,
+    fontSize: 10,
+    fontWeight: 900,
+  };
 
-  if (type.includes('STORY') || type.includes('TEXT')) {
-    const storyText = pickText(memory, [
+  if (
+    status === 'PUBLISHED'
+  ) {
+    return {
+      ...base,
+      background: '#e3f4e5',
+      color: '#2f6b38',
+    };
+  }
+
+  if (
+    status ===
+    'IN_PRODUCTION'
+  ) {
+    return {
+      ...base,
+      background: '#efe6ff',
+      color: '#62438a',
+    };
+  }
+
+  return {
+    ...base,
+    background: '#fff1c7',
+    color: '#83540d',
+  };
+}
+
+function productionStatusBadgeStyle(
+  status: string | null,
+): CSSProperties {
+  const base: CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 26,
+    padding: '0 9px',
+    borderRadius: 999,
+    fontSize: 10,
+    fontWeight: 900,
+  };
+
+  if (!status) {
+    return {
+      ...base,
+      background:
+        'rgba(34, 28, 22, 0.08)',
+      color: '#776868',
+    };
+  }
+
+  if (
+    status === 'COMPLETED'
+  ) {
+    return {
+      ...base,
+      background: '#e3f4e5',
+      color: '#2f6b38',
+    };
+  }
+
+  if (
+    status === 'CANCELED'
+  ) {
+    return {
+      ...base,
+      background: '#f2eeee',
+      color: '#776868',
+    };
+  }
+
+  return {
+    ...base,
+    background: '#e4f2ff',
+    color: '#245d8c',
+  };
+}
+
+function isPhotoMemory(
+  memory: MemoryRecord,
+) {
+  const type = String(
+    memory.type ?? '',
+  ).toUpperCase();
+
+  const fileUrl = pickText(
+    memory,
+    [
+      'fileUrl',
+      'imageUrl',
+      'photoUrl',
+      'url',
+    ],
+  );
+
+  return (
+    type === 'PHOTO' ||
+    Boolean(fileUrl)
+  );
+}
+
+function hasStoryDescription(
+  memory: MemoryRecord,
+) {
+  const description = pickText(
+    memory,
+    [
+      'description',
+      'content',
+      'summary',
+      'memo',
+      'text',
+    ],
+  );
+
+  return (
+    description.length >= 10
+  );
+}
+
+function isStoryMemory(
+  memory: MemoryRecord,
+) {
+  if (isPhotoMemory(memory)) {
+    return false;
+  }
+
+  if (
+    isLegacyAiInterviewMemory(
+      memory,
+    )
+  ) {
+    return false;
+  }
+
+  const type = String(
+    memory.type ?? '',
+  ).toUpperCase();
+
+  const storyText = pickText(
+    memory,
+    [
       'answer',
       'content',
       'description',
       'summary',
       'memo',
-    ]);
-
-    return storyText.length > 0;
-  }
-
-  const hasStoryText = Boolean(
-    pickText(memory, ['answer', 'content', 'description', 'summary', 'memo']),
+    ],
   );
-
-  return hasStoryText;
-}
-
-function isLegacyAiInterviewMemory(memory: MemoryRecord) {
-  const title = pickText(memory, ['title', 'question', 'prompt']);
-  const normalizedTitle = title.trim();
 
   return (
-    normalizedTitle.startsWith('AI 인터뷰') ||
-    normalizedTitle.includes('AI 인터뷰 -')
+    (type.includes('STORY') ||
+      type.includes('TEXT')) &&
+    storyText.length > 0
   );
 }
 
-function parseBookContent(content: string): ParsedBookBlock[] {
-  if (!content) return [];
+function isLegacyAiInterviewMemory(
+  memory: MemoryRecord,
+) {
+  const title = pickText(
+    memory,
+    [
+      'title',
+      'question',
+      'prompt',
+    ],
+  );
+
+  const normalizedTitle =
+    title.trim();
+
+  return (
+    normalizedTitle.startsWith(
+      'AI 인터뷰',
+    ) ||
+    normalizedTitle.includes(
+      'AI 인터뷰 -',
+    )
+  );
+}
+
+function parseBookContent(
+  content: string,
+): ParsedBookBlock[] {
+  if (!content) {
+    return [];
+  }
 
   return content
     .split('\n')
     .map((line) => line.trim())
-    .filter((line) => line && line !== '---')
+    .filter(
+      (line) =>
+        line &&
+        line !== '---',
+    )
     .map((line) => {
-      if (line.startsWith('# ')) {
+      if (
+        line.startsWith('# ')
+      ) {
         return {
-          type: 'title',
-          text: line.replace(/^#\s+/, '').trim(),
+          type: 'title' as const,
+          text: line
+            .replace(
+              /^#\s+/,
+              '',
+            )
+            .trim(),
         };
       }
 
-      if (line.startsWith('## ')) {
+      if (
+        line.startsWith('## ')
+      ) {
         return {
-          type: 'heading',
-          text: line.replace(/^##\s+/, '').trim(),
+          type: 'heading' as const,
+          text: line
+            .replace(
+              /^##\s+/,
+              '',
+            )
+            .trim(),
         };
       }
 
-      if (/^\d+\.\s+/.test(line)) {
+      if (
+        /^\d+\.\s+/.test(
+          line,
+        )
+      ) {
         return {
-          type: 'numbered',
+          type: 'numbered' as const,
           text: line,
         };
       }
 
       return {
-        type: 'paragraph',
+        type: 'paragraph' as const,
         text: line,
       };
     });
 }
 
-function cleanText(value: unknown) {
-  if (typeof value !== 'string') return '';
+function cleanText(
+  value: unknown,
+) {
+  if (
+    typeof value !== 'string'
+  ) {
+    return '';
+  }
 
   return value
     .replace(/\r\n/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .replace(/[ \t]{2,}/g, ' ')
+    .replace(
+      /\n{3,}/g,
+      '\n\n',
+    )
+    .replace(
+      /[ \t]{2,}/g,
+      ' ',
+    )
     .trim();
 }
 
-function pickText(item: MemoryRecord, keys: string[]) {
+function pickText(
+  item: MemoryRecord,
+  keys: string[],
+) {
   for (const key of keys) {
-    const value = cleanText(item[key]);
-    if (value) return value;
+    const value = cleanText(
+      item[key],
+    );
+
+    if (value) {
+      return value;
+    }
   }
 
   return '';
 }
 
-function makeShortText(text: string, maxLength = 120) {
-  if (text.length <= maxLength) return text;
-  return `${text.slice(0, maxLength).trim()}...`;
+function makeShortText(
+  text: string,
+  maxLength = 120,
+) {
+  if (
+    text.length <= maxLength
+  ) {
+    return text;
+  }
+
+  return `${text
+    .slice(0, maxLength)
+    .trim()}...`;
 }
 
-function getDateInputValue(value: unknown) {
-  if (!value) return '';
-
-  const date = value instanceof Date ? value : new Date(String(value));
-
-  if (Number.isNaN(date.getTime())) {
+function getDateInputValue(
+  value: unknown,
+) {
+  if (!value) {
     return '';
   }
 
-  return date.toISOString().slice(0, 10);
-} 
+  const date =
+    value instanceof Date
+      ? value
+      : new Date(
+          String(value),
+        );
 
-function formatDate(value: Date | string | unknown) {
-  if (!value) return '-';
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return '';
+  }
 
-  const date = value instanceof Date ? value : new Date(String(value));
+  return date
+    .toISOString()
+    .slice(0, 10);
+}
 
-  if (Number.isNaN(date.getTime())) {
+function formatDate(
+  value: unknown,
+) {
+  if (!value) {
     return '-';
   }
 
-  return new Intl.DateTimeFormat('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(date);
+  const date =
+    value instanceof Date
+      ? value
+      : new Date(
+          String(value),
+        );
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return '-';
+  }
+
+  return new Intl.DateTimeFormat(
+    'ko-KR',
+    {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    },
+  ).format(date);
 }
 
-function getPageCountLabel(pageCount: number | null | undefined) {
-  if (!pageCount || pageCount <= 0) {
-    return '원고 다시 정리 필요';
+function getPageCountLabel(
+  pageCount:
+    | number
+    | null
+    | undefined,
+) {
+  if (
+    !pageCount ||
+    pageCount <= 0
+  ) {
+    return '분량 미정';
   }
 
   return `${pageCount}쪽`;
 }
 
-function getStatusLabel(status: string) {
-  if (status === 'DRAFT') return '원고 초안';
-  if (status === 'IN_PRODUCTION') return '제작 준비 중';
-  if (status === 'PUBLISHED') return '완성';
-  if (status === 'ARCHIVED') return '보관됨';
+function getBookTypeLabel(
+  type: string,
+) {
+  if (
+    type === 'LIFE_BOOK'
+  ) {
+    return '인생 기록책';
+  }
+
+  if (
+    type === 'FAMILY_BOOK'
+  ) {
+    return '가족 이야기책';
+  }
+
+  if (
+    type === 'COUPLE_BOOK'
+  ) {
+    return '부부 이야기책';
+  }
+
+  if (
+    type === 'BABY_BOOK'
+  ) {
+    return '성장 기록책';
+  }
+
+  if (
+    type === 'TRAVEL_BOOK'
+  ) {
+    return '여행 기록책';
+  }
+
+  if (
+    type === 'AI_MOVIE'
+  ) {
+    return 'AI 영상';
+  }
+
+  return '책 원고';
+}
+
+function getStatusLabel(
+  status: string,
+) {
+  if (
+    status === 'DRAFT'
+  ) {
+    return '원고 초안';
+  }
+
+  if (
+    status ===
+    'IN_PRODUCTION'
+  ) {
+    return '제작 진행 중';
+  }
+
+  if (
+    status === 'PUBLISHED'
+  ) {
+    return '완성';
+  }
 
   return '상태 확인 필요';
 }
 
-function getProductionRequestStatusLabel(status: string) {
-  if (status === 'REQUESTED') return '상담 신청 접수';
-  if (status === 'CONTACTED') return '고객 연락 완료';
-  if (status === 'IN_PROGRESS') return '제작 상담 진행 중';
-  if (status === 'COMPLETED') return '상담 완료';
-  if (status === 'CANCELED') return '상담 취소';
+function getProductionRequestStatusLabel(
+  status: string,
+) {
+  if (
+    status === 'REQUESTED'
+  ) {
+    return '상담 신청 접수';
+  }
+
+  if (
+    status === 'CONTACTED'
+  ) {
+    return '고객 연락 완료';
+  }
+
+  if (
+    status === 'IN_PROGRESS'
+  ) {
+    return '제작 상담 진행 중';
+  }
+
+  if (
+    status === 'COMPLETED'
+  ) {
+    return '상담 완료';
+  }
+
+  if (
+    status === 'CANCELED'
+  ) {
+    return '상담 취소';
+  }
 
   return '상담 상태 확인 필요';
 }
 
-function gridPaperPageStyle() {
+function gridPaperPageStyle(): CSSProperties {
   return {
     backgroundColor: '#f7eddc',
     backgroundImage: `
-      linear-gradient(rgba(154, 106, 36, 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(154, 106, 36, 0.08) 1px, transparent 1px),
-      linear-gradient(rgba(154, 106, 36, 0.14) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(154, 106, 36, 0.14) 1px, transparent 1px)
+      linear-gradient(
+        rgba(154, 106, 36, 0.08) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        rgba(154, 106, 36, 0.08) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        rgba(154, 106, 36, 0.14) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        rgba(154, 106, 36, 0.14) 1px,
+        transparent 1px
+      )
     `,
-    backgroundSize: '24px 24px, 24px 24px, 120px 120px, 120px 120px',
+    backgroundSize:
+      '24px 24px, 24px 24px, 120px 120px, 120px 120px',
     backgroundPosition: '0 0',
   };
 }
