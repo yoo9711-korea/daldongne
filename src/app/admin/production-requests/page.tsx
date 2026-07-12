@@ -1,8 +1,9 @@
 import { auth } from '@/auth';
+import ProductionRequestStatusButton from '@/components/admin/ProductionRequestStatusButton';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import ProductionRequestStatusButton from '@/components/admin/ProductionRequestStatusButton';
+import type { CSSProperties } from 'react';
 
 type ProductionRequestRecord = {
   id: string;
@@ -53,7 +54,6 @@ const STATUS_FILTERS: {
 export default async function AdminProductionRequestsPage({
   searchParams,
 }: PageProps) {
-
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id;
 
@@ -72,14 +72,16 @@ export default async function AdminProductionRequestsPage({
         };
 
   const requests = (await prisma.bookProductionRequest.findMany({
-      where: requestWhere,
-      orderBy: {
+    where: requestWhere,
+    orderBy: {
       createdAt: 'desc',
     },
     take: 100,
   })) as ProductionRequestRecord[];
 
-  const bookIds = Array.from(new Set(requests.map((request) => request.bookId)));
+  const bookIds = Array.from(
+    new Set(requests.map((request) => request.bookId)),
+  );
 
   const books = bookIds.length
     ? ((await prisma.book.findMany({
@@ -103,7 +105,7 @@ export default async function AdminProductionRequestsPage({
     <main
       style={{
         minHeight: '100vh',
-        padding: '34px 28px 80px',
+        padding: '34px 20px 80px',
         background: '#f7eddc',
         color: '#24170f',
       }}
@@ -140,6 +142,7 @@ export default async function AdminProductionRequestsPage({
             style={{
               display: 'flex',
               justifyContent: 'space-between',
+              flexWrap: 'wrap',
               gap: 18,
               alignItems: 'center',
               marginTop: 10,
@@ -150,7 +153,7 @@ export default async function AdminProductionRequestsPage({
                 style={{
                   margin: 0,
                   fontFamily: 'Noto Serif KR, serif',
-                  fontSize: 40,
+                  fontSize: 'clamp(30px, 5vw, 40px)',
                   lineHeight: 1.25,
                   letterSpacing: '-0.05em',
                   color: '#20130d',
@@ -167,7 +170,8 @@ export default async function AdminProductionRequestsPage({
                   color: '#6b5a46',
                 }}
               >
-                고객이 책 상세 페이지에서 신청한 제작 상담 요청을 확인합니다.
+                고객이 책 상세 페이지에서 신청한 제작 상담 요청을
+                확인하고 처리합니다.
               </p>
             </div>
 
@@ -191,7 +195,7 @@ export default async function AdminProductionRequestsPage({
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: 8,
+              gap: 12,
               alignItems: 'center',
               justifyContent: 'space-between',
             }}
@@ -243,7 +247,7 @@ export default async function AdminProductionRequestsPage({
             border: '1px solid #e4cda3',
             background: '#fffaf0',
             borderRadius: 30,
-            padding: 28,
+            padding: '28px clamp(16px, 4vw, 28px)',
             boxShadow: '0 18px 45px rgba(80, 55, 20, 0.08)',
           }}
         >
@@ -272,25 +276,19 @@ export default async function AdminProductionRequestsPage({
                       style={{
                         display: 'flex',
                         justifyContent: 'space-between',
+                        flexWrap: 'wrap',
                         gap: 16,
                         alignItems: 'flex-start',
                       }}
                     >
                       <div>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: 13,
-                            fontWeight: 900,
-                            color: '#9a6a24',
-                          }}
-                        >
+                        <span style={getStatusBadgeStyle(request.status)}>
                           {getStatusLabel(request.status)}
-                        </p>
+                        </span>
 
                         <h2
                           style={{
-                            margin: '8px 0 0',
+                            margin: '10px 0 0',
                             fontSize: 22,
                             lineHeight: 1.35,
                             color: '#20130d',
@@ -308,31 +306,55 @@ export default async function AdminProductionRequestsPage({
                         >
                           신청일: {formatDate(request.createdAt)}
                         </p>
+
+                        <p
+                          style={{
+                            margin: '4px 0 0',
+                            fontSize: 13,
+                            color: '#9b8c77',
+                          }}
+                        >
+                          최근 처리일: {formatDate(request.updatedAt)}
+                        </p>
                       </div>
 
                       <Link
-                          href={`/admin/books/${request.bookId}`}
-                          style={buttonStyle('#f3d28a', '#6d4512')}
-                             >
-                         책 상세 보기
-                         </Link>
+                        href={`/admin/books/${request.bookId}`}
+                        style={buttonStyle('#f3d28a', '#6d4512')}
+                      >
+                        책 상세 보기
+                      </Link>
                     </div>
 
-                                        <div
+                    <div
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+                        gridTemplateColumns:
+                          'repeat(auto-fit, minmax(160px, 1fr))',
                         gap: 12,
                         marginTop: 18,
                       }}
                     >
-                      <InfoBox title="신청자" value={request.name || '-'} />
-                      <InfoBox title="연락처" value={request.phone || '-'} />
-                      <InfoBox title="이메일" value={request.email || '-'} />
+                      <InfoBox
+                        title="신청자"
+                        value={request.name || '-'}
+                      />
+
+                      <InfoBox
+                        title="연락처"
+                        value={request.phone || '-'}
+                      />
+
+                      <InfoBox
+                        title="이메일"
+                        value={request.email || '-'}
+                      />
+
                       <InfoBox
                         title="책 상태"
                         value={getBookStatusLabel(book?.status || '')}
                       />
+
                       <InfoBox
                         title="책 종류"
                         value={getBookTypeLabel(book?.type || '')}
@@ -366,18 +388,18 @@ export default async function AdminProductionRequestsPage({
                           fontSize: 15,
                           lineHeight: 1.75,
                           color: '#4a3828',
+                          wordBreak: 'break-word',
                         }}
                       >
                         {request.message || '요청 내용이 없습니다.'}
                       </p>
                     </div>
-               
-                   <ProductionRequestStatusButton
+
+                    <ProductionRequestStatusButton
                       requestId={request.id}
                       currentStatus={request.status}
                     />
-           
-              </article>
+                  </article>
                 );
               })}
             </div>
@@ -394,7 +416,7 @@ export default async function AdminProductionRequestsPage({
                 lineHeight: 1.75,
               }}
             >
-              아직 접수된 제작 상담 신청이 없습니다.
+              해당 상태의 제작 상담 신청이 없습니다.
             </div>
           )}
         </section>
@@ -449,7 +471,7 @@ function InfoBox({ title, value }: { title: string; value: string }) {
   );
 }
 
-function buttonStyle(background: string, color: string) {
+function buttonStyle(background: string, color: string): CSSProperties {
   return {
     display: 'inline-flex',
     alignItems: 'center',
@@ -463,7 +485,72 @@ function buttonStyle(background: string, color: string) {
     fontSize: 14,
     fontWeight: 900,
     textDecoration: 'none',
-    whiteSpace: 'nowrap' as const,
+    whiteSpace: 'nowrap',
+  };
+}
+
+function getStatusBadgeStyle(status: string): CSSProperties {
+  const baseStyle: CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 30,
+    padding: '0 12px',
+    borderRadius: 999,
+    fontSize: 13,
+    fontWeight: 900,
+    border: '1px solid transparent',
+  };
+
+  if (status === 'REQUESTED') {
+    return {
+      ...baseStyle,
+      background: '#fff1c7',
+      color: '#83540d',
+      borderColor: '#eac66f',
+    };
+  }
+
+  if (status === 'CONTACTED') {
+    return {
+      ...baseStyle,
+      background: '#e4f2ff',
+      color: '#245d8c',
+      borderColor: '#9fc9e8',
+    };
+  }
+
+  if (status === 'IN_PROGRESS') {
+    return {
+      ...baseStyle,
+      background: '#efe6ff',
+      color: '#62438a',
+      borderColor: '#c8b1e8',
+    };
+  }
+
+  if (status === 'COMPLETED') {
+    return {
+      ...baseStyle,
+      background: '#e3f4e5',
+      color: '#2f6b38',
+      borderColor: '#9dcca4',
+    };
+  }
+
+  if (status === 'CANCELED') {
+    return {
+      ...baseStyle,
+      background: '#f2eeee',
+      color: '#776868',
+      borderColor: '#d8cccc',
+    };
+  }
+
+  return {
+    ...baseStyle,
+    background: '#f1eee8',
+    color: '#6b5a46',
+    borderColor: '#d8cdbc',
   };
 }
 
