@@ -13,14 +13,28 @@ type PageProps = {
   searchParams?: Promise<{
     status?: string;
     type?: string;
+    consultation?: string;
     q?: string;
     sort?: string;
+    page?: string;
   }>;
 };
 
 type StatusFilter = 'ALL' | BookStatus;
 type TypeFilter = 'ALL' | BookType;
+type ConsultationFilter = 'ALL' | 'HAS' | 'NONE';
 type SortOrder = 'latest' | 'oldest';
+
+type FilterHrefOptions = {
+  status: StatusFilter;
+  type: TypeFilter;
+  consultation: ConsultationFilter;
+  searchQuery?: string;
+  sortOrder?: SortOrder;
+  page?: number;
+};
+
+const PAGE_SIZE = 20;
 
 const STATUS_FILTERS: {
   value: StatusFilter;
@@ -40,12 +54,39 @@ const TYPE_FILTERS: {
   label: string;
 }[] = [
   { value: 'ALL', label: '전체 종류' },
-  { value: BookType.LIFE_BOOK, label: '부모님 인생책' },
-  { value: BookType.FAMILY_BOOK, label: '가족 이야기책' },
-  { value: BookType.COUPLE_BOOK, label: '부부 이야기책' },
-  { value: BookType.BABY_BOOK, label: '성장 기록책' },
-  { value: BookType.TRAVEL_BOOK, label: '여행 기록책' },
-  { value: BookType.AI_MOVIE, label: 'AI 영상' },
+  {
+    value: BookType.LIFE_BOOK,
+    label: '부모님 인생책',
+  },
+  {
+    value: BookType.FAMILY_BOOK,
+    label: '가족 이야기책',
+  },
+  {
+    value: BookType.COUPLE_BOOK,
+    label: '부부 이야기책',
+  },
+  {
+    value: BookType.BABY_BOOK,
+    label: '성장 기록책',
+  },
+  {
+    value: BookType.TRAVEL_BOOK,
+    label: '여행 기록책',
+  },
+  {
+    value: BookType.AI_MOVIE,
+    label: 'AI 영상',
+  },
+];
+
+const CONSULTATION_FILTERS: {
+  value: ConsultationFilter;
+  label: string;
+}[] = [
+  { value: 'ALL', label: '상담 전체' },
+  { value: 'HAS', label: '상담 신청 있음' },
+  { value: 'NONE', label: '상담 신청 없음' },
 ];
 
 export default async function AdminBooksPage({
@@ -80,6 +121,11 @@ export default async function AdminBooksPage({
     resolvedSearchParams?.type,
   );
 
+  const consultationFilter =
+    normalizeConsultationFilter(
+      resolvedSearchParams?.consultation,
+    );
+
   const searchQuery = String(
     resolvedSearchParams?.q || '',
   )
@@ -90,6 +136,25 @@ export default async function AdminBooksPage({
     resolvedSearchParams?.sort,
   );
 
+  const requestedPage = normalizePage(
+    resolvedSearchParams?.page,
+  );
+
+  const consultationBookRows =
+    await prisma.bookProductionRequest.findMany({
+      distinct: ['bookId'],
+      select: {
+        bookId: true,
+      },
+    });
+
+  const consultationBookIds =
+    consultationBookRows.map((row) => row.bookId);
+
+  const consultationBookIdSet = new Set(
+    consultationBookIds,
+  );
+
   const where: Prisma.BookWhereInput = {};
 
   if (statusFilter !== 'ALL') {
@@ -98,6 +163,18 @@ export default async function AdminBooksPage({
 
   if (typeFilter !== 'ALL') {
     where.type = typeFilter;
+  }
+
+  if (consultationFilter === 'HAS') {
+    where.id = {
+      in: consultationBookIds,
+    };
+  }
+
+  if (consultationFilter === 'NONE') {
+    where.id = {
+      notIn: consultationBookIds,
+    };
   }
 
   if (searchQuery) {
@@ -133,11 +210,27 @@ export default async function AdminBooksPage({
     ];
   }
 
+  const filteredBookCount = await prisma.book.count({
+    where,
+  });
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredBookCount / PAGE_SIZE),
+  );
+
+  const currentPage = Math.min(
+    requestedPage,
+    totalPages,
+  );
+
+  const skip = (currentPage - 1) * PAGE_SIZE;
+
   const [
     books,
-    filteredBookCount,
     statusCountRows,
     typeCountRows,
+    totalBookCount,
   ] = await Promise.all([
     prisma.book.findMany({
       where,
@@ -145,7 +238,8 @@ export default async function AdminBooksPage({
         createdAt:
           sortOrder === 'oldest' ? 'asc' : 'desc',
       },
-      take: 200,
+      skip,
+      take: PAGE_SIZE,
       select: {
         id: true,
         authorId: true,
@@ -161,10 +255,6 @@ export default async function AdminBooksPage({
       },
     }),
 
-    prisma.book.count({
-      where,
-    }),
-
     prisma.book.groupBy({
       by: ['status'],
       _count: {
@@ -178,6 +268,8 @@ export default async function AdminBooksPage({
         _all: true,
       },
     }),
+
+    prisma.book.count(),
   ]);
 
   const authorIds = Array.from(
@@ -186,42 +278,45 @@ export default async function AdminBooksPage({
 
   const bookIds = books.map((book) => book.id);
 
-  const [authors, productionRequests] = await Promise.all([
-    authorIds.length > 0
-      ? prisma.user.findMany({
-          where: {
-            id: {
-              in: authorIds,
+  const [authors, productionRequests] =
+    await Promise.all([
+      authorIds.length > 0
+        ? prisma.user.findMany({
+            where: {
+              id: {
+                in: authorIds,
+              },
             },
-          },
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        })
-      : Promise.resolve([]),
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          })
+        : Promise.resolve([]),
 
-    bookIds.length > 0
-      ? prisma.bookProductionRequest.findMany({
-          where: {
-            bookId: {
-              in: bookIds,
+      bookIds.length > 0
+        ? prisma.bookProductionRequest.findMany({
+            where: {
+              bookId: {
+                in: bookIds,
+              },
             },
-          },
-          orderBy: {
-            createdAt: 'desc',
-          },
-          select: {
-            id: true,
-            bookId: true,
-            name: true,
-            status: true,
-            createdAt: true,
-          },
-        })
-      : Promise.resolve([]),
-  ]);
+            orderBy: {
+              createdAt: 'desc',
+            },
+            select: {
+              id: true,
+              bookId: true,
+              name: true,
+              phone: true,
+              email: true,
+              status: true,
+              createdAt: true,
+            },
+          })
+        : Promise.resolve([]),
+    ]);
 
   const authorMap = new Map(
     authors.map((author) => [author.id, author]),
@@ -252,22 +347,59 @@ export default async function AdminBooksPage({
     ]),
   );
 
-  const totalBookCount = statusCountRows.reduce(
-    (total, row) => total + row._count._all,
+  const booksWithConsultationCount =
+    consultationBookIds.length;
+
+  const booksWithoutConsultationCount = Math.max(
+    totalBookCount - booksWithConsultationCount,
     0,
   );
 
   const hasActiveCondition =
     statusFilter !== 'ALL' ||
     typeFilter !== 'ALL' ||
+    consultationFilter !== 'ALL' ||
     Boolean(searchQuery) ||
     sortOrder !== 'latest';
 
+  const firstVisibleBook =
+    filteredBookCount === 0 ? 0 : skip + 1;
+
+  const lastVisibleBook = Math.min(
+    skip + books.length,
+    filteredBookCount,
+  );
+
+  const pageNumbers = getPageNumbers(
+    currentPage,
+    totalPages,
+  );
+
   return (
     <main>
+      <style>{`
+        .admin-books-mobile-list {
+          display: none;
+        }
+
+        @media (max-width: 860px) {
+          .admin-books-desktop-table {
+            display: none;
+          }
+
+          .admin-books-mobile-list {
+            display: grid;
+          }
+        }
+      `}</style>
+
       <div className="runninghead">
-        <span className="runninghead__chapter">ADMIN</span>
+        <span className="runninghead__chapter">
+          ADMIN
+        </span>
+
         <span className="runninghead__rule" />
+
         <span style={{ color: 'var(--ink-soft)' }}>
           책 관리
         </span>
@@ -302,12 +434,15 @@ export default async function AdminBooksPage({
               lineHeight: 1.75,
             }}
           >
-            회원이 만든 책 원고와 제작 상태, 작성자 및 제작
-            상담 현황을 확인합니다.
+            회원이 만든 책 원고와 제작 상태, 작성자 및
+            제작 상담 현황을 확인합니다.
           </p>
         </div>
 
-        <Link href="/admin" style={primaryButtonStyle()}>
+        <Link
+          href="/admin"
+          style={primaryButtonStyle()}
+        >
           관리자 홈
         </Link>
       </section>
@@ -316,7 +451,7 @@ export default async function AdminBooksPage({
         style={{
           display: 'grid',
           gridTemplateColumns:
-            'repeat(auto-fit, minmax(170px, 1fr))',
+            'repeat(auto-fit, minmax(165px, 1fr))',
           gap: 14,
           marginBottom: 28,
         }}
@@ -330,7 +465,9 @@ export default async function AdminBooksPage({
 
         <SummaryCard
           label="원고 초안"
-          value={statusCountMap.get(BookStatus.DRAFT) ?? 0}
+          value={
+            statusCountMap.get(BookStatus.DRAFT) ?? 0
+          }
           unit="권"
           color="#7b4f2a"
         />
@@ -338,7 +475,9 @@ export default async function AdminBooksPage({
         <SummaryCard
           label="제작 준비 중"
           value={
-            statusCountMap.get(BookStatus.IN_PRODUCTION) ?? 0
+            statusCountMap.get(
+              BookStatus.IN_PRODUCTION,
+            ) ?? 0
           }
           unit="권"
           color="#9a6a24"
@@ -347,10 +486,19 @@ export default async function AdminBooksPage({
         <SummaryCard
           label="완성된 책"
           value={
-            statusCountMap.get(BookStatus.PUBLISHED) ?? 0
+            statusCountMap.get(
+              BookStatus.PUBLISHED,
+            ) ?? 0
           }
           unit="권"
           color="#3e5f3a"
+        />
+
+        <SummaryCard
+          label="상담 신청 책"
+          value={booksWithConsultationCount}
+          unit="권"
+          color="#62438a"
         />
 
         <SummaryCard
@@ -397,6 +545,14 @@ export default async function AdminBooksPage({
             />
           ) : null}
 
+          {consultationFilter !== 'ALL' ? (
+            <input
+              type="hidden"
+              name="consultation"
+              value={consultationFilter}
+            />
+          ) : null}
+
           <label
             style={{
               display: 'grid',
@@ -404,13 +560,7 @@ export default async function AdminBooksPage({
               gap: 7,
             }}
           >
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 900,
-                color: 'var(--ink-soft)',
-              }}
-            >
+            <span style={inputLabelStyle()}>
               책 또는 작성자 검색
             </span>
 
@@ -420,19 +570,7 @@ export default async function AdminBooksPage({
               defaultValue={searchQuery}
               placeholder="책 제목, 작성자 이름, 이메일"
               maxLength={100}
-              style={{
-                width: '100%',
-                minHeight: 42,
-                padding: '0 14px',
-                borderRadius: 12,
-                border:
-                  '1px solid rgba(34, 28, 22, 0.18)',
-                background:
-                  'rgba(255, 255, 255, 0.55)',
-                color: 'var(--ink)',
-                fontSize: 14,
-                outline: 'none',
-              }}
+              style={inputStyle()}
             />
           </label>
 
@@ -443,49 +581,41 @@ export default async function AdminBooksPage({
               gap: 7,
             }}
           >
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 900,
-                color: 'var(--ink-soft)',
-              }}
-            >
+            <span style={inputLabelStyle()}>
               정렬
             </span>
 
             <select
               name="sort"
               defaultValue={sortOrder}
-              style={{
-                width: '100%',
-                minHeight: 42,
-                padding: '0 12px',
-                borderRadius: 12,
-                border:
-                  '1px solid rgba(34, 28, 22, 0.18)',
-                background:
-                  'rgba(255, 255, 255, 0.55)',
-                color: 'var(--ink)',
-                fontSize: 14,
-              }}
+              style={selectStyle()}
             >
-              <option value="latest">최신순</option>
-              <option value="oldest">오래된순</option>
+              <option value="latest">
+                최신순
+              </option>
+
+              <option value="oldest">
+                오래된순
+              </option>
             </select>
           </label>
 
-          <button type="submit" style={searchButtonStyle()}>
+          <button
+            type="submit"
+            style={searchButtonStyle()}
+          >
             검색 적용
           </button>
 
-          {searchQuery || sortOrder !== 'latest' ? (
+          {searchQuery ||
+          sortOrder !== 'latest' ? (
             <Link
-              href={buildFilterHref(
-                statusFilter,
-                typeFilter,
-                '',
-                'latest',
-              )}
+              href={buildFilterHref({
+                status: statusFilter,
+                type: typeFilter,
+                consultation:
+                  consultationFilter,
+              })}
               style={secondaryButtonStyle()}
             >
               검색 초기화
@@ -493,89 +623,88 @@ export default async function AdminBooksPage({
           ) : null}
         </form>
 
-        <p
-          className="dash-card__label"
-          style={{
-            margin: 0,
-          }}
-        >
-          책 상태
-        </p>
-
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 8,
-            marginTop: 14,
-          }}
-        >
-          {STATUS_FILTERS.map((filter) => {
-            const active = filter.value === statusFilter;
-
-            const count =
+        <FilterGroup
+          label="책 상태"
+          items={STATUS_FILTERS.map((filter) => ({
+            key: filter.value,
+            label: filter.label,
+            count:
               filter.value === 'ALL'
                 ? totalBookCount
-                : statusCountMap.get(filter.value) ?? 0;
+                : statusCountMap.get(
+                    filter.value,
+                  ) ?? 0,
+            active:
+              filter.value === statusFilter,
+            href: buildFilterHref({
+              status: filter.value,
+              type: typeFilter,
+              consultation:
+                consultationFilter,
+              searchQuery,
+              sortOrder,
+            }),
+          }))}
+        />
 
-            return (
-              <Link
-                key={filter.value}
-                href={buildFilterHref(
-                  filter.value,
-                  typeFilter,
-                  searchQuery,
-                  sortOrder,
-                )}
-                style={filterButtonStyle(active)}
-              >
-                {filter.label} ({count})
-              </Link>
-            );
-          })}
-        </div>
-
-        <p
-          className="dash-card__label"
-          style={{
-            margin: '22px 0 0',
-          }}
-        >
-          책 종류
-        </p>
-
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 8,
-            marginTop: 14,
-          }}
-        >
-          {TYPE_FILTERS.map((filter) => {
-            const active = filter.value === typeFilter;
-
-            const count =
+        <FilterGroup
+          label="책 종류"
+          marginTop={22}
+          items={TYPE_FILTERS.map((filter) => ({
+            key: filter.value,
+            label: filter.label,
+            count:
               filter.value === 'ALL'
                 ? totalBookCount
-                : typeCountMap.get(filter.value) ?? 0;
+                : typeCountMap.get(
+                    filter.value,
+                  ) ?? 0,
+            active: filter.value === typeFilter,
+            href: buildFilterHref({
+              status: statusFilter,
+              type: filter.value,
+              consultation:
+                consultationFilter,
+              searchQuery,
+              sortOrder,
+            }),
+          }))}
+        />
 
-            return (
-              <Link
-                key={filter.value}
-                href={buildFilterHref(
-                  statusFilter,
-                  filter.value,
+        <FilterGroup
+          label="제작 상담 신청"
+          marginTop={22}
+          items={CONSULTATION_FILTERS.map(
+            (filter) => {
+              let count = totalBookCount;
+
+              if (filter.value === 'HAS') {
+                count = booksWithConsultationCount;
+              }
+
+              if (filter.value === 'NONE') {
+                count =
+                  booksWithoutConsultationCount;
+              }
+
+              return {
+                key: filter.value,
+                label: filter.label,
+                count,
+                active:
+                  filter.value ===
+                  consultationFilter,
+                href: buildFilterHref({
+                  status: statusFilter,
+                  type: typeFilter,
+                  consultation: filter.value,
                   searchQuery,
                   sortOrder,
-                )}
-                style={filterButtonStyle(active)}
-              >
-                {filter.label} ({count})
-              </Link>
-            );
-          })}
-        </div>
+                }),
+              };
+            },
+          )}
+        />
       </section>
 
       <section
@@ -612,10 +741,12 @@ export default async function AdminBooksPage({
                 margin: '8px 0 0',
                 color: 'var(--ink-soft)',
                 fontSize: 13,
-                lineHeight: 1.6,
+                lineHeight: 1.65,
               }}
             >
-              현재 조건에 맞는 책 {filteredBookCount}권
+              전체 검색 결과 {filteredBookCount}권
+              {' · '}
+              {firstVisibleBook}–{lastVisibleBook}번째 표시
               {searchQuery
                 ? ` · 검색어 "${searchQuery}"`
                 : ''}
@@ -637,266 +768,422 @@ export default async function AdminBooksPage({
         </div>
 
         {books.length > 0 ? (
-          <div
-            style={{
-              overflowX: 'auto',
-            }}
-          >
-            <table
-              style={{
-                width: '100%',
-                minWidth: 1120,
-                borderCollapse: 'collapse',
-              }}
-            >
-              <thead>
-                <tr
+          <>
+            <div className="admin-books-desktop-table">
+              <div
+                style={{
+                  overflowX: 'auto',
+                }}
+              >
+                <table
                   style={{
-                    background: 'var(--paper-shade)',
-                    borderBottom:
-                      '1px solid rgba(34, 28, 22, 0.1)',
+                    width: '100%',
+                    minWidth: 1120,
+                    borderCollapse: 'collapse',
                   }}
                 >
-                  {[
-                    '책 제목',
-                    '작성자',
-                    '종류',
-                    '책 상태',
-                    '자료',
-                    '예상 분량',
-                    '제작 상담',
-                    '생성일',
-                    '관리',
-                  ].map((heading) => (
-                    <th
-                      key={heading}
-                      style={{
-                        padding: '12px 14px',
-                        textAlign: 'left',
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: 11,
-                        fontWeight: 400,
-                        letterSpacing: '.05em',
-                        color: 'var(--ink-faint)',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {heading}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-
-              <tbody>
-                {books.map((book) => {
-                  const author = authorMap.get(book.authorId);
-                  const request = latestRequestMap.get(book.id);
-
-                  return (
+                  <thead>
                     <tr
-                      key={book.id}
                       style={{
+                        background:
+                          'var(--paper-shade)',
                         borderBottom:
-                          '1px solid rgba(34, 28, 22, 0.06)',
+                          '1px solid rgba(34, 28, 22, 0.1)',
                       }}
                     >
-                      <td
-                        style={{
-                          padding: '14px',
-                          minWidth: 230,
-                        }}
-                      >
-                        <strong
-                          style={{
-                            display: 'block',
-                            fontSize: 14,
-                            lineHeight: 1.5,
-                            color: 'var(--ink)',
-                            wordBreak: 'break-word',
-                          }}
+                      {[
+                        '책 제목',
+                        '작성자',
+                        '종류',
+                        '책 상태',
+                        '자료',
+                        '예상 분량',
+                        '제작 상담',
+                        '생성일',
+                        '관리',
+                      ].map((heading) => (
+                        <th
+                          key={heading}
+                          style={tableHeadingStyle()}
                         >
-                          {book.title}
-                        </strong>
-
-                        {book.subtitle ? (
-                          <span
-                            style={{
-                              display: 'block',
-                              marginTop: 5,
-                              maxWidth: 290,
-                              fontSize: 12,
-                              lineHeight: 1.5,
-                              color: 'var(--ink-soft)',
-                              wordBreak: 'break-word',
-                            }}
-                          >
-                            {book.subtitle}
-                          </span>
-                        ) : null}
-
-                        <span
-                          style={{
-                            display: 'block',
-                            marginTop: 5,
-                            fontSize: 11,
-                            color: 'var(--ink-faint)',
-                          }}
-                        >
-                          최근 수정 {formatDate(book.updatedAt)}
-                        </span>
-                      </td>
-
-                      <td
-                        style={{
-                          padding: '14px',
-                          minWidth: 180,
-                        }}
-                      >
-                        <strong
-                          style={{
-                            display: 'block',
-                            fontSize: 13,
-                            color: 'var(--ink)',
-                          }}
-                        >
-                          {author?.name || '이름 없음'}
-                        </strong>
-
-                        <span
-                          style={{
-                            display: 'block',
-                            marginTop: 4,
-                            fontSize: 12,
-                            color: 'var(--ink-soft)',
-                            wordBreak: 'break-all',
-                          }}
-                        >
-                          {author?.email || '이메일 없음'}
-                        </span>
-                      </td>
-
-                      <td
-                        style={{
-                          padding: '14px',
-                          fontSize: 12,
-                          color: 'var(--ink-soft)',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {getBookTypeLabel(book.type)}
-                      </td>
-
-                      <td
-                        style={{
-                          padding: '14px',
-                        }}
-                      >
-                        <span
-                          style={bookStatusBadgeStyle(
-                            book.status,
-                          )}
-                        >
-                          {getBookStatusLabel(book.status)}
-                        </span>
-                      </td>
-
-                      <td
-                        style={{
-                          padding: '14px',
-                          fontSize: 12,
-                          color: 'var(--ink-soft)',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        사진 {book.basedPhotoCount ?? 0}장
-                        <br />
-                        이야기 {book.basedStoryCount ?? 0}개
-                      </td>
-
-                      <td
-                        style={{
-                          padding: '14px',
-                          fontSize: 13,
-                          color: 'var(--ink-soft)',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {book.pageCount
-                          ? `${book.pageCount}쪽`
-                          : '미정'}
-                      </td>
-
-                      <td
-                        style={{
-                          padding: '14px',
-                          minWidth: 140,
-                        }}
-                      >
-                        {request ? (
-                          <>
-                            <span
-                              style={requestStatusBadgeStyle(
-                                request.status,
-                              )}
-                            >
-                              {getRequestStatusLabel(
-                                request.status,
-                              )}
-                            </span>
-
-                            <span
-                              style={{
-                                display: 'block',
-                                marginTop: 5,
-                                fontSize: 11,
-                                color: 'var(--ink-faint)',
-                              }}
-                            >
-                              {formatDate(request.createdAt)}
-                            </span>
-                          </>
-                        ) : (
-                          <span
-                            style={{
-                              fontSize: 12,
-                              color: 'var(--ink-faint)',
-                            }}
-                          >
-                            신청 없음
-                          </span>
-                        )}
-                      </td>
-
-                      <td
-                        style={{
-                          padding: '14px',
-                          fontSize: 12,
-                          color: 'var(--ink-faint)',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {formatDate(book.createdAt)}
-                      </td>
-
-                      <td
-                        style={{
-                          padding: '14px',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <Link
-                          href={`/admin/books/${book.id}`}
-                          style={detailButtonStyle()}
-                        >
-                          상세 보기
-                        </Link>
-                      </td>
+                          {heading}
+                        </th>
+                      ))}
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                  </thead>
+
+                  <tbody>
+                    {books.map((book) => {
+                      const author = authorMap.get(
+                        book.authorId,
+                      );
+
+                      const request =
+                        latestRequestMap.get(
+                          book.id,
+                        );
+
+                      return (
+                        <tr
+                          key={book.id}
+                          style={{
+                            borderBottom:
+                              '1px solid rgba(34, 28, 22, 0.06)',
+                          }}
+                        >
+                          <td
+                            style={{
+                              padding: 14,
+                              minWidth: 230,
+                            }}
+                          >
+                            <BookTitle
+                              title={book.title}
+                              subtitle={book.subtitle}
+                              updatedAt={book.updatedAt}
+                            />
+                          </td>
+
+                          <td
+                            style={{
+                              padding: 14,
+                              minWidth: 180,
+                            }}
+                          >
+                            <AuthorInfo
+                              name={author?.name}
+                              email={author?.email}
+                            />
+                          </td>
+
+                          <td
+                            style={standardCellStyle()}
+                          >
+                            {getBookTypeLabel(
+                              book.type,
+                            )}
+                          </td>
+
+                          <td
+                            style={{
+                              padding: 14,
+                            }}
+                          >
+                            <span
+                              style={bookStatusBadgeStyle(
+                                book.status,
+                              )}
+                            >
+                              {getBookStatusLabel(
+                                book.status,
+                              )}
+                            </span>
+                          </td>
+
+                          <td
+                            style={standardCellStyle()}
+                          >
+                            사진{' '}
+                            {book.basedPhotoCount ??
+                              0}
+                            장
+                            <br />
+                            이야기{' '}
+                            {book.basedStoryCount ??
+                              0}
+                            개
+                          </td>
+
+                          <td
+                            style={standardCellStyle()}
+                          >
+                            {book.pageCount
+                              ? `${book.pageCount}쪽`
+                              : '미정'}
+                          </td>
+
+                          <td
+                            style={{
+                              padding: 14,
+                              minWidth: 140,
+                            }}
+                          >
+                            <ConsultationStatus
+                              request={request}
+                            />
+                          </td>
+
+                          <td
+                            style={{
+                              padding: 14,
+                              fontSize: 12,
+                              color:
+                                'var(--ink-faint)',
+                              whiteSpace:
+                                'nowrap',
+                            }}
+                          >
+                            {formatDate(
+                              book.createdAt,
+                            )}
+                          </td>
+
+                          <td
+                            style={{
+                              padding: 14,
+                              whiteSpace:
+                                'nowrap',
+                            }}
+                          >
+                            <Link
+                              href={`/admin/books/${book.id}`}
+                              style={detailButtonStyle()}
+                            >
+                              상세 보기
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div
+              className="admin-books-mobile-list"
+              style={{
+                gap: 12,
+                padding: 14,
+              }}
+            >
+              {books.map((book) => {
+                const author = authorMap.get(
+                  book.authorId,
+                );
+
+                const request =
+                  latestRequestMap.get(book.id);
+
+                return (
+                  <article
+                    key={book.id}
+                    style={{
+                      borderRadius: 18,
+                      border:
+                        '1px solid rgba(34, 28, 22, 0.1)',
+                      background:
+                        'rgba(255, 255, 255, 0.32)',
+                      padding: 16,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: 7,
+                      }}
+                    >
+                      <span
+                        style={bookStatusBadgeStyle(
+                          book.status,
+                        )}
+                      >
+                        {getBookStatusLabel(
+                          book.status,
+                        )}
+                      </span>
+
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color:
+                            'var(--ink-faint)',
+                        }}
+                      >
+                        {getBookTypeLabel(
+                          book.type,
+                        )}
+                      </span>
+
+                      {consultationBookIdSet.has(
+                        book.id,
+                      ) ? (
+                        <span
+                          style={{
+                            display:
+                              'inline-flex',
+                            padding:
+                              '4px 8px',
+                            borderRadius: 999,
+                            background:
+                              '#efe6ff',
+                            color: '#62438a',
+                            fontSize: 10,
+                            fontWeight: 900,
+                          }}
+                        >
+                          상담 신청
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <h2
+                      style={{
+                        margin: '11px 0 0',
+                        fontSize: 18,
+                        lineHeight: 1.5,
+                        color: 'var(--ink)',
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {book.title}
+                    </h2>
+
+                    {book.subtitle ? (
+                      <p
+                        style={{
+                          margin: '6px 0 0',
+                          color:
+                            'var(--ink-soft)',
+                          fontSize: 13,
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {book.subtitle}
+                      </p>
+                    ) : null}
+
+                    <div
+                      style={{
+                        marginTop: 13,
+                        padding: 13,
+                        borderRadius: 14,
+                        background:
+                          'rgba(34, 28, 22, 0.04)',
+                      }}
+                    >
+                      <strong
+                        style={{
+                          display: 'block',
+                          fontSize: 13,
+                          color: 'var(--ink)',
+                        }}
+                      >
+                        {author?.name ||
+                          '이름 없음'}
+                      </strong>
+
+                      <span
+                        style={{
+                          display: 'block',
+                          marginTop: 4,
+                          fontSize: 12,
+                          color:
+                            'var(--ink-soft)',
+                          wordBreak: 'break-all',
+                        }}
+                      >
+                        {author?.email ||
+                          '이메일 없음'}
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns:
+                          'repeat(3, minmax(0, 1fr))',
+                        gap: 8,
+                        marginTop: 12,
+                      }}
+                    >
+                      <MobileInfo
+                        label="사진"
+                        value={`${
+                          book.basedPhotoCount ??
+                          0
+                        }장`}
+                      />
+
+                      <MobileInfo
+                        label="이야기"
+                        value={`${
+                          book.basedStoryCount ??
+                          0
+                        }개`}
+                      />
+
+                      <MobileInfo
+                        label="분량"
+                        value={
+                          book.pageCount
+                            ? `${book.pageCount}쪽`
+                            : '미정'
+                        }
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: 12,
+                        paddingTop: 12,
+                        borderTop:
+                          '1px solid rgba(34, 28, 22, 0.08)',
+                      }}
+                    >
+                      <ConsultationStatus
+                        request={request}
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent:
+                          'space-between',
+                        gap: 12,
+                        marginTop: 14,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color:
+                            'var(--ink-faint)',
+                        }}
+                      >
+                        생성{' '}
+                        {formatDate(
+                          book.createdAt,
+                        )}
+                      </span>
+
+                      <Link
+                        href={`/admin/books/${book.id}`}
+                        style={detailButtonStyle()}
+                      >
+                        상세 보기
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageNumbers={pageNumbers}
+              status={statusFilter}
+              type={typeFilter}
+              consultation={consultationFilter}
+              searchQuery={searchQuery}
+              sortOrder={sortOrder}
+            />
+          </>
         ) : (
           <div
             style={{
@@ -962,6 +1249,334 @@ function SummaryCard({
   );
 }
 
+function FilterGroup({
+  label,
+  items,
+  marginTop = 0,
+}: {
+  label: string;
+  items: {
+    key: string;
+    label: string;
+    count: number;
+    active: boolean;
+    href: string;
+  }[];
+  marginTop?: number;
+}) {
+  return (
+    <div style={{ marginTop }}>
+      <p
+        className="dash-card__label"
+        style={{
+          margin: 0,
+        }}
+      >
+        {label}
+      </p>
+
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 8,
+          marginTop: 14,
+        }}
+      >
+        {items.map((item) => (
+          <Link
+            key={item.key}
+            href={item.href}
+            style={filterButtonStyle(item.active)}
+          >
+            {item.label} ({item.count})
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BookTitle({
+  title,
+  subtitle,
+  updatedAt,
+}: {
+  title: string;
+  subtitle: string | null;
+  updatedAt: Date;
+}) {
+  return (
+    <>
+      <strong
+        style={{
+          display: 'block',
+          fontSize: 14,
+          lineHeight: 1.5,
+          color: 'var(--ink)',
+          wordBreak: 'break-word',
+        }}
+      >
+        {title}
+      </strong>
+
+      {subtitle ? (
+        <span
+          style={{
+            display: 'block',
+            marginTop: 5,
+            maxWidth: 290,
+            fontSize: 12,
+            lineHeight: 1.5,
+            color: 'var(--ink-soft)',
+            wordBreak: 'break-word',
+          }}
+        >
+          {subtitle}
+        </span>
+      ) : null}
+
+      <span
+        style={{
+          display: 'block',
+          marginTop: 5,
+          fontSize: 11,
+          color: 'var(--ink-faint)',
+        }}
+      >
+        최근 수정 {formatDate(updatedAt)}
+      </span>
+    </>
+  );
+}
+
+function AuthorInfo({
+  name,
+  email,
+}: {
+  name: string | null | undefined;
+  email: string | null | undefined;
+}) {
+  return (
+    <>
+      <strong
+        style={{
+          display: 'block',
+          fontSize: 13,
+          color: 'var(--ink)',
+        }}
+      >
+        {name || '이름 없음'}
+      </strong>
+
+      <span
+        style={{
+          display: 'block',
+          marginTop: 4,
+          fontSize: 12,
+          color: 'var(--ink-soft)',
+          wordBreak: 'break-all',
+        }}
+      >
+        {email || '이메일 없음'}
+      </span>
+    </>
+  );
+}
+
+function ConsultationStatus({
+  request,
+}: {
+  request:
+    | {
+        status: string;
+        createdAt: Date;
+        name: string | null;
+      }
+    | undefined;
+}) {
+  if (!request) {
+    return (
+      <span
+        style={{
+          fontSize: 12,
+          color: 'var(--ink-faint)',
+        }}
+      >
+        신청 없음
+      </span>
+    );
+  }
+
+  return (
+    <>
+      <span
+        style={requestStatusBadgeStyle(
+          request.status,
+        )}
+      >
+        {getRequestStatusLabel(request.status)}
+      </span>
+
+      <span
+        style={{
+          display: 'block',
+          marginTop: 5,
+          fontSize: 11,
+          color: 'var(--ink-faint)',
+        }}
+      >
+        {request.name || '신청자 이름 없음'} ·{' '}
+        {formatDate(request.createdAt)}
+      </span>
+    </>
+  );
+}
+
+function MobileInfo({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div
+      style={{
+        padding: '10px 7px',
+        borderRadius: 12,
+        background: 'rgba(34, 28, 22, 0.05)',
+        textAlign: 'center',
+      }}
+    >
+      <span
+        style={{
+          display: 'block',
+          fontSize: 10,
+          color: 'var(--ink-faint)',
+        }}
+      >
+        {label}
+      </span>
+
+      <strong
+        style={{
+          display: 'block',
+          marginTop: 4,
+          fontSize: 13,
+          color: 'var(--ink)',
+        }}
+      >
+        {value}
+      </strong>
+    </div>
+  );
+}
+
+function Pagination({
+  currentPage,
+  totalPages,
+  pageNumbers,
+  status,
+  type,
+  consultation,
+  searchQuery,
+  sortOrder,
+}: {
+  currentPage: number;
+  totalPages: number;
+  pageNumbers: number[];
+  status: StatusFilter;
+  type: TypeFilter;
+  consultation: ConsultationFilter;
+  searchQuery: string;
+  sortOrder: SortOrder;
+}) {
+  if (totalPages <= 1) {
+    return null;
+  }
+
+  return (
+    <nav
+      aria-label="책 목록 페이지 이동"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: 7,
+        padding: '20px 16px',
+        borderTop:
+          '1px solid rgba(34, 28, 22, 0.08)',
+      }}
+    >
+      {currentPage > 1 ? (
+        <Link
+          href={buildFilterHref({
+            status,
+            type,
+            consultation,
+            searchQuery,
+            sortOrder,
+            page: currentPage - 1,
+          })}
+          style={pageButtonStyle(false)}
+        >
+          이전
+        </Link>
+      ) : (
+        <span style={disabledPageButtonStyle()}>
+          이전
+        </span>
+      )}
+
+      {pageNumbers.map((pageNumber) => (
+        <Link
+          key={pageNumber}
+          href={buildFilterHref({
+            status,
+            type,
+            consultation,
+            searchQuery,
+            sortOrder,
+            page: pageNumber,
+          })}
+          aria-current={
+            pageNumber === currentPage
+              ? 'page'
+              : undefined
+          }
+          style={pageButtonStyle(
+            pageNumber === currentPage,
+          )}
+        >
+          {pageNumber}
+        </Link>
+      ))}
+
+      {currentPage < totalPages ? (
+        <Link
+          href={buildFilterHref({
+            status,
+            type,
+            consultation,
+            searchQuery,
+            sortOrder,
+            page: currentPage + 1,
+          })}
+          style={pageButtonStyle(false)}
+        >
+          다음
+        </Link>
+      ) : (
+        <span style={disabledPageButtonStyle()}>
+          다음
+        </span>
+      )}
+    </nav>
+  );
+}
+
 function normalizeStatusFilter(
   value: string | undefined,
 ): StatusFilter {
@@ -1010,6 +1625,20 @@ function normalizeTypeFilter(
   return 'ALL';
 }
 
+function normalizeConsultationFilter(
+  value: string | undefined,
+): ConsultationFilter {
+  if (value === 'HAS') {
+    return 'HAS';
+  }
+
+  if (value === 'NONE') {
+    return 'NONE';
+  }
+
+  return 'ALL';
+}
+
 function normalizeSortOrder(
   value: string | undefined,
 ): SortOrder {
@@ -1020,12 +1649,56 @@ function normalizeSortOrder(
   return 'latest';
 }
 
-function buildFilterHref(
-  status: StatusFilter,
-  type: TypeFilter,
-  searchQuery = '',
-  sortOrder: SortOrder = 'latest',
+function normalizePage(
+  value: string | undefined,
 ) {
+  const parsed = Number.parseInt(
+    String(value || '1'),
+    10,
+  );
+
+  if (
+    !Number.isFinite(parsed) ||
+    parsed < 1
+  ) {
+    return 1;
+  }
+
+  return parsed;
+}
+
+function getPageNumbers(
+  currentPage: number,
+  totalPages: number,
+) {
+  const start = Math.max(
+    1,
+    Math.min(currentPage - 2, totalPages - 4),
+  );
+
+  const end = Math.min(totalPages, start + 4);
+
+  const pages: number[] = [];
+
+  for (
+    let pageNumber = start;
+    pageNumber <= end;
+    pageNumber += 1
+  ) {
+    pages.push(pageNumber);
+  }
+
+  return pages;
+}
+
+function buildFilterHref({
+  status,
+  type,
+  consultation,
+  searchQuery = '',
+  sortOrder = 'latest',
+  page = 1,
+}: FilterHrefOptions) {
   const params = new URLSearchParams();
 
   if (status !== 'ALL') {
@@ -1036,6 +1709,10 @@ function buildFilterHref(
     params.set('type', type);
   }
 
+  if (consultation !== 'ALL') {
+    params.set('consultation', consultation);
+  }
+
   if (searchQuery.trim()) {
     params.set('q', searchQuery.trim());
   }
@@ -1044,11 +1721,54 @@ function buildFilterHref(
     params.set('sort', sortOrder);
   }
 
+  if (page > 1) {
+    params.set('page', String(page));
+  }
+
   const query = params.toString();
 
   return query
     ? `/admin/books?${query}`
     : '/admin/books';
+}
+
+function inputLabelStyle(): CSSProperties {
+  return {
+    fontSize: 12,
+    fontWeight: 900,
+    color: 'var(--ink-soft)',
+  };
+}
+
+function inputStyle(): CSSProperties {
+  return {
+    width: '100%',
+    minHeight: 42,
+    padding: '0 14px',
+    borderRadius: 12,
+    border:
+      '1px solid rgba(34, 28, 22, 0.18)',
+    background:
+      'rgba(255, 255, 255, 0.55)',
+    color: 'var(--ink)',
+    fontSize: 14,
+    outline: 'none',
+  };
+}
+
+function selectStyle(): CSSProperties {
+  return {
+    width: '100%',
+    minHeight: 42,
+    padding: '0 12px',
+    borderRadius: 12,
+    border:
+      '1px solid rgba(34, 28, 22, 0.18)',
+    background:
+      'rgba(255, 255, 255, 0.55)',
+    color: 'var(--ink)',
+    fontSize: 14,
+  };
 }
 
 function primaryButtonStyle(): CSSProperties {
@@ -1077,7 +1797,8 @@ function secondaryButtonStyle(): CSSProperties {
     minHeight: 34,
     padding: '0 12px',
     borderRadius: 999,
-    border: '1px solid rgba(34, 28, 22, 0.18)',
+    border:
+      '1px solid rgba(34, 28, 22, 0.18)',
     background: 'transparent',
     color: 'var(--ink-soft)',
     fontSize: 12,
@@ -1136,11 +1857,77 @@ function detailButtonStyle(): CSSProperties {
     minHeight: 32,
     padding: '0 11px',
     borderRadius: 999,
-    border: '1px solid rgba(34, 28, 22, 0.2)',
+    border:
+      '1px solid rgba(34, 28, 22, 0.2)',
     color: 'var(--wine)',
     fontSize: 11,
     fontWeight: 900,
     textDecoration: 'none',
+    whiteSpace: 'nowrap',
+  };
+}
+
+function pageButtonStyle(
+  active: boolean,
+): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 34,
+    minHeight: 34,
+    padding: '0 10px',
+    borderRadius: 999,
+    border: active
+      ? '1px solid var(--wine)'
+      : '1px solid rgba(34, 28, 22, 0.16)',
+    background: active
+      ? 'var(--wine)'
+      : 'transparent',
+    color: active
+      ? 'var(--cream)'
+      : 'var(--ink-soft)',
+    fontSize: 12,
+    fontWeight: 900,
+    textDecoration: 'none',
+  };
+}
+
+function disabledPageButtonStyle(): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 34,
+    minHeight: 34,
+    padding: '0 10px',
+    borderRadius: 999,
+    border:
+      '1px solid rgba(34, 28, 22, 0.08)',
+    color: 'var(--ink-faint)',
+    fontSize: 12,
+    opacity: 0.5,
+  };
+}
+
+function tableHeadingStyle(): CSSProperties {
+  return {
+    padding: '12px 14px',
+    textAlign: 'left',
+    fontFamily: 'var(--font-mono)',
+    fontSize: 11,
+    fontWeight: 400,
+    letterSpacing: '.05em',
+    color: 'var(--ink-faint)',
+    whiteSpace: 'nowrap',
+  };
+}
+
+function standardCellStyle(): CSSProperties {
+  return {
+    padding: 14,
+    fontSize: 12,
+    color: 'var(--ink-soft)',
     whiteSpace: 'nowrap',
   };
 }
@@ -1167,7 +1954,9 @@ function bookStatusBadgeStyle(
     };
   }
 
-  if (status === BookStatus.IN_PRODUCTION) {
+  if (
+    status === BookStatus.IN_PRODUCTION
+  ) {
     return {
       ...base,
       background: '#fff1c7',
@@ -1185,7 +1974,8 @@ function bookStatusBadgeStyle(
 
   return {
     ...base,
-    background: 'rgba(34, 28, 22, 0.08)',
+    background:
+      'rgba(34, 28, 22, 0.08)',
     color: 'var(--ink-faint)',
   };
 }
@@ -1246,7 +2036,8 @@ function requestStatusBadgeStyle(
 
   return {
     ...base,
-    background: 'rgba(34, 28, 22, 0.08)',
+    background:
+      'rgba(34, 28, 22, 0.08)',
     color: 'var(--ink-faint)',
   };
 }
@@ -1256,7 +2047,9 @@ function getBookStatusLabel(status: string) {
     return '원고 초안';
   }
 
-  if (status === BookStatus.IN_PRODUCTION) {
+  if (
+    status === BookStatus.IN_PRODUCTION
+  ) {
     return '제작 준비 중';
   }
 
@@ -1295,19 +2088,37 @@ function getBookTypeLabel(type: string) {
   return '종류 확인';
 }
 
-function getRequestStatusLabel(status: string) {
-  if (status === 'REQUESTED') return '상담 접수';
-  if (status === 'CONTACTED') return '고객 연락';
-  if (status === 'IN_PROGRESS') return '상담 진행';
-  if (status === 'COMPLETED') return '상담 완료';
-  if (status === 'CANCELED') return '취소';
+function getRequestStatusLabel(
+  status: string,
+) {
+  if (status === 'REQUESTED') {
+    return '상담 접수';
+  }
+
+  if (status === 'CONTACTED') {
+    return '고객 연락';
+  }
+
+  if (status === 'IN_PROGRESS') {
+    return '상담 진행';
+  }
+
+  if (status === 'COMPLETED') {
+    return '상담 완료';
+  }
+
+  if (status === 'CANCELED') {
+    return '취소';
+  }
 
   return '상태 확인';
 }
 
 function formatDate(value: Date | string) {
   const date =
-    value instanceof Date ? value : new Date(value);
+    value instanceof Date
+      ? value
+      : new Date(value);
 
   if (Number.isNaN(date.getTime())) {
     return '-';
