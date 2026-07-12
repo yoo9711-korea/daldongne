@@ -1,20 +1,14 @@
-// src/app/admin/layout.tsx
 import { auth } from '@/auth';
+import AdminNavigation from '@/components/admin/AdminNavigation';
 import { prisma } from '@/lib/prisma';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
-
-const NAV = [
-  { href: '/admin', label: '대시보드' },
-  { href: '/admin/users', label: '회원 관리' },
-  { href: '/admin/inquiries', label: '가족 공간 관리' },
-  { href: '/admin/production-requests', label: '제작 상담' },
-];
+import { redirect } from 'next/navigation';
+import type { ReactNode } from 'react';
 
 export default async function AdminLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const session = await auth();
 
@@ -23,9 +17,13 @@ export default async function AdminLayout({
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: {
+      id: session.user.id,
+    },
     select: {
       role: true,
+      name: true,
+      email: true,
     },
   });
 
@@ -38,61 +36,104 @@ export default async function AdminLayout({
       className="admin-shell"
       style={{
         display: 'grid',
-        gridTemplateColumns: '220px 1fr',
+        gridTemplateColumns:
+          'minmax(210px, 230px) minmax(0, 1fr)',
         minHeight: '100vh',
+        background: 'var(--paper)',
       }}
     >
       <aside
         style={{
-          borderRight: '1px solid rgba(34,28,22,.1)',
-          padding: '32px 20px',
+          position: 'sticky',
+          top: 0,
+          alignSelf: 'start',
+          minHeight: '100vh',
+          padding: '28px 18px',
+          borderRight:
+            '1px solid rgba(34, 28, 22, 0.1)',
           background: 'var(--paper-shade)',
         }}
       >
-        <p
+        <div
           style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 10.5,
-            letterSpacing: '.1em',
-            color: 'var(--wine)',
-            marginBottom: 20,
+            padding: '0 8px 20px',
+            borderBottom:
+              '1px solid rgba(34, 28, 22, 0.1)',
+            marginBottom: 18,
           }}
         >
-          ADMIN
-        </p>
+          <p
+            style={{
+              margin: 0,
+              fontFamily: 'var(--font-mono)',
+              fontSize: 10.5,
+              fontWeight: 900,
+              letterSpacing: '.1em',
+              color: 'var(--wine)',
+            }}
+          >
+            DALDONGNE ADMIN
+          </p>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              style={{
-                fontSize: 14,
-                color: 'var(--ink-soft)',
-                padding: '9px 10px',
-                borderRadius: 2,
-                display: 'block',
-              }}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+          <h1
+            style={{
+              margin: '8px 0 0',
+              fontFamily: 'var(--font-display)',
+              fontSize: 20,
+              lineHeight: 1.4,
+              color: 'var(--ink)',
+            }}
+          >
+            관리자 페이지
+          </h1>
+        </div>
+
+        <AdminNavigation />
 
         <div
           style={{
-            marginTop: 32,
-            paddingTop: 20,
-            borderTop: '1px solid rgba(34,28,22,.1)',
+            marginTop: 28,
+            padding: '18px 8px 0',
+            borderTop:
+              '1px solid rgba(34, 28, 22, 0.1)',
           }}
         >
-          <Link href="/dashboard" style={{ fontSize: 13, color: 'var(--ink-faint)' }}>
-            ← 내 서재로
+          <p
+            style={{
+              margin: 0,
+              fontSize: 12,
+              lineHeight: 1.6,
+              color: 'var(--ink-soft)',
+              wordBreak: 'break-all',
+            }}
+          >
+            {user.name || user.email || '관리자'}
+          </p>
+
+          <Link
+            href="/dashboard"
+            style={{
+              display: 'inline-flex',
+              marginTop: 12,
+              color: 'var(--ink-faint)',
+              fontSize: 13,
+              fontWeight: 700,
+              textDecoration: 'none',
+            }}
+          >
+            사용자 화면으로
           </Link>
         </div>
       </aside>
 
-      <div style={{ padding: 'clamp(32px,4vw,56px)' }}>{children}</div>
+      <div
+        style={{
+          minWidth: 0,
+          padding: 'clamp(24px, 4vw, 56px)',
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
