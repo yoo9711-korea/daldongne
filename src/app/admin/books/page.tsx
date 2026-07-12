@@ -13,11 +13,14 @@ type PageProps = {
   searchParams?: Promise<{
     status?: string;
     type?: string;
+    q?: string;
+    sort?: string;
   }>;
 };
 
 type StatusFilter = 'ALL' | BookStatus;
 type TypeFilter = 'ALL' | BookType;
+type SortOrder = 'latest' | 'oldest';
 
 const STATUS_FILTERS: {
   value: StatusFilter;
@@ -77,6 +80,16 @@ export default async function AdminBooksPage({
     resolvedSearchParams?.type,
   );
 
+  const searchQuery = String(
+    resolvedSearchParams?.q || '',
+  )
+    .trim()
+    .slice(0, 100);
+
+  const sortOrder = normalizeSortOrder(
+    resolvedSearchParams?.sort,
+  );
+
   const where: Prisma.BookWhereInput = {};
 
   if (statusFilter !== 'ALL') {
@@ -85,6 +98,39 @@ export default async function AdminBooksPage({
 
   if (typeFilter !== 'ALL') {
     where.type = typeFilter;
+  }
+
+  if (searchQuery) {
+    where.OR = [
+      {
+        title: {
+          contains: searchQuery,
+        },
+      },
+      {
+        subtitle: {
+          contains: searchQuery,
+        },
+      },
+      {
+        author: {
+          is: {
+            OR: [
+              {
+                name: {
+                  contains: searchQuery,
+                },
+              },
+              {
+                email: {
+                  contains: searchQuery,
+                },
+              },
+            ],
+          },
+        },
+      },
+    ];
   }
 
   const [
@@ -96,7 +142,8 @@ export default async function AdminBooksPage({
     prisma.book.findMany({
       where,
       orderBy: {
-        createdAt: 'desc',
+        createdAt:
+          sortOrder === 'oldest' ? 'asc' : 'desc',
       },
       take: 200,
       select: {
@@ -210,6 +257,12 @@ export default async function AdminBooksPage({
     0,
   );
 
+  const hasActiveCondition =
+    statusFilter !== 'ALL' ||
+    typeFilter !== 'ALL' ||
+    Boolean(searchQuery) ||
+    sortOrder !== 'latest';
+
   return (
     <main>
       <div className="runninghead">
@@ -314,6 +367,132 @@ export default async function AdminBooksPage({
           marginBottom: 22,
         }}
       >
+        <form
+          action="/admin/books"
+          method="get"
+          style={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            flexWrap: 'wrap',
+            gap: 12,
+            paddingBottom: 22,
+            marginBottom: 22,
+            borderBottom:
+              '1px solid rgba(34, 28, 22, 0.08)',
+          }}
+        >
+          {statusFilter !== 'ALL' ? (
+            <input
+              type="hidden"
+              name="status"
+              value={statusFilter}
+            />
+          ) : null}
+
+          {typeFilter !== 'ALL' ? (
+            <input
+              type="hidden"
+              name="type"
+              value={typeFilter}
+            />
+          ) : null}
+
+          <label
+            style={{
+              display: 'grid',
+              flex: '1 1 280px',
+              gap: 7,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 900,
+                color: 'var(--ink-soft)',
+              }}
+            >
+              책 또는 작성자 검색
+            </span>
+
+            <input
+              type="search"
+              name="q"
+              defaultValue={searchQuery}
+              placeholder="책 제목, 작성자 이름, 이메일"
+              maxLength={100}
+              style={{
+                width: '100%',
+                minHeight: 42,
+                padding: '0 14px',
+                borderRadius: 12,
+                border:
+                  '1px solid rgba(34, 28, 22, 0.18)',
+                background:
+                  'rgba(255, 255, 255, 0.55)',
+                color: 'var(--ink)',
+                fontSize: 14,
+                outline: 'none',
+              }}
+            />
+          </label>
+
+          <label
+            style={{
+              display: 'grid',
+              flex: '0 1 180px',
+              gap: 7,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 900,
+                color: 'var(--ink-soft)',
+              }}
+            >
+              정렬
+            </span>
+
+            <select
+              name="sort"
+              defaultValue={sortOrder}
+              style={{
+                width: '100%',
+                minHeight: 42,
+                padding: '0 12px',
+                borderRadius: 12,
+                border:
+                  '1px solid rgba(34, 28, 22, 0.18)',
+                background:
+                  'rgba(255, 255, 255, 0.55)',
+                color: 'var(--ink)',
+                fontSize: 14,
+              }}
+            >
+              <option value="latest">최신순</option>
+              <option value="oldest">오래된순</option>
+            </select>
+          </label>
+
+          <button type="submit" style={searchButtonStyle()}>
+            검색 적용
+          </button>
+
+          {searchQuery || sortOrder !== 'latest' ? (
+            <Link
+              href={buildFilterHref(
+                statusFilter,
+                typeFilter,
+                '',
+                'latest',
+              )}
+              style={secondaryButtonStyle()}
+            >
+              검색 초기화
+            </Link>
+          ) : null}
+        </form>
+
         <p
           className="dash-card__label"
           style={{
@@ -345,6 +524,8 @@ export default async function AdminBooksPage({
                 href={buildFilterHref(
                   filter.value,
                   typeFilter,
+                  searchQuery,
+                  sortOrder,
                 )}
                 style={filterButtonStyle(active)}
               >
@@ -385,6 +566,8 @@ export default async function AdminBooksPage({
                 href={buildFilterHref(
                   statusFilter,
                   filter.value,
+                  searchQuery,
+                  sortOrder,
                 )}
                 style={filterButtonStyle(active)}
               >
@@ -429,21 +612,28 @@ export default async function AdminBooksPage({
                 margin: '8px 0 0',
                 color: 'var(--ink-soft)',
                 fontSize: 13,
+                lineHeight: 1.6,
               }}
             >
               현재 조건에 맞는 책 {filteredBookCount}권
+              {searchQuery
+                ? ` · 검색어 "${searchQuery}"`
+                : ''}
+              {' · '}
+              {sortOrder === 'oldest'
+                ? '오래된순'
+                : '최신순'}
             </p>
           </div>
 
-          {(statusFilter !== 'ALL' ||
-            typeFilter !== 'ALL') && (
+          {hasActiveCondition ? (
             <Link
               href="/admin/books"
               style={secondaryButtonStyle()}
             >
-              필터 초기화
+              전체 조건 초기화
             </Link>
-          )}
+          ) : null}
         </div>
 
         {books.length > 0 ? (
@@ -500,7 +690,6 @@ export default async function AdminBooksPage({
               <tbody>
                 {books.map((book) => {
                   const author = authorMap.get(book.authorId);
-
                   const request = latestRequestMap.get(book.id);
 
                   return (
@@ -821,9 +1010,21 @@ function normalizeTypeFilter(
   return 'ALL';
 }
 
+function normalizeSortOrder(
+  value: string | undefined,
+): SortOrder {
+  if (value === 'oldest') {
+    return 'oldest';
+  }
+
+  return 'latest';
+}
+
 function buildFilterHref(
   status: StatusFilter,
   type: TypeFilter,
+  searchQuery = '',
+  sortOrder: SortOrder = 'latest',
 ) {
   const params = new URLSearchParams();
 
@@ -833,6 +1034,14 @@ function buildFilterHref(
 
   if (type !== 'ALL') {
     params.set('type', type);
+  }
+
+  if (searchQuery.trim()) {
+    params.set('q', searchQuery.trim());
+  }
+
+  if (sortOrder !== 'latest') {
+    params.set('sort', sortOrder);
   }
 
   const query = params.toString();
@@ -874,6 +1083,21 @@ function secondaryButtonStyle(): CSSProperties {
     fontSize: 12,
     fontWeight: 900,
     textDecoration: 'none',
+    whiteSpace: 'nowrap',
+  };
+}
+
+function searchButtonStyle(): CSSProperties {
+  return {
+    minHeight: 42,
+    padding: '0 18px',
+    borderRadius: 999,
+    border: '1px solid var(--wine)',
+    background: 'var(--wine)',
+    color: 'var(--cream)',
+    fontSize: 13,
+    fontWeight: 900,
+    cursor: 'pointer',
     whiteSpace: 'nowrap',
   };
 }
@@ -1028,13 +1252,17 @@ function requestStatusBadgeStyle(
 }
 
 function getBookStatusLabel(status: string) {
-  if (status === BookStatus.DRAFT) return '원고 초안';
+  if (status === BookStatus.DRAFT) {
+    return '원고 초안';
+  }
 
   if (status === BookStatus.IN_PRODUCTION) {
     return '제작 준비 중';
   }
 
-  if (status === BookStatus.PUBLISHED) return '완성';
+  if (status === BookStatus.PUBLISHED) {
+    return '완성';
+  }
 
   return '상태 확인';
 }
