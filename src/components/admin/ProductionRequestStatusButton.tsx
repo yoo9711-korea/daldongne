@@ -32,22 +32,30 @@ export default function ProductionRequestStatusButton({
 }: Props) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
+  const [savingStatus, setSavingStatus] =
+    useState<ProductionRequestStatus | null>(null);
 
-  const handleChangeStatus = async (status: ProductionRequestStatus) => {
-    if (isSaving) return;
-
-    if (status === currentStatus) {
+  const handleChangeStatus = async (
+    status: ProductionRequestStatus,
+  ) => {
+    if (isSaving || status === currentStatus) {
       return;
     }
 
-    const option = STATUS_OPTIONS.find((item) => item.value === status);
+    const option = STATUS_OPTIONS.find(
+      (item) => item.value === status,
+    );
+
     const label = option?.label || status;
+    const confirmMessage = getConfirmMessage(status, label);
+    const confirmed = window.confirm(confirmMessage);
 
-    const ok = window.confirm(`상담 상태를 "${label}" 상태로 변경할까요?`);
-
-    if (!ok) return;
+    if (!confirmed) {
+      return;
+    }
 
     setIsSaving(true);
+    setSavingStatus(status);
 
     try {
       const response = await fetch(
@@ -63,63 +71,183 @@ export default function ProductionRequestStatusButton({
         },
       );
 
-      const result = (await response.json()) as {
+      const result = (await response.json().catch(() => null)) as {
         ok?: boolean;
         message?: string;
-      };
+      } | null;
 
-      if (!response.ok || !result.ok) {
-        alert(result.message || '상담 상태를 변경하지 못했습니다.');
+      if (!response.ok || !result?.ok) {
+        window.alert(
+          result?.message ||
+            '상담 상태를 변경하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+        );
         return;
       }
 
-      alert(result.message || '상담 상태를 변경했습니다.');
+      window.alert(
+        result.message || `상담 상태를 "${label}"로 변경했습니다.`,
+      );
+
       router.refresh();
     } catch {
-      alert('상담 상태를 변경하는 중 오류가 발생했습니다.');
+      window.alert(
+        '상담 상태를 변경하는 중 오류가 발생했습니다. 인터넷 연결을 확인한 후 다시 시도해 주세요.',
+      );
     } finally {
       setIsSaving(false);
+      setSavingStatus(null);
     }
   };
 
   return (
     <div
       style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 8,
-        marginTop: 14,
+        marginTop: 16,
+        paddingTop: 16,
+        borderTop: '1px solid #ead7b7',
       }}
     >
-      {STATUS_OPTIONS.map((option) => {
-        const active = option.value === currentStatus;
+      <p
+        style={{
+          margin: '0 0 10px',
+          fontSize: 13,
+          fontWeight: 900,
+          color: '#8a806f',
+        }}
+      >
+        상담 상태 변경
+      </p>
 
-        return (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => handleChangeStatus(option.value)}
-            disabled={isSaving || active}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: 34,
-              padding: '0 12px',
-              borderRadius: 999,
-              border: active ? '1px solid #24170f' : '1px solid #d6b778',
-              background: active ? '#24170f' : '#fffaf0',
-              color: active ? '#fffaf0' : '#5a3a18',
-              fontSize: 13,
-              fontWeight: 900,
-              cursor: isSaving || active ? 'not-allowed' : 'pointer',
-              opacity: isSaving && !active ? 0.65 : 1,
-            }}
-          >
-            {option.label}
-          </button>
-        );
-      })}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 8,
+        }}
+      >
+        {STATUS_OPTIONS.map((option) => {
+          const active = option.value === currentStatus;
+          const saving = savingStatus === option.value;
+
+          return (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => handleChangeStatus(option.value)}
+              disabled={isSaving || active}
+              aria-pressed={active}
+              style={getButtonStyle(
+                option.value,
+                active,
+                isSaving,
+              )}
+            >
+              {saving ? '변경 중...' : option.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {isSaving ? (
+        <p
+          style={{
+            margin: '10px 0 0',
+            fontSize: 13,
+            color: '#8a806f',
+          }}
+        >
+          상태를 저장하고 이메일 알림을 발송하고 있습니다.
+        </p>
+      ) : null}
     </div>
   );
+}
+
+function getConfirmMessage(
+  status: ProductionRequestStatus,
+  label: string,
+) {
+  if (status === 'COMPLETED') {
+    return [
+      `상담 상태를 "${label}"로 변경할까요?`,
+      '',
+      '책 상태가 완성으로 변경되고 고객에게 완료 안내 이메일이 발송됩니다.',
+    ].join('\n');
+  }
+
+  if (status === 'CANCELED') {
+    return [
+      `상담 상태를 "${label}"로 변경할까요?`,
+      '',
+      '책 상태가 원고 초안으로 되돌아가고 고객에게 취소 안내 이메일이 발송됩니다.',
+    ].join('\n');
+  }
+
+  return [
+    `상담 상태를 "${label}"로 변경할까요?`,
+    '',
+    '변경된 상태는 고객에게 이메일로 안내됩니다.',
+  ].join('\n');
+}
+
+function getButtonStyle(
+  status: ProductionRequestStatus,
+  active: boolean,
+  isSaving: boolean,
+) {
+  const statusColors: Record<
+    ProductionRequestStatus,
+    {
+      background: string;
+      color: string;
+      border: string;
+    }
+  > = {
+    REQUESTED: {
+      background: '#fff1c7',
+      color: '#83540d',
+      border: '#eac66f',
+    },
+    CONTACTED: {
+      background: '#e4f2ff',
+      color: '#245d8c',
+      border: '#9fc9e8',
+    },
+    IN_PROGRESS: {
+      background: '#efe6ff',
+      color: '#62438a',
+      border: '#c8b1e8',
+    },
+    COMPLETED: {
+      background: '#e3f4e5',
+      color: '#2f6b38',
+      border: '#9dcca4',
+    },
+    CANCELED: {
+      background: '#f2eeee',
+      color: '#776868',
+      border: '#d8cccc',
+    },
+  };
+
+  const colors = statusColors[status];
+
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 38,
+    padding: '0 14px',
+    borderRadius: 999,
+    border: active
+      ? '2px solid #24170f'
+      : `1px solid ${colors.border}`,
+    background: active ? '#24170f' : colors.background,
+    color: active ? '#fffaf0' : colors.color,
+    fontSize: 13,
+    fontWeight: 900,
+    cursor: isSaving || active ? 'not-allowed' : 'pointer',
+    opacity: isSaving && !active ? 0.6 : 1,
+    transition: 'opacity 0.15s ease',
+  };
 }
