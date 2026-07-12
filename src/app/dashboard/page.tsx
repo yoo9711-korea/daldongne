@@ -143,10 +143,11 @@ export default async function DashboardPage() {
   const bookReady =
     photoReady && storyReady;
 
-  const nextAction = getNextAction({
+    const nextAction = getNextAction({
     photoCount,
     storyCount,
     bookCount,
+    activeProductionBookCount,
   });
 
   const displayName =
@@ -1042,10 +1043,12 @@ function getNextAction({
   photoCount,
   storyCount,
   bookCount,
+  activeProductionBookCount,
 }: {
   photoCount: number;
   storyCount: number;
   bookCount: number;
+  activeProductionBookCount: number;
 }) {
   if (photoCount < REQUIRED_PHOTO_COUNT) {
     return {
@@ -1071,13 +1074,23 @@ function getNextAction({
     };
   }
 
-  if (bookCount === 0) {
+   if (bookCount === 0) {
     return {
       title: '책 원고를 만들 준비가 되었습니다.',
       description:
         '지금까지 모은 사진과 이야기를 바탕으로 첫 번째 책 원고를 만들어보세요.',
       href: '/dashboard/book',
       buttonLabel: '첫 책 원고 만들기',
+    };
+  }
+
+  if (activeProductionBookCount > 0) {
+    return {
+      title: `현재 ${activeProductionBookCount}권의 제작 상담이 진행 중입니다.`,
+      description:
+        '내 책장에서 상담 접수, 고객 연락, 제작 상담 진행 상태와 최근 변경 내용을 확인해보세요.',
+      href: '/dashboard/library',
+      buttonLabel: '상담 진행 현황 보기',
     };
   }
 
