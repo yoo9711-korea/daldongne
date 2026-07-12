@@ -44,34 +44,50 @@ export default async function LibraryPage() {
     (book) => book.id,
   );
 
-  const productionRequests =
+   const productionRequests =
     bookIds.length > 0
       ? await prisma.bookProductionRequest.findMany({
           where: {
             bookId: {
               in: bookIds,
             },
+            authorId: userId,
           },
-          orderBy: {
-            createdAt: 'desc',
-          },
+          orderBy: [
+            {
+              createdAt: 'desc',
+            },
+            {
+              updatedAt: 'desc',
+            },
+          ],
           select: {
             bookId: true,
             status: true,
             createdAt: true,
+            updatedAt: true,
           },
         })
       : [];
+
+  const activeProductionStatuses =
+    new Set([
+      'REQUESTED',
+      'CONTACTED',
+      'IN_PROGRESS',
+    ]);
 
   const activeProductionRequestBookIds =
     new Set(
       productionRequests
         .filter(
           (request) =>
-            request.status !== 'CANCELED',
+            request.status !==
+            'CANCELED',
         )
         .map(
-          (request) => request.bookId,
+          (request) =>
+            request.bookId,
         ),
     );
 
@@ -79,18 +95,86 @@ export default async function LibraryPage() {
     new Set(
       productionRequests
         .filter((request) =>
-          [
-            'REQUESTED',
-            'CONTACTED',
-            'IN_PROGRESS',
-          ].includes(
-            String(request.status),
+          activeProductionStatuses.has(
+            String(
+              request.status,
+            ),
           ),
         )
         .map(
-          (request) => request.bookId,
+          (request) =>
+            request.bookId,
         ),
     );
+
+  const productionRequestsByBookId =
+    new Map<
+      string,
+      Array<
+        (typeof productionRequests)[number]
+      >
+    >();
+
+  for (
+    const request of productionRequests
+  ) {
+    const requests =
+      productionRequestsByBookId.get(
+        request.bookId,
+      ) || [];
+
+    requests.push(request);
+
+    productionRequestsByBookId.set(
+      request.bookId,
+      requests,
+    );
+  }
+
+  const representativeProductionRequestStatusByBookId =
+    new Map<string, string>();
+
+  for (
+    const [
+      bookId,
+      requests,
+    ] of productionRequestsByBookId
+  ) {
+    const activeRequest = requests
+      .filter((request) =>
+        activeProductionStatuses.has(
+          String(
+            request.status,
+          ),
+        ),
+      )
+      .sort(
+        (first, second) =>
+          second.updatedAt.getTime() -
+          first.updatedAt.getTime(),
+      )[0];
+
+    const latestRequest = [
+      ...requests,
+    ].sort(
+      (first, second) =>
+        second.createdAt.getTime() -
+        first.createdAt.getTime(),
+    )[0];
+
+    const representativeRequest =
+      activeRequest ||
+      latestRequest;
+
+    if (representativeRequest) {
+      representativeProductionRequestStatusByBookId.set(
+        bookId,
+        String(
+          representativeRequest.status,
+        ),
+      );
+    }
+  }
 
   const draftCount = books.filter(
     (book) =>
@@ -140,10 +224,14 @@ export default async function LibraryPage() {
         book.basedStoryCount,
       createdAt:
         book.createdAt.toISOString(),
-      hasProductionRequest:
+            hasProductionRequest:
         activeProductionRequestBookIds.has(
           book.id,
         ),
+      productionRequestStatus:
+        representativeProductionRequestStatusByBookId.get(
+          book.id,
+        ) || null,
     }),
   );
 
