@@ -322,13 +322,34 @@ export default async function AdminBooksPage({
     authors.map((author) => [author.id, author]),
   );
 
-  const latestRequestMap = new Map<
+    const latestRequestMap = new Map<
     string,
     (typeof productionRequests)[number]
   >();
 
+  const activeRequestStatuses = new Set([
+    'REQUESTED',
+    'CONTACTED',
+    'IN_PROGRESS',
+  ]);
+
   for (const request of productionRequests) {
-    if (!latestRequestMap.has(request.bookId)) {
+    const currentRequest = latestRequestMap.get(
+      request.bookId,
+    );
+
+    if (!currentRequest) {
+      latestRequestMap.set(request.bookId, request);
+      continue;
+    }
+
+    const currentIsActive =
+      activeRequestStatuses.has(currentRequest.status);
+
+    const requestIsActive =
+      activeRequestStatuses.has(request.status);
+
+    if (!currentIsActive && requestIsActive) {
       latestRequestMap.set(request.bookId, request);
     }
   }
