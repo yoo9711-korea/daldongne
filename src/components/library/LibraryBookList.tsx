@@ -2,7 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import {
+  useMemo,
+  useState,
+} from 'react';
+import type { CSSProperties } from 'react';
 
 type LibraryBook = {
   id: string;
@@ -13,6 +17,8 @@ type LibraryBook = {
   pageCount: number | null;
   basedPhotoCount: number | null;
   basedStoryCount: number | null;
+  createdAt?: string | null;
+  hasProductionRequest?: boolean;
 };
 
 type Props = {
@@ -20,45 +26,60 @@ type Props = {
 };
 
 const TYPE_LABEL: Record<string, string> = {
-  LIFE_BOOK: '부모님 인생책',
-  FAMILY_BOOK: '우리 가족 인생책',
+  LIFE_BOOK: '인생 기록책',
+  FAMILY_BOOK: '가족 이야기책',
   COUPLE_BOOK: '부부 이야기책',
   BABY_BOOK: '성장 기록책',
   TRAVEL_BOOK: '여행 기록책',
-  AI_MOVIE: '추억 영상',
+  AI_MOVIE: 'AI 영상',
 };
 
 const TYPE_SPINE: Record<string, string> = {
-  LIFE_BOOK: '#6E2A36',
-  FAMILY_BOOK: '#2E3F52',
-  COUPLE_BOOK: '#5C3A52',
-  BABY_BOOK: '#5C6B4F',
-  TRAVEL_BOOK: '#8C4A2D',
-  AI_MOVIE: '#B6892F',
+  LIFE_BOOK: '#6e2a36',
+  FAMILY_BOOK: '#2e3f52',
+  COUPLE_BOOK: '#5c3a52',
+  BABY_BOOK: '#5c6b4f',
+  TRAVEL_BOOK: '#8c4a2d',
+  AI_MOVIE: '#b6892f',
 };
 
 const STATUS_LABEL: Record<string, string> = {
   DRAFT: '원고 초안',
-  IN_PRODUCTION: '제작 준비 중',
+  IN_PRODUCTION: '제작 진행 중',
   PUBLISHED: '완성',
-  ARCHIVED: '보관됨',
 };
 
-export default function LibraryBookList({ books }: Props) {
+export default function LibraryBookList({
+  books,
+}: Props) {
   const router = useRouter();
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const selectedCount = selectedIds.length;
+  const [selectedIds, setSelectedIds] =
+    useState<string[]>([]);
+
+  const [isDeleting, setIsDeleting] =
+    useState(false);
+
+  const selectedCount =
+    selectedIds.length;
 
   const allSelected = useMemo(() => {
-    return books.length > 0 && selectedIds.length === books.length;
-  }, [books.length, selectedIds.length]);
+    return (
+      books.length > 0 &&
+      books.every((book) =>
+        selectedIds.includes(book.id),
+      )
+    );
+  }, [books, selectedIds]);
 
-  const toggleBook = (bookId: string) => {
+  const toggleBook = (
+    bookId: string,
+  ) => {
     setSelectedIds((current) =>
       current.includes(bookId)
-        ? current.filter((id) => id !== bookId)
+        ? current.filter(
+            (id) => id !== bookId,
+          )
         : [...current, bookId],
     );
   };
@@ -69,211 +90,308 @@ export default function LibraryBookList({ books }: Props) {
       return;
     }
 
-    setSelectedIds(books.map((book) => book.id));
+    setSelectedIds(
+      books.map((book) => book.id),
+    );
   };
 
-  const handleBulkDelete = async () => {
-    if (isDeleting) return;
-
-    if (selectedIds.length === 0) {
-      alert('삭제할 책을 먼저 선택해 주세요.');
-      return;
-    }
-
-    const confirmed = window.confirm(
-      `선택한 책 ${selectedIds.length}권을 삭제할까요?\n삭제하면 복구할 수 없습니다.`,
-    );
-
-    if (!confirmed) return;
-
-    setIsDeleting(true);
-
-    try {
-      const response = await fetch('/api/book/bulk-delete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          bookIds: selectedIds,
-        }),
-      });
-
-      const result = (await response.json()) as {
-        ok?: boolean;
-        message?: string;
-        deletedCount?: number;
-      };
-
-      if (!response.ok || !result.ok) {
-        alert(result.message || '책을 삭제하지 못했습니다.');
+  const handleBulkDelete =
+    async () => {
+      if (isDeleting) {
         return;
       }
 
-      alert(result.message || '선택한 책이 삭제되었습니다.');
-      setSelectedIds([]);
-      router.refresh();
-    } catch {
-      alert('책을 삭제하는 중 오류가 발생했습니다.');
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+      if (selectedIds.length === 0) {
+        alert(
+          '삭제할 책을 먼저 선택해 주세요.',
+        );
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          `선택한 책 ${selectedIds.length}권을 삭제할까요?\n삭제한 책은 복구할 수 없습니다.`,
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      setIsDeleting(true);
+
+      try {
+        const response = await fetch(
+          '/api/book/bulk-delete',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify({
+              bookIds: selectedIds,
+            }),
+          },
+        );
+
+        const result =
+          (await response.json()) as {
+            ok?: boolean;
+            message?: string;
+            deletedCount?: number;
+          };
+
+        if (
+          !response.ok ||
+          !result.ok
+        ) {
+          alert(
+            result.message ||
+              '선택한 책을 삭제하지 못했습니다.',
+          );
+          return;
+        }
+
+        alert(
+          result.message ||
+            `선택한 책 ${
+              result.deletedCount ??
+              selectedIds.length
+            }권을 삭제했습니다.`,
+        );
+
+        setSelectedIds([]);
+        router.refresh();
+      } catch {
+        alert(
+          '책을 삭제하는 중 오류가 발생했습니다.',
+        );
+      } finally {
+        setIsDeleting(false);
+      }
+    };
 
   if (books.length === 0) {
-    return (
-      <div
-        style={{
-          marginTop: 24,
-          padding: 24,
-          borderRadius: 18,
-          background: 'var(--paper-shade)',
-          color: 'var(--ink-soft)',
-          fontSize: 17,
-          lineHeight: 1.75,
-        }}
-      >
-        아직 완성된 책이 없습니다. 먼저 부모님의 사진을 올리고, 기억나는
-        이야기를 남겨보세요. 사진과 이야기가 모이면 가족이 오래 간직할
-        인생책의 첫 원고가 시작됩니다.
-      </div>
-    );
+    return <EmptyLibrary />;
   }
 
   return (
     <div>
+      <style>{`
+        .library-toolbar {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .library-book-grid {
+          display: grid;
+          grid-template-columns:
+            repeat(auto-fit, minmax(270px, 1fr));
+          gap: 18px;
+          align-items: stretch;
+        }
+
+        .library-card-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+        }
+
+        @media (max-width: 700px) {
+          .library-toolbar {
+            align-items: stretch;
+          }
+
+          .library-toolbar-group {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+          }
+
+          .library-toolbar-group button {
+            width: 100%;
+          }
+
+          .library-book-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .library-card-actions {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
       <div
+        className="library-toolbar"
         style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 12,
           marginBottom: 18,
           padding: 16,
           borderRadius: 20,
           background: '#f7eddc',
-          border: '1px solid #e4cda3',
+          border:
+            '1px solid #e4cda3',
         }}
       >
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div
+          className="library-toolbar-group"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+          }}
+        >
           <button
             type="button"
             onClick={toggleAll}
-            style={toolbarButtonStyle('#fffaf0', '#4a3828')}
+            style={toolbarButtonStyle(
+              '#fffaf0',
+              '#4a3828',
+            )}
           >
-            {allSelected ? '전체 선택 해제' : '전체 선택'}
+            {allSelected
+              ? '전체 선택 해제'
+              : '전체 선택'}
           </button>
 
           <button
             type="button"
-            onClick={() => setSelectedIds([])}
-            disabled={selectedCount === 0}
+            onClick={() =>
+              setSelectedIds([])
+            }
+            disabled={
+              selectedCount === 0
+            }
             style={toolbarButtonStyle(
-              selectedCount === 0 ? '#eee1ca' : '#fffaf0',
-              selectedCount === 0 ? '#9f927e' : '#4a3828',
+              selectedCount === 0
+                ? '#eee1ca'
+                : '#fffaf0',
+              selectedCount === 0
+                ? '#9f927e'
+                : '#4a3828',
             )}
           >
             선택 해제
           </button>
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+        <div
+          className="library-toolbar-group"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
           <span
             style={{
-              fontSize: 14,
-              fontWeight: 900,
+              display: 'inline-flex',
+              alignItems: 'center',
+              minHeight: 38,
+              padding: '0 11px',
               color: '#6b5a46',
+              fontSize: 13,
+              fontWeight: 900,
             }}
           >
-            선택된 책 {selectedCount}권
+            선택한 책 {selectedCount}권
           </span>
 
           <button
             type="button"
-            onClick={handleBulkDelete}
-            disabled={selectedCount === 0 || isDeleting}
+            onClick={
+              handleBulkDelete
+            }
+            disabled={
+              selectedCount === 0 ||
+              isDeleting
+            }
             style={{
               ...toolbarButtonStyle(
-                selectedCount === 0 || isDeleting ? '#ead6d2' : '#fff5f3',
-                selectedCount === 0 || isDeleting ? '#a58a86' : '#9f2f25',
+                selectedCount === 0 ||
+                  isDeleting
+                  ? '#ead6d2'
+                  : '#fff5f3',
+                selectedCount === 0 ||
+                  isDeleting
+                  ? '#a58a86'
+                  : '#9f2f25',
               ),
-              border: '1px solid #c96b61',
+              border:
+                '1px solid #c96b61',
             }}
           >
-            {isDeleting ? '삭제 중...' : '선택 삭제'}
+            {isDeleting
+              ? '삭제 중...'
+              : '선택 삭제'}
           </button>
         </div>
       </div>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: 18,
-          alignItems: 'stretch',
-        }}
-      >
+      <div className="library-book-grid">
         {books.map((book) => (
           <BookCard
             key={book.id}
             book={book}
-            selected={selectedIds.includes(book.id)}
-            onToggle={() => toggleBook(book.id)}
+            selected={selectedIds.includes(
+              book.id,
+            )}
+            onToggle={() =>
+              toggleBook(book.id)
+            }
           />
         ))}
 
         <Link
-          href="/dashboard/timeline"
-          style={{
-            minHeight: 310,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            gap: 12,
-            padding: 24,
-            borderRadius: 24,
-            border: '1px dashed #c9ad7b',
-            background: '#f7eddc',
-            textDecoration: 'none',
-            color: 'var(--ink-soft)',
-          }}
+          href="/dashboard/book"
+          style={newBookCardStyle()}
         >
-          <p
+          <span
             style={{
-              margin: 0,
-              fontSize: 36,
+              width: 52,
+              height: 52,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent:
+                'center',
+              borderRadius: 999,
+              background: '#33271d',
+              color: '#fff8ec',
+              fontSize: 30,
               lineHeight: 1,
-              color: '#8a6b4d',
             }}
           >
             +
-          </p>
+          </span>
 
-          <p
+          <strong
             style={{
-              margin: 0,
-              fontFamily: 'Noto Serif KR, serif',
+              color: '#33271d',
+              fontFamily:
+                'Noto Serif KR, serif',
               fontSize: 22,
-              fontWeight: 900,
-              color: 'var(--ink)',
+              lineHeight: 1.4,
             }}
           >
-            사진부터 모으기
-          </p>
+            새 책 원고 만들기
+          </strong>
 
-          <p
+          <span
             style={{
-              margin: 0,
+              maxWidth: 230,
+              color: '#6b5845',
               fontSize: 14,
               lineHeight: 1.7,
-              maxWidth: 220,
             }}
           >
-            사진과 이야기를 모으면 첫 인생책 원고를 만들 수 있습니다.
-          </p>
+            모아 둔 사진과 이야기를
+            선택해 새로운 책 원고를
+            만듭니다.
+          </span>
         </Link>
       </div>
     </div>
@@ -289,25 +407,31 @@ function BookCard({
   selected: boolean;
   onToggle: () => void;
 }) {
-  const spine = TYPE_SPINE[book.type] || '#6E2A36';
+  const spine =
+    TYPE_SPINE[book.type] ||
+    '#6e2a36';
 
   return (
     <article
       style={{
         position: 'relative',
-        minHeight: 330,
+        minHeight: 365,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        gap: 16,
+        justifyContent:
+          'space-between',
+        gap: 18,
         padding: 22,
         borderRadius: 24,
-        background: '#17110c',
+        background:
+          'linear-gradient(145deg, #211710 0%, #120d09 100%)',
         borderLeft: `8px solid ${spine}`,
-        outline: selected ? '4px solid #d6a43b' : '1px solid rgba(255,255,255,0.08)',
+        outline: selected
+          ? '4px solid #d6a43b'
+          : '1px solid rgba(255,255,255,0.08)',
         boxShadow: selected
           ? '0 16px 36px rgba(180, 130, 35, 0.28)'
-          : '0 14px 30px rgba(60, 38, 18, 0.12)',
+          : '0 14px 30px rgba(60, 38, 18, 0.14)',
         color: '#fffaf0',
         overflow: 'hidden',
       }}
@@ -317,14 +441,19 @@ function BookCard({
           position: 'absolute',
           top: 14,
           right: 14,
+          zIndex: 2,
           display: 'inline-flex',
           alignItems: 'center',
           gap: 6,
           padding: '7px 10px',
           borderRadius: 999,
-          background: selected ? '#f3d28a' : 'rgba(255, 250, 240, 0.12)',
-          color: selected ? '#3b260e' : '#fffaf0',
-          fontSize: 12,
+          background: selected
+            ? '#f3d28a'
+            : 'rgba(255, 250, 240, 0.12)',
+          color: selected
+            ? '#3b260e'
+            : '#fffaf0',
+          fontSize: 11,
           fontWeight: 900,
           cursor: 'pointer',
         }}
@@ -339,6 +468,7 @@ function BookCard({
             cursor: 'pointer',
           }}
         />
+
         선택
       </label>
 
@@ -346,119 +476,143 @@ function BookCard({
         <p
           style={{
             margin: 0,
-            paddingRight: 76,
-            fontSize: 12,
+            paddingRight: 82,
+            color: '#f3d28a',
+            fontSize: 11,
             fontWeight: 900,
             letterSpacing: '0.08em',
-            color: '#f3d28a',
           }}
         >
-          {TYPE_LABEL[book.type] || '인생책'}
+          {TYPE_LABEL[book.type] ||
+            '책 원고'}
         </p>
 
         <h3
           style={{
             margin: '16px 0 0',
-            fontFamily: 'Noto Serif KR, serif',
+            color: '#fffaf0',
+            fontFamily:
+              'Noto Serif KR, serif',
             fontSize: 22,
             lineHeight: 1.45,
             letterSpacing: '-0.04em',
-            color: '#fffaf0',
+            wordBreak: 'break-word',
           }}
         >
           {book.title}
         </h3>
 
-        <p
+        <div
           style={{
-            margin: '10px 0 0',
-            fontSize: 13,
-            lineHeight: 1.6,
-            color: '#b8a68f',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 7,
+            marginTop: 13,
           }}
         >
-          {STATUS_LABEL[book.status] || '상태 확인 필요'} ·{' '}
-          {getPageCountLabel(book.pageCount)}
-        </p>
+          <span
+            style={statusBadgeStyle(
+              book.status,
+            )}
+          >
+            {STATUS_LABEL[
+              book.status
+            ] || '상태 확인 필요'}
+          </span>
+
+          <span
+            style={productionBadgeStyle(
+              book,
+            )}
+          >
+            {getProductionLabel(book)}
+          </span>
+        </div>
+
+        {book.createdAt ? (
+          <p
+            style={{
+              margin: '11px 0 0',
+              color: '#a99880',
+              fontSize: 11,
+            }}
+          >
+            생성일{' '}
+            {formatDate(
+              book.createdAt,
+            )}
+          </p>
+        ) : null}
 
         <p
           style={{
-            marginTop: 16,
-            marginBottom: 0,
-            fontSize: 14,
-            lineHeight: 1.75,
+            margin: '15px 0 0',
+            minHeight: 70,
             color: '#c8b79e',
+            fontSize: 13,
+            lineHeight: 1.75,
+            wordBreak: 'break-word',
           }}
         >
-          {getBookSummaryLabel(book.summary)}
+          {getBookSummaryLabel(
+            book.summary,
+          )}
         </p>
       </div>
 
       <div>
-        <p
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            margin: 0,
-            padding: '7px 11px',
-            borderRadius: 999,
-            background: '#fff1d8',
-            fontSize: 13,
-            fontWeight: 900,
-            color: '#8a5a1f',
-          }}
-        >
-          {getBookSourceLabel(book.basedPhotoCount, book.basedStoryCount)}
-        </p>
-
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr',
-            gap: 8,
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 7,
+          }}
+        >
+          <span
+            style={sourceBadgeStyle()}
+          >
+            {getBookSourceLabel(
+              book.basedPhotoCount,
+              book.basedStoryCount,
+            )}
+          </span>
+
+          <span
+            style={pageBadgeStyle()}
+          >
+            {getPageCountLabel(
+              book.pageCount,
+            )}
+          </span>
+        </div>
+
+        <div
+          className="library-card-actions"
+          style={{
             marginTop: 16,
             paddingTop: 14,
-            borderTop: '1px solid rgba(255, 250, 240, 0.14)',
+            borderTop:
+              '1px solid rgba(255, 250, 240, 0.14)',
           }}
         >
           <Link
             href={`/dashboard/library/${book.id}`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: 38,
-              padding: '0 14px',
-              borderRadius: 999,
-              background: '#fffaf0',
-              border: '1px solid #fffaf0',
-              color: spine,
-              fontSize: 13,
-              fontWeight: 900,
-              textDecoration: 'none',
-            }}
+            style={detailButtonStyle(
+              spine,
+            )}
           >
-            {getBookActionLabel(book.pageCount)} →
+            {getBookActionLabel(
+              book.pageCount,
+            )}
           </Link>
 
           <Link
             href={`/dashboard/library/${book.id}/print`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: 38,
-              padding: '0 14px',
-              borderRadius: 999,
-              background: spine,
-              border: `1px solid ${spine}`,
-              color: '#fffaf0',
-              fontSize: 13,
-              fontWeight: 900,
-              textDecoration: 'none',
-            }}
+            style={printButtonStyle(
+              spine,
+            )}
           >
-            인쇄용 보기 →
+            인쇄용 원고
           </Link>
         </div>
       </div>
@@ -466,7 +620,151 @@ function BookCard({
   );
 }
 
-function toolbarButtonStyle(background: string, color: string) {
+function EmptyLibrary() {
+  return (
+    <div
+      style={{
+        padding: 28,
+        borderRadius: 24,
+        border:
+          '1px dashed #c9ad7b',
+        background: '#f7eddc',
+      }}
+    >
+      <h3
+        style={{
+          margin: 0,
+          color: '#33271d',
+          fontFamily:
+            'Noto Serif KR, serif',
+          fontSize: 25,
+          lineHeight: 1.45,
+        }}
+      >
+        아직 내 책장에 저장된
+        책이 없습니다.
+      </h3>
+
+      <p
+        style={{
+          margin: '10px 0 0',
+          maxWidth: 720,
+          color: '#6b5845',
+          fontSize: 14,
+          lineHeight: 1.75,
+        }}
+      >
+        사진을 모으고 이야기를
+        남긴 뒤 책 원고 만들기
+        화면에서 첫 번째 책을
+        만들어보세요.
+      </p>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 10,
+          marginTop: 20,
+        }}
+      >
+        <EmptyStepLink
+          number={1}
+          title="사진 모으기"
+          description="책에 사용할 사진을 올립니다."
+          href="/dashboard/timeline"
+        />
+
+        <EmptyStepLink
+          number={2}
+          title="이야기 남기기"
+          description="사진과 삶의 이야기를 기록합니다."
+          href="/dashboard/interview"
+        />
+
+        <EmptyStepLink
+          number={3}
+          title="책 원고 만들기"
+          description="자료를 골라 책 원고를 만듭니다."
+          href="/dashboard/book"
+        />
+      </div>
+    </div>
+  );
+}
+
+function EmptyStepLink({
+  number,
+  title,
+  description,
+  href,
+}: {
+  number: number;
+  title: string;
+  description: string;
+  href: string;
+}) {
+  return (
+    <Link
+      href={href}
+      style={{
+        display: 'block',
+        padding: 16,
+        borderRadius: 17,
+        border:
+          '1px solid rgba(91, 66, 43, 0.12)',
+        background: '#fffaf1',
+        color: '#33271d',
+        textDecoration: 'none',
+      }}
+    >
+      <span
+        style={{
+          width: 30,
+          height: 30,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 999,
+          background: '#33271d',
+          color: '#fff8ec',
+          fontSize: 11,
+          fontWeight: 900,
+        }}
+      >
+        {number}
+      </span>
+
+      <strong
+        style={{
+          display: 'block',
+          marginTop: 10,
+          fontSize: 16,
+        }}
+      >
+        {title}
+      </strong>
+
+      <span
+        style={{
+          display: 'block',
+          marginTop: 5,
+          color: '#6b5845',
+          fontSize: 12,
+          lineHeight: 1.6,
+        }}
+      >
+        {description}
+      </span>
+    </Link>
+  );
+}
+
+function toolbarButtonStyle(
+  background: string,
+  color: string,
+): CSSProperties {
   return {
     display: 'inline-flex',
     alignItems: 'center',
@@ -474,54 +772,293 @@ function toolbarButtonStyle(background: string, color: string) {
     minHeight: 38,
     padding: '0 14px',
     borderRadius: 999,
-    border: '1px solid #d6b778',
+    border:
+      '1px solid #d6b778',
     background,
     color,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 900,
     cursor: 'pointer',
-    whiteSpace: 'nowrap' as const,
+    whiteSpace: 'nowrap',
   };
 }
 
-function getPageCountLabel(pageCount: number | null | undefined) {
-  if (!pageCount || pageCount <= 0) {
-    return '원고 다시 정리 필요';
+function statusBadgeStyle(
+  status: string,
+): CSSProperties {
+  const base: CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 25,
+    padding: '0 9px',
+    borderRadius: 999,
+    fontSize: 10,
+    fontWeight: 900,
+  };
+
+  if (status === 'PUBLISHED') {
+    return {
+      ...base,
+      background: '#e3f4e5',
+      color: '#2f6b38',
+    };
+  }
+
+  if (
+    status === 'IN_PRODUCTION'
+  ) {
+    return {
+      ...base,
+      background: '#efe6ff',
+      color: '#62438a',
+    };
+  }
+
+  return {
+    ...base,
+    background: '#fff1c7',
+    color: '#83540d',
+  };
+}
+
+function productionBadgeStyle(
+  book: LibraryBook,
+): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 25,
+    padding: '0 9px',
+    borderRadius: 999,
+    background:
+      book.hasProductionRequest ||
+      book.status ===
+        'IN_PRODUCTION'
+        ? '#e4f2ff'
+        : 'rgba(255,255,255,0.12)',
+    color:
+      book.hasProductionRequest ||
+      book.status ===
+        'IN_PRODUCTION'
+        ? '#245d8c'
+        : '#d7c8b3',
+    fontSize: 10,
+    fontWeight: 900,
+  };
+}
+
+function sourceBadgeStyle(): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 28,
+    padding: '0 10px',
+    borderRadius: 999,
+    background: '#fff1d8',
+    color: '#8a5a1f',
+    fontSize: 11,
+    fontWeight: 900,
+  };
+}
+
+function pageBadgeStyle(): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 28,
+    padding: '0 10px',
+    borderRadius: 999,
+    background:
+      'rgba(255,255,255,0.12)',
+    color: '#d7c8b3',
+    fontSize: 11,
+    fontWeight: 900,
+  };
+}
+
+function detailButtonStyle(
+  spine: string,
+): CSSProperties {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 39,
+    padding: '0 12px',
+    borderRadius: 999,
+    background: '#fffaf0',
+    border:
+      '1px solid #fffaf0',
+    color: spine,
+    fontSize: 12,
+    fontWeight: 900,
+    textDecoration: 'none',
+    textAlign: 'center',
+  };
+}
+
+function printButtonStyle(
+  spine: string,
+): CSSProperties {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 39,
+    padding: '0 12px',
+    borderRadius: 999,
+    background: spine,
+    border: `1px solid ${spine}`,
+    color: '#fffaf0',
+    fontSize: 12,
+    fontWeight: 900,
+    textDecoration: 'none',
+    textAlign: 'center',
+  };
+}
+
+function newBookCardStyle(): CSSProperties {
+  return {
+    minHeight: 365,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    gap: 12,
+    padding: 24,
+    borderRadius: 24,
+    border:
+      '1px dashed #c9ad7b',
+    background: '#f7eddc',
+    color: '#33271d',
+    textDecoration: 'none',
+  };
+}
+
+function getProductionLabel(
+  book: LibraryBook,
+) {
+  if (
+    book.status === 'PUBLISHED'
+  ) {
+    return '제작 완료';
+  }
+
+  if (
+    book.status ===
+    'IN_PRODUCTION'
+  ) {
+    return '제작 진행 중';
+  }
+
+  if (
+    book.hasProductionRequest
+  ) {
+    return '상담 신청됨';
+  }
+
+  return '제작 상담 가능';
+}
+
+function getPageCountLabel(
+  pageCount:
+    | number
+    | null
+    | undefined,
+) {
+  if (
+    !pageCount ||
+    pageCount <= 0
+  ) {
+    return '분량 미정';
   }
 
   return `${pageCount}쪽`;
 }
 
-function getBookSummaryLabel(summary: string | null | undefined) {
-  if (!summary || summary.trim().length === 0) {
-    return '아직 책 소개가 정리되지 않았습니다. 책 상세 화면에서 원고 다시 정리하기를 누르면 소개 문구가 채워집니다.';
+function getBookSummaryLabel(
+  summary:
+    | string
+    | null
+    | undefined,
+) {
+  if (
+    !summary ||
+    summary.trim().length === 0
+  ) {
+    return '아직 책 소개가 정리되지 않았습니다. 책 상세 화면에서 원고를 다시 정리하면 소개 문구도 함께 갱신됩니다.';
   }
 
-  if (summary.length <= 90) {
+  if (summary.length <= 100) {
     return summary;
   }
 
-  return `${summary.slice(0, 90).trim()}...`;
+  return `${summary
+    .slice(0, 100)
+    .trim()}...`;
 }
 
 function getBookSourceLabel(
-  photoCount: number | null | undefined,
-  storyCount: number | null | undefined,
+  photoCount:
+    | number
+    | null
+    | undefined,
+  storyCount:
+    | number
+    | null
+    | undefined,
 ) {
-  const photos = photoCount ?? 0;
-  const stories = storyCount ?? 0;
+  const photos =
+    photoCount ?? 0;
 
-  if (photos === 0 && stories === 0) {
-    return '사진과 이야기를 더 모아야 합니다';
+  const stories =
+    storyCount ?? 0;
+
+  if (
+    photos === 0 &&
+    stories === 0
+  ) {
+    return '선택 자료 확인 필요';
   }
 
   return `사진 ${photos}장 · 이야기 ${stories}개`;
 }
 
-function getBookActionLabel(pageCount: number | null | undefined) {
-  if (!pageCount || pageCount <= 0) {
-    return '원고 정리하러 가기';
+function getBookActionLabel(
+  pageCount:
+    | number
+    | null
+    | undefined,
+) {
+  if (
+    !pageCount ||
+    pageCount <= 0
+  ) {
+    return '원고 정리하기';
   }
 
-  return '책 자세히 보기';
+  return '책 상세 보기';
+}
+
+function formatDate(
+  value: string,
+) {
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(date.getTime())
+  ) {
+    return '-';
+  }
+
+  return new Intl.DateTimeFormat(
+    'ko-KR',
+    {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    },
+  ).format(date);
 }
