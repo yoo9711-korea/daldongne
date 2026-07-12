@@ -140,8 +140,17 @@ export default async function AdminBooksPage({
     resolvedSearchParams?.page,
   );
 
-  const consultationBookRows =
+    const consultationBookRows =
     await prisma.bookProductionRequest.findMany({
+      where: {
+        status: {
+          in: [
+            'REQUESTED',
+            'CONTACTED',
+            'IN_PROGRESS',
+          ],
+        },
+      },
       distinct: ['bookId'],
       select: {
         bookId: true,
