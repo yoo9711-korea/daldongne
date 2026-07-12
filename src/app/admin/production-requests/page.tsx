@@ -196,9 +196,28 @@ export default async function AdminProductionRequestsPage({
               </p>
             </div>
 
-            <Link href="/admin" style={buttonStyle('#24170f', '#fffaf0')}>
-              관리자 홈
-            </Link>
+             <div
+  style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 8,
+  }}
+>
+  <Link
+    href="/admin/books"
+    style={buttonStyle('#f3d28a', '#6d4512')}
+  >
+    전체 책 관리
+  </Link>
+
+  <Link
+    href="/admin"
+    style={buttonStyle('#24170f', '#fffaf0')}
+  >
+    관리자 홈
+  </Link>
+</div>            
+
           </div>
         </section>
 

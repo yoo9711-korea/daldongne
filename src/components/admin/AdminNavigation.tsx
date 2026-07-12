@@ -13,14 +13,18 @@ const NAV_ITEMS = [
     href: '/admin/users',
     label: '회원 관리',
   },
-  {
+   {
     href: '/admin/families',
     label: '가족 공간 관리',
   },
   {
+    href: '/admin/books',
+    label: '책 관리',
+  },
+  {
     href: '/admin/production-requests',
     label: '제작 상담',
-  },
+ },
 ];
 
 export default function AdminNavigation() {

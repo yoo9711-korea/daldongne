@@ -357,15 +357,20 @@ export default async function AdminDashboard() {
             <span>상담 접수와 진행 상태 확인</span>
           </Link>
 
-          <Link href="/admin/users" style={quickLinkStyle()}>
-            <strong>회원 관리</strong>
-            <span>회원 정보와 관리자 권한 확인</span>
-          </Link>
-
           <Link href="/admin/families" style={quickLinkStyle()}>
-            <strong>가족 공간 관리</strong>
-            <span>가족 공간과 참여 회원 확인</span>
-          </Link>
+  <strong>가족 공간 관리</strong>
+  <span>가족 공간과 참여 회원 확인</span>
+</Link>
+
+<Link href="/admin/books" style={quickLinkStyle()}>
+  <strong>책 관리</strong>
+  <span>전체 책 원고와 제작 상태 확인</span>
+</Link>
+
+<Link href="/dashboard" style={quickLinkStyle()}>
+  <strong>사용자 화면</strong>
+  <span>일반 대시보드 화면 확인</span>
+</Link>
 
           <Link href="/dashboard" style={quickLinkStyle()}>
             <strong>사용자 화면</strong>
