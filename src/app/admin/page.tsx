@@ -27,20 +27,23 @@ export default async function AdminDashboard() {
   const [
     totalUsers,
     totalMemories,
-    totalFamilies,
     totalBooks,
     totalProductionRequests,
     requestedProductionRequests,
     activeProductionRequests,
     completedProductionRequests,
+    inProductionBookCount,
+    familyHealthRows,
+    pendingProductionRequests,
+    inProductionBooks,
     recentUsers,
-    recentProductionRequests,
-    recentBooks,
   ] = await Promise.all([
     prisma.user.count(),
+
     prisma.memory.count(),
-    prisma.family.count(),
+
     prisma.book.count(),
+
     prisma.bookProductionRequest.count(),
 
     prisma.bookProductionRequest.count({
@@ -63,23 +66,36 @@ export default async function AdminDashboard() {
       },
     }),
 
-    prisma.user.findMany({
-      orderBy: {
-        createdAt: 'desc',
+    prisma.book.count({
+      where: {
+        status: 'IN_PRODUCTION',
       },
-      take: 5,
+    }),
+
+    prisma.family.findMany({
+      orderBy: {
+        updatedAt: 'desc',
+      },
       select: {
         id: true,
         name: true,
-        email: true,
         createdAt: true,
-        role: true,
+        updatedAt: true,
+        members: {
+          select: {
+            id: true,
+            role: true,
+          },
+        },
       },
     }),
 
     prisma.bookProductionRequest.findMany({
+      where: {
+        status: 'REQUESTED',
+      },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
       take: 5,
       select: {
@@ -94,8 +110,11 @@ export default async function AdminDashboard() {
     }),
 
     prisma.book.findMany({
+      where: {
+        status: 'IN_PRODUCTION',
+      },
       orderBy: {
-        createdAt: 'desc',
+        updatedAt: 'desc',
       },
       take: 5,
       select: {
@@ -105,22 +124,102 @@ export default async function AdminDashboard() {
         type: true,
         status: true,
         createdAt: true,
+        updatedAt: true,
+      },
+    }),
+
+    prisma.user.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 5,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
       },
     }),
   ]);
 
+  const totalFamilies = familyHealthRows.length;
+
+  const emptyFamilies = familyHealthRows.filter(
+    (family) => family.members.length === 0,
+  );
+
+  const noOwnerFamilies = familyHealthRows.filter(
+    (family) =>
+      family.members.length > 0 &&
+      !family.members.some(
+        (member) => member.role === 'OWNER',
+      ),
+  );
+
+  const warningFamilyMap = new Map<
+    string,
+    {
+      id: string;
+      name: string;
+      createdAt: Date;
+      updatedAt: Date;
+      members: {
+        id: string;
+        role: string;
+      }[];
+      warningType: 'EMPTY' | 'NO_OWNER';
+    }
+  >();
+
+  for (const family of emptyFamilies) {
+    warningFamilyMap.set(family.id, {
+      ...family,
+      warningType: 'EMPTY',
+    });
+  }
+
+  for (const family of noOwnerFamilies) {
+    warningFamilyMap.set(family.id, {
+      ...family,
+      warningType: 'NO_OWNER',
+    });
+  }
+
+  const warningFamilies = Array.from(
+    warningFamilyMap.values(),
+  )
+    .sort(
+      (first, second) =>
+        second.updatedAt.getTime() -
+        first.updatedAt.getTime(),
+    )
+    .slice(0, 5);
+
+  const familyWarningCount =
+    warningFamilyMap.size;
+
   const requestBookIds = Array.from(
     new Set(
-      recentProductionRequests.map((request) => request.bookId),
+      pendingProductionRequests.map(
+        (request) => request.bookId,
+      ),
     ),
   );
 
-  const recentBookAuthorIds = Array.from(
-    new Set(recentBooks.map((book) => book.authorId)),
+  const inProductionBookAuthorIds = Array.from(
+    new Set(
+      inProductionBooks.map(
+        (book) => book.authorId,
+      ),
+    ),
   );
 
-  const [requestBooks, recentBookAuthors] = await Promise.all([
-    requestBookIds.length
+  const [
+    requestBooks,
+    inProductionBookAuthors,
+  ] = await Promise.all([
+    requestBookIds.length > 0
       ? prisma.book.findMany({
           where: {
             id: {
@@ -134,11 +233,11 @@ export default async function AdminDashboard() {
         })
       : Promise.resolve([]),
 
-    recentBookAuthorIds.length
+    inProductionBookAuthorIds.length > 0
       ? prisma.user.findMany({
           where: {
             id: {
-              in: recentBookAuthorIds,
+              in: inProductionBookAuthorIds,
             },
           },
           select: {
@@ -151,11 +250,17 @@ export default async function AdminDashboard() {
   ]);
 
   const requestBookMap = new Map(
-    requestBooks.map((book) => [book.id, book]),
+    requestBooks.map((book) => [
+      book.id,
+      book,
+    ]),
   );
 
   const authorMap = new Map(
-    recentBookAuthors.map((author) => [author.id, author]),
+    inProductionBookAuthors.map((author) => [
+      author.id,
+      author,
+    ]),
   );
 
   const stats = [
@@ -178,7 +283,7 @@ export default async function AdminDashboard() {
       color: '#2e3f52',
     },
     {
-      label: '책 원고',
+      label: '전체 책',
       value: totalBooks,
       unit: '권',
       color: '#7b4f2a',
@@ -190,10 +295,10 @@ export default async function AdminDashboard() {
       color: '#6d3b1f',
     },
     {
-      label: '신규 상담 접수',
+      label: '미처리 상담',
       value: requestedProductionRequests,
       unit: '건',
-      color: '#9a6a24',
+      color: '#9a4b24',
     },
     {
       label: '상담 처리 중',
@@ -202,19 +307,58 @@ export default async function AdminDashboard() {
       color: '#2e3f52',
     },
     {
-      label: '상담 완료',
-      value: completedProductionRequests,
-      unit: '건',
-      color: '#3e5f3a',
+      label: '제작 중인 책',
+      value: inProductionBookCount,
+      unit: '권',
+      color: '#62438a',
     },
   ];
 
   return (
     <main>
+      <style>{`
+        .admin-dashboard-operation-grid {
+          display: grid;
+          grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+          gap: 20px;
+        }
+
+        @media (max-width: 1050px) {
+          .admin-dashboard-operation-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .admin-dashboard-alert {
+            padding: 18px !important;
+          }
+
+          .admin-dashboard-alert-inner {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+          }
+
+          .admin-dashboard-user-row {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+
       <div className="runninghead">
-        <span className="runninghead__chapter">ADMIN</span>
+        <span className="runninghead__chapter">
+          ADMIN
+        </span>
+
         <span className="runninghead__rule" />
-        <span style={{ color: 'var(--ink-soft)' }}>
+
+        <span
+          style={{
+            color: 'var(--ink-soft)',
+          }}
+        >
           관리자 대시보드
         </span>
       </div>
@@ -226,7 +370,7 @@ export default async function AdminDashboard() {
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: 20,
-          marginBottom: 32,
+          marginBottom: 28,
         }}
       >
         <div>
@@ -242,14 +386,15 @@ export default async function AdminDashboard() {
           <p
             style={{
               margin: 0,
-              maxWidth: 720,
+              maxWidth: 760,
               color: 'var(--ink-soft)',
               fontSize: 15,
               lineHeight: 1.8,
             }}
           >
-            달동네 출판사의 회원, 기록, 가족 공간, 책 원고와
-            제작 상담 현황을 한눈에 확인합니다.
+            달동네 출판사의 회원, 기록, 가족 공간,
+            책 원고와 제작 상담 현황을 한눈에
+            확인합니다.
           </p>
         </div>
 
@@ -265,48 +410,100 @@ export default async function AdminDashboard() {
       </section>
 
       <section
-        style={{
-          display: 'grid',
-          gridTemplateColumns:
-            'repeat(auto-fit, minmax(175px, 1fr))',
-          gap: 16,
-          marginBottom: 34,
-        }}
+        className="admin-dashboard-alert"
+        style={urgentAlertStyle(
+          requestedProductionRequests,
+        )}
       >
-        {stats.map((stat) => (
-          <article
-            key={stat.label}
-            className="dash-card"
-            style={{
-              textAlign: 'center',
-              minWidth: 0,
-            }}
-          >
-            <p
-              style={{
-                margin: '0 0 5px',
-                fontFamily: 'var(--font-display)',
-                fontWeight: 700,
-                fontSize: 36,
-                lineHeight: 1.2,
-                color: stat.color,
-              }}
-            >
-              {stat.value.toLocaleString()}
-            </p>
-
+        <div
+          className="admin-dashboard-alert-inner"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 18,
+          }}
+        >
+          <div>
             <p
               style={{
                 margin: 0,
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                color: 'var(--ink-faint)',
-                letterSpacing: '.05em',
+                fontSize: 12,
+                fontWeight: 900,
+                letterSpacing: '.04em',
+                color:
+                  requestedProductionRequests > 0
+                    ? '#8b3f18'
+                    : '#2f6b38',
               }}
             >
-              {stat.label} ({stat.unit})
+              운영 확인
             </p>
-          </article>
+
+            <h2
+              style={{
+                margin: '7px 0 0',
+                fontSize: 22,
+                lineHeight: 1.45,
+                color: 'var(--ink)',
+              }}
+            >
+              {requestedProductionRequests > 0
+                ? `아직 확인하지 않은 제작 상담이 ${requestedProductionRequests}건 있습니다.`
+                : '새로 접수된 미처리 상담이 없습니다.'}
+            </h2>
+
+            <p
+              style={{
+                margin: '7px 0 0',
+                color: 'var(--ink-soft)',
+                fontSize: 13,
+                lineHeight: 1.7,
+              }}
+            >
+              {requestedProductionRequests > 0
+                ? '접수 순서가 오래된 상담부터 확인하고 고객 연락 상태로 변경해 주세요.'
+                : `현재 상담 처리 중 ${activeProductionRequests}건, 상담 완료 ${completedProductionRequests}건입니다.`}
+            </p>
+          </div>
+
+          <Link
+            href={
+              requestedProductionRequests > 0
+                ? '/admin/production-requests?status=REQUESTED'
+                : '/admin/production-requests'
+            }
+            style={
+              requestedProductionRequests > 0
+                ? alertButtonStyle()
+                : smallButtonStyle()
+            }
+          >
+            {requestedProductionRequests > 0
+              ? '미처리 상담 확인'
+              : '전체 상담 보기'}
+          </Link>
+        </div>
+      </section>
+
+      <section
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            'repeat(auto-fit, minmax(170px, 1fr))',
+          gap: 14,
+          marginTop: 24,
+          marginBottom: 28,
+        }}
+      >
+        {stats.map((stat) => (
+          <SummaryCard
+            key={stat.label}
+            label={stat.label}
+            value={stat.value}
+            unit={stat.unit}
+            color={stat.color}
+          />
         ))}
       </section>
 
@@ -316,113 +513,123 @@ export default async function AdminDashboard() {
           marginBottom: 28,
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 12,
-          }}
-        >
-          <div>
-            <p className="dash-card__label">운영 바로가기</p>
+        <div>
+          <p
+            className="dash-card__label"
+            style={{
+              margin: 0,
+            }}
+          >
+            운영 바로가기
+          </p>
 
-            <p
-              style={{
-                margin: '8px 0 0',
-                color: 'var(--ink-soft)',
-                fontSize: 14,
-              }}
-            >
-              자주 사용하는 관리자 메뉴로 이동합니다.
-            </p>
-          </div>
+          <p
+            style={{
+              margin: '8px 0 0',
+              color: 'var(--ink-soft)',
+              fontSize: 13,
+              lineHeight: 1.7,
+            }}
+          >
+            자주 사용하는 관리자 화면과 현재 처리할
+            업무로 이동합니다.
+          </p>
         </div>
 
         <div
           style={{
             display: 'grid',
             gridTemplateColumns:
-              'repeat(auto-fit, minmax(180px, 1fr))',
+              'repeat(auto-fit, minmax(185px, 1fr))',
             gap: 12,
             marginTop: 18,
           }}
         >
           <Link
             href="/admin/production-requests"
-            style={quickLinkStyle()}
+            style={quickLinkStyle(
+              requestedProductionRequests > 0,
+            )}
           >
             <strong>제작 상담 관리</strong>
-            <span>상담 접수와 진행 상태 확인</span>
+
+            <span>
+              미처리 {requestedProductionRequests}건 ·
+              처리 중 {activeProductionRequests}건
+            </span>
           </Link>
 
-          <Link href="/admin/families" style={quickLinkStyle()}>
-  <strong>가족 공간 관리</strong>
-  <span>가족 공간과 참여 회원 확인</span>
-</Link>
+          <Link
+            href="/admin/families"
+            style={quickLinkStyle(
+              familyWarningCount > 0,
+            )}
+          >
+            <strong>가족 공간 관리</strong>
 
-<Link href="/admin/books" style={quickLinkStyle()}>
-  <strong>책 관리</strong>
-  <span>전체 책 원고와 제작 상태 확인</span>
-</Link>
+            <span>
+              운영 확인 필요 {familyWarningCount}개
+            </span>
+          </Link>
 
-<Link href="/dashboard" style={quickLinkStyle()}>
-  <strong>사용자 화면</strong>
-  <span>일반 대시보드 화면 확인</span>
-</Link>
+          <Link
+            href="/admin/books?status=IN_PRODUCTION"
+            style={quickLinkStyle(
+              inProductionBookCount > 0,
+            )}
+          >
+            <strong>제작 중인 책</strong>
 
-          <Link href="/dashboard" style={quickLinkStyle()}>
+            <span>
+              현재 제작 준비 중 {inProductionBookCount}권
+            </span>
+          </Link>
+
+          <Link
+            href="/admin/users"
+            style={quickLinkStyle(false)}
+          >
+            <strong>회원 관리</strong>
+
+            <span>
+              전체 회원 {totalUsers}명과 권한 확인
+            </span>
+          </Link>
+
+          <Link
+            href="/admin/books"
+            style={quickLinkStyle(false)}
+          >
+            <strong>전체 책 관리</strong>
+
+            <span>
+              원고, 종류, 제작 상태 확인
+            </span>
+          </Link>
+
+          <Link
+            href="/dashboard"
+            style={quickLinkStyle(false)}
+          >
             <strong>사용자 화면</strong>
-            <span>일반 대시보드 화면 확인</span>
+
+            <span>
+              일반 회원 대시보드 확인
+            </span>
           </Link>
         </div>
       </section>
 
-      <section
-        style={{
-          display: 'grid',
-          gridTemplateColumns:
-            'repeat(auto-fit, minmax(340px, 1fr))',
-          gap: 24,
-          marginBottom: 28,
-        }}
-      >
+      <section className="admin-dashboard-operation-grid">
         <article className="dash-card">
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: 12,
-            }}
-          >
-            <div>
-              <p className="dash-card__label">
-                최근 제작 상담
-              </p>
+          <OperationHeader
+            label="미처리 제작 상담"
+            description="접수된 순서가 오래된 상담 5건"
+            href="/admin/production-requests?status=REQUESTED"
+            buttonLabel="전체 보기"
+          />
 
-              <p
-                style={{
-                  margin: '8px 0 0',
-                  fontSize: 13,
-                  color: 'var(--ink-soft)',
-                }}
-              >
-                최근 접수된 상담 5건
-              </p>
-            </div>
-
-            <Link
-              href="/admin/production-requests"
-              style={smallButtonStyle()}
-            >
-              전체 보기
-            </Link>
-          </div>
-
-          {recentProductionRequests.length > 0 ? (
+          {pendingProductionRequests.length > 0 ? (
             <div
               style={{
                 display: 'grid',
@@ -430,113 +637,109 @@ export default async function AdminDashboard() {
                 marginTop: 18,
               }}
             >
-              {recentProductionRequests.map((request) => {
-                const book = requestBookMap.get(request.bookId);
+              {pendingProductionRequests.map(
+                (request) => {
+                  const book =
+                    requestBookMap.get(
+                      request.bookId,
+                    );
 
-                return (
-                  <Link
-                    key={request.id}
-                    href={`/admin/books/${request.bookId}`}
-                    style={listItemStyle()}
-                  >
-                    <div
-                      style={{
-                        minWidth: 0,
-                      }}
+                  return (
+                    <Link
+                      key={request.id}
+                      href={`/admin/books/${request.bookId}`}
+                      style={listItemStyle()}
                     >
                       <div
                         style={{
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          alignItems: 'center',
-                          gap: 8,
+                          minWidth: 0,
                         }}
                       >
-                        <span
-                          style={statusBadgeStyle(request.status)}
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: 7,
+                          }}
                         >
-                          {getProductionRequestStatusLabel(
-                            request.status,
-                          )}
-                        </span>
+                          <span
+                            style={statusBadgeStyle(
+                              request.status,
+                            )}
+                          >
+                            상담 접수
+                          </span>
+
+                          <span
+                            style={{
+                              fontSize: 11,
+                              color:
+                                'var(--ink-faint)',
+                            }}
+                          >
+                            {formatDate(
+                              request.createdAt,
+                            )}
+                          </span>
+                        </div>
+
+                        <strong
+                          style={{
+                            display: 'block',
+                            marginTop: 8,
+                            color: 'var(--ink)',
+                            fontSize: 14,
+                            lineHeight: 1.45,
+                            wordBreak: 'break-word',
+                          }}
+                        >
+                          {book?.title ||
+                            '책 제목 확인 필요'}
+                        </strong>
 
                         <span
                           style={{
+                            display: 'block',
+                            marginTop: 5,
+                            color:
+                              'var(--ink-soft)',
                             fontSize: 12,
-                            color: 'var(--ink-faint)',
+                            lineHeight: 1.5,
+                            wordBreak: 'break-all',
                           }}
                         >
-                          {formatDate(request.createdAt)}
+                          {request.name ||
+                            '신청자 이름 없음'}
+                          {' · '}
+                          {request.phone ||
+                            request.email ||
+                            '연락처 없음'}
                         </span>
                       </div>
 
-                      <strong
-                        style={{
-                          display: 'block',
-                          marginTop: 8,
-                          color: 'var(--ink)',
-                          fontSize: 15,
-                          lineHeight: 1.45,
-                          wordBreak: 'break-word',
-                        }}
-                      >
-                        {book?.title || '책 제목 확인 필요'}
-                      </strong>
-
-                      <span
-                        style={{
-                          display: 'block',
-                          marginTop: 5,
-                          color: 'var(--ink-soft)',
-                          fontSize: 13,
-                          lineHeight: 1.5,
-                          wordBreak: 'break-all',
-                        }}
-                      >
-                        {request.name || '이름 없음'} ·{' '}
-                        {request.phone ||
-                          request.email ||
-                          '연락처 없음'}
+                      <span style={detailTextStyle()}>
+                        상세
                       </span>
-                    </div>
-
-                    <span
-                      style={{
-                        flexShrink: 0,
-                        color: 'var(--wine)',
-                        fontSize: 13,
-                        fontWeight: 900,
-                      }}
-                    >
-                      상세
-                    </span>
-                  </Link>
-                );
-              })}
+                    </Link>
+                  );
+                },
+              )}
             </div>
           ) : (
-            <EmptyBox text="아직 제작 상담 신청이 없습니다." />
+            <EmptyBox text="미처리 제작 상담이 없습니다." />
           )}
         </article>
 
         <article className="dash-card">
-          <div>
-            <p className="dash-card__label">
-              최근 등록된 책
-            </p>
+          <OperationHeader
+            label="가족 공간 운영 경고"
+            description={`소유자 또는 구성원 확인 필요 ${familyWarningCount}개`}
+            href="/admin/families"
+            buttonLabel="가족 관리"
+          />
 
-            <p
-              style={{
-                margin: '8px 0 0',
-                fontSize: 13,
-                color: 'var(--ink-soft)',
-              }}
-            >
-              최근 생성된 책 원고 5권
-            </p>
-          </div>
-
-          {recentBooks.length > 0 ? (
+          {warningFamilies.length > 0 ? (
             <div
               style={{
                 display: 'grid',
@@ -544,8 +747,88 @@ export default async function AdminDashboard() {
                 marginTop: 18,
               }}
             >
-              {recentBooks.map((book) => {
-                const author = authorMap.get(book.authorId);
+              {warningFamilies.map((family) => (
+                <Link
+                  key={family.id}
+                  href={buildSearchHref(
+                    '/admin/families',
+                    family.name,
+                  )}
+                  style={listItemStyle()}
+                >
+                  <div
+                    style={{
+                      minWidth: 0,
+                    }}
+                  >
+                    <span
+                      style={familyWarningBadgeStyle(
+                        family.warningType,
+                      )}
+                    >
+                      {family.warningType === 'EMPTY'
+                        ? '구성원 없음'
+                        : '소유자 없음'}
+                    </span>
+
+                    <strong
+                      style={{
+                        display: 'block',
+                        marginTop: 8,
+                        color: 'var(--ink)',
+                        fontSize: 14,
+                        lineHeight: 1.45,
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {family.name}
+                    </strong>
+
+                    <span
+                      style={{
+                        display: 'block',
+                        marginTop: 5,
+                        color:
+                          'var(--ink-soft)',
+                        fontSize: 12,
+                      }}
+                    >
+                      구성원 {family.members.length}명 ·
+                      최근 수정{' '}
+                      {formatDate(family.updatedAt)}
+                    </span>
+                  </div>
+
+                  <span style={detailTextStyle()}>
+                    확인
+                  </span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <EmptyBox text="운영 상태를 확인할 가족 공간이 없습니다." />
+          )}
+        </article>
+
+        <article className="dash-card">
+          <OperationHeader
+            label="제작 중인 책"
+            description={`현재 제작 준비 중인 책 ${inProductionBookCount}권`}
+            href="/admin/books?status=IN_PRODUCTION"
+            buttonLabel="전체 보기"
+          />
+
+          {inProductionBooks.length > 0 ? (
+            <div
+              style={{
+                display: 'grid',
+                gap: 10,
+                marginTop: 18,
+              }}
+            >
+              {inProductionBooks.map((book) => {
+                const author =
+                  authorMap.get(book.authorId);
 
                 return (
                   <Link
@@ -563,22 +846,27 @@ export default async function AdminDashboard() {
                           display: 'flex',
                           alignItems: 'center',
                           flexWrap: 'wrap',
-                          gap: 8,
+                          gap: 7,
                         }}
                       >
                         <span
-                          style={bookStatusBadgeStyle(book.status)}
+                          style={bookStatusBadgeStyle(
+                            book.status,
+                          )}
                         >
-                          {getBookStatusLabel(book.status)}
+                          제작 준비 중
                         </span>
 
                         <span
                           style={{
-                            fontSize: 12,
-                            color: 'var(--ink-faint)',
+                            fontSize: 11,
+                            color:
+                              'var(--ink-faint)',
                           }}
                         >
-                          {getBookTypeLabel(book.type)}
+                          {getBookTypeLabel(
+                            book.type,
+                          )}
                         </span>
                       </div>
 
@@ -587,7 +875,7 @@ export default async function AdminDashboard() {
                           display: 'block',
                           marginTop: 8,
                           color: 'var(--ink)',
-                          fontSize: 15,
+                          fontSize: 14,
                           lineHeight: 1.45,
                           wordBreak: 'break-word',
                         }}
@@ -599,27 +887,23 @@ export default async function AdminDashboard() {
                         style={{
                           display: 'block',
                           marginTop: 5,
-                          color: 'var(--ink-soft)',
-                          fontSize: 13,
+                          color:
+                            'var(--ink-soft)',
+                          fontSize: 12,
                           lineHeight: 1.5,
                           wordBreak: 'break-all',
                         }}
                       >
                         {author?.name ||
                           author?.email ||
-                          '작성자 확인 필요'}{' '}
-                        · {formatDate(book.createdAt)}
+                          '작성자 확인 필요'}
+                        {' · '}
+                        최근 수정{' '}
+                        {formatDate(book.updatedAt)}
                       </span>
                     </div>
 
-                    <span
-                      style={{
-                        flexShrink: 0,
-                        color: 'var(--wine)',
-                        fontSize: 13,
-                        fontWeight: 900,
-                      }}
-                    >
+                    <span style={detailTextStyle()}>
                       상세
                     </span>
                   </Link>
@@ -627,162 +911,246 @@ export default async function AdminDashboard() {
               })}
             </div>
           ) : (
-            <EmptyBox text="아직 등록된 책이 없습니다." />
+            <EmptyBox text="현재 제작 중인 책이 없습니다." />
           )}
         </article>
       </section>
 
-      <section className="dash-card">
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 12,
-          }}
-        >
-          <div>
-            <p className="dash-card__label">
-              최근 가입 회원
-            </p>
-
-            <p
-              style={{
-                margin: '8px 0 0',
-                fontSize: 13,
-                color: 'var(--ink-soft)',
-              }}
-            >
-              최근 가입한 회원 5명
-            </p>
-          </div>
-
-          <Link href="/admin/users" style={smallButtonStyle()}>
-            회원 관리
-          </Link>
-        </div>
+      <section
+        className="dash-card"
+        style={{
+          marginTop: 28,
+        }}
+      >
+        <OperationHeader
+          label="최근 가입 회원"
+          description="가장 최근에 가입한 회원 5명"
+          href="/admin/users"
+          buttonLabel="회원 관리"
+        />
 
         {recentUsers.length > 0 ? (
           <div
             style={{
-              overflowX: 'auto',
+              display: 'grid',
+              gap: 9,
               marginTop: 18,
             }}
           >
-            <table
-              style={{
-                width: '100%',
-                minWidth: 600,
-                borderCollapse: 'collapse',
-              }}
-            >
-              <thead>
-                <tr
+            {recentUsers.map((user) => (
+              <Link
+                key={user.id}
+                href={buildSearchHref(
+                  '/admin/users',
+                  user.email ||
+                    user.name ||
+                    '',
+                )}
+                className="admin-dashboard-user-row"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns:
+                    'minmax(150px, 1fr) minmax(210px, 1.4fr) 100px 110px',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '12px 14px',
+                  borderRadius: 14,
+                  border:
+                    '1px solid rgba(34, 28, 22, 0.08)',
+                  background:
+                    'rgba(255, 255, 255, 0.3)',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                }}
+              >
+                <strong
                   style={{
-                    borderBottom:
-                      '1px solid rgba(34, 28, 22, 0.1)',
+                    fontSize: 14,
+                    color: 'var(--ink)',
+                    wordBreak: 'break-word',
                   }}
                 >
-                  {['이름', '이메일', '권한', '가입일'].map(
-                    (heading) => (
-                      <th
-                        key={heading}
-                        style={{
-                          padding: '9px 12px',
-                          textAlign: 'left',
-                          fontFamily: 'var(--font-mono)',
-                          fontSize: 11,
-                          letterSpacing: '.05em',
-                          color: 'var(--ink-faint)',
-                          fontWeight: 400,
-                        }}
-                      >
-                        {heading}
-                      </th>
-                    ),
+                  {user.name || '이름 없음'}
+                </strong>
+
+                <span
+                  style={{
+                    fontSize: 13,
+                    color: 'var(--ink-soft)',
+                    wordBreak: 'break-all',
+                  }}
+                >
+                  {user.email || '이메일 없음'}
+                </span>
+
+                <span
+                  style={roleBadgeStyle(
+                    user.role,
                   )}
-                </tr>
-              </thead>
+                >
+                  {user.role === 'ADMIN'
+                    ? '관리자'
+                    : '일반 회원'}
+                </span>
 
-              <tbody>
-                {recentUsers.map((user) => (
-                  <tr
-                    key={user.id}
-                    style={{
-                      borderBottom:
-                        '1px solid rgba(34, 28, 22, 0.06)',
-                    }}
-                  >
-                    <td
-                      style={{
-                        padding: '11px 12px',
-                        fontSize: 14,
-                      }}
-                    >
-                      {user.name || '-'}
-                    </td>
-
-                    <td
-                      style={{
-                        padding: '11px 12px',
-                        fontSize: 14,
-                        color: 'var(--ink-soft)',
-                        wordBreak: 'break-all',
-                      }}
-                    >
-                      {user.email || '-'}
-                    </td>
-
-                    <td
-                      style={{
-                        padding: '11px 12px',
-                      }}
-                    >
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          padding: '4px 9px',
-                          borderRadius: 999,
-                          background:
-                            user.role === 'ADMIN'
-                              ? 'var(--wine)'
-                              : 'rgba(34, 28, 22, 0.08)',
-                          color:
-                            user.role === 'ADMIN'
-                              ? 'var(--cream)'
-                              : 'var(--ink-faint)',
-                          fontFamily: 'var(--font-mono)',
-                          fontSize: 10,
-                          letterSpacing: '.04em',
-                        }}
-                      >
-                        {user.role === 'ADMIN'
-                          ? '관리자'
-                          : '일반 회원'}
-                      </span>
-                    </td>
-
-                    <td
-                      style={{
-                        padding: '11px 12px',
-                        fontSize: 13,
-                        color: 'var(--ink-faint)',
-                      }}
-                    >
-                      {formatDate(user.createdAt)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                <span
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--ink-faint)',
+                  }}
+                >
+                  {formatDate(user.createdAt)}
+                </span>
+              </Link>
+            ))}
           </div>
         ) : (
-          <EmptyBox text="아직 가입한 회원이 없습니다." />
+          <EmptyBox text="가입한 회원이 없습니다." />
         )}
       </section>
     </main>
   );
+}
+
+function SummaryCard({
+  label,
+  value,
+  unit,
+  color,
+}: {
+  label: string;
+  value: number;
+  unit: string;
+  color: string;
+}) {
+  return (
+    <article
+      className="dash-card"
+      style={{
+        textAlign: 'center',
+        minWidth: 0,
+      }}
+    >
+      <p
+        style={{
+          margin: '0 0 5px',
+          fontFamily: 'var(--font-display)',
+          fontWeight: 700,
+          fontSize: 34,
+          lineHeight: 1.2,
+          color,
+        }}
+      >
+        {value.toLocaleString()}
+      </p>
+
+      <p
+        style={{
+          margin: 0,
+          fontFamily: 'var(--font-mono)',
+          fontSize: 11,
+          color: 'var(--ink-faint)',
+          letterSpacing: '.05em',
+        }}
+      >
+        {label} ({unit})
+      </p>
+    </article>
+  );
+}
+
+function OperationHeader({
+  label,
+  description,
+  href,
+  buttonLabel,
+}: {
+  label: string;
+  description: string;
+  href: string;
+  buttonLabel: string;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 10,
+      }}
+    >
+      <div>
+        <p
+          className="dash-card__label"
+          style={{
+            margin: 0,
+          }}
+        >
+          {label}
+        </p>
+
+        <p
+          style={{
+            margin: '7px 0 0',
+            color: 'var(--ink-soft)',
+            fontSize: 12,
+            lineHeight: 1.6,
+          }}
+        >
+          {description}
+        </p>
+      </div>
+
+      <Link
+        href={href}
+        style={smallButtonStyle()}
+      >
+        {buttonLabel}
+      </Link>
+    </div>
+  );
+}
+
+function EmptyBox({
+  text,
+}: {
+  text: string;
+}) {
+  return (
+    <div
+      style={{
+        marginTop: 18,
+        padding: 22,
+        borderRadius: 18,
+        border:
+          '1px dashed rgba(34, 28, 22, 0.18)',
+        color: 'var(--ink-soft)',
+        fontSize: 13,
+        lineHeight: 1.7,
+        textAlign: 'center',
+      }}
+    >
+      {text}
+    </div>
+  );
+}
+
+function buildSearchHref(
+  path: string,
+  searchQuery: string,
+) {
+  const query = searchQuery.trim();
+
+  if (!query) {
+    return path;
+  }
+
+  const params = new URLSearchParams();
+
+  params.set('q', query);
+
+  return `${path}?${params.toString()}`;
 }
 
 function primaryButtonStyle(): CSSProperties {
@@ -803,6 +1171,24 @@ function primaryButtonStyle(): CSSProperties {
   };
 }
 
+function alertButtonStyle(): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 42,
+    padding: '0 18px',
+    borderRadius: 999,
+    border: '1px solid #9a4b24',
+    background: '#9a4b24',
+    color: '#fffaf0',
+    fontSize: 13,
+    fontWeight: 900,
+    textDecoration: 'none',
+    whiteSpace: 'nowrap',
+  };
+}
+
 function smallButtonStyle(): CSSProperties {
   return {
     display: 'inline-flex',
@@ -811,7 +1197,8 @@ function smallButtonStyle(): CSSProperties {
     minHeight: 34,
     padding: '0 12px',
     borderRadius: 999,
-    border: '1px solid rgba(34, 28, 22, 0.15)',
+    border:
+      '1px solid rgba(34, 28, 22, 0.15)',
     background: 'transparent',
     color: 'var(--wine)',
     fontSize: 12,
@@ -821,16 +1208,41 @@ function smallButtonStyle(): CSSProperties {
   };
 }
 
-function quickLinkStyle(): CSSProperties {
+function urgentAlertStyle(
+  requestedCount: number,
+): CSSProperties {
+  return {
+    borderRadius: 22,
+    border:
+      requestedCount > 0
+        ? '1px solid #e2a26e'
+        : '1px solid #9dcca4',
+    background:
+      requestedCount > 0
+        ? '#fff1df'
+        : '#edf8ee',
+    padding: '22px 24px',
+    boxShadow:
+      '0 12px 30px rgba(34, 28, 22, 0.05)',
+  };
+}
+
+function quickLinkStyle(
+  emphasized: boolean,
+): CSSProperties {
   return {
     display: 'flex',
     flexDirection: 'column',
     gap: 6,
-    minHeight: 86,
+    minHeight: 88,
     padding: 16,
     borderRadius: 18,
-    border: '1px solid rgba(34, 28, 22, 0.1)',
-    background: 'rgba(255, 255, 255, 0.35)',
+    border: emphasized
+      ? '1px solid rgba(154, 75, 36, 0.38)'
+      : '1px solid rgba(34, 28, 22, 0.1)',
+    background: emphasized
+      ? '#fff1df'
+      : 'rgba(255, 255, 255, 0.35)',
     color: 'var(--ink)',
     textDecoration: 'none',
     lineHeight: 1.5,
@@ -842,25 +1254,39 @@ function listItemStyle(): CSSProperties {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 14,
-    padding: 14,
-    borderRadius: 16,
-    border: '1px solid rgba(34, 28, 22, 0.08)',
-    background: 'rgba(255, 255, 255, 0.3)',
+    gap: 12,
+    padding: 13,
+    borderRadius: 15,
+    border:
+      '1px solid rgba(34, 28, 22, 0.08)',
+    background:
+      'rgba(255, 255, 255, 0.3)',
     color: 'inherit',
     textDecoration: 'none',
   };
 }
 
-function statusBadgeStyle(status: string): CSSProperties {
+function detailTextStyle(): CSSProperties {
+  return {
+    flexShrink: 0,
+    color: 'var(--wine)',
+    fontSize: 12,
+    fontWeight: 900,
+  };
+}
+
+function statusBadgeStyle(
+  status: string,
+): CSSProperties {
   const base: CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
     minHeight: 24,
     padding: '0 8px',
     borderRadius: 999,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 900,
+    whiteSpace: 'nowrap',
   };
 
   if (status === 'REQUESTED') {
@@ -895,45 +1321,32 @@ function statusBadgeStyle(status: string): CSSProperties {
     };
   }
 
-  if (status === 'CANCELED') {
-    return {
-      ...base,
-      background: '#f2eeee',
-      color: '#776868',
-    };
-  }
-
   return {
     ...base,
-    background: 'rgba(34, 28, 22, 0.08)',
-    color: 'var(--ink-faint)',
+    background: '#f2eeee',
+    color: '#776868',
   };
 }
 
-function bookStatusBadgeStyle(status: string): CSSProperties {
+function bookStatusBadgeStyle(
+  status: string,
+): CSSProperties {
   const base: CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
     minHeight: 24,
     padding: '0 8px',
     borderRadius: 999,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 900,
+    whiteSpace: 'nowrap',
   };
-
-  if (status === 'DRAFT') {
-    return {
-      ...base,
-      background: '#f1eee8',
-      color: '#6b5a46',
-    };
-  }
 
   if (status === 'IN_PRODUCTION') {
     return {
       ...base,
-      background: '#fff1c7',
-      color: '#83540d',
+      background: '#efe6ff',
+      color: '#62438a',
     };
   }
 
@@ -947,70 +1360,108 @@ function bookStatusBadgeStyle(status: string): CSSProperties {
 
   return {
     ...base,
-    background: 'rgba(34, 28, 22, 0.08)',
-    color: 'var(--ink-faint)',
+    background: '#f1eee8',
+    color: '#6b5a46',
   };
 }
 
-function EmptyBox({ text }: { text: string }) {
-  return (
-    <div
-      style={{
-        marginTop: 18,
-        padding: 22,
-        borderRadius: 18,
-        border: '1px dashed rgba(34, 28, 22, 0.18)',
-        color: 'var(--ink-soft)',
-        fontSize: 14,
-        lineHeight: 1.7,
-        textAlign: 'center',
-      }}
-    >
-      {text}
-    </div>
-  );
+function familyWarningBadgeStyle(
+  warningType: 'EMPTY' | 'NO_OWNER',
+): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 24,
+    padding: '0 8px',
+    borderRadius: 999,
+    background:
+      warningType === 'EMPTY'
+        ? '#f2eeee'
+        : '#fff1c7',
+    color:
+      warningType === 'EMPTY'
+        ? '#776868'
+        : '#83540d',
+    fontSize: 10,
+    fontWeight: 900,
+    whiteSpace: 'nowrap',
+  };
 }
 
-function getProductionRequestStatusLabel(status: string) {
-  if (status === 'REQUESTED') return '상담 접수';
-  if (status === 'CONTACTED') return '고객 연락';
-  if (status === 'IN_PROGRESS') return '상담 진행';
-  if (status === 'COMPLETED') return '상담 완료';
-  if (status === 'CANCELED') return '취소';
-
-  return '상태 확인';
+function roleBadgeStyle(
+  role: string,
+): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 24,
+    padding: '0 8px',
+    borderRadius: 999,
+    background:
+      role === 'ADMIN'
+        ? 'var(--wine)'
+        : 'rgba(34, 28, 22, 0.08)',
+    color:
+      role === 'ADMIN'
+        ? 'var(--cream)'
+        : 'var(--ink-faint)',
+    fontSize: 10,
+    fontWeight: 900,
+    whiteSpace: 'nowrap',
+  };
 }
 
-function getBookStatusLabel(status: string) {
-  if (status === 'DRAFT') return '원고 초안';
-  if (status === 'IN_PRODUCTION') return '제작 준비';
-  if (status === 'PUBLISHED') return '완성';
+function getBookTypeLabel(
+  type: string,
+) {
+  if (type === 'LIFE_BOOK') {
+    return '부모님 인생책';
+  }
 
-  return '상태 확인';
+  if (type === 'FAMILY_BOOK') {
+    return '가족 이야기책';
+  }
+
+  if (type === 'COUPLE_BOOK') {
+    return '부부 이야기책';
+  }
+
+  if (type === 'BABY_BOOK') {
+    return '성장 기록책';
+  }
+
+  if (type === 'TRAVEL_BOOK') {
+    return '여행 기록책';
+  }
+
+  if (type === 'AI_MOVIE') {
+    return 'AI 영상';
+  }
+
+  return '종류 확인';
 }
 
-function getBookTypeLabel(type: string) {
-  if (type === 'LIFE_BOOK') return '부모님 인생책';
-  if (type === 'FAMILY_BOOK') return '가족 이야기책';
-  if (type === 'COUPLE_BOOK') return '부부 이야기책';
-  if (type === 'BABY_BOOK') return '성장 기록책';
-  if (type === 'TRAVEL_BOOK') return '여행 기록책';
-  if (type === 'AI_MOVIE') return 'AI 영상';
-
-  return '기타';
-}
-
-function formatDate(value: Date | string) {
+function formatDate(
+  value: Date | string,
+) {
   const date =
-    value instanceof Date ? value : new Date(value);
+    value instanceof Date
+      ? value
+      : new Date(value);
 
-  if (Number.isNaN(date.getTime())) {
+  if (
+    Number.isNaN(date.getTime())
+  ) {
     return '-';
   }
 
-  return new Intl.DateTimeFormat('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(date);
+  return new Intl.DateTimeFormat(
+    'ko-KR',
+    {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    },
+  ).format(date);
 }
