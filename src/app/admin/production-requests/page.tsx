@@ -177,7 +177,15 @@ export default async function AdminProductionRequestsPage({
           in: matchingBookIds,
         },
       },
-    ];
+      ];
+  }
+
+  const statusCountWhere: Prisma.BookProductionRequestWhereInput =
+    {};
+
+  if (searchQuery) {
+    statusCountWhere.OR =
+      requestWhere.OR;
   }
 
   const [
@@ -188,8 +196,9 @@ export default async function AdminProductionRequestsPage({
       where: requestWhere,
     }),
 
-    prisma.bookProductionRequest.groupBy({
+        prisma.bookProductionRequest.groupBy({
       by: ['status'],
+      where: statusCountWhere,
       _count: {
         _all: true,
       },
