@@ -185,7 +185,7 @@ export default function HomePage() {
               style={{
                 position: 'relative',
                 zIndex: 1,
-                minHeight: 420,
+                minHeight: 360,
                 padding: 28,
                 display: 'flex',
                 flexDirection: 'column',
@@ -333,7 +333,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ maxWidth: 1180, margin: '0 auto', padding: '76px 24px',animation: 'daldongneFadeUp 0.7s ease-out both', }}>
+      <section style={{ maxWidth: 1180, margin: '0 auto', padding: '56px 24px',animation: 'daldongneFadeUp 0.7s ease-out both', }}>
         <p style={{ color: '#9b6a3d', fontWeight: 700 }}>제작 과정</p>
         <h2 style={{ fontSize: 42, lineHeight: 1.3, marginTop: 12 }}>
           복잡한 출판 과정을
