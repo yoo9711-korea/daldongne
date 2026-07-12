@@ -59,25 +59,70 @@ export default async function BookDetailPage({
     productionRequest,
     linkedBookMemories,
   ] = await Promise.all([
-    prisma.bookProductionRequest.findFirst({
-      where: {
-        bookId: book.id,
-        authorId: userId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: {
-        id: true,
-        name: true,
-        phone: true,
-        email: true,
-        message: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    }),
+    
+       (async () => {
+      const activeRequest =
+        await prisma.bookProductionRequest.findFirst({
+          where: {
+            bookId: book.id,
+            authorId: userId,
+            status: {
+              in: [
+                'REQUESTED',
+                'CONTACTED',
+                'IN_PROGRESS',
+              ],
+            },
+          },
+          orderBy: [
+            {
+              updatedAt: 'desc',
+            },
+            {
+              createdAt: 'desc',
+            },
+          ],
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            message: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+
+      if (activeRequest) {
+        return activeRequest;
+      }
+
+      return prisma.bookProductionRequest.findFirst({
+        where: {
+          bookId: book.id,
+          authorId: userId,
+        },
+        orderBy: [
+          {
+            createdAt: 'desc',
+          },
+          {
+            updatedAt: 'desc',
+          },
+        ],
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          email: true,
+          message: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+    })(),
 
     prisma.bookMemory.findMany({
       where: {
