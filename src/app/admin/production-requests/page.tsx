@@ -1,9 +1,10 @@
 import { auth } from '@/auth';
 import ProductionRequestStatusButton from '@/components/admin/ProductionRequestStatusButton';
+import CopyTextButton from '@/components/admin/CopyTextButton';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 type ProductionRequestRecord = {
   id: string;
@@ -79,6 +80,26 @@ export default async function AdminProductionRequestsPage({
     take: 100,
   })) as ProductionRequestRecord[];
 
+     const statusCountRows =
+    await prisma.bookProductionRequest.groupBy({
+      by: ['status'],
+      _count: {
+        _all: true,
+      },
+    });
+
+  const statusCountMap = new Map(
+    statusCountRows.map((row) => [
+      row.status,
+      row._count._all,
+    ]),
+  );
+
+  const totalRequestCount = statusCountRows.reduce(
+    (total, row) => total + row._count._all,
+    0,
+  );
+  
   const bookIds = Array.from(
     new Set(requests.map((request) => request.bookId)),
   );
@@ -208,9 +229,15 @@ export default async function AdminProductionRequestsPage({
               }}
             >
               {STATUS_FILTERS.map((filter) => {
-                const active = filter.value === statusFilter;
+                
+              const active = filter.value === statusFilter;
+              const count =
+                      filter.value === 'ALL'
+                      ? totalRequestCount
+                      : statusCountMap.get(filter.value) ?? 0;
 
-                return (
+         return (     
+
                   <Link
                     key={filter.value}
                     href={
@@ -223,7 +250,7 @@ export default async function AdminProductionRequestsPage({
                       active ? '#fffaf0' : '#5a3a18',
                     )}
                   >
-                    {filter.label}
+                    {filter.label} ({count})
                   </Link>
                 );
               })}
@@ -341,14 +368,26 @@ export default async function AdminProductionRequestsPage({
                       />
 
                       <InfoBox
-                        title="연락처"
-                        value={request.phone || '-'}
-                      />
+                         title="연락처"
+                         value={request.phone || '-'}
+                         action={
+                 <CopyTextButton
+                        value={request.phone}
+                        label="번호 복사"
+                        />
+                      }
+                   />
 
                       <InfoBox
-                        title="이메일"
-                        value={request.email || '-'}
+                          title="이메일"
+                          value={request.email || '-'}
+                          action={
+                         <CopyTextButton
+                        value={request.email}
+                     label="메일 복사"
                       />
+                    }
+                 />
 
                       <InfoBox
                         title="책 상태"
@@ -435,7 +474,15 @@ function normalizeStatusFilter(value: string | undefined): StatusFilter {
   return 'ALL';
 }
 
-function InfoBox({ title, value }: { title: string; value: string }) {
+function InfoBox({
+  title,
+  value,
+  action,
+}: {
+  title: string;
+  value: string;
+  action?: ReactNode;
+}) {
   return (
     <div
       style={{
@@ -445,16 +492,27 @@ function InfoBox({ title, value }: { title: string; value: string }) {
         padding: 14,
       }}
     >
-      <p
+      <div
         style={{
-          margin: 0,
-          fontSize: 12,
-          fontWeight: 900,
-          color: '#8a806f',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 8,
         }}
       >
-        {title}
-      </p>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 12,
+            fontWeight: 900,
+            color: '#8a806f',
+          }}
+        >
+          {title}
+        </p>
+
+        {action}
+      </div>
 
       <p
         style={{
