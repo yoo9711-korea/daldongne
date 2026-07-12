@@ -44,12 +44,13 @@ export default async function DashboardPage() {
 
   const userId = session.user.id;
 
-  const [
+    const [
     user,
     familyCount,
     memoryCount,
     photoCount,
     bookCount,
+    activeProductionRequests,
     recentMemories,
   ] = await Promise.all([
     prisma.user.findUnique({
@@ -82,9 +83,25 @@ export default async function DashboardPage() {
       },
     }),
 
-    prisma.book.count({
+        prisma.book.count({
       where: {
         authorId: userId,
+      },
+    }),
+
+    prisma.bookProductionRequest.findMany({
+      where: {
+        authorId: userId,
+        status: {
+          in: [
+            'REQUESTED',
+            'CONTACTED',
+            'IN_PROGRESS',
+          ],
+        },
+      },
+      select: {
+        bookId: true,
       },
     }),
 
@@ -106,10 +123,16 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  const storyCount = Math.max(
+    const storyCount = Math.max(
     memoryCount - photoCount,
     0,
   );
+    const activeProductionBookCount =
+    new Set(
+      activeProductionRequests.map(
+        (request) => request.bookId,
+      ),
+    ).size;
 
   const photoReady =
     photoCount >= REQUIRED_PHOTO_COUNT;
@@ -148,12 +171,20 @@ export default async function DashboardPage() {
         '사진과 삶의 의미를 설명하는 이야기 기록입니다.',
       href: '/dashboard/interview',
     },
-    {
+       {
       label: '만든 책',
       value: bookCount,
       unit: '권',
       description:
         '원고를 만들고 내 책장에 저장한 결과물입니다.',
+      href: '/dashboard/library',
+    },
+    {
+      label: '제작 상담 진행',
+      value: activeProductionBookCount,
+      unit: '권',
+      description:
+        '현재 상담 접수 또는 제작 상담이 진행 중인 책입니다.',
       href: '/dashboard/library',
     },
     {
