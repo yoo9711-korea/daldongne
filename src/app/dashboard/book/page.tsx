@@ -107,16 +107,27 @@ export default async function BookPage() {
     }),
   ]);
 
-  const usableMemories =
+    const usableMemories =
     materialMemories.filter((memory) => {
+      const title =
+        memory.title?.trim() || '';
+
+      if (
+        memory.type === 'TEXT' &&
+        isLegacyAiInterviewTitle(title)
+      ) {
+        return false;
+      }
+
       if (memory.type === 'PHOTO') {
         return Boolean(memory.fileUrl);
       }
 
-      if (memory.type === 'TEXT') {
-        return Boolean(
-          memory.description?.trim(),
-        );
+            if (memory.type === 'TEXT') {
+        return (
+          memory.description?.trim().length ??
+          0
+        ) >= 10;
       }
 
       return false;
@@ -166,8 +177,7 @@ export default async function BookPage() {
           memory.title || '',
         ),
         description,
-        hasStory:
-          isPhoto &&
+                hasStory:
           description.trim().length >= 10,
       };
     });
@@ -1042,6 +1052,15 @@ function getReadiness({
     description:
       '책 원고를 만들려면 선택 가능한 사진이 최소 3장 필요합니다. 사진 모으기 화면에서 사진을 추가해주세요.',
   };
+}
+
+function isLegacyAiInterviewTitle(
+  title: string,
+) {
+  return (
+    title.startsWith('AI 인터뷰') ||
+    title.includes('AI 인터뷰 -')
+  );
 }
 
 function cleanMaterialTitle(
