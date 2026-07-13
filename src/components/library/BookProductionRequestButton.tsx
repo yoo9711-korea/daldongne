@@ -974,7 +974,10 @@ function openButtonStyle(
       : hasRequest
         ? '#f3d28a'
         : '#24170f',
-    color: '#24170f',
+        color:
+      hasRequest || isCanceledRequest
+        ? '#24170f'
+        : '#fffaf0',
     fontSize: 14,
     fontWeight: 900,
     cursor: 'pointer',
