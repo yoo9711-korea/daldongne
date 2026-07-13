@@ -44,11 +44,11 @@ export default async function DashboardPage() {
 
   const userId = session.user.id;
 
-    const [
+      const [
     user,
     familyCount,
     memoryCount,
-    photoCount,
+    materialMemories,
     bookCount,
     activeProductionRequests,
     recentMemories,
@@ -76,14 +76,33 @@ export default async function DashboardPage() {
       },
     }),
 
-    prisma.memory.count({
+    prisma.memory.findMany({
       where: {
         authorId: userId,
-        type: 'PHOTO',
+        OR: [
+          {
+            type: 'PHOTO',
+            fileUrl: {
+              not: null,
+            },
+          },
+          {
+            type: 'TEXT',
+            description: {
+              not: null,
+            },
+          },
+        ],
+      },
+      select: {
+        type: true,
+        title: true,
+        description: true,
+        fileUrl: true,
       },
     }),
 
-        prisma.book.count({
+    prisma.book.count({
       where: {
         authorId: userId,
       },
@@ -123,11 +142,51 @@ export default async function DashboardPage() {
     }),
   ]);
 
-    const storyCount = Math.max(
-    memoryCount - photoCount,
-    0,
-  );
-    const activeProductionBookCount =
+  const usableMaterialMemories =
+    materialMemories.filter((memory) => {
+      const title =
+        memory.title?.trim() || '';
+
+      const description =
+        memory.description?.trim() || '';
+
+      if (memory.type === 'PHOTO') {
+        return Boolean(
+          memory.fileUrl?.trim(),
+        );
+      }
+
+      if (memory.type === 'TEXT') {
+        return (
+          description.length >= 10 &&
+          !isLegacyAiInterviewTitle(title)
+        );
+      }
+
+      return false;
+    });
+
+  const photoCount =
+    usableMaterialMemories.filter(
+      (memory) =>
+        memory.type === 'PHOTO',
+    ).length;
+
+  const storyCount =
+    usableMaterialMemories.filter(
+      (memory) => {
+        const description =
+          memory.description?.trim() || '';
+
+        if (memory.type === 'PHOTO') {
+          return description.length >= 10;
+        }
+
+        return memory.type === 'TEXT';
+      },
+    ).length;
+
+  const activeProductionBookCount =
     new Set(
       activeProductionRequests.map(
         (request) => request.bookId,
@@ -140,8 +199,7 @@ export default async function DashboardPage() {
   const storyReady =
     storyCount >= REQUIRED_STORY_COUNT;
 
-  const bookReady =
-    photoReady && storyReady;
+  const bookReady = photoReady;
 
     const nextAction = getNextAction({
     photoCount,
@@ -417,11 +475,11 @@ export default async function DashboardPage() {
               '부모님과 가족의 사진을 먼저 모읍니다.',
               '사진마다 날짜, 장소와 기억나는 내용을 남깁니다.',
               '사진 속 인물과 사건에 대한 이야기를 추가합니다.',
-              '사진 3장과 이야기 3개 이상을 준비합니다.',
+              '사진은 최소 3장을 준비하고, 이야기는 3개 이상 남기면 더 풍부한 원고를 만들 수 있습니다.',
               '책 종류와 원고 방향을 선택해 원고를 만듭니다.',
               '완성된 원고는 내 책장에서 확인하고 제작 상담을 신청합니다.',
             ]}
-            note="처음에는 사진 3장과 이야기 3개만 준비해도 책 원고 만들기를 시작할 수 있습니다."
+           note="사진이 3장 이상이면 기본 원고를 만들 수 있습니다. 이야기는 3개 이상 준비하는 것을 권장합니다."
           />
         </div>
 
@@ -477,7 +535,7 @@ export default async function DashboardPage() {
               title="사진 모으기"
               description="책에 넣을 사진을 모으고 날짜와 장소를 기록합니다."
               count={`${photoCount}장`}
-              requirement={`${REQUIRED_PHOTO_COUNT}장 이상 권장`}
+              requirement={`${REQUIRED_PHOTO_COUNT}장 이상 필요`}
               completed={photoReady}
               href="/dashboard/timeline"
               buttonLabel="사진 관리"
@@ -1062,15 +1120,18 @@ function getNextAction({
     };
   }
 
-  if (storyCount < REQUIRED_STORY_COUNT) {
+    if (
+    storyCount < REQUIRED_STORY_COUNT &&
+    bookCount === 0
+  ) {
     return {
-      title: `이야기를 ${
+      title:
+        '기본 책 원고를 만들 수 있습니다.',
+      description: `사진은 준비되었습니다. 이야기를 ${
         REQUIRED_STORY_COUNT - storyCount
-      }개 더 남겨보세요.`,
-      description:
-        '사진 속 상황과 사람에 대한 이야기가 책의 문장이 됩니다.',
-      href: '/dashboard/interview',
-      buttonLabel: '이야기 남기기',
+      }개 더 남기면 더 구체적이고 풍부한 원고가 만들어집니다.`,
+      href: '/dashboard/book',
+      buttonLabel: '책 원고 만들기',
     };
   }
 
@@ -1102,6 +1163,16 @@ function getNextAction({
     buttonLabel: '내 책장 보기',
   };
 }
+
+function isLegacyAiInterviewTitle(
+  title: string,
+) {
+  return (
+    title.startsWith('AI 인터뷰') ||
+    title.includes('AI 인터뷰 -')
+  );
+}
+
 
 function getMemoryTypeLabel(
   type: string,
