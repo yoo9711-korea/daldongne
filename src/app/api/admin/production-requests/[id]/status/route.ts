@@ -25,6 +25,26 @@ const ACTIVE_STATUSES = [
 type ProductionRequestStatus =
   (typeof ALLOWED_STATUSES)[number];
 
+const STATUS_TRANSITIONS: Record<
+  ProductionRequestStatus,
+  readonly ProductionRequestStatus[]
+> = {
+  REQUESTED: [
+    'CONTACTED',
+    'CANCELED',
+  ],
+  CONTACTED: [
+    'IN_PROGRESS',
+    'CANCELED',
+  ],
+  IN_PROGRESS: [
+    'COMPLETED',
+    'CANCELED',
+  ],
+  COMPLETED: [],
+  CANCELED: [],
+};
+
 type BookStatus =
   | 'DRAFT'
   | 'IN_PRODUCTION'
@@ -207,8 +227,31 @@ export async function PATCH(
       );
     }
 
-    const previousStatus =
+        const previousStatus =
       existingRequest.status as ProductionRequestStatus;
+
+    if (
+      !isAllowedStatusTransition(
+        previousStatus,
+        nextStatus,
+      )
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            `"${getProductionRequestStatusLabel(
+              previousStatus,
+            )}" 상태에서는 ` +
+            `"${getProductionRequestStatusLabel(
+              nextStatus,
+            )}" 상태로 변경할 수 없습니다.`,
+        },
+        {
+          status: 409,
+        },
+      );
+    }
 
     const result =
       await prisma.$transaction(
@@ -349,6 +392,20 @@ export async function PATCH(
     );
   }
 }
+
+function isAllowedStatusTransition(
+  currentStatus: ProductionRequestStatus,
+  nextStatus: ProductionRequestStatus,
+) {
+  if (currentStatus === nextStatus) {
+    return true;
+  }
+
+  return STATUS_TRANSITIONS[
+    currentStatus
+  ].includes(nextStatus);
+}
+
 
 function getBookStatusFromRequestCounts(
   activeRequestCount: number,
