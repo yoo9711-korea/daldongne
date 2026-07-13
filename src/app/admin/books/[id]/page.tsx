@@ -94,7 +94,7 @@ export default async function AdminBookDetailPage({
     notFound();
   }
 
-  const [author, productionRequest, linkedMemories] =
+    const [author, productionRequests, linkedMemories] =
     await Promise.all([
       prisma.user.findUnique({
         where: {
@@ -107,7 +107,7 @@ export default async function AdminBookDetailPage({
         },
       }) as Promise<UserRecord | null>,
 
-      prisma.bookProductionRequest.findFirst({
+            prisma.bookProductionRequest.findMany({
         where: {
           bookId: book.id,
         },
@@ -124,7 +124,7 @@ export default async function AdminBookDetailPage({
           createdAt: true,
           updatedAt: true,
         },
-      }) as Promise<ProductionRequestRecord | null>,
+      }) as Promise<ProductionRequestRecord[]>,
 
       prisma.bookMemory.findMany({
         where: {
@@ -147,7 +147,22 @@ export default async function AdminBookDetailPage({
           },
         },
       }) as Promise<LinkedMemoryRecord[]>,
-    ]);
+        ]);
+
+  const activeProductionRequestStatuses = new Set([
+    'REQUESTED',
+    'CONTACTED',
+    'IN_PROGRESS',
+  ]);
+
+  const productionRequest =
+    productionRequests.find((request) =>
+      activeProductionRequestStatuses.has(
+        request.status,
+      ),
+    ) ??
+    productionRequests[0] ??
+    null;
 
   return (
     <main
