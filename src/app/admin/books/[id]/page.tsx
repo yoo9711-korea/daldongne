@@ -155,7 +155,7 @@ export default async function AdminBookDetailPage({
     'IN_PROGRESS',
   ]);
 
-  const productionRequest =
+    const productionRequest =
     productionRequests.find((request) =>
       activeProductionRequestStatuses.has(
         request.status,
@@ -163,6 +163,12 @@ export default async function AdminBookDetailPage({
     ) ??
     productionRequests[0] ??
     null;
+
+  const pastProductionRequests =
+    productionRequests.filter(
+      (request) =>
+        request.id !== productionRequest?.id,
+    );
 
   return (
     <main
@@ -461,9 +467,150 @@ export default async function AdminBookDetailPage({
                   currentStatus={productionRequest.status}
                 />
               </div>
-            ) : (
+                        ) : (
               <EmptyBox text="아직 제작 상담 신청이 없습니다." />
             )}
+
+            {pastProductionRequests.length > 0 ? (
+              <div
+                style={{
+                  marginTop: 24,
+                  paddingTop: 22,
+                  borderTop: '1px solid #ead7b7',
+                }}
+              >
+                <p style={smallLabelStyle()}>
+                  상담 이력
+                </p>
+
+                <h3
+                  style={{
+                    margin: '6px 0 0',
+                    fontSize: 18,
+                    lineHeight: 1.5,
+                    color: '#20130d',
+                  }}
+                >
+                  이전·기타 상담 기록{' '}
+                  {pastProductionRequests.length}건
+                </h3>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gap: 12,
+                    marginTop: 14,
+                  }}
+                >
+                  {pastProductionRequests.map(
+                    (request) => (
+                      <article
+                        key={request.id}
+                        style={{
+                          borderRadius: 18,
+                          border:
+                            '1px solid #ead7b7',
+                          background: '#fffdf6',
+                          padding: 15,
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            justifyContent:
+                              'space-between',
+                            gap: 10,
+                          }}
+                        >
+                          <span
+                            style={getProductionRequestStatusBadgeStyle(
+                              request.status,
+                            )}
+                          >
+                            {getProductionRequestStatusLabel(
+                              request.status,
+                            )}
+                          </span>
+
+                          <span
+                            style={{
+                              fontSize: 11,
+                              lineHeight: 1.6,
+                              color: '#8a806f',
+                            }}
+                          >
+                            신청{' '}
+                            {formatDateTime(
+                              request.createdAt,
+                            )}
+                            {' · '}
+                            처리{' '}
+                            {formatDateTime(
+                              request.updatedAt,
+                            )}
+                          </span>
+                        </div>
+
+                        <div
+                          style={{
+                            display: 'grid',
+                            gap: 5,
+                            marginTop: 12,
+                            fontSize: 13,
+                            lineHeight: 1.6,
+                            color: '#4a3828',
+                          }}
+                        >
+                          <div>
+                            <strong>신청자:</strong>{' '}
+                            {request.name || '-'}
+                          </div>
+
+                          <div>
+                            <strong>연락처:</strong>{' '}
+                            {request.phone || '-'}
+                          </div>
+
+                          <div
+                            style={{
+                              wordBreak: 'break-all',
+                            }}
+                          >
+                            <strong>이메일:</strong>{' '}
+                            {request.email || '-'}
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            marginTop: 12,
+                            padding: 12,
+                            borderRadius: 14,
+                            background: '#f7eddc',
+                          }}
+                        >
+                          <p
+                            style={{
+                              margin: 0,
+                              whiteSpace: 'pre-line',
+                              fontSize: 13,
+                              lineHeight: 1.7,
+                              color: '#4a3828',
+                              wordBreak: 'break-word',
+                            }}
+                          >
+                            {request.message ||
+                              '요청 내용이 없습니다.'}
+                          </p>
+                        </div>
+                      </article>
+                    ),
+                  )}
+                </div>
+              </div>
+                       ) : null}
           </section>
         </section>
 
