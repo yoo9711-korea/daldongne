@@ -63,6 +63,26 @@ const STATUS_OPTIONS: {
   },
 ];
 
+const STATUS_TRANSITIONS: Record<
+  ProductionRequestStatus,
+  readonly ProductionRequestStatus[]
+> = {
+  REQUESTED: [
+    'CONTACTED',
+    'CANCELED',
+  ],
+  CONTACTED: [
+    'IN_PROGRESS',
+    'CANCELED',
+  ],
+  IN_PROGRESS: [
+    'COMPLETED',
+    'CANCELED',
+  ],
+  COMPLETED: [],
+  CANCELED: [],
+};
+
 export default function ProductionRequestStatusButton({
   requestId,
   currentStatus,
@@ -95,6 +115,21 @@ export default function ProductionRequestStatusButton({
       );
     }
   }, [currentStatus]);
+
+   const availableStatusOptions =
+    selectedStatus
+      ? STATUS_OPTIONS.filter(
+          (option) =>
+            STATUS_TRANSITIONS[
+              selectedStatus
+            ].includes(option.value),
+        )
+      : [];
+
+  const isFinalStatus =
+    selectedStatus === 'COMPLETED' ||
+    selectedStatus === 'CANCELED';
+
 
   const handleChangeStatus = async (
     status: ProductionRequestStatus,
@@ -252,58 +287,63 @@ export default function ProductionRequestStatusButton({
         </span>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 8,
-        }}
-      >
-        {STATUS_OPTIONS.map(
-          (option) => {
-            const active =
-              option.value ===
-              selectedStatus;
+           {availableStatusOptions.length > 0 ? (
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+          }}
+        >
+          {availableStatusOptions.map(
+            (option) => {
+              const saving =
+                savingStatus ===
+                option.value;
 
-            const saving =
-              savingStatus ===
-              option.value;
-
-            return (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() =>
-                  handleChangeStatus(
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() =>
+                    handleChangeStatus(
+                      option.value,
+                    )
+                  }
+                  disabled={isSaving}
+                  aria-label={`상담 상태를 ${option.label}로 변경`}
+                  style={getButtonStyle(
                     option.value,
-                  )
-                }
-                disabled={
-                  isSaving ||
-                  active
-                }
-                aria-pressed={active}
-                aria-label={
-                  active
-                    ? `${option.label}, 현재 상태`
-                    : `상담 상태를 ${option.label}로 변경`
-                }
-                style={getButtonStyle(
-                  option.value,
-                  active,
-                  isSaving,
-                )}
-              >
-                {saving
-                  ? '변경 중...'
-                  : active
-                    ? `✓ ${option.label}`
+                    false,
+                    isSaving,
+                  )}
+                >
+                  {saving
+                    ? '변경 중...'
                     : option.label}
-              </button>
-            );
-          },
-        )}
-      </div>
+                </button>
+              );
+            },
+          )}
+        </div>
+      ) : (
+        <div
+          style={{
+            padding: '13px 14px',
+            borderRadius: 14,
+            border:
+              '1px solid #e1d4bf',
+            background: '#f7f2e9',
+            color: '#6b5a46',
+            fontSize: 13,
+            lineHeight: 1.65,
+          }}
+        >
+          {isFinalStatus
+            ? '완료 또는 취소된 상담은 최종 상태이므로 더 이상 변경할 수 없습니다.'
+            : '현재 상담 상태를 확인할 수 없어 상태 변경이 잠겨 있습니다.'}
+        </div>
+      )}
 
       {isSaving ? (
         <p
