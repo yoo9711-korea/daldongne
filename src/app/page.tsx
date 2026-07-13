@@ -1,3 +1,4 @@
+import { auth } from '@/auth';
 import Link from 'next/link';
 import HomeGuidePopup from '@/components/home/HomeGuidePopup';
 
@@ -53,8 +54,17 @@ const animationStyles = `
   }
 `;
 
-export default function HomePage() {
-    return (
+export default async function HomePage() {
+  const session = await auth();
+
+  const isAdmin =
+    (
+      session?.user as
+        | { role?: string }
+        | undefined
+    )?.role === 'ADMIN';
+
+  return (
   <>
     <style>{animationStyles}</style>
     <HomeGuidePopup />
@@ -106,7 +116,33 @@ export default function HomePage() {
             인생책 원고로 만들어 드립니다.
           </p>
 
-          <div style={{ display: 'flex', gap: 14, marginTop: 24, flexWrap: 'wrap' }}>
+                    <div
+            style={{
+              display: 'flex',
+              gap: 14,
+              marginTop: 24,
+              flexWrap: 'wrap',
+            }}
+          >
+            {isAdmin ? (
+              <Link
+                href="/admin"
+                style={{
+                  padding: '15px 24px',
+                  borderRadius: 999,
+                  background: '#8a4f22',
+                  color: '#fffaf0',
+                  textDecoration: 'none',
+                  fontWeight: 900,
+                  border: '1px solid #8a4f22',
+                  boxShadow:
+                    '0 8px 20px rgba(90, 50, 20, 0.2)',
+                }}
+              >
+                관리자 홈
+              </Link>
+            ) : null}
+
             <Link
               href="/pricing"
               style={{
