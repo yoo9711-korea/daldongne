@@ -376,48 +376,51 @@ export async function POST(request: Request) {
       basedStoryCount: totalStoryCount,
     };
 
-        const book = existingBook
-      ? await prisma.book.update({
+       const book = await prisma.$transaction(
+      async (tx) => {
+        const savedBook = existingBook
+          ? await tx.book.update({
+              where: {
+                id: existingBook.id,
+              },
+              data: bookData,
+            })
+          : await tx.book.create({
+              data: {
+                type: prismaBookType,
+                status: 'DRAFT',
+                authorId: userId,
+                ...bookData,
+              },
+            });
+
+        await tx.bookMemory.deleteMany({
           where: {
-            id: existingBook.id,
-          },
-          data: bookData,
-        })
-      : await prisma.book.create({
-          data: {
-            type: prismaBookType,
-            status: 'DRAFT',
-            authorId: userId,
-            ...bookData,
+            bookId: savedBook.id,
           },
         });
 
-    await prisma.bookMemory.deleteMany({
-      where: {
-        bookId: book.id,
+        await tx.bookMemory.createMany({
+          data: timelineSourceMemories.map(
+            (memory, index) => ({
+              bookId: savedBook.id,
+              memoryId: memory.id,
+              order: index,
+            }),
+          ),
+          skipDuplicates: true,
+        });
+
+        return savedBook;
       },
-    });
-
-    await prisma.bookMemory.createMany({
-      data: timelineSourceMemories.map((memory, index) => ({
-        bookId: book.id,
-        memoryId: memory.id,
-        order: index,
-      })),
-      skipDuplicates: true,
-    });
+    );
 
     return NextResponse.json({
       ok: true,
       bookId: book.id,
       message: 'AI가 책 원고 초안을 만들었습니다.',
     });
-
-    return NextResponse.json({
-      ok: true,
-      bookId: book.id,
-      message: 'AI가 책 원고 초안을 만들었습니다.',
-    });
+               
   } catch (error) {
     console.error('[AI_BOOK_CREATE_DRAFT_ERROR]', error);
 
