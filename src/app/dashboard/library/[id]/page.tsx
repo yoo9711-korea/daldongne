@@ -163,7 +163,7 @@ export default async function BookDetailPage({
       ? linkedMemories
       : (fallbackMemories as unknown as MemoryRecord[]);
 
-  const photoMemories =
+    const photoMemories =
     allMemories.filter(
       isPhotoMemory,
     );
@@ -171,15 +171,21 @@ export default async function BookDetailPage({
   const photos =
     photoMemories.slice(0, 8);
 
+  const allPhotoStories =
+    photoMemories.filter(
+      hasStoryDescription,
+    );
+
   const photoStories =
-    photoMemories
-      .filter(hasStoryDescription)
-      .slice(0, 8);
+    allPhotoStories.slice(0, 8);
+
+  const storyMemories =
+    allMemories.filter(
+      isStoryMemory,
+    );
 
   const stories =
-    allMemories
-      .filter(isStoryMemory)
-      .slice(0, 8);
+    storyMemories.slice(0, 8);
 
   const selectedMemoryIdsForRefresh =
     allMemories
@@ -211,15 +217,14 @@ export default async function BookDetailPage({
     cleanText(bookRecord.summary) ||
     '사진과 이야기를 바탕으로 정리한 책 원고 초안입니다.';
 
-  const displayedPhotoCount =
+    const displayedPhotoCount =
     book.basedPhotoCount ??
-    photos.length;
+    photoMemories.length;
 
   const displayedStoryCount =
     book.basedStoryCount ??
-    stories.length +
-      photoStories.length;
-
+    storyMemories.length +
+      allPhotoStories.length;
   return (
     <main
       style={{
@@ -1910,8 +1915,8 @@ function isPhotoMemory(
     ],
   );
 
-  return (
-    type === 'PHOTO' ||
+    return (
+    type === 'PHOTO' &&
     Boolean(fileUrl)
   );
 }
@@ -1965,10 +1970,10 @@ function isStoryMemory(
     ],
   );
 
-  return (
+    return (
     (type.includes('STORY') ||
       type.includes('TEXT')) &&
-    storyText.length > 0
+    storyText.length >= 10
   );
 }
 
