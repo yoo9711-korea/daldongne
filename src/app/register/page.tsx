@@ -7,6 +7,15 @@ import {
 } from 'react';
 import { useRouter } from 'next/navigation';
 
+const PASSWORD_LETTER_PATTERN =
+  /[A-Za-z]/;
+
+const PASSWORD_NUMBER_PATTERN =
+  /[0-9]/;
+
+const PASSWORD_SPECIAL_PATTERN =
+  /[^A-Za-z0-9]/;
+
 export default function RegisterPage() {
   const router = useRouter();
 
@@ -46,9 +55,33 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 8) {
+       if (password.length < 8) {
       setErrorMessage(
         '비밀번호는 8자 이상 입력해 주세요.',
+      );
+      return;
+    }
+
+    if (password.length > 72) {
+      setErrorMessage(
+        '비밀번호는 72자 이하로 입력해 주세요.',
+      );
+      return;
+    }
+
+    if (
+      !PASSWORD_LETTER_PATTERN.test(
+        password,
+      ) ||
+      !PASSWORD_NUMBER_PATTERN.test(
+        password,
+      ) ||
+      !PASSWORD_SPECIAL_PATTERN.test(
+        password,
+      )
+    ) {
+      setErrorMessage(
+        '비밀번호는 영문, 숫자, 특수문자를 각각 1개 이상 포함해 주세요.',
       );
       return;
     }
