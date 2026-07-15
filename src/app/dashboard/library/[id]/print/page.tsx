@@ -112,32 +112,8 @@ export default async function BookPrintPage({
       (item) => item.memory,
     ) as PrintMemory[];
 
-  const fallbackMemories =
-    linkedMemories.length > 0
-      ? []
-      : ((await prisma.memory.findMany({
-          where: {
-            authorId: userId,
-          },
-          orderBy: {
-            createdAt: 'desc',
-          },
-          take: 50,
-          select: {
-            id: true,
-            type: true,
-            title: true,
-            description: true,
-            fileUrl: true,
-            occurredAt: true,
-            createdAt: true,
-          },
-        })) as PrintMemory[]);
-
-  const allMemories =
-    linkedMemories.length > 0
-      ? linkedMemories
-      : fallbackMemories;
+    const allMemories =
+    linkedMemories;
 
   const photoMemories =
     allMemories.filter(
@@ -147,15 +123,21 @@ export default async function BookPrintPage({
   const photos =
     photoMemories.slice(0, 12);
 
+    const allPhotoStories =
+    photoMemories.filter(
+      hasStoryDescription,
+    );
+
   const photoStories =
-    photoMemories
-      .filter(hasStoryDescription)
-      .slice(0, 12);
+    allPhotoStories.slice(0, 12);
+
+  const storyMemories =
+    allMemories.filter(
+      isStoryMemory,
+    );
 
   const stories =
-    allMemories
-      .filter(isStoryMemory)
-      .slice(0, 16);
+    storyMemories.slice(0, 16);
 
   const blocks =
     parseBookContent(
@@ -207,10 +189,10 @@ export default async function BookPrintPage({
     book.basedPhotoCount ??
     photoMemories.length;
 
-  const displayedStoryCount =
+    const displayedStoryCount =
     book.basedStoryCount ??
-    photoStories.length +
-      stories.length;
+    allPhotoStories.length +
+      storyMemories.length;
 
   return (
     <main
@@ -736,7 +718,7 @@ export default async function BookPrintPage({
                   {linkedMemories.length >
                   0
                     ? '이 사진은 책 원고를 만들 때 선택한 자료를 기준으로 표시했습니다.'
-                    : '이전 방식으로 만든 책이라 현재 보관 중인 사진을 기준으로 표시했습니다.'}
+                                        : '이전 방식으로 만든 책이라 연결된 자료가 없습니다. 원고 다시 정리하기에서 사용할 자료를 다시 선택해 주세요.'}
                 </p>
               ) : null}
             </PrintPage>
@@ -1615,7 +1597,7 @@ function isStoryMemory(
   return (
     (type.includes('STORY') ||
       type.includes('TEXT')) &&
-    text.length > 0
+    text.length >=10
   );
 }
 
