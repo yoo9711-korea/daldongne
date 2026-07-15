@@ -191,6 +191,27 @@ export default function CredentialsLoginForm({
             disabled={isSubmitting}
             style={inputStyle}
           />
+
+                   <div
+            style={{
+              marginTop: 9,
+              textAlign: 'right',
+            }}
+          >
+            <Link
+              href="/forgot-password"
+              style={{
+                color: '#6b3f18',
+                fontSize: 12,
+                fontWeight: 800,
+                textDecoration: 'underline',
+                textUnderlineOffset: 3,
+              }}
+            >
+              비밀번호를 잊으셨나요?
+            </Link>
+          </div>         
+
         </div>
 
         {errorMessage ? (
