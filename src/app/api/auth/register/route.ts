@@ -9,6 +9,15 @@ import { prisma } from '@/lib/prisma';
 const EMAIL_PATTERN =
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const PASSWORD_LETTER_PATTERN =
+  /[A-Za-z]/;
+
+const PASSWORD_NUMBER_PATTERN =
+  /[0-9]/;
+
+const PASSWORD_SPECIAL_PATTERN =
+  /[^A-Za-z0-9]/;
+
 export async function POST(
   request: Request,
 ) {
@@ -39,6 +48,9 @@ export async function POST(
       'string'
         ? body.passwordConfirm
         : '';
+
+       const termsAccepted =
+      body?.termsAccepted === true;
 
     if (name.length < 2) {
       return NextResponse.json(
@@ -121,12 +133,48 @@ export async function POST(
       );
     }
 
+        if (
+      !PASSWORD_LETTER_PATTERN.test(
+        password,
+      ) ||
+      !PASSWORD_NUMBER_PATTERN.test(
+        password,
+      ) ||
+      !PASSWORD_SPECIAL_PATTERN.test(
+        password,
+      )
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            '비밀번호는 영문, 숫자, 특수문자를 각각 1개 이상 포함해 주세요.',
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
     if (password !== passwordConfirm) {
       return NextResponse.json(
         {
           ok: false,
           message:
             '비밀번호와 비밀번호 확인이 일치하지 않습니다.',
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+      if (!termsAccepted) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            '이용약관과 개인정보처리방침에 동의해 주세요.',
         },
         {
           status: 400,
