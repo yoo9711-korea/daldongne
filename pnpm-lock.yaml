@@ -20,6 +20,9 @@ importers:
       axios:
         specifier: ^1.18.1
         version: 1.18.1
+      bcryptjs:
+        specifier: ^3.0.3
+        version: 3.0.3
       next:
         specifier: 15.5.18
         version: 15.5.18(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -376,6 +379,10 @@ packages:
 
   axios@1.18.1:
     resolution: {integrity: sha512-3nTvFlvpn9Zu/RkHUqtc7/+al4UpRW5az71ap5zccp6e8RAYEzhMTecX8Dz1wWDYrPpUoB1HAQEGEAEvUr7S9g==}
+
+  bcryptjs@3.0.3:
+    resolution: {integrity: sha512-GlF5wPWnSa/X5LKM1o0wz0suXIINz1iHRLvTS+sLyi7XPbe5ycmYI3DlZqVGZZtDgl4DmasFg7gOB3JYbphV5g==}
+    hasBin: true
 
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
@@ -1017,6 +1024,8 @@ snapshots:
     transitivePeerDependencies:
       - debug
       - supports-color
+
+  bcryptjs@3.0.3: {}
 
   call-bind-apply-helpers@1.0.2:
     dependencies:

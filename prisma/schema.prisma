@@ -13,6 +13,7 @@ model User {
   email             String?        @unique
   emailVerified     DateTime?
   image             String?
+  passwordHash      String?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   role              String         @default("USER")
@@ -109,18 +110,18 @@ model FamilyMember {
 }
 
 model Memory {
-  id          String     @id @default(cuid())
-  type        MemoryType
-  title       String?
-  description String?
-  fileUrl     String?
-  occurredAt  DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  authorId    String
-  familyId    String?
-  author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  family      Family?    @relation(fields: [familyId], references: [id])
+  id           String       @id @default(cuid())
+  type         MemoryType
+  title        String?
+  description  String?
+  fileUrl      String?
+  occurredAt   DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  authorId     String
+  familyId     String?
+  author       User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  family       Family?      @relation(fields: [familyId], references: [id])
   bookMemories BookMemory[]
 
   @@index([authorId, occurredAt])
@@ -128,7 +129,7 @@ model Memory {
 }
 
 model Book {
-  id              String       @id @default(cuid())
+  id              String     @id @default(cuid())
   authorId        String
   type            BookType
   title           String
@@ -136,15 +137,15 @@ model Book {
   summary         String?
   content         String?
   coverText       String?
-  status          BookStatus   @default(DRAFT)
+  status          BookStatus @default(DRAFT)
   pageCount       Int?
   basedPhotoCount Int?
   basedStoryCount Int?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
-  author          User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  bookMemories    BookMemory[]
+  author       User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  bookMemories BookMemory[]
 
   @@index([authorId])
   @@map("books")
@@ -157,8 +158,8 @@ model BookMemory {
   order     Int      @default(0)
   createdAt DateTime @default(now())
 
-  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  memory    Memory   @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  memory Memory @relation(fields: [memoryId], references: [id], onDelete: Cascade)
 
   @@unique([bookId, memoryId])
   @@index([bookId])
