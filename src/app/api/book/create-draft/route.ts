@@ -331,7 +331,7 @@ export async function POST(request: Request) {
 
     const parsed = parseBookDraft(aiText);
 
-        const existingBook = targetBookId
+            const existingBook = targetBookId
       ? await prisma.book.findFirst({
           where: {
             id: targetBookId,
@@ -339,16 +339,7 @@ export async function POST(request: Request) {
             status: 'DRAFT',
           },
         })
-      : await prisma.book.findFirst({
-          where: {
-            authorId: userId,
-            type: prismaBookType,
-            status: 'DRAFT',
-          },
-          orderBy: {
-            updatedAt: 'desc',
-          },
-        });
+      : null;
 
         if (targetBookId && !existingBook) {
       return NextResponse.json(
