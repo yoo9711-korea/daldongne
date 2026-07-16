@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { auth } from '@/auth';
 
 const STEPS = [
   {
@@ -27,7 +28,12 @@ const STEPS = [
   },
 ];
 
-export default function ProcessPage() {
+export default async function ProcessPage() {
+    const session = await auth();
+
+  const consultationHref = session?.user
+    ? '/dashboard/book'
+    : '/login?callbackUrl=/dashboard/book';
   return (
     <main style={{ background: '#fffaf1', color: '#33271d' }}>
       <section
@@ -79,7 +85,7 @@ export default function ProcessPage() {
 
           <div style={{ marginTop: 36, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
             <Link
-              href="/pricing"
+              href={consultationHref}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -319,7 +325,7 @@ export default function ProcessPage() {
 
           <div style={{ marginTop: 34 }}>
             <Link
-              href="/pricing"
+              href={consultationHref}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
