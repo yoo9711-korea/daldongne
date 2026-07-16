@@ -239,8 +239,8 @@ export default async function InterviewPage() {
             }}
           >
             사진 속 기억과
-            <br />
-            우리 가족의 이야기를 남깁니다.
+           <br />
+           소중한 삶의 이야기를 남깁니다.
           </h1>
 
           <p
@@ -440,7 +440,7 @@ export default async function InterviewPage() {
               >
                 {storyReady
                   ? '사진과 이야기가 준비되었습니다. 책 원고를 만들어보세요.'
-                  : '사진 속 기억이나 가족 이야기를 조금 더 남겨주세요.'}
+                  : '사진 속 기억이나 삶의 이야기를 조금 더 남겨주세요.'}
               </strong>
             </div>
 
