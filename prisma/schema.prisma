@@ -19,6 +19,7 @@ model User {
   role                String               @default("USER")
   accounts            Account[]
   books               Book[]
+  bookOrders          BookOrder[]
   familyMemberships   FamilyMember[]
   memories            Memory[]
   passwordResetTokens PasswordResetToken[]
@@ -55,6 +56,8 @@ model BookProductionRequest {
   status    ProductionRequestStatus @default(REQUESTED)
   createdAt DateTime                @default(now())
   updatedAt DateTime                @updatedAt
+
+  bookOrder BookOrder?
 
   @@index([bookId])
   @@index([authorId])
@@ -163,9 +166,41 @@ model Book {
 
   author       User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
   bookMemories BookMemory[]
+  bookOrders   BookOrder[]
 
   @@index([authorId])
   @@map("books")
+}
+
+model BookOrder {
+  id                  String          @id @default(cuid())
+  productionRequestId String          @unique
+  bookId              String
+  authorId            String
+  productType         BookProductType
+  productName         String
+  specification       String?
+  quantity            Int             @default(1)
+  productAmount       Int
+  shippingFee         Int             @default(0)
+  totalAmount         Int
+  status              BookOrderStatus @default(READY)
+  orderId             String          @unique
+  paymentKey          String?         @unique
+  paymentMethod       String?
+  paidAt              DateTime?
+  canceledAt          DateTime?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  productionRequest BookProductionRequest @relation(fields: [productionRequestId], references: [id], onDelete: Cascade)
+  book              Book                  @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  author            User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@index([authorId])
+  @@index([status])
+  @@map("book_orders")
 }
 
 model BookMemory {
@@ -245,6 +280,22 @@ enum BookStatus {
   DRAFT
   IN_PRODUCTION
   PUBLISHED
+}
+
+enum BookProductType {
+  DIGITAL_MANUSCRIPT
+  BASIC_SOFTCOVER
+  CUSTOM_BOOK
+}
+
+enum BookOrderStatus {
+  READY
+  PAYMENT_PENDING
+  PAID
+  PARTIALLY_REFUNDED
+  REFUNDED
+  CANCELED
+  FAILED
 }
 
 enum ProductionRequestStatus {
