@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import ProductApplicationStatusButton from '@/components/admin/ProductApplicationStatusButton';
 import {
   PRODUCT_ADDONS,
 } from '@/lib/products/catalog';
@@ -663,7 +664,7 @@ export default async function AdminProductApplicationsPage() {
                     </section>
                   </div>
 
-                  {application.message ? (
+                                    {application.message ? (
                     <div className="product-message">
                       <strong>
                         요청사항
@@ -673,14 +674,21 @@ export default async function AdminProductApplicationsPage() {
                     </div>
                   ) : null}
 
+                  <ProductApplicationStatusButton
+                    applicationId={application.id}
+                    currentStatus={application.status}
+                  />
+
                   <footer className="product-card-footer">
                     <span>
                       접수번호 {application.id}
                     </span>
 
-                    <span>
-                      상태 변경 기능은 다음 단계에서
-                      연결합니다.
+                                        <span>
+                      현재 상태{' '}
+                      {getStatusLabel(
+                        application.status,
+                      )}
                     </span>
                   </footer>
                 </article>
