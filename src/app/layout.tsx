@@ -151,6 +151,9 @@ export default async function RootLayout({
   const session = await auth();
   const isLoggedIn = Boolean(session?.user);
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === 'ADMIN';
+  const bookHref = isLoggedIn
+  ? '/dashboard/book'
+  : '/login?callbackUrl=/dashboard/book';
 
   return (
     <html lang="ko">
@@ -193,7 +196,7 @@ export default async function RootLayout({
                 이용 가이드
               </Link>
 
-              <Link href="/dashboard/book" style={linkStyle}>
+              <Link href={bookHref} style={linkStyle}>
                 인생책 만들기
               </Link>
 
@@ -209,7 +212,7 @@ export default async function RootLayout({
                 제작 사례
               </Link>
 
-              <Link href="/dashboard/book" style={linkStyle}>
+              <Link href={bookHref} style={linkStyle}>
                 신청하기
               </Link>
 
