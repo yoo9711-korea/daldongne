@@ -4,6 +4,7 @@ import DeleteBookButton from '@/components/library/DeleteBookButton';
 import RefreshBookDraftButton from '@/components/library/RefreshBookDraftButton';
 import DeleteMemoryButton from '@/components/memory/DeleteMemoryButton';
 import EditMemoryButton from '@/components/memory/EditMemoryButton';
+import TossPaymentWidget from '@/components/payment/TossPaymentWidget';
 import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -946,19 +947,34 @@ export default async function BookDetailPage({
                   </strong>
                 </div>
 
-                {productionRequest.bookOrder.status === 'READY' ? (
-                  <p
-                    style={{
-                      margin: '13px 0 0',
-                      color: '#6d533a',
-                      fontSize: 13,
-                      lineHeight: 1.7,
-                      fontWeight: 800,
-                    }}
-                  >
-                    제작 견적이 확정되었습니다. 결제 기능이 연결되면
-                    이곳에서 결제를 진행할 수 있습니다.
-                  </p>
+                {[
+                   'READY',
+                    'FAILED',
+                    ].includes(
+                    productionRequest.bookOrder.status,
+                   ) ? (
+                  <TossPaymentWidget
+                    bookId={book.id}
+                    orderId={
+                      productionRequest.bookOrder.orderId
+                    }
+                    orderName={
+                      productionRequest.bookOrder.productName
+                    }
+                    amount={
+                      productionRequest.bookOrder.totalAmount
+                    }
+                    customerKey={userId}
+                    customerName={
+                      productionRequest.name
+                    }
+                    customerEmail={
+                      productionRequest.email
+                    }
+                    customerMobilePhone={
+                      productionRequest.phone
+                    }
+                  />
                 ) : null}
               </section>
             ) : null}
