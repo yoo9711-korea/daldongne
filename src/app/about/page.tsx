@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { auth } from '@/auth';
 
 const VALUES = [
   {
@@ -15,7 +16,12 @@ const VALUES = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+   const session = await auth();
+
+  const consultationHref = session?.user
+    ? '/dashboard/book'
+    : '/login?callbackUrl=/dashboard/book';
   return (
     <main style={{ background: '#fffaf1', color: '#33271d' }}>
       <section
@@ -315,7 +321,7 @@ export default function AboutPage() {
 
           <div style={{ marginTop: 34 }}>
             <Link
-              href="/dashboard/book"
+              href={consultationHref}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
