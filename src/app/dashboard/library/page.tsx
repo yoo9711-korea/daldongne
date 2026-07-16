@@ -494,7 +494,7 @@ export default async function LibraryPage() {
           <PageGuideBox
             label="내 책장 이용 안내"
             title="책을 선택하면 원고와 제작 상태를 확인할 수 있습니다"
-            description="내 책장에는 생성한 책 원고가 저장됩니다. 책 상세 화면에서 원고를 읽고 다시 정리하거나 인쇄용 원고와 제작 상담을 확인할 수 있습니다."
+            description="내 책장에는 만든 책 원고가 저장됩니다. 책 상세 화면에서 원고를 읽고 다시 정리하거나 인쇄용 원고와 제작 상담을 확인할 수 있습니다."
             steps={[
               '저장된 책의 종류와 현재 상태를 확인합니다.',
               '책 상세 보기에서 원고와 사용된 사진·이야기를 확인합니다.',
@@ -558,8 +558,8 @@ export default async function LibraryPage() {
                   lineHeight: 1.7,
                 }}
               >
-                가장 최근에 생성한 책
-                6권을 책장 형태로 확인합니다.
+                가장 최근에 만든 책 원고
+                 6권을 책장 형태로 확인합니다.
               </p>
             </div>
 
@@ -651,7 +651,7 @@ export default async function LibraryPage() {
                   lineHeight: 1.7,
                 }}
               >
-                책 종류, 원고 상태, 생성일,
+                책 종류, 원고 상태, 만든 날짜,
                 사용한 사진과 이야기 수,
                 제작 상담 상태를 확인할 수
                 있습니다.
@@ -662,7 +662,7 @@ export default async function LibraryPage() {
               href="/dashboard/book"
               style={darkButtonStyle()}
             >
-              새 책 만들기
+              새 책 원고 만들기
             </Link>
           </div>
 
