@@ -82,7 +82,7 @@ export default async function BookDetailPage({
               createdAt: 'desc',
             },
           ],
-          select: {
+                    select: {
             id: true,
             name: true,
             phone: true,
@@ -91,6 +91,19 @@ export default async function BookDetailPage({
             status: true,
             createdAt: true,
             updatedAt: true,
+            bookOrder: {
+              select: {
+                productType: true,
+                productName: true,
+                specification: true,
+                quantity: true,
+                productAmount: true,
+                shippingFee: true,
+                totalAmount: true,
+                status: true,
+                orderId: true,
+              },
+            },
           },
         });
 
@@ -111,7 +124,7 @@ export default async function BookDetailPage({
             updatedAt: 'desc',
           },
         ],
-        select: {
+                select: {
           id: true,
           name: true,
           phone: true,
@@ -120,6 +133,19 @@ export default async function BookDetailPage({
           status: true,
           createdAt: true,
           updatedAt: true,
+          bookOrder: {
+            select: {
+              productType: true,
+              productName: true,
+              specification: true,
+              quantity: true,
+              productAmount: true,
+              shippingFee: true,
+              totalAmount: true,
+              status: true,
+              orderId: true,
+            },
+          },
         },
       });
     })(),
@@ -761,6 +787,181 @@ export default async function BookDetailPage({
                   background: '#eef7ff',
                 }}
               >
+
+                           {productionRequest?.bookOrder ? (
+              <section
+                style={{
+                  marginTop: 18,
+                  padding: 22,
+                  borderRadius: 22,
+                  border: '1px solid #d8b97c',
+                  background: '#fff8e9',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    flexWrap: 'wrap',
+                    gap: 12,
+                  }}
+                >
+                  <div>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: '#9a6a24',
+                        fontSize: 12,
+                        fontWeight: 900,
+                        letterSpacing: '0.06em',
+                      }}
+                    >
+                      제작 견적
+                    </p>
+
+                    <h2
+                      style={{
+                        margin: '7px 0 0',
+                        color: '#2d1c12',
+                        fontFamily: 'Noto Serif KR, serif',
+                        fontSize: 24,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {productionRequest.bookOrder.productName}
+                    </h2>
+                  </div>
+
+                  <span
+                    style={{
+                      padding: '7px 11px',
+                      borderRadius: 999,
+                      background: '#6e421d',
+                      color: '#fffaf0',
+                      fontSize: 12,
+                      fontWeight: 900,
+                    }}
+                  >
+                    {getBookOrderStatusLabel(
+                      productionRequest.bookOrder.status,
+                    )}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns:
+                      'repeat(auto-fit, minmax(160px, 1fr))',
+                    gap: 10,
+                    marginTop: 18,
+                  }}
+                >
+                  <InfoCard
+                    title="제작 수량"
+                    value={`${productionRequest.bookOrder.quantity.toLocaleString()}권`}
+                  />
+
+                  <InfoCard
+                    title="상품 금액"
+                    value={`${productionRequest.bookOrder.productAmount.toLocaleString()}원`}
+                  />
+
+                  <InfoCard
+                    title="배송비"
+                    value={`${productionRequest.bookOrder.shippingFee.toLocaleString()}원`}
+                  />
+
+                  <InfoCard
+                    title="최종 결제 금액"
+                    value={`${productionRequest.bookOrder.totalAmount.toLocaleString()}원`}
+                  />
+                </div>
+
+                {productionRequest.bookOrder.specification ? (
+                  <div
+                    style={{
+                      marginTop: 14,
+                      padding: 15,
+                      borderRadius: 16,
+                      background: '#fffdf7',
+                      border: '1px solid #ead7b7',
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        color: '#8a806f',
+                        fontSize: 11,
+                        fontWeight: 900,
+                      }}
+                    >
+                      제작 사양
+                    </p>
+
+                    <p
+                      style={{
+                        margin: '8px 0 0',
+                        color: '#3b2b1d',
+                        fontSize: 14,
+                        lineHeight: 1.75,
+                        whiteSpace: 'pre-line',
+                      }}
+                    >
+                      {productionRequest.bookOrder.specification}
+                    </p>
+                  </div>
+                ) : null}
+
+                <div
+                  style={{
+                    marginTop: 14,
+                    padding: 14,
+                    borderRadius: 16,
+                    background: '#2d2119',
+                    color: '#fffaf0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: 10,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: 'rgba(255, 250, 240, 0.74)',
+                    }}
+                  >
+                    주문번호 {productionRequest.bookOrder.orderId}
+                  </span>
+
+                  <strong
+                    style={{
+                      fontSize: 21,
+                    }}
+                  >
+                    {productionRequest.bookOrder.totalAmount.toLocaleString()}원
+                  </strong>
+                </div>
+
+                {productionRequest.bookOrder.status === 'READY' ? (
+                  <p
+                    style={{
+                      margin: '13px 0 0',
+                      color: '#6d533a',
+                      fontSize: 13,
+                      lineHeight: 1.7,
+                      fontWeight: 800,
+                    }}
+                  >
+                    제작 견적이 확정되었습니다. 결제 기능이 연결되면
+                    이곳에서 결제를 진행할 수 있습니다.
+                  </p>
+                ) : null}
+              </section>
+            ) : null}
                 <p
                   style={{
                     margin: 0,
@@ -2258,6 +2459,40 @@ function getStatusLabel(
   }
 
   return '상태 확인 필요';
+}
+
+function getBookOrderStatusLabel(
+  status: string,
+) {
+  if (status === 'READY') {
+    return '결제 준비';
+  }
+
+  if (status === 'PAYMENT_PENDING') {
+    return '결제 진행 중';
+  }
+
+  if (status === 'PAID') {
+    return '결제 완료';
+  }
+
+  if (status === 'PARTIALLY_REFUNDED') {
+    return '부분 환불';
+  }
+
+  if (status === 'REFUNDED') {
+    return '환불 완료';
+  }
+
+  if (status === 'CANCELED') {
+    return '주문 취소';
+  }
+
+  if (status === 'FAILED') {
+    return '결제 실패';
+  }
+
+  return '결제 상태 확인 필요';
 }
 
 function getProductionRequestStatusLabel(
