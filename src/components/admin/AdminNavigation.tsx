@@ -21,10 +21,14 @@ const NAV_ITEMS = [
     href: '/admin/books',
     label: '책 관리',
   },
-  {
+    {
     href: '/admin/production-requests',
     label: '제작 상담',
- },
+  },
+  {
+    href: '/admin/product-applications',
+    label: '상품 신청 관리',
+  },
 ];
 
 export default function AdminNavigation() {
