@@ -5,10 +5,28 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import OrderQuoteForm from './OrderQuoteForm';
 import type {
   CSSProperties,
   ReactNode,
 } from 'react';
+
+type BookProductType =
+  | 'DIGITAL_MANUSCRIPT'
+  | 'BASIC_SOFTCOVER'
+  | 'CUSTOM_BOOK';
+
+type BookOrderRecord = {
+  productType: BookProductType;
+  productName: string;
+  specification: string | null;
+  quantity: number;
+  productAmount: number;
+  shippingFee: number;
+  totalAmount: number;
+  status: string;
+  orderId: string;
+};
 
 type ProductionRequestRecord = {
   id: string;
@@ -21,6 +39,7 @@ type ProductionRequestRecord = {
   status: string;
   createdAt: Date;
   updatedAt: Date;
+  bookOrder: BookOrderRecord | null;
 };
 
 type BookRecord = {
@@ -225,9 +244,24 @@ export default async function AdminProductionRequestsPage({
   const skip =
     (currentPage - 1) * PAGE_SIZE;
 
-  const requests =
+    const requests =
     (await prisma.bookProductionRequest.findMany({
       where: requestWhere,
+      include: {
+        bookOrder: {
+          select: {
+            productType: true,
+            productName: true,
+            specification: true,
+            quantity: true,
+            productAmount: true,
+            shippingFee: true,
+            totalAmount: true,
+            status: true,
+            orderId: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: 'desc',
       },
@@ -914,6 +948,12 @@ function ProductionRequestCard({
             '상담 요청 내용이 없습니다.'}
         </p>
       </div>
+
+            <OrderQuoteForm
+        requestId={request.id}
+        requestStatus={request.status}
+        initialOrder={request.bookOrder}
+      />
 
       <ProductionRequestStatusButton
         requestId={request.id}
