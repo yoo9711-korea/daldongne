@@ -20,6 +20,7 @@ model User {
   accounts            Account[]
   books               Book[]
   bookOrders          BookOrder[]
+  productApplications ProductApplication[]
   familyMemberships   FamilyMember[]
   memories            Memory[]
   passwordResetTokens PasswordResetToken[]
@@ -63,6 +64,32 @@ model BookProductionRequest {
   @@index([authorId])
   @@index([status])
   @@map("book_production_requests")
+}
+
+model ProductApplication {
+  id          String                  @id @default(cuid())
+  userId      String
+  productCode String
+  productName String
+  category    String
+  billingType String
+  price       Int
+  name        String?
+  phone       String?
+  email       String?
+  message     String?
+  addonCodes  Json?
+  status      ProductionRequestStatus @default(REQUESTED)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([productCode])
+  @@index([status])
+  @@index([createdAt])
+  @@map("product_applications")
 }
 
 model Account {
