@@ -141,6 +141,8 @@ export default async function AdminProductApplicationsPage({
           application.name,
           application.phone,
           application.email,
+          application.message,
+          application.adminNote,
           application.user.name,
           application.user.email,
         ]
@@ -661,7 +663,76 @@ export default async function AdminProductApplicationsPage({
           label="취소"
           value={canceledCount}
         />
-      </section>
+            </section>
+
+      <form
+        method="get"
+        className="product-filter-panel"
+      >
+        <input
+          type="search"
+          name="q"
+          defaultValue={query}
+          placeholder="상품명, 신청자, 연락처, 요청사항, 관리자 메모 검색"
+          aria-label="상품 신청 검색"
+        />
+
+        <select
+          name="status"
+          defaultValue={statusFilter}
+          aria-label="신청 상태 필터"
+        >
+          <option value="ALL">
+            전체 상태
+          </option>
+
+          <option value="REQUESTED">
+            새로운 접수
+          </option>
+
+          <option value="CONTACTED">
+            연락 완료
+          </option>
+
+          <option value="IN_PROGRESS">
+            진행 중
+          </option>
+
+          <option value="COMPLETED">
+            처리 완료
+          </option>
+
+          <option value="CANCELED">
+            신청 취소
+          </option>
+        </select>
+
+        <button
+          type="submit"
+          className="product-filter-button"
+        >
+          검색
+        </button>
+
+        <Link
+          href="/admin/product-applications"
+          className="product-filter-reset"
+        >
+          초기화
+        </Link>
+      </form>
+
+      <p className="product-filter-result">
+        전체{' '}
+        {applications.length.toLocaleString(
+          'ko-KR',
+        )}
+        건 중{' '}
+        {filteredApplications.length.toLocaleString(
+          'ko-KR',
+        )}
+        건이 표시됩니다.
+      </p>
 
       {applications.length === 0 ? (
         <section className="product-empty-card">
