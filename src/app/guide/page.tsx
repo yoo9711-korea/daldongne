@@ -60,6 +60,10 @@ const faqItems = [
 export default async function GuidePage() {
   const session = await auth();
 
+const photoHref = session?.user
+  ? '/dashboard/timeline'
+  : '/login?callbackUrl=/dashboard/timeline';
+
   const interviewHref = session?.user
     ? '/dashboard/interview'
     : '/login?callbackUrl=/dashboard/interview';
@@ -125,7 +129,7 @@ export default async function GuidePage() {
           }}
         >
           <Link
-            href={interviewHref}
+            href={photoHref}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
