@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { auth } from '@/auth';
 
 const plans = [
   {
@@ -64,7 +65,13 @@ const options = [
   },
 ];
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const session = await auth();
+
+  const bookHref = session?.user
+    ? '/dashboard/book'
+    : '/login?callbackUrl=/dashboard/book'; 
+
   return (
     <main
       style={{
@@ -220,7 +227,7 @@ export default function PricingPage() {
               </div>
 
               <Link
-                href={plan.href}
+                href={bookHref}
                 style={{
                   marginTop: '28px',
                   display: 'inline-flex',
