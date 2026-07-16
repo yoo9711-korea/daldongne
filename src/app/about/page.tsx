@@ -315,7 +315,7 @@ export default function AboutPage() {
 
           <div style={{ marginTop: 34 }}>
             <Link
-              href="/pricing"
+              href="/dashboard/book"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
