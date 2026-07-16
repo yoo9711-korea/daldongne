@@ -95,49 +95,52 @@ const navStyle: CSSProperties = {
 };
 
 const linkStyle: CSSProperties = {
-  height: 40,
-  padding: '0 8px',
+  height: 44,
+  padding: '0 11px',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
-  color: '#3a2414',
-  fontSize: 15,
-  fontWeight: 750,
+  color: '#24150a',
+  fontSize: 16,
+  fontWeight: 900,
   lineHeight: 1,
-  letterSpacing: '-0.04em',
+  letterSpacing: '-0.03em',
   textDecoration: 'none',
   whiteSpace: 'nowrap',
   wordBreak: 'keep-all',
+  textShadow: '0 1px 0 rgba(255,255,255,0.7)',
 };
 
 const buttonStyle: CSSProperties = {
-  minWidth: 86,
-  height: 44,
-  padding: '0 18px',
+  minWidth: 90,
+  height: 46,
+  padding: '0 20px',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
-  border: '1px solid #cdbb9c',
-  borderRadius: 4,
-  background: '#fff8eb',
-  color: '#2d1a0b',
-  fontSize: 15,
+  border: '1px solid #9f7952',
+  borderRadius: 999,
+  background: '#fffaf0',
+  color: '#24150a',
+  fontSize: 16,
   fontWeight: 900,
   lineHeight: 1,
-  letterSpacing: '-0.04em',
+  letterSpacing: '-0.03em',
   textDecoration: 'none',
   whiteSpace: 'nowrap',
   wordBreak: 'keep-all',
   cursor: 'pointer',
+  boxShadow: '0 4px 12px rgba(70, 38, 12, 0.12)',
 };
 
 const darkButtonStyle: CSSProperties = {
   ...buttonStyle,
   background: '#2d1a0b',
-  color: '#fffaf0',
+  color: '#ffffff',
   borderColor: '#2d1a0b',
+  boxShadow: '0 5px 14px rgba(45, 26, 11, 0.24)',
 };
 
 export default async function RootLayout({
