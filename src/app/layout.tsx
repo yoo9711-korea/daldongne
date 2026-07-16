@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
-
 import { auth, signOut } from '@/auth';
+import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -16,9 +16,26 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
   },
   icons: {
-    icon: '/brand/icon-mark.png',
-    apple: '/brand/icon-mark.png',
-  },
+  icon: [
+    {
+      url: '/brand/favicon-32.png',
+      sizes: '32x32',
+      type: 'image/png',
+    },
+    {
+      url: '/app/icon-192.png',
+      sizes: '192x192',
+      type: 'image/png',
+    },
+  ],
+  apple: [
+    {
+      url: '/brand/favicon-180.png',
+      sizes: '180x180',
+      type: 'image/png',
+    },
+  ],
+},
 };
 
 export const viewport: Viewport = {
@@ -165,6 +182,7 @@ export default async function RootLayout({
       </head>
 
       <body>
+        <ServiceWorkerRegister />
         <div role="banner" style={headerStyle}>
           <div style={innerStyle}>
             <Link href="/" style={brandStyle}>

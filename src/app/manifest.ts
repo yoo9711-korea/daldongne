@@ -6,13 +6,17 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: '달동네',
     description:
       '사진과 글을 모아 가족의 삶을 한 권의 인생책으로 만드는 달동네 출판사 앱',
-    start_url: '/dashboard',
+    start_url: '/',
     scope: '/',
     display: 'standalone',
     orientation: 'portrait',
     background_color: '#f7efe0',
     theme_color: '#6b3f18',
-    categories: ['books', 'lifestyle', 'photo'],
+    categories: [
+      'books',
+      'lifestyle',
+      'photo',
+    ],
     icons: [
       {
         src: '/app/icon-192.png',
