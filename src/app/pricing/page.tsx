@@ -95,8 +95,13 @@ export default async function PricingPage() {
     (product) => product.category === 'LIFE_BOOK',
   );
 
-  const monthlyPlans = PRODUCT_PLANS.filter(
+    const monthlyPlans = PRODUCT_PLANS.filter(
     (product) => product.category === 'MONTHLY_RECORD',
+  );
+
+  const publishingPlans = PRODUCT_PLANS.filter(
+    (product) =>
+      product.category === 'BOOK_PUBLISHING',
   );
 
   const createProductHref = (
@@ -175,9 +180,9 @@ export default async function PricingPage() {
           word-break: keep-all;
         }
 
-        .start-grid {
+                .start-grid {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 16px;
           margin-top: 26px;
         }
@@ -259,9 +264,17 @@ export default async function PricingPage() {
           margin-top: 24px;
         }
 
-        .monthly-plan-grid {
+                .monthly-plan-grid {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 16px;
+          margin-top: 24px;
+        }
+
+        .publishing-plan-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          align-items: stretch;
           gap: 16px;
           margin-top: 24px;
         }
@@ -609,9 +622,10 @@ export default async function PricingPage() {
             border-radius: 28px;
           }
 
-          .start-grid,
+                    .start-grid,
           .life-plan-grid,
           .monthly-plan-grid,
+          .publishing-plan-grid,
           .addon-grid,
           .book-type-grid,
           .step-grid {
@@ -635,16 +649,17 @@ export default async function PricingPage() {
             달동네 출판사 상품 안내
           </p>
 
-          <h1>
-            지금 한 권으로 만들거나,
+                    <h1>
+            기록을 책으로 만들고,
             <br />
-            매달 조금씩 기록하세요
+            완성된 원고를 출간하세요
           </h1>
 
           <p className="pricing-hero-description">
-            사진과 이야기를 한 번에 정리해 인생책으로 만들거나,
-            매달 기록을 차곡차곡 모아 1년에 한 번 책으로
-            완성할 수 있습니다.
+            사진과 이야기를 인생책으로 만들거나, 매달 기록을
+            차곡차곡 모을 수 있습니다. 이미 완성된 원고가 있다면
+            편집·디자인·ISBN 등록과 인쇄까지 단행본 출간을
+            신청할 수 있습니다.
           </p>
 
           <div className="start-grid">
@@ -661,6 +676,24 @@ export default async function PricingPage() {
               <span>
                 사진 50장 이하와 이야기를 바탕으로
                 50~80페이지 기본 책을 제작합니다.
+              </span>
+            </Link>
+
+                 <Link
+              href="#book-publishing"
+              className="start-card"
+            >
+              <span className="start-card-label">
+                완성된 원고 출간하기
+              </span>
+
+              <strong>
+                단행본 출간 · 490,000원부터
+              </strong>
+
+              <span>
+                원고 편집, 표지와 내지 디자인, ISBN 등록,
+                인쇄와 온라인 서점 등록을 지원합니다.
               </span>
             </Link>
 
@@ -740,6 +773,58 @@ export default async function PricingPage() {
             </div>
           </div>
         </section>
+
+                <section
+          id="book-publishing"
+          className="section"
+        >
+          <div className="section-panel">
+            <p className="section-label">
+              완성된 원고 출간
+            </p>
+
+            <h2 className="section-title">
+              단행본 출간 3가지 선택
+            </h2>
+
+            <p className="section-description">
+              이미 작성한 소설, 에세이, 시집, 자기계발서,
+              전문 원고를 실제 판매 가능한 책으로 제작합니다.
+              원고 분량과 필요한 편집 범위에 맞춰 기본,
+              스탠다드, 프리미엄 가운데 선택할 수 있습니다.
+            </p>
+
+            <div className="publishing-plan-grid">
+              {publishingPlans.map((product) => (
+                <ProductCard
+                  key={product.code}
+                  product={product}
+                  href={createProductHref(product)}
+                />
+              ))}
+            </div>
+
+            <div className="notice-box">
+              <strong>
+                단행본 출간 신청 전 확인
+              </strong>
+
+              <p>
+                표시된 금액은 완성된 원고를 제출하는 경우의
+                기본 시작 가격입니다. 원고 분량, 교정 난이도,
+                페이지 수, 컬러 인쇄, 종이, 제본 방식과 인쇄
+                부수에 따라 최종 견적이 달라질 수 있습니다.
+              </p>
+
+              <p>
+                단행본 출간 신청 후 원고 상태와 제작 사양을
+                확인하고, 관리자 상담을 통해 최종 제작 범위와
+                금액을 확정합니다.
+              </p>
+            </div>
+          </div>
+        </section>
+
 
         <section
           id="monthly-record"
@@ -950,11 +1035,11 @@ export default async function PricingPage() {
             상품 이용 전 확인해 주세요
           </strong>
 
-          <p>
+                    <p>
             월간기록 구독의 기본 책 제작은 12개월 유지 고객을
-            기준으로 합니다. 사진 50장 초과, 80페이지 초과,
-            하드커버, 추가 인쇄, 전문 교정과 대량 수정은
-            상담 후 별도 금액이 안내됩니다.
+            기준으로 합니다. 인생책과 단행본 출간은 사진 수,
+            원고 분량, 페이지, 제본, 종이, 컬러 여부와 인쇄
+            부수에 따라 추가 견적이 발생할 수 있습니다.
           </p>
 
           <p>
