@@ -64,12 +64,6 @@ export default async function TimelinePage() {
     (memory) => memory.type === 'TEXT',
   ).length;
 
-  const mediaCount = visibleMemories.filter(
-    (memory) =>
-      memory.type === 'VIDEO' ||
-      memory.type === 'AUDIO',
-  ).length;
-
   const describedPhotoCount = photos.filter(
     (photo) =>
       Boolean(photo.description?.trim()),
@@ -235,9 +229,9 @@ export default async function TimelinePage() {
               letterSpacing: '-0.05em',
             }}
           >
-            부모님의 사진과
-            <br />
-            가족의 시간을 모읍니다.
+            소중한 사진과
+           <br />
+            삶의 시간을 모읍니다.
           </h1>
 
           <p
@@ -387,15 +381,7 @@ export default async function TimelinePage() {
             description="책의 문장이 되는 이야기 기록"
             color="#62438a"
           />
-
-          <SummaryCard
-            label="영상·음성"
-            value={mediaCount}
-            unit="개"
-            description="함께 보관 중인 영상과 음성"
-            color="#245d8c"
-          />
-        </section>
+         </section>
 
         <section
           style={{
