@@ -4,6 +4,7 @@ import {
   NextRequest,
   NextResponse,
 } from 'next/server';
+import { Resend } from 'resend';
 
 export const runtime = 'nodejs';
 
@@ -38,6 +39,197 @@ export async function PATCH(
       );
     }
 
+   type ProductApplicationCancelEmailPayload = {
+  applicationId: string;
+  productName: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  customerMessage: string;
+};
+
+async function sendProductApplicationCancelEmail(
+  payload: ProductApplicationCancelEmailPayload,
+) {
+  const resendApiKey =
+    process.env.RESEND_API_KEY;
+
+  const adminEmail =
+    process.env.ADMIN_EMAIL?.trim() ||
+    '';
+
+  if (
+    !resendApiKey ||
+    !adminEmail
+  ) {
+    console.warn(
+      '[PRODUCT_APPLICATION_CANCEL_EMAIL_SKIPPED]',
+      {
+        hasResendApiKey:
+          Boolean(resendApiKey),
+        hasAdminEmail:
+          Boolean(adminEmail),
+      },
+    );
+
+    return;
+  }
+
+  try {
+    const resend =
+      new Resend(resendApiKey);
+
+    const appUrl =
+      process.env
+        .NEXT_PUBLIC_APP_URL ||
+      process.env.NEXTAUTH_URL ||
+      'https://www.daldongne.kr';
+
+    const cleanAppUrl =
+      appUrl.replace(/\/$/, '');
+
+    const adminApplicationUrl =
+      `${cleanAppUrl}/admin/product-applications`;
+
+    await resend.emails.send({
+      from:
+        process.env.EMAIL_FROM ||
+        '달동네 출판사 <onboarding@resend.dev>',
+
+      to: adminEmail,
+
+      subject:
+        `[달동네] 상품 신청 취소 - ${payload.productName}`,
+
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.7; color: #24170f;">
+          <h2 style="margin: 0 0 16px;">
+            상품 신청이 사용자에 의해 취소되었습니다.
+          </h2>
+
+          <p style="margin: 0 0 20px;">
+            관리자 화면에서 취소된 신청 내용을 확인해 주세요.
+          </p>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <tbody>
+              <tr>
+                <td style="width: 150px; padding: 10px; border: 1px solid #ead7b7; font-weight: bold;">
+                  신청 상품
+                </td>
+                <td style="padding: 10px; border: 1px solid #ead7b7;">
+                  ${escapeHtml(
+                    payload.productName,
+                  )}
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ead7b7; font-weight: bold;">
+                  신청자
+                </td>
+                <td style="padding: 10px; border: 1px solid #ead7b7;">
+                  ${escapeHtml(
+                    payload.customerName ||
+                      '-',
+                  )}
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ead7b7; font-weight: bold;">
+                  전화번호
+                </td>
+                <td style="padding: 10px; border: 1px solid #ead7b7;">
+                  ${escapeHtml(
+                    payload.customerPhone ||
+                      '-',
+                  )}
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ead7b7; font-weight: bold;">
+                  이메일
+                </td>
+                <td style="padding: 10px; border: 1px solid #ead7b7;">
+                  ${escapeHtml(
+                    payload.customerEmail ||
+                      '-',
+                  )}
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ead7b7; font-weight: bold;">
+                  요청사항
+                </td>
+                <td style="padding: 10px; border: 1px solid #ead7b7; white-space: pre-line;">
+                  ${escapeHtml(
+                    payload.customerMessage ||
+                      '-',
+                  )}
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ead7b7; font-weight: bold;">
+                  변경 상태
+                </td>
+                <td style="padding: 10px; border: 1px solid #ead7b7;">
+                  사용자 직접 취소
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p style="margin: 24px 0 8px;">
+            <a
+              href="${escapeHtml(
+                adminApplicationUrl,
+              )}"
+              style="display: inline-block; padding: 12px 18px; border-radius: 999px; background: #24170f; color: #fffaf0; text-decoration: none; font-weight: bold;"
+            >
+              상품 신청 관리 보기
+            </a>
+          </p>
+
+          <p style="margin-top: 28px; font-size: 12px; color: #8a806f;">
+            접수번호:
+            ${escapeHtml(
+              payload.applicationId,
+            )}
+          </p>
+        </div>
+      `,
+    });
+
+    console.info(
+      '[PRODUCT_APPLICATION_CANCEL_EMAIL_SENT]',
+      {
+        applicationId:
+          payload.applicationId,
+      },
+    );
+  } catch (error) {
+    console.error(
+      '[PRODUCT_APPLICATION_CANCEL_EMAIL_ERROR]',
+      error,
+    );
+  }
+}
+
+function escapeHtml(
+  value: string,
+) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
     const { id } =
       await context.params;
 
@@ -63,14 +255,24 @@ export async function PATCH(
           id: applicationId,
           userId,
         },
-        select: {
+                select: {
           id: true,
           userId: true,
           productCode: true,
           productName: true,
           status: true,
+          name: true,
+          phone: true,
+          email: true,
+          message: true,
           createdAt: true,
           updatedAt: true,
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
         },
       });
 
@@ -165,7 +367,26 @@ export async function PATCH(
           createdAt: true,
           updatedAt: true,
         },
-      });
+            });
+
+    await sendProductApplicationCancelEmail({
+      applicationId:
+        application.id,
+      productName:
+        application.productName,
+      customerName:
+        application.name ||
+        application.user.name ||
+        '',
+      customerPhone:
+        application.phone || '',
+      customerEmail:
+        application.email ||
+        application.user.email ||
+        '',
+      customerMessage:
+        application.message || '',
+    });
 
     console.info(
       '[PRODUCT_APPLICATION_CANCELED_BY_USER]',
