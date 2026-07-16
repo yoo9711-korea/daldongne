@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import ProductApplicationAdminNote from '@/components/admin/ProductApplicationAdminNote';
 import ProductApplicationStatusButton from '@/components/admin/ProductApplicationStatusButton';
 import {
   PRODUCT_ADDONS,
@@ -101,6 +102,8 @@ export default async function AdminProductApplicationsPage({
         email: true,
         message: true,
         addonCodes: true,
+        adminNote: true,
+        adminNoteUpdatedAt: true,
         status: true,
         createdAt: true,
         updatedAt: true,
@@ -851,7 +854,7 @@ export default async function AdminProductApplicationsPage({
                     </section>
                   </div>
 
-                                    {application.message ? (
+                                  {application.message ? (
                     <div className="product-message">
                       <strong>
                         요청사항
@@ -860,6 +863,20 @@ export default async function AdminProductApplicationsPage({
                       {application.message}
                     </div>
                   ) : null}
+
+                  <ProductApplicationAdminNote
+                    applicationId={application.id}
+                    initialNote={
+                      application.adminNote || ''
+                    }
+                    updatedAt={
+                      application.adminNoteUpdatedAt
+                        ? formatDateTime(
+                            application.adminNoteUpdatedAt,
+                          )
+                        : null
+                    }
+                  />
 
                   <ProductApplicationStatusButton
                     applicationId={application.id}
