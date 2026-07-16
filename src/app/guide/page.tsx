@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { auth } from '@/auth';
 
 const guideSteps = [
   {
@@ -56,7 +57,12 @@ const faqItems = [
   },
 ];
 
-export default function GuidePage() {
+export default async function GuidePage() {
+  const session = await auth();
+
+  const interviewHref = session?.user
+    ? '/dashboard/interview'
+    : '/login?callbackUrl=/dashboard/interview';
   return (
     <main
       style={{
@@ -119,7 +125,7 @@ export default function GuidePage() {
           }}
         >
           <Link
-            href="/dashboard/interview"
+            href={interviewHref}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -402,7 +408,7 @@ export default function GuidePage() {
           </p>
 
           <Link
-            href="/dashboard/interview"
+            href={interviewHref}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
