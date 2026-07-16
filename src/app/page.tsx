@@ -64,6 +64,10 @@ export default async function HomePage() {
         | undefined
     )?.role === 'ADMIN';
 
+ const startHref = session?.user
+  ? '/dashboard'
+  : '/login?callbackUrl=/dashboard';
+
   return (
   <>
     <style>{animationStyles}</style>
@@ -144,22 +148,24 @@ export default async function HomePage() {
             ) : null}
 
             <Link
-              href="/pricing"
-              style={{
-                padding: '15px 24px',
-                borderRadius: 999,
-                background: '#3a2a1f',
-                color: '#fff',
-                textDecoration: 'none',
-                fontWeight: 700,
-              }}
-            >
-              무료로 시작하기
-            </Link>
+  href={startHref}
+  style={{
+    display: 'inline-block',
+    marginTop: 20,
+    padding: '16px 28px',
+    borderRadius: 999,
+    background: '#3a2a1f',
+    color: '#fff',
+    textDecoration: 'none',
+    fontWeight: 800,
+  }}
+>
+  {session?.user ? '내 기록 이어가기' : '무료로 시작하기'}
+</Link>
 
             <Link
-              href="/pricing"
-              style={{
+                href={startHref}
+                style={{
                 padding: '15px 24px',
                 borderRadius: 999,
                 background: '#fff',
@@ -429,20 +435,20 @@ export default async function HomePage() {
           </p>
 
           <Link
-            href="/pricing"
-            style={{
-              display: 'inline-block',
-              marginTop: 20,
-              padding: '16px 28px',
-              borderRadius: 999,
-              background: '#3a2a1f',
-              color: '#fff',
-              textDecoration: 'none',
-              fontWeight: 800,
-            }}
-          >
-           지금 시작하기
-          </Link>
+  href={startHref}
+  style={{
+    display: 'inline-block',
+    marginTop: 20,
+    padding: '16px 28px',
+    borderRadius: 999,
+    background: '#3a2a1f',
+    color: '#fff',
+    textDecoration: 'none',
+    fontWeight: 800,
+  }}
+>
+  {session?.user ? '내 기록 이어가기' : '지금 시작하기'}
+</Link>
         </div>
       </section>
          </main>
