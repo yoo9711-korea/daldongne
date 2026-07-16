@@ -34,6 +34,11 @@ export default async function AdminDashboard() {
     completedProductionRequests,
     canceledProductionRequests,
     inProductionBookCount,
+    totalProductApplications,
+    requestedProductApplications,
+    activeProductApplications,
+    completedProductApplications,
+    recentProductApplications,
     familyHealthRows,
     pendingProductionRequests,
     inProductionBooks,
@@ -76,9 +81,57 @@ export default async function AdminDashboard() {
       },
     }),
 
-        prisma.book.count({
+            prisma.book.count({
       where: {
         status: 'IN_PRODUCTION',
+      },
+    }),
+
+    prisma.productApplication.count(),
+
+    prisma.productApplication.count({
+      where: {
+        status: 'REQUESTED',
+      },
+    }),
+
+    prisma.productApplication.count({
+      where: {
+        status: {
+          in: [
+            'CONTACTED',
+            'IN_PROGRESS',
+          ],
+        },
+      },
+    }),
+
+    prisma.productApplication.count({
+      where: {
+        status: 'COMPLETED',
+      },
+    }),
+
+    prisma.productApplication.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 5,
+      select: {
+        id: true,
+        productName: true,
+        billingType: true,
+        price: true,
+        name: true,
+        email: true,
+        status: true,
+        createdAt: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
     }),
 
@@ -298,11 +351,29 @@ export default async function AdminDashboard() {
       unit: '권',
       color: '#7b4f2a',
     },
-    {
-      label: '전체 제작 상담',
-      value: totalProductionRequests,
+       {
+      label: '전체 상품 신청',
+      value: totalProductApplications,
       unit: '건',
-      color: '#6d3b1f',
+      color: '#7b4f2a',
+    },
+    {
+      label: '새 상품 신청',
+      value: requestedProductApplications,
+      unit: '건',
+      color: '#a25b20',
+    },
+    {
+      label: '상품 처리 중',
+      value: activeProductApplications,
+      unit: '건',
+      color: '#435d83',
+    },
+    {
+      label: '상품 처리 완료',
+      value: completedProductApplications,
+      unit: '건',
+      color: '#2f6b38',
     },
     {
       label: '미처리 상담',
@@ -415,8 +486,8 @@ export default async function AdminDashboard() {
             }}
           >
             달동네 출판사의 회원, 기록, 가족 공간,
-            책 원고와 제작 상담 현황을 한눈에
-            확인합니다.
+            책 원고와 제작 상담, 상품 신청 현황을
+            한눈에 확인합니다.
           </p>
         </div>
 
@@ -578,6 +649,24 @@ export default async function AdminDashboard() {
             <span>
               미처리 {requestedProductionRequests}건 ·
               처리 중 {activeProductionRequests}건
+            </span>
+          </Link>
+
+                    <Link
+            href="/admin/product-applications"
+            style={quickLinkStyle(
+              requestedProductApplications > 0,
+            )}
+          >
+            <strong>
+              상품 신청 관리
+            </strong>
+
+            <span>
+              새 신청{' '}
+              {requestedProductApplications}건 ·
+              처리 중{' '}
+              {activeProductApplications}건
             </span>
           </Link>
 
@@ -936,6 +1025,126 @@ export default async function AdminDashboard() {
             <EmptyBox text="현재 제작 중인 책이 없습니다." />
           )}
         </article>
+      </section>
+
+             <section
+        className="dash-card"
+        style={{
+          marginTop: 28,
+        }}
+      >
+        <OperationHeader
+          label="최근 상품 신청"
+          description="가장 최근에 접수된 상품 신청 5건"
+          href="/admin/product-applications"
+          buttonLabel="신청 관리"
+        />
+
+        {recentProductApplications.length > 0 ? (
+          <div
+            style={{
+              display: 'grid',
+              gap: 10,
+              marginTop: 18,
+            }}
+          >
+            {recentProductApplications.map(
+              (application) => {
+                const customerName =
+                  application.name ||
+                  application.user.name ||
+                  application.email ||
+                  application.user.email ||
+                  '신청자 확인 필요';
+
+                return (
+                  <Link
+                    key={application.id}
+                    href={buildSearchHref(
+                      '/admin/product-applications',
+                      application.productName,
+                    )}
+                    style={listItemStyle()}
+                  >
+                    <div
+                      style={{
+                        minWidth: 0,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          gap: 7,
+                        }}
+                      >
+                        <span
+                          style={productApplicationStatusBadgeStyle(
+                            String(
+                              application.status,
+                            ),
+                          )}
+                        >
+                          {getProductApplicationStatusLabel(
+                            String(
+                              application.status,
+                            ),
+                          )}
+                        </span>
+
+                        <strong
+                          style={{
+                            color:
+                              'var(--ink)',
+                            fontSize: 14,
+                            lineHeight: 1.5,
+                            wordBreak:
+                              'break-word',
+                          }}
+                        >
+                          {application.productName}
+                        </strong>
+                      </div>
+
+                      <span
+                        style={{
+                          display: 'block',
+                          marginTop: 7,
+                          color:
+                            'var(--ink-soft)',
+                          fontSize: 12,
+                          lineHeight: 1.65,
+                          wordBreak:
+                            'break-word',
+                        }}
+                      >
+                        {customerName}
+                        {' · '}
+                        {formatProductApplicationPrice(
+                          application.price,
+                          application.billingType,
+                        )}
+                        {' · '}
+                        {formatDate(
+                          application.createdAt,
+                        )}
+                      </span>
+                    </div>
+
+                    <span
+                      style={detailTextStyle()}
+                    >
+                      확인
+                    </span>
+                  </Link>
+                );
+              },
+            )}
+          </div>
+        ) : (
+          <EmptyBox text="최근 상품 신청이 없습니다." />
+        )}
       </section>
 
       <section
@@ -1347,6 +1556,99 @@ function statusBadgeStyle(
     ...base,
     background: '#f2eeee',
     color: '#776868',
+  };
+}
+
+function formatProductApplicationPrice(
+  price: number,
+  billingType: string,
+) {
+  const formattedPrice =
+    price.toLocaleString('ko-KR');
+
+  if (billingType === 'MONTHLY') {
+    return `${formattedPrice}원 / 월`;
+  }
+
+  return `${formattedPrice}원부터`;
+}
+
+function getProductApplicationStatusLabel(
+  status: string,
+) {
+  if (status === 'REQUESTED') {
+    return '새 신청';
+  }
+
+  if (status === 'CONTACTED') {
+    return '연락 완료';
+  }
+
+  if (status === 'IN_PROGRESS') {
+    return '처리 중';
+  }
+
+  if (status === 'COMPLETED') {
+    return '처리 완료';
+  }
+
+  if (status === 'CANCELED') {
+    return '신청 취소';
+  }
+
+  return '상태 확인';
+}
+
+function productApplicationStatusBadgeStyle(
+  status: string,
+): CSSProperties {
+  const base: CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 24,
+    padding: '0 8px',
+    borderRadius: 999,
+    fontSize: 10,
+    fontWeight: 900,
+    whiteSpace: 'nowrap',
+  };
+
+  if (status === 'REQUESTED') {
+    return {
+      ...base,
+      background: '#fff0c9',
+      color: '#80520e',
+    };
+  }
+
+  if (status === 'CONTACTED') {
+    return {
+      ...base,
+      background: '#e7efff',
+      color: '#28538a',
+    };
+  }
+
+  if (status === 'IN_PROGRESS') {
+    return {
+      ...base,
+      background: '#eee7ff',
+      color: '#603a97',
+    };
+  }
+
+  if (status === 'COMPLETED') {
+    return {
+      ...base,
+      background: '#e3f4e6',
+      color: '#2f6938',
+    };
+  }
+
+  return {
+    ...base,
+    background: '#f0ebe6',
+    color: '#776b60',
   };
 }
 
