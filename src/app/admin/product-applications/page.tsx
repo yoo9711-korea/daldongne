@@ -13,7 +13,28 @@ const ACTIVE_STATUSES = [
   'IN_PROGRESS',
 ] as const;
 
-export default async function AdminProductApplicationsPage() {
+type AdminProductApplicationsPageProps = {
+  searchParams: Promise<{
+    q?: string | string[];
+    status?: string | string[];
+  }>;
+};
+
+const STATUS_FILTERS = [
+  'ALL',
+  'REQUESTED',
+  'CONTACTED',
+  'IN_PROGRESS',
+  'COMPLETED',
+  'CANCELED',
+] as const;
+
+type StatusFilter =
+  (typeof STATUS_FILTERS)[number];
+
+export default async function AdminProductApplicationsPage({
+  searchParams,
+}: AdminProductApplicationsPageProps) {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -31,9 +52,32 @@ export default async function AdminProductApplicationsPage() {
       },
     });
 
-  if (adminUser?.role !== 'ADMIN') {
+   if (adminUser?.role !== 'ADMIN') {
     redirect('/dashboard');
   }
+
+  const params = await searchParams;
+
+  const rawQuery =
+    Array.isArray(params.q)
+      ? params.q[0]
+      : params.q;
+
+  const query =
+    rawQuery?.trim() || '';
+
+  const rawStatus =
+    Array.isArray(params.status)
+      ? params.status[0]
+      : params.status;
+
+    const statusFilter: StatusFilter =
+    typeof rawStatus === 'string' &&
+    STATUS_FILTERS.includes(
+      rawStatus as StatusFilter,
+    )
+      ? (rawStatus as StatusFilter)
+      : 'ALL';
 
   const applications =
     await prisma.productApplication.findMany({
@@ -68,6 +112,53 @@ export default async function AdminProductApplicationsPage() {
         },
       },
     });
+
+   const normalizedQuery =
+    query.toLocaleLowerCase('ko-KR');
+
+  const filteredApplications =
+    applications.filter(
+      (application) => {
+        const matchesStatus =
+          statusFilter === 'ALL' ||
+          application.status ===
+            statusFilter;
+
+        if (!matchesStatus) {
+          return false;
+        }
+
+        if (!normalizedQuery) {
+          return true;
+        }
+
+        const searchableText = [
+          application.productName,
+          application.productCode,
+          application.name,
+          application.phone,
+          application.email,
+          application.user.name,
+          application.user.email,
+        ]
+          .filter(
+            (
+              value,
+            ): value is string =>
+              typeof value ===
+                'string' &&
+              value.length > 0,
+          )
+          .join(' ')
+          .toLocaleLowerCase(
+            'ko-KR',
+          );
+
+        return searchableText.includes(
+          normalizedQuery,
+        );
+      },
+    );
 
   const requestedCount =
     applications.filter(
@@ -179,7 +270,83 @@ export default async function AdminProductApplicationsPage() {
           color: #392719;
           font-size: 25px;
         }
+    
+               .product-filter-panel {
+          display: grid;
+          grid-template-columns:
+            minmax(0, 1fr) 190px auto auto;
+          gap: 10px;
+          margin-top: 20px;
+          padding: 18px;
+          border-radius: 20px;
+          border: 1px solid #dfc9a4;
+          background: #fffdf7;
+        }
 
+        .product-filter-panel input,
+        .product-filter-panel select {
+          width: 100%;
+          min-height: 44px;
+          box-sizing: border-box;
+          border: 1px solid #d8c3a1;
+          border-radius: 12px;
+          background: #fffefb;
+          color: #35251a;
+          font: inherit;
+          font-size: 13px;
+          outline: none;
+        }
+
+        .product-filter-panel input {
+          padding: 0 13px;
+        }
+
+        .product-filter-panel select {
+          padding: 0 11px;
+        }
+
+        .product-filter-panel input:focus,
+        .product-filter-panel select:focus {
+          border-color: #8a5a2c;
+          box-shadow:
+            0 0 0 3px
+            rgba(138, 90, 44, 0.12);
+        }
+
+        .product-filter-button,
+        .product-filter-reset {
+          min-height: 44px;
+          padding: 0 16px;
+          border-radius: 12px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+          font-size: 13px;
+          font-weight: 900;
+          text-decoration: none;
+          white-space: nowrap;
+        }
+
+        .product-filter-button {
+          border: 1px solid #6e421d;
+          background: #6e421d;
+          color: #fffaf0;
+          cursor: pointer;
+        }
+
+        .product-filter-reset {
+          border: 1px solid #d8c3a1;
+          background: #fffaf0;
+          color: #6e421d;
+        }
+
+        .product-filter-result {
+          margin: 12px 2px 0;
+          color: #786654;
+          font-size: 12px;
+          line-height: 1.65;
+        }
         .product-admin-list {
           display: grid;
           gap: 16px;
@@ -426,6 +593,14 @@ export default async function AdminProductApplicationsPage() {
         }
 
         @media (max-width: 720px) {
+                     .product-filter-panel {
+            grid-template-columns: 1fr;
+          }
+
+          .product-filter-button,
+          .product-filter-reset {
+            width: 100%;
+          }
           .product-summary-grid,
           .product-info-grid,
           .product-detail-grid {
@@ -458,7 +633,7 @@ export default async function AdminProductApplicationsPage() {
         </p>
       </section>
 
-      <section className="product-summary-grid">
+            <section className="product-summary-grid">
         <SummaryCard
           label="전체 신청"
           value={applications.length}
@@ -497,9 +672,21 @@ export default async function AdminProductApplicationsPage() {
             상품 안내 페이지 확인
           </Link>
         </section>
+            ) : filteredApplications.length === 0 ? (
+        <section className="product-empty-card">
+          검색 조건에 맞는 상품 신청이 없습니다.
+          <br />
+
+          <Link
+            href="/admin/product-applications"
+            className="product-pricing-link"
+          >
+            검색 조건 초기화
+          </Link>
+        </section>
       ) : (
         <section className="product-admin-list">
-          {applications.map(
+          {filteredApplications.map(
             (application) => {
               const addonNames =
                 getAddonNames(
@@ -875,3 +1062,5 @@ function getStatusClassName(
 
   return 'product-status-canceled';
 }
+
+getStatusClassName
