@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import ProductApplicationCancelButton from '@/components/applications/ProductApplicationCancelButton';
 import {
   PRODUCT_ADDONS,
 } from '@/lib/products/catalog';
@@ -727,7 +728,7 @@ export default async function MyProductApplicationsPage() {
                       </section>
                     </div>
 
-                    {application.message ? (
+                                        {application.message ? (
                       <div className="application-message">
                         <strong>
                           요청사항
@@ -736,6 +737,11 @@ export default async function MyProductApplicationsPage() {
                         {application.message}
                       </div>
                     ) : null}
+
+                    <ProductApplicationCancelButton
+                      applicationId={application.id}
+                      currentStatus={application.status}
+                    />
 
                     <footer className="application-card-footer">
                       <span>
