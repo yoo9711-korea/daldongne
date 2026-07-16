@@ -67,21 +67,23 @@ model BookProductionRequest {
 }
 
 model ProductApplication {
-  id          String                  @id @default(cuid())
-  userId      String
-  productCode String
-  productName String
-  category    String
-  billingType String
-  price       Int
-  name        String?
-  phone       String?
-  email       String?
-  message     String?
-  addonCodes  Json?
-  status      ProductionRequestStatus @default(REQUESTED)
-  createdAt   DateTime                @default(now())
-  updatedAt   DateTime                @updatedAt
+  id                 String                  @id @default(cuid())
+  userId             String
+  productCode        String
+  productName        String
+  category           String
+  billingType        String
+  price              Int
+  name               String?
+  phone              String?
+  email              String?
+  message            String?
+  addonCodes         Json?
+  adminNote          String?
+  adminNoteUpdatedAt DateTime?
+  status             ProductionRequestStatus @default(REQUESTED)
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
