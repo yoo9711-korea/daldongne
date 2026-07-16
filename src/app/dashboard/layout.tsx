@@ -9,8 +9,6 @@ const menuItems = [
   { href: '/dashboard/book', label: '책 원고 만들기' },
   { href: '/dashboard/library', label: '내 책장' },
   { href: '/dashboard/family', label: '가족 공간' },
-  { href: '/dashboard/movie', label: '추억 영상' },
-  { href: '/dashboard/capsule', label: '미래 편지함' },
 ];
 
 export default async function DashboardLayout({
