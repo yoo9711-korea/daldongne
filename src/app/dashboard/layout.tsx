@@ -8,6 +8,7 @@ const menuItems = [
   { href: '/dashboard/interview', label: '이야기 남기기' },
   { href: '/dashboard/book', label: '책 원고 만들기' },
   { href: '/dashboard/library', label: '내 책장' },
+  { href: '/dashboard/applications', label: '내 상품 신청' },
   { href: '/dashboard/family', label: '가족 공간' },
 ];
 
