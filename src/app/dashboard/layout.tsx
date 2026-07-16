@@ -129,10 +129,10 @@ export default async function DashboardLayout({
             }}
           >
             사진과 이야기를 모아
-            <br />
-            가족의 인생책을
-            <br />
-            만들어 보세요.
+           <br />
+            소중한 삶의 기록을
+           <br />
+           한 권의 책으로 만들어 보세요.
           </p>
         </div>
       </aside>
