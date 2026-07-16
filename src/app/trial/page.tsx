@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { auth } from '@/auth';
 
 const cases = [
   {
@@ -46,7 +47,13 @@ const samples = [
   },
 ];
 
-export default function TrialPage() {
+export default async function TrialPage() {
+    const session = await auth();
+
+  const bookHref = session?.user
+    ? '/dashboard/book'
+    : '/login?callbackUrl=/dashboard/book';
+ 
   return (
     <main style={{ minHeight: '100vh', background: '#fffaf3', color: '#2f241c' }}>
       <section
@@ -102,7 +109,7 @@ export default function TrialPage() {
           </Link>
 
           <Link
-            href="/dashboard/book"
+            href={bookHref}
             style={{
               padding: '15px 24px',
               borderRadius: 999,
@@ -332,7 +339,7 @@ export default function TrialPage() {
             </p>
 
             <Link
-              href="/dashboard/book"
+              href={bookHref}
               style={{
                 display: 'inline-flex',
                 marginTop: 24,
@@ -393,7 +400,7 @@ export default function TrialPage() {
             </Link>
 
             <Link
-              href="/dashboard/book"
+              href={bookHref}
               style={{
                 padding: '15px 24px',
                 borderRadius: 999,
