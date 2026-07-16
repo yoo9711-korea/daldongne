@@ -674,7 +674,7 @@ export default async function BookPage() {
             steps={[
               '책에 넣을 사진과 이야기를 확인합니다.',
               '필요한 자료만 선택하고 불필요한 자료는 선택 해제합니다.',
-              '부모님 인생책, 가족 이야기책 등 책 종류를 선택합니다.',
+              '인생책, 가족 이야기책, 부부·아이·여행책 등 원하는 책 종류를 선택합니다.',
               '따뜻한 문체, 담백한 문체, 편지체 또는 자서전 문체를 선택합니다.',
               '짧은 소책자, 보통 분량 또는 긴 원고를 선택합니다.',
               '원고 만들기 버튼을 누르면 완성된 원고가 내 책장에 저장됩니다.',
@@ -835,7 +835,7 @@ export default async function BookPage() {
                   fontWeight: 900,
                 }}
               >
-                원고 생성 후
+                원고를 만든 후
               </p>
 
               <strong
@@ -1039,7 +1039,7 @@ function getReadiness({
 
   if (canCreateDraft) {
     return {
-      label: '기본 원고 생성 가능',
+      label: '기본 원고 만들기 가능',
       title:
         '지금도 책 원고를 만들 수 있습니다.',
       description: `사진은 준비되었습니다. 이야기를 ${missingStoryCount}개 더 남기면 더 구체적이고 풍부한 원고를 만들 수 있습니다.`,
