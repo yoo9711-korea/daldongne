@@ -213,7 +213,7 @@ export default async function RootLayout({
               </Link>
 
               <Link href={bookHref} style={linkStyle}>
-                신청하기
+                인생책 만들기
               </Link>
 
               {isLoggedIn ? (
