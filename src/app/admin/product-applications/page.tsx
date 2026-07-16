@@ -197,6 +197,31 @@ export default async function AdminProductApplicationsPage({
         'CANCELED',
     ).length;
 
+    const exportParams =
+    new URLSearchParams();
+
+  if (query) {
+    exportParams.set('q', query);
+  }
+
+  if (statusFilter !== 'ALL') {
+    exportParams.set(
+      'status',
+      statusFilter,
+    );
+  }
+
+  const exportQueryString =
+    exportParams.toString();
+
+  const exportHref =
+    `/api/admin/product-applications/export${
+      exportQueryString
+        ? `?${exportQueryString}`
+        : ''
+    }`;
+
+
   return (
     <main className="product-admin-page">
       <style>{`
@@ -721,6 +746,24 @@ export default async function AdminProductApplicationsPage({
           초기화
         </Link>
       </form>
+
+              <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          marginTop: 10,
+        }}
+      >
+        <a
+          href={exportHref}
+          className="product-filter-button"
+          style={{
+            textDecoration: 'none',
+          }}
+        >
+          CSV 다운로드
+        </a>
+      </div>
 
       <p className="product-filter-result">
         전체{' '}
