@@ -198,11 +198,31 @@ export default async function RootLayout({
                 }}
               />
 
-              <span style={brandNameStyle}>달동네 출판사</span>
+              <div
+  style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    minWidth: 0,
+    lineHeight: 1.15,
+  }}
+>
+  <span style={brandNameStyle}>
+    달동네 출판사
+  </span>
 
-              <small style={brandDescStyle}>
-                가치있는 삶의 인생책 제작 서비스
-              </small>
+  <small
+    style={{
+      ...brandDescStyle,
+      display: 'block',
+      marginLeft: 0,
+      marginTop: 4,
+    }}
+  >
+    가치있는 삶의 인생책
+  </small>
+</div>
             </Link>
 
             <nav aria-label="상단 메뉴" style={navStyle}>
