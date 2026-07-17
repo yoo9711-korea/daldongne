@@ -219,8 +219,31 @@ model BookOrder {
   paymentMethod       String?
   paidAt              DateTime?
   canceledAt          DateTime?
-  createdAt           DateTime        @default(now())
-  updatedAt           DateTime        @updatedAt
+
+  productionStage          BookProductionStage @default(PREPARING)
+  productionStageUpdatedAt DateTime            @default(now())
+  manuscriptReceivedAt     DateTime?
+  reviewStartedAt          DateTime?
+  proofFileUrl             String?
+  proofSentAt              DateTime?
+  proofApprovedAt          DateTime?
+  printOrderedAt           DateTime?
+  printingCompletedAt      DateTime?
+
+  recipientName    String?
+  recipientPhone   String?
+  postalCode       String?
+  shippingAddress1 String?
+  shippingAddress2 String?
+  shippingMemo     String?
+  shippingCarrier  String?
+  trackingNumber   String?
+  shippedAt        DateTime?
+  completedAt      DateTime?
+  productionNote   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   productionRequest BookProductionRequest @relation(fields: [productionRequestId], references: [id], onDelete: Cascade)
   book              Book                  @relation(fields: [bookId], references: [id], onDelete: Cascade)
@@ -229,6 +252,8 @@ model BookOrder {
   @@index([bookId])
   @@index([authorId])
   @@index([status])
+  @@index([productionStage])
+  @@index([trackingNumber])
   @@map("book_orders")
 }
 
@@ -315,6 +340,21 @@ enum BookProductType {
   DIGITAL_MANUSCRIPT
   BASIC_SOFTCOVER
   CUSTOM_BOOK
+}
+
+enum BookProductionStage {
+  PREPARING
+  MANUSCRIPT_RECEIVED
+  REVIEWING
+  PROOFING
+  PROOF_SENT
+  PROOF_APPROVED
+  PRINT_ORDERED
+  PRINTING
+  SHIPPING_PREPARATION
+  SHIPPED
+  COMPLETED
+  ON_HOLD
 }
 
 enum BookOrderStatus {
