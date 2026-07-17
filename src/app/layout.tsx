@@ -42,7 +42,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#6b3f18',
+  themeColor: '#ff8f7d',
 };
 
 const headerStyle: CSSProperties = {
@@ -50,8 +50,11 @@ const headerStyle: CSSProperties = {
   position: 'sticky',
   top: 0,
   zIndex: 9999,
-  background: '#f7efe0',
-  borderBottom: '1px solid #e2d4bb',
+  background: 'rgba(255, 252, 247, 0.96)',
+  borderBottom: '1px solid #f3c5b8',
+  boxShadow: '0 7px 24px rgba(137, 91, 72, 0.08)',
+  backdropFilter: 'blur(16px) saturate(135%)',
+  WebkitBackdropFilter: 'blur(16px) saturate(135%)',
 };
 
 const innerStyle: CSSProperties = {
@@ -72,7 +75,7 @@ const brandStyle: CSSProperties = {
   alignItems: 'center',
   gap: 10,
   flexShrink: 0,
-  color: '#2d1a0b',
+  color: '#553a31',
   textDecoration: 'none',
   whiteSpace: 'nowrap',
 };
@@ -80,7 +83,7 @@ const brandStyle: CSSProperties = {
 const brandNameStyle: CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
-  color: '#2d1a0b',
+  color: '#553a31',
   fontSize: 22,
   fontWeight: 900,
   lineHeight: 1,
@@ -91,7 +94,7 @@ const brandNameStyle: CSSProperties = {
 const brandDescStyle: CSSProperties = {
   display: 'inline-block',
   width: 170,
-  color: '#a56518',
+  color: '#df786b',
   fontSize: 14,
   fontWeight: 800,
   lineHeight: 1.35,
@@ -118,7 +121,7 @@ const linkStyle: CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
-  color: '#24150a',
+  color: '#553a31',
   fontSize: 16,
   fontWeight: 900,
   lineHeight: 1,
@@ -296,11 +299,12 @@ export default async function RootLayout({
 
         <footer
           style={{
-            padding: '34px 20px 42px',
-            borderTop: '1px solid #e2d4bb',
-            background: '#f7efe0',
-            color: '#6a4a2b',
-          }}
+  padding: '38px 20px 46px',
+  borderTop: '1px solid #f3c5b8',
+  background:
+    'linear-gradient(180deg, #fffaf5 0%, #fff0e8 100%)',
+  color: '#755d54',
+}}
         >
           <div
             style={{
@@ -332,7 +336,7 @@ export default async function RootLayout({
                            <Link
                 href="/terms"
                 style={{
-                  color: '#5a3510',
+                  color: '#d76359',
                   fontWeight: 900,
                   textDecoration: 'underline',
                   textUnderlineOffset: 3,
@@ -341,12 +345,12 @@ export default async function RootLayout({
                 이용약관
               </Link>
 
-              <span style={{ color: '#b99b73' }}>|</span>
+              <span style={{ color: '#e2a99b' }}>|</span>
 
               <Link
                 href="/privacy"
                 style={{
-                  color: '#5a3510',
+                  color: '#d76359',
                   fontWeight: 900,
                   textDecoration: 'underline',
                   textUnderlineOffset: 3,
@@ -355,12 +359,12 @@ export default async function RootLayout({
                 개인정보처리방침
               </Link>
 
-              <span style={{ color: '#b99b73' }}>|</span>
+              <span style={{ color: '#e2a99b' }}>|</span>
 
               <Link
                 href="/data-deletion"
                 style={{
-                  color: '#5a3510',
+                  color: '#d76359',
                   fontWeight: 900,
                   textDecoration: 'underline',
                   textUnderlineOffset: 3,
