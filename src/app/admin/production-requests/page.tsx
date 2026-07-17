@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import OrderQuoteForm from './OrderQuoteForm';
+import ProductionManagementForm from './ProductionManagementForm';
 import type {
   CSSProperties,
   ReactNode,
@@ -26,6 +27,28 @@ type BookOrderRecord = {
   totalAmount: number;
   status: string;
   orderId: string;
+
+  productionStage: string;
+  productionStageUpdatedAt: Date;
+  manuscriptReceivedAt: Date | null;
+  reviewStartedAt: Date | null;
+  proofFileUrl: string | null;
+  proofSentAt: Date | null;
+  proofApprovedAt: Date | null;
+  printOrderedAt: Date | null;
+  printingCompletedAt: Date | null;
+
+  recipientName: string | null;
+  recipientPhone: string | null;
+  postalCode: string | null;
+  shippingAddress1: string | null;
+  shippingAddress2: string | null;
+  shippingMemo: string | null;
+  shippingCarrier: string | null;
+  trackingNumber: string | null;
+  shippedAt: Date | null;
+  completedAt: Date | null;
+  productionNote: string | null;
 };
 
 type ProductionRequestRecord = {
@@ -249,18 +272,40 @@ export default async function AdminProductionRequestsPage({
       where: requestWhere,
       include: {
         bookOrder: {
-          select: {
-            productType: true,
-            productName: true,
-            specification: true,
-            quantity: true,
-            productAmount: true,
-            shippingFee: true,
-            totalAmount: true,
-            status: true,
-            orderId: true,
-          },
-        },
+  select: {
+    productType: true,
+    productName: true,
+    specification: true,
+    quantity: true,
+    productAmount: true,
+    shippingFee: true,
+    totalAmount: true,
+    status: true,
+    orderId: true,
+
+    productionStage: true,
+    productionStageUpdatedAt: true,
+    manuscriptReceivedAt: true,
+    reviewStartedAt: true,
+    proofFileUrl: true,
+    proofSentAt: true,
+    proofApprovedAt: true,
+    printOrderedAt: true,
+    printingCompletedAt: true,
+
+    recipientName: true,
+    recipientPhone: true,
+    postalCode: true,
+    shippingAddress1: true,
+    shippingAddress2: true,
+    shippingMemo: true,
+    shippingCarrier: true,
+    trackingNumber: true,
+    shippedAt: true,
+    completedAt: true,
+    productionNote: true,
+  },
+},
       },
       orderBy: {
         createdAt: 'desc',
@@ -950,15 +995,20 @@ function ProductionRequestCard({
       </div>
 
             <OrderQuoteForm
-        requestId={request.id}
-        requestStatus={request.status}
-        initialOrder={request.bookOrder}
-      />
+  requestId={request.id}
+  requestStatus={request.status}
+  initialOrder={request.bookOrder}
+/>
 
-      <ProductionRequestStatusButton
-        requestId={request.id}
-        currentStatus={request.status}
-      />
+<ProductionManagementForm
+  requestId={request.id}
+  initialOrder={request.bookOrder}
+/>
+
+<ProductionRequestStatusButton
+  requestId={request.id}
+  currentStatus={request.status}
+/>
     </article>
   );
 }
