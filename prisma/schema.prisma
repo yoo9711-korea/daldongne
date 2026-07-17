@@ -379,3 +379,30 @@ enum CapsuleStatus {
   LOCKED
   OPENED
 }
+
+enum CustomerReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model CustomerReview {
+  id              String               @id @default(cuid())
+  displayName     String
+  email           String
+  orderReference  String?
+  title           String?
+  content         String
+  rating          Int                  @default(5)
+  status          CustomerReviewStatus @default(PENDING)
+  isFeatured      Boolean              @default(false)
+  isVisible       Boolean              @default(true)
+  privacyAgreedAt DateTime
+  approvedAt      DateTime?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  @@index([status, isVisible, createdAt])
+  @@index([isFeatured, status])
+  @@index([email])
+}

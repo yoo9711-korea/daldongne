@@ -1,7 +1,16 @@
 import type { MetadataRoute } from 'next';
 
-export default function manifest(): MetadataRoute.Manifest {
+type ExtendedManifest =
+  MetadataRoute.Manifest & {
+    id: string;
+    launch_handler: {
+      client_mode: 'navigate-existing';
+    };
+  };
+
+export default function manifest(): ExtendedManifest {
   return {
+    id: '/',
     name: '달동네 출판사',
     short_name: '달동네',
     description:
@@ -9,7 +18,10 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: '/',
     scope: '/',
     display: 'standalone',
-    orientation: 'portrait',
+    launch_handler: {
+  client_mode: 'navigate-existing',
+    },
+   orientation: 'portrait',
     background_color: '#f7efe0',
     theme_color: '#6b3f18',
     categories: [

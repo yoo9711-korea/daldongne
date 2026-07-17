@@ -21,9 +21,13 @@ const NAV_ITEMS = [
     href: '/admin/books',
     label: '책 관리',
   },
-    {
+      {
     href: '/admin/production-requests',
     label: '제작 상담',
+  },
+  {
+    href: '/admin/reviews',
+    label: '고객 후기',
   },
   {
     href: '/admin/product-applications',
