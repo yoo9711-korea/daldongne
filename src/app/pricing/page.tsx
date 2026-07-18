@@ -514,10 +514,10 @@ const styles = `
   }
 
   .pricing-section-title {
-    margin: 0;
-    font-size: 27px;
-    line-height: 1.25;
-  }
+  margin: 0;
+  font-size: 31px;
+  line-height: 1.25;
+}
 
   .pricing-comparison-wrap {
     margin-top: 12px;
@@ -534,15 +534,15 @@ const styles = `
   }
 
   .pricing-comparison-table th,
-  .pricing-comparison-table td {
-    padding: 10px 9px;
-    border-right: 1px solid rgba(139, 96, 69, 0.11);
-    border-bottom: 1px solid rgba(139, 96, 69, 0.11);
-    color: #5f4d43;
-    font-size: 10px;
-    line-height: 1.45;
-    text-align: center;
-  }
+.pricing-comparison-table td {
+  padding: 12px 10px;
+  border-right: 1px solid rgba(139, 96, 69, 0.11);
+  border-bottom: 1px solid rgba(139, 96, 69, 0.11);
+  color: #5f4d43;
+  font-size: 11.5px;
+  line-height: 1.5;
+  text-align: center;
+}
 
   .pricing-comparison-table th:first-child,
   .pricing-comparison-table td:first-child {
@@ -614,15 +614,15 @@ const styles = `
   }
 
   .pricing-notice {
-    margin-top: 22px;
-    padding: 18px 20px;
-    border: 1px solid rgba(146, 99, 70, 0.14);
-    border-radius: 14px;
-    color: #756157;
-    background: #fffaf5;
-    font-size: 11px;
-    line-height: 1.7;
-  }
+  margin-top: 22px;
+  padding: 20px 22px;
+  border: 1px solid rgba(146, 99, 70, 0.14);
+  border-radius: 14px;
+  color: #756157;
+  background: #fffaf5;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
 
   .pricing-cta {
     padding: 0 24px 40px;
@@ -819,9 +819,9 @@ const styles = `
     }
 
     .pricing-section-title {
-      font-size: 25px;
-      text-align: center;
-    }
+  font-size: 29px;
+  text-align: center;
+}
 
     .pricing-recommend-grid {
       grid-template-columns:
