@@ -399,42 +399,35 @@ export default async function BookPage() {
           </div>
 
           <div
-            className="book-hero-actions"
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 10,
-              marginTop: 22,
-            }}
-          >
-            <a
-              href="#book-material-selector"
-              style={heroPrimaryButtonStyle()}
-            >
-              책에 넣을 자료 선택
-            </a>
+  className="book-hero-actions"
+  style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 22,
+  }}
+>
+  <a
+    href="#book-material-selector"
+    style={heroPrimaryButtonStyle()}
+  >
+    자료 선택
+  </a>
 
-            <Link
-              href="/dashboard/timeline"
-              style={heroSecondaryButtonStyle()}
-            >
-              사진 더 모으기
-            </Link>
+  <a
+    href="#book-material-selector"
+    style={heroSecondaryButtonStyle()}
+  >
+    책 만들기
+  </a>
 
-            <Link
-              href="/dashboard/interview"
-              style={heroSecondaryButtonStyle()}
-            >
-              이야기 더 남기기
-            </Link>
-
-            <Link
-              href="/dashboard/library"
-              style={heroSecondaryButtonStyle()}
-            >
-              내 책장 보기
-            </Link>
-          </div>
+  <Link
+    href="/dashboard/library"
+    style={heroSecondaryButtonStyle()}
+  >
+    내 책장
+  </Link>
+</div>
         </section>
 
         <section

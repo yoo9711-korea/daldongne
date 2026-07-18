@@ -877,14 +877,18 @@ const styles = `
     }
 
     .process-cta-image {
-      width: 220px;
-      height: 104px;
-      justify-self: center;
-    }
+  position: relative;
+  width: 315px;
+  height: 105px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f7eadb;
+}
 
-    .process-cta-title {
-      font-size: 29px;
-    }
+.process-cta-image img {
+  object-fit: cover;
+  object-position: center 58%;
+}
   }
 `;
 
@@ -1081,45 +1085,45 @@ export default async function ProcessPage() {
         </section>
 
         <section className="process-cta">
-          <div className="process-cta-inner">
-            <div className="process-cta-image">
-              <Image
-                src="/home/storybook/hero-left.webp"
-                alt="꽃과 사진이 놓인 따뜻한 책상"
-                fill
-                sizes="315px"
-              />
-            </div>
+  <div className="process-cta-inner">
+    <div className="process-cta-image">
+      <Image
+        src="/home/storybook/process-hero-bright.png"
+        alt="추억의 사진과 앨범, 카메라가 놓인 따뜻한 책상"
+        fill
+        sizes="(max-width: 560px) 220px, 315px"
+      />
+    </div>
 
-            <div className="process-cta-copy">
-              <h2 className="process-cta-title">
-                지금, 당신의 이야기를
-                들려주세요.
-              </h2>
+    <div className="process-cta-copy">
+      <h2 className="process-cta-title">
+        지금, 당신의 이야기를
+        들려주세요.
+      </h2>
 
-              <p>
-                소중한 기억을 책으로 만들어
-                드릴게요.
-              </p>
-            </div>
+      <p>
+        소중한 기억을 책으로 만들어
+        드릴게요.
+      </p>
+    </div>
 
-            <div className="process-cta-actions">
-              <Link
-                href={consultationHref}
-                className="process-primary-button"
-              >
-                무료 상담 신청하기&nbsp; →
-              </Link>
+    <div className="process-cta-actions">
+      <Link
+        href={consultationHref}
+        className="process-primary-button"
+      >
+        무료 상담 신청하기&nbsp; →
+      </Link>
 
-              <Link
-                href="/guide#contact"
-                className="process-secondary-button"
-              >
-                빠르게 문의하기
-              </Link>
-            </div>
-          </div>
-        </section>
+      <Link
+        href="/guide#contact"
+        className="process-secondary-button"
+      >
+        빠르게 문의하기
+      </Link>
+    </div>
+  </div>
+</section>
       </main>
 
       <style

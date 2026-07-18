@@ -10,10 +10,11 @@ export default function StoryPhotoUploadBox() {
   const [title, setTitle] = useState('');
   const [occurredAt, setOccurredAt] = useState('');
   const [story, setStory] = useState('');
-  const [editedStory, setEditedStory] = useState('');
   const [mode, setMode] = useState('warm');
   const [isUploading, setIsUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isModeModalOpen, setIsModeModalOpen] =
+  useState(false);
 
   const previewUrl = useMemo(() => {
     if (!file) return '';
@@ -81,7 +82,7 @@ export default function StoryPhotoUploadBox() {
         return;
       }
 
-      setEditedStory(result.editedText);
+      setStory(result.editedText);
     } catch {
       alert('AI로 사진 이야기를 다듬는 중 오류가 발생했습니다.');
     } finally {
@@ -89,13 +90,7 @@ export default function StoryPhotoUploadBox() {
     }
   };
 
-  const useEditedStory = () => {
-    if (!editedStory.trim()) return;
-
-    setStory(editedStory);
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (isUploading) return;
@@ -145,8 +140,6 @@ export default function StoryPhotoUploadBox() {
       setTitle('');
       setOccurredAt('');
       setStory('');
-      setEditedStory('');
-
       const fileInput = document.getElementById(
         'story-photo-file',
       ) as HTMLInputElement | null;
@@ -423,120 +416,72 @@ export default function StoryPhotoUploadBox() {
             </p>
 
             <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 8,
-                marginTop: 12,
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => setMode('warm')}
-                style={modeButtonStyle(mode === 'warm')}
-              >
-                따뜻하게
-              </button>
+  style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 12,
+  }}
+>
+  <button
+    type="button"
+    onClick={() => setIsModeModalOpen(true)}
+    style={{
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: 42,
+  padding: '0 16px',
+  borderRadius: 999,
+  border: '1px solid #c18a23',
+  background: '#f3d28a',
+  color: '#24170f',
+  fontSize: 14,
+  fontWeight: 900,
+  cursor: 'pointer',
+}}
+  >
+    글 다듬기 방식 · {getModeLabel(mode)}
+  </button>
+</div>
 
-              <button
-                type="button"
-                onClick={() => setMode('book')}
-                style={modeButtonStyle(mode === 'book')}
-              >
-                책 원고처럼
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setMode('letter')}
-                style={modeButtonStyle(mode === 'letter')}
-              >
-                편지처럼
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setMode('short')}
-                style={modeButtonStyle(mode === 'short')}
-              >
-                짧고 담백하게
-              </button>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 10,
-                marginTop: 14,
-              }}
-            >
-              <button
-                type="button"
-                onClick={handleAiEdit}
-                disabled={isEditing}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minHeight: 42,
-                  padding: '0 18px',
-                  borderRadius: 999,
-                  border: '1px solid #24170f',
-                  background: isEditing ? '#b8a68f' : '#24170f',
-                  color: '#fffaf0',
-                  fontSize: 14,
-                  fontWeight: 900,
-                  cursor: isEditing ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {isEditing ? 'AI가 다듬는 중...' : '사진 이야기 AI로 다듬기'}
-              </button>
-
-              <button
-                type="button"
-                onClick={useEditedStory}
-                disabled={!editedStory.trim()}
-                style={subButtonStyle(!editedStory.trim())}
-              >
-                다듬은 글 반영
-              </button>
-            </div>
-
-            {editedStory ? (
-              <div
-                style={{
-                  marginTop: 14,
-                  padding: 16,
-                  borderRadius: 18,
-                  border: '1px solid #e4cda3',
-                  background: '#f7eddc',
-                }}
-              >
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 13,
-                    fontWeight: 900,
-                    color: '#9a6a24',
-                  }}
-                >
-                  AI가 다듬은 사진 이야기
-                </p>
-
-                <p
-                  style={{
-                    margin: '8px 0 0',
-                    whiteSpace: 'pre-line',
-                    fontSize: 14,
-                    lineHeight: 1.75,
-                    color: '#4a3828',
-                  }}
-                >
-                  {editedStory}
-                </p>
-              </div>
-            ) : null}
+           <div
+  style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 14,
+  }}
+>
+  <button
+    type="button"
+    onClick={handleAiEdit}
+    disabled={isEditing}
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 42,
+      padding: '0 18px',
+      borderRadius: 999,
+      border: '1px solid #24170f',
+      background: isEditing
+        ? '#b8a68f'
+        : '#24170f',
+      color: '#fffaf0',
+      fontSize: 14,
+      fontWeight: 900,
+      cursor: isEditing
+        ? 'not-allowed'
+        : 'pointer',
+    }}
+  >
+    {isEditing
+      ? 'AI가 다듬는 중...'
+      : 'AI로 다듬기'}
+    </button>
+   </div>
+        
 
             <button
               type="submit"
@@ -563,40 +508,224 @@ export default function StoryPhotoUploadBox() {
           </div>
         </div>
       </form>
+
+    {isModeModalOpen ? (
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="photo-story-mode-title"
+    onClick={() => setIsModeModalOpen(false)}
+    style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 9999,
+      display: 'grid',
+      placeItems: 'center',
+      padding: 20,
+      background: 'rgba(43, 33, 24, 0.52)',
+      backdropFilter: 'blur(5px)',
+    }}
+  >
+    <div
+      onClick={(event) => event.stopPropagation()}
+      style={{
+        position: 'relative',
+        width: 'min(480px, 100%)',
+        maxHeight: 'calc(100vh - 40px)',
+        overflowY: 'auto',
+        padding: '36px 28px 28px',
+        borderRadius: 28,
+        border:
+          '1px solid rgba(124, 84, 49, 0.2)',
+        background:
+          'linear-gradient(145deg, #fffdf8 0%, #fff5e7 100%)',
+        boxShadow:
+          '0 28px 70px rgba(52, 35, 22, 0.28)',
+        textAlign: 'center',
+      }}
+    >
+      <button
+        type="button"
+        aria-label="글 다듬기 방식 팝업 닫기"
+        onClick={() => setIsModeModalOpen(false)}
+        style={{
+          position: 'absolute',
+          top: 14,
+          right: 16,
+          width: 36,
+          height: 36,
+          border: 0,
+          borderRadius: '50%',
+          background:
+            'rgba(105, 75, 48, 0.08)',
+          color: '#765d49',
+          fontSize: 25,
+          cursor: 'pointer',
+        }}
+      >
+        ×
+      </button>
+
+      <p
+        style={{
+          margin: 0,
+          color: '#a67145',
+          fontSize: 13,
+          fontWeight: 900,
+          letterSpacing: '0.08em',
+        }}
+      >
+        글 다듬기 방식
+      </p>
+
+      <h2
+        id="photo-story-mode-title"
+        style={{
+          margin: '9px 0 0',
+          fontFamily: 'Noto Serif KR, serif',
+          fontSize: 30,
+          lineHeight: 1.4,
+          letterSpacing: '-0.04em',
+          color: '#3f3025',
+        }}
+      >
+        사진 속 이야기를
+        <br />
+        어떤 문장으로 다듬을까요?
+      </h2>
+
+      <p
+        style={{
+          margin: '13px 0 0',
+          color: '#715e50',
+          fontSize: 14,
+          lineHeight: 1.7,
+        }}
+      >
+        이야기의 내용은 바꾸지 않고
+        표현과 문장 흐름만 자연스럽게 정리합니다.
+      </p>
+
+      <div
+        style={{
+          display: 'grid',
+          gap: 10,
+          marginTop: 23,
+        }}
+      >
+        <ModeSelectButton
+          label="따뜻하게"
+          description="정감 있고 편안한 문장으로 다듬습니다."
+          active={mode === 'warm'}
+          onClick={() => {
+            setMode('warm');
+            setIsModeModalOpen(false);
+          }}
+        />
+
+        <ModeSelectButton
+          label="책 원고처럼"
+          description="책에 바로 담기 좋은 자연스러운 문장으로 정리합니다."
+          active={mode === 'book'}
+          onClick={() => {
+            setMode('book');
+            setIsModeModalOpen(false);
+          }}
+        />
+
+        <ModeSelectButton
+          label="편지처럼"
+          description="누군가에게 마음을 전하는 편지 문체로 다듬습니다."
+          active={mode === 'letter'}
+          onClick={() => {
+            setMode('letter');
+            setIsModeModalOpen(false);
+          }}
+        />
+
+        <ModeSelectButton
+          label="짧고 담백하게"
+          description="군더더기를 줄이고 간결한 문장으로 정리합니다."
+          active={mode === 'short'}
+          onClick={() => {
+            setMode('short');
+            setIsModeModalOpen(false);
+          }}
+        />
+      </div>
+    </div>
+  </div>
+) : null}
+
     </section>
   );
 }
 
-function modeButtonStyle(active: boolean) {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 34,
-    padding: '0 12px',
-    borderRadius: 999,
-    border: active ? '1px solid #c18a23' : '1px solid #d6b778',
-    background: active ? '#f3d28a' : '#fffaf0',
-    color: active ? '#24170f' : '#6b5a46',
-    fontSize: 13,
-    fontWeight: 900,
-    cursor: 'pointer',
-  };
+function getModeLabel(mode: string) {
+  switch (mode) {
+    case 'book':
+      return '책 원고처럼';
+    case 'letter':
+      return '편지처럼';
+    case 'short':
+      return '짧고 담백하게';
+    default:
+      return '따뜻하게';
+  }
 }
 
-function subButtonStyle(disabled: boolean) {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 42,
-    padding: '0 16px',
-    borderRadius: 999,
-    border: '1px solid #d6b778',
-    background: disabled ? '#eadcc5' : '#fffaf0',
-    color: disabled ? '#9f927e' : '#5a3a18',
-    fontSize: 14,
-    fontWeight: 900,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-  };
+function ModeSelectButton({
+  label,
+  description,
+  active,
+  onClick,
+}: {
+  label: string;
+  description: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        width: '100%',
+        padding: '15px 17px',
+        borderRadius: 17,
+        border: active
+          ? '1px solid #c18a23'
+          : '1px solid rgba(145, 100, 57, 0.2)',
+        background: active
+          ? '#f6dda8'
+          : 'rgba(255,255,255,0.72)',
+        color: '#3f3025',
+        textAlign: 'left',
+        cursor: 'pointer',
+      }}
+    >
+      <strong
+        style={{
+          display: 'block',
+          fontSize: 15,
+          fontWeight: 900,
+        }}
+      >
+        {active ? '✓ ' : ''}
+        {label}
+      </strong>
+
+         <span
+        style={{
+          display: 'block',
+          marginTop: 5,
+          color: '#786555',
+          fontSize: 13,
+          lineHeight: 1.55,
+        }}
+      >
+        {description}
+      </span>
+    </button>
+  );
 }

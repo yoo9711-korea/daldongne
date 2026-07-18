@@ -384,13 +384,15 @@ export default function BookMaterialSelector({ materials }: Props) {
       >
         
        <CreateBookDraftButton
-          disabled={!canCreate}
-          selectedMemoryIds={selectedIds}
-          targetBookId={targetBookId}
-          bookType={bookType}
-          tone={tone}
-          length={length}
-        />
+  disabled={!canCreate}
+  selectedMemoryIds={selectedIds}
+  selectedPhotoCount={selectedPhotoCount}
+  selectedStoryCount={selectedStoryCount}
+  targetBookId={targetBookId}
+  bookType={bookType}
+  tone={tone}
+  length={length}
+/>
 
       </div>
     </section>
