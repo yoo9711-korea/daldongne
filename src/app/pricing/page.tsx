@@ -850,12 +850,12 @@ export default async function PricingPage() {
   const session = await auth();
 
     const plans: readonly ProductPlan[] =
-    PRODUCT_PLANS.filter(
-      (product) =>
-        product.category === 'LIFE_BOOK' ||
-        product.category ===
-          'MONTHLY_RECORD',
-    );
+  PRODUCT_PLANS.filter(
+    (product) =>
+      product.category === 'LIFE_BOOK' ||
+      product.category === 'MONTHLY_RECORD' ||
+      product.category === 'BOOK_PUBLISHING',
+  );
 
   const isLoggedIn = Boolean(session?.user);
 
