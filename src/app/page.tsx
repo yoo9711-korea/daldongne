@@ -29,43 +29,52 @@ const processSteps = [
 
 const storybookExamples = [
   {
-    image: '/home/storybook/example-1.webp',
-    label: '엄마의 이야기',
+    image:
+      '/home/storybook/anime/anime-mother-baby.webp',
+    label: '엄마와 아기의 사랑',
   },
   {
-    image: '/home/storybook/example-2.webp',
+    image:
+      '/home/storybook/anime/anime-boy-cat.webp',
+    label: '나의 반려와 함께한 추억',
+  },
+  {
+    image:
+      '/home/storybook/anime/anime-elderly-couple.webp',
     label: '부모님의 인생 이야기',
   },
   {
-    image: '/home/storybook/example-3.webp',
-    label: '우리 가족 이야기',
-  },
-  {
-    image: '/home/storybook/example-4.webp',
-    label: '아이 성장 그림책',
+    image:
+      '/home/storybook/anime/anime-family-spring.webp',
+    label: '우리 가족의 봄날',
   },
 ];
 
 const recommendationItems = [
   {
-    image: '/home/storybook/recommend-1.webp',
-    text: '부모님께\n선물하고 싶을 때',
+    image:
+      '/home/storybook/new/home-recommend-parent.webp',
+    text: '부모님의 인생 이야기를\n선물하고 싶을 때',
   },
   {
-    image: '/home/storybook/recommend-2.webp',
-    text: '결혼기념일을\n특별한 선물로 남길 때',
+    image:
+      '/home/storybook/new/home-recommend-couple.webp',
+    text: '연인과의 추억을\n오래 간직하고 싶을 때',
   },
   {
-    image: '/home/storybook/recommend-3.webp',
+    image:
+      '/home/storybook/new/home-recommend-child.webp',
     text: '아이의 성장 과정을\n기록하고 싶을 때',
   },
   {
-    image: '/home/storybook/recommend-4.webp',
-    text: '은퇴·회갑·칠순을\n기념하고 싶을 때',
+    image:
+      '/home/storybook/new/home-recommend-pet.webp',
+    text: '반려동물과 함께한 시간을\n남기고 싶을 때',
   },
   {
-    image: '/home/storybook/recommend-5.webp',
-    text: '여행의 추억을\n오래 간직하고 싶을 때',
+    image:
+      '/home/storybook/new/home-recommend-friends.webp',
+    text: '친구와의 우정을\n특별한 선물로 만들 때',
   },
 ];
 
@@ -122,6 +131,8 @@ async function getApprovedCustomerReviews() {
 }
 
 const homeStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
+
   body:has(.storybook-home) > [role='banner'] {
     display: none !important;
   }
@@ -348,10 +359,11 @@ const homeStyles = `
   .storybook-title {
     margin: 0;
     font-family:
+  'Gamja Flower',
   'MapoFlowerIsland',
-  'Noto Serif KR',
-  serif;
-font-weight: 400;
+  cursive;
+  font-weight: 400;
+   font-synthesis: none;
     font-size: clamp(42px, 4.25vw, 62px);
     font-weight: 400;
     line-height: 1.4;
@@ -664,8 +676,10 @@ font-weight: 400;
   }
 
   .storybook-side-cta-image img {
-    object-fit: contain;
-  }
+  border-radius: 12px;
+  object-fit: cover;
+  object-position: center center;
+}
 
   .storybook-side-cta-copy h3 {
     margin: 0;
@@ -736,8 +750,10 @@ font-weight: 400;
   }
 
   .storybook-recommend-image img {
-    object-fit: contain;
-  }
+  border-radius: 10px;
+  object-fit: cover;
+  object-position: center center;
+}
 
   .storybook-recommend-card p {
     margin: 0;
@@ -769,8 +785,10 @@ font-weight: 400;
   }
 
   .storybook-bottom-cta-image img {
-    object-fit: contain;
-  }
+  border-radius: 10px;
+  object-fit: cover;
+  object-position: center center;
+}
 
   .storybook-bottom-cta h3 {
     margin: 0;
@@ -1209,9 +1227,9 @@ font-weight: 400;
     }
 
     .storybook-title {
-  font-size: clamp(43px, 2.9vw, 48px);
-  line-height: 1.32;
-  letter-spacing: -0.02em;
+  font-size: clamp(46px, 3vw, 52px);
+  line-height: 1.27;
+  letter-spacing: 0.005em;
 }
 
     .storybook-description {
@@ -1417,12 +1435,13 @@ export default async function HomePage() {
 
               <div className="storybook-hero-art">
                 <Image
-                  src="/home/storybook/hero-book.webp"
-                  alt="가족의 추억을 담은 펼쳐진 스토리북"
-                  fill
-                  priority
-                  sizes="(max-width: 930px) 100vw, 62vw"
-                />
+  src="/home/storybook/hero-vintage-desk.png"
+  alt=" 달동네 스토리북 메인 이미지"
+  fill
+  priority
+  sizes="(max-width: 1024px) 100vw, 58vw"
+  style={{ objectFit: 'cover', objectPosition: 'center center' }}
+/>
               </div>
             </div>
           </section>
@@ -1551,12 +1570,12 @@ export default async function HomePage() {
 
               <div className="storybook-side-cta">
                 <div className="storybook-side-cta-image">
-                  <Image
-                    src="/home/storybook/house.webp"
-                    alt="따뜻한 집 그림"
-                    fill
-                    sizes="132px"
-                  />
+      <Image
+          src="/home/storybook/new/home-side-cta.webp"
+          alt="반려묘와 함께 추억 사진을 바라보는 모습"
+          fill
+          sizes="132px"
+        />
                 </div>
 
                 <div className="storybook-side-cta-copy">
@@ -1596,11 +1615,11 @@ export default async function HomePage() {
               <div className="storybook-bottom-cta">
                 <div className="storybook-bottom-cta-image">
                   <Image
-                    src="/home/storybook/house.webp"
-                    alt=""
-                    fill
-                    sizes="90px"
-                  />
+  src="/home/storybook/new/home-bottom-cta.webp"
+  alt="어머니와 딸이 함께 추억 앨범을 보는 모습"
+  fill
+  sizes="90px"
+/>
                 </div>
 
                 <div>
