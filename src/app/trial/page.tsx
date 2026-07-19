@@ -802,6 +802,12 @@ const styles = `
   }
 
   @media (max-width: 560px) {
+
+    .trial-cta-image {
+     width: min(100%, 360px);
+     height: 180px;
+     margin: 0 auto;
+   }
     .trial-gallery,
     .trial-cta {
       padding-right: 16px;
@@ -870,14 +876,18 @@ const styles = `
     }
 
     .trial-cta-image {
-      width: 220px;
-      height: 104px;
-      justify-self: center;
-    }
+  position: relative;
+  width: 360px;
+  height: 150px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fffaf5;
+}
 
-    .trial-cta-title {
-      font-size: 29px;
-    }
+.trial-cta-image img {
+  object-fit: contain;
+  object-position: center center;
+}
   }
 `;
 
@@ -923,18 +933,18 @@ export default async function TrialPage({
 
       <main>
         <section className="trial-hero">
-          <div
-            className="trial-hero-decoration"
-            aria-hidden="true"
-          >
-            <Image
-              src="/home/storybook/hero-left.webp"
-              alt=""
-              fill
-              priority
-              sizes="195px"
-            />
-          </div>
+          <div className="trial-cta-image">
+  <Image
+    src="/home/storybook/detail-hero.webp"
+    alt="사진과 이야기가 담긴 따뜻한 스토리북"
+    fill
+    sizes="(max-width: 560px) 100vw, 360px"
+    style={{
+      objectFit: 'contain',
+      objectPosition: 'center center',
+    }}
+  />
+</div>
 
           <div className="trial-hero-image">
             <Image
