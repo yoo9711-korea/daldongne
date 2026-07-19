@@ -889,6 +889,51 @@ const styles = `
   object-position: center center;
 }
   }
+
+  }
+
+  /* 작품소개 페이지 이미지 표시 보정 */
+
+  .trial-hero-decoration {
+    display: none;
+  }
+
+  .trial-hero-inner {
+    padding-left:
+      clamp(80px, 10vw, 150px);
+  }
+
+  .trial-cta-image {
+    position: relative;
+    width: 360px;
+    height: 150px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #f8eee3;
+    box-shadow:
+      0 8px 22px
+      rgba(87, 56, 39, 0.08);
+  }
+
+  .trial-cta-image img {
+    object-fit: cover;
+    object-position: center 55%;
+  }
+
+  @media (max-width: 860px) {
+    .trial-hero-inner {
+      padding-left: 22px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .trial-cta-image {
+      width: min(100%, 360px);
+      height: 160px;
+      margin: 0 auto;
+    }
+  }
+
 `;
 
 export default async function TrialPage({
@@ -932,21 +977,8 @@ export default async function TrialPage({
       />
 
       <main>
-        <section className="trial-hero">
-          <div className="trial-cta-image">
-  <Image
-    src="/home/storybook/detail-hero.webp"
-    alt="사진과 이야기가 담긴 따뜻한 스토리북"
-    fill
-    sizes="(max-width: 560px) 100vw, 360px"
-    style={{
-      objectFit: 'contain',
-      objectPosition: 'center center',
-    }}
-  />
-</div>
-
-          <div className="trial-hero-image">
+         <section className="trial-hero">
+           <div className="trial-hero-image">
             <Image
               src="/home/storybook/hero-book.webp"
               alt="가족의 기억을 담은 달동네 스토리북"
@@ -1163,13 +1195,13 @@ export default async function TrialPage({
         <section className="trial-cta">
           <div className="trial-cta-inner">
             <div className="trial-cta-image">
-              <Image
-                src="/home/storybook/hero-left.webp"
-                alt="꽃과 추억 사진이 놓인 책상"
-                fill
-                sizes="315px"
-              />
-            </div>
+  <Image
+    src="/home/storybook/hero-book.webp"
+    alt="사진과 이야기가 담긴 따뜻한 스토리북"
+    fill
+    sizes="(max-width: 560px) 100vw, 315px"
+  />
+</div>
 
             <div className="trial-cta-copy">
               <h2 className="trial-cta-title">
