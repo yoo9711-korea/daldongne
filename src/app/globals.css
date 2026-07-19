@@ -2,6 +2,7 @@
 /* 기존 정적 사이트(assets/style.css)와 동일한 디자인 토큰을 사용합니다.
    색상/폰트/헤더/버튼 스타일을 그대로 이식해, Next.js로 전환되어도
    "출판사 감성"이 끊기지 않게 합니다. */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700;800;900&display=swap');
 
 :root {
   --paper: #F8F1E2;
@@ -17,7 +18,7 @@
   --wine: #6E2A36;
 
   --font-display: 'Noto Serif KR', serif;
-  --font-body: 'Noto Sans KR', sans-serif;
+  --font-body: 'Noto Serif KR', serif;
   --font-mono: 'IBM Plex Mono', monospace;
 
   --container: 1180px;
@@ -1824,4 +1825,24 @@ body > footer {
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+}
+
+/* 모든 페이지 헤더와 메인 글씨체 통일 */
+header,
+header *,
+main,
+main * {
+  font-family: 'Noto Serif KR', serif !important;
+}
+
+/* 버튼과 입력창도 동일한 글씨체 적용 */
+header button,
+header input,
+header select,
+header textarea,
+main button,
+main input,
+main select,
+main textarea {
+  font-family: 'Noto Serif KR', serif !important;
 }
