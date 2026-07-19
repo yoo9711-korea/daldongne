@@ -266,6 +266,16 @@ const homeStyles = `
     transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
   }
 
+.storybook-header-actions {
+  gap: 6px;
+}
+
+.storybook-login-link {
+  min-height: 40px;
+  padding: 0 11px;
+  font-size: 12px;
+}
+
   .storybook-header-cta {
     min-height: 46px;
     padding: 0 24px;
@@ -504,15 +514,15 @@ const homeStyles = `
     border-left: 1px solid rgba(133, 91, 69, 0.12);
   }
 
-  .storybook-section-title {
-    margin: 0 0 20px;
-    font-family: 'Gowun Batang', serif;
-    font-size: clamp(22px, 2.1vw, 28px);
-    font-weight: 700;
-    line-height: 1.4;
-    text-align: center;
-    letter-spacing: -0.04em;
-  }
+ .storybook-section-title {
+  margin: 0;
+  color: #4d392f;
+  font-family: "Gamja Flower", "MapoFlowerIsland", cursive;
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1.3;
+  text-align: center;
+}
 
   .storybook-section-title span {
     color: var(--storybook-coral);
@@ -886,8 +896,39 @@ const homeStyles = `
 
     .storybook-nav,
     .storybook-admin-link {
-      display: none;
-    }
+  color: #8a6d60;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.storybook-login-link {
+  min-height: 42px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e6b49d;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #8b5847;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.storybook-login-link:hover {
+  transform: translateY(-2px);
+  border-color: #df9278;
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(137, 84, 64, 0.12);
+}
 
     .storybook-logo {
       font-size: 25px;
@@ -1359,16 +1400,33 @@ export default async function HomePage() {
             </nav>
 
             <div className="storybook-header-actions">
-              {isAdmin ? (
-                <Link href="/admin" className="storybook-admin-link">
-                  관리자
-                </Link>
-              ) : null}
+  {isAdmin ? (
+    <Link
+      href="/admin"
+      className="storybook-admin-link"
+    >
+      관리자
+    </Link>
+  ) : null}
 
-              <Link href={startHref} className="storybook-header-cta">
-               스토리북 만들기
-              </Link>
-            </div>
+  {!session?.user ? (
+    <Link
+      href="/login?callbackUrl=/dashboard"
+      className="storybook-login-link"
+    >
+      로그인
+    </Link>
+  ) : null}
+
+  <Link
+    href={startHref}
+    className="storybook-header-cta"
+  >
+    {session?.user
+      ? '내 스토리북 열기'
+      : '스토리북 만들기'}
+  </Link>
+</div>
           </div>
 
           <nav className="storybook-mobile-nav" aria-label="모바일 메인 메뉴">
