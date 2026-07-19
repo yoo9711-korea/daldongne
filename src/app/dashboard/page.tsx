@@ -333,16 +333,18 @@ export default async function DashboardPage() {
             borderRadius: 34,
             padding: 38,
             background:
-              'linear-gradient(135deg, #33271d 0%, #5b422c 52%, #8a6238 100%)',
-            color: '#fff8ec',
-            boxShadow:
-              '0 22px 60px rgba(51, 39, 29, 0.18)',
+           'linear-gradient(135deg, #fff8f2 0%, #fffdf9 52%, #fff2e8 100%)',
+           color: '#49362c',
+           border:
+           '1px solid rgba(221, 153, 119, 0.24)',
+         boxShadow:
+         '0 18px 45px rgba(177, 105, 72, 0.08)',
           }}
         >
           <p
             style={{
               margin: '0 0 13px',
-              color: '#f0c36a',
+              color: '#df765b',
               fontSize: 13,
               fontWeight: 900,
               letterSpacing: '0.08em',
@@ -369,15 +371,14 @@ export default async function DashboardPage() {
           </h1>
 
           <p
-            style={{
-              margin: '22px 0 0',
-              maxWidth: 800,
-              fontSize: 18,
-              lineHeight: 1.8,
-              color:
-                'rgba(255, 248, 236, 0.86)',
-            }}
-          >
+  style={{
+    margin: '19px 0 0',
+    maxWidth: 800,
+    fontSize: 18,
+    lineHeight: 1.8,
+    color: '#725c50',
+  }}
+>
             완성된 원고가 없어도 괜찮습니다.
             사진을 먼저 모으고, 기억나는 이야기를
             하나씩 남기면 달동네가 책의 흐름으로
@@ -390,9 +391,9 @@ export default async function DashboardPage() {
               padding: '18px 20px',
               borderRadius: 20,
               border:
-                '1px solid rgba(255,255,255,0.2)',
+             '1px solid rgba(222, 155, 124, 0.22)',
               background:
-                'rgba(255,255,255,0.08)',
+             'rgba(255,255,255,0.72)',
             }}
           >
             <p
@@ -420,8 +421,7 @@ export default async function DashboardPage() {
             <p
               style={{
                 margin: '6px 0 0',
-                color:
-                  'rgba(255, 248, 236, 0.75)',
+                color: '#80695d',
                 fontSize: 14,
                 lineHeight: 1.7,
               }}
@@ -641,11 +641,11 @@ export default async function DashboardPage() {
             style={{
               padding: 28,
               borderRadius: 30,
-              background: '#fffaf1',
+              background: '#ffffff',
               border:
                 '1px solid rgba(91, 66, 43, 0.12)',
               boxShadow:
-                '0 12px 30px rgba(91, 66, 43, 0.08)',
+                '0 14px 34px rgba(145, 88, 55, 0.06)',
             }}
           >
             <div
@@ -816,11 +816,12 @@ export default async function DashboardPage() {
             style={{
               padding: 28,
               borderRadius: 30,
-              background: '#f4ead8',
+              background:
+             'linear-gradient(145deg, #fff9f4, #ffffff)',
               border:
-                '1px solid rgba(91, 66, 43, 0.12)',
-              boxShadow:
-                '0 12px 30px rgba(91, 66, 43, 0.08)',
+            '1px solid rgba(216, 147, 111, 0.18)',
+            boxShadow:
+           '0 14px 34px rgba(151, 89, 56, 0.07)',
             }}
           >
             <p
@@ -1226,8 +1227,11 @@ function heroPrimaryButtonStyle(): CSSProperties {
     minHeight: 46,
     padding: '0 21px',
     borderRadius: 999,
-    background: '#f0c36a',
-    color: '#2b2118',
+    background:
+    'linear-gradient(135deg, #f28b70, #e97861)',
+    color: '#ffffff',
+    boxShadow:
+    '0 10px 24px rgba(222, 105, 78, 0.18)',
     fontSize: 14,
     fontWeight: 900,
     textDecoration: 'none',
@@ -1244,9 +1248,9 @@ function heroSecondaryButtonStyle(): CSSProperties {
     padding: '0 21px',
     borderRadius: 999,
     border:
-      '1px solid rgba(255,255,255,0.42)',
-    background: 'transparent',
-    color: '#fff8ec',
+    '1px solid rgba(205, 126, 91, 0.32)',
+   background: '#ffffff',
+    color: '#a45f47',
     fontSize: 14,
     fontWeight: 900,
     textDecoration: 'none',
@@ -1262,8 +1266,10 @@ function stepButtonStyle(): CSSProperties {
     minHeight: 38,
     padding: '0 14px',
     borderRadius: 999,
-    background: '#33271d',
-    color: '#fff8ec',
+    background: '#fff0e9',
+    color: '#a75b46',
+   border:
+   '1px solid rgba(211, 124, 88, 0.22)',
     fontSize: 12,
     fontWeight: 900,
     textDecoration: 'none',
@@ -1335,9 +1341,11 @@ function sideLinkStyle(): CSSProperties {
 function adminLinkStyle(): CSSProperties {
   return {
     ...sideLinkStyle(),
-    background: '#33271d',
-    color: '#fff8ec',
-    border: '1px solid #33271d',
+    background:
+    'linear-gradient(135deg, #6f5144, #8b6858)',
+    color: '#ffffff',
+    border:
+    '1px solid rgba(111, 81, 68, 0.2)',
   };
 }
 

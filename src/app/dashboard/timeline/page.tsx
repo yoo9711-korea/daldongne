@@ -121,6 +121,173 @@ export default async function TimelinePage() {
       }}
     >
       <style>{`
+               .photo-page-main {
+          min-height: 100vh;
+          color: #4a352b;
+        }
+
+        .photo-hero {
+          position: relative;
+          overflow: hidden;
+          background:
+            radial-gradient(
+              circle at 90% 5%,
+              rgba(255, 209, 188, 0.56),
+              transparent 24rem
+            ),
+            radial-gradient(
+              circle at 5% 100%,
+              rgba(255, 240, 196, 0.5),
+              transparent 22rem
+            ),
+            linear-gradient(
+              135deg,
+              #fff8f3 0%,
+              #ffffff 52%,
+              #fff1e8 100%
+            ) !important;
+          color: #4a352b !important;
+          border:
+            1px solid rgba(218, 143, 108, 0.22) !important;
+          box-shadow:
+            0 18px 48px
+            rgba(156, 91, 58, 0.08) !important;
+        }
+
+        .photo-hero h1,
+        .photo-hero strong {
+          color: #49352b !important;
+        }
+
+        .photo-hero > p:first-of-type {
+          color: #dd765b !important;
+        }
+
+        .photo-hero > p:not(:first-of-type) {
+          color: #725d52 !important;
+        }
+
+        .photo-hero > div:not(.photo-hero-actions) {
+          border:
+            1px solid rgba(218, 143, 108, 0.2) !important;
+          background:
+            rgba(255, 255, 255, 0.76) !important;
+          box-shadow:
+            0 10px 26px
+            rgba(147, 87, 55, 0.045);
+        }
+
+        .photo-hero
+        > div:not(.photo-hero-actions)
+        p {
+          color: #80685c !important;
+        }
+
+        .photo-hero
+        > div:not(.photo-hero-actions)
+        p:first-child {
+          color: #d56f55 !important;
+        }
+
+        .photo-hero-actions a {
+          border:
+            1px solid rgba(210, 126, 90, 0.3) !important;
+          background: #ffffff !important;
+          color: #a65f48 !important;
+          box-shadow:
+            0 9px 22px
+            rgba(181, 104, 71, 0.08);
+        }
+
+        .photo-hero-actions a:first-child {
+          border-color: transparent !important;
+          background:
+            linear-gradient(
+              135deg,
+              #f49378,
+              #e97861
+            ) !important;
+          color: #ffffff !important;
+          box-shadow:
+            0 11px 25px
+            rgba(220, 104, 77, 0.2);
+        }
+
+        .photo-upload-section,
+        .photo-tip-section,
+        .photo-list-section {
+          background: #ffffff !important;
+          border:
+            1px solid rgba(196, 139, 108, 0.18) !important;
+          box-shadow:
+            0 14px 34px
+            rgba(132, 79, 48, 0.055) !important;
+        }
+
+        .photo-page-main article {
+          background: #ffffff !important;
+          border-color:
+            rgba(191, 137, 106, 0.18) !important;
+          box-shadow:
+            0 12px 28px
+            rgba(127, 76, 47, 0.05) !important;
+        }
+
+        .photo-page-main h2,
+        .photo-page-main h3 {
+          color: #49352b !important;
+        }
+
+        .photo-page-main
+        section:not(.photo-hero)
+        > p:first-child,
+        .photo-upload-section
+        > p:first-child,
+        .photo-list-section
+        > p:first-child {
+          color: #d67358 !important;
+        }
+
+        #photo-upload input,
+        #photo-upload textarea,
+        #photo-upload select {
+          border:
+            1px solid rgba(192, 139, 108, 0.28) !important;
+          background: #fffdfb !important;
+          color: #49352b !important;
+          box-shadow: none !important;
+        }
+
+        #photo-upload input:focus,
+        #photo-upload textarea:focus,
+        #photo-upload select:focus {
+          border-color: #e68a6f !important;
+          outline:
+            3px solid rgba(230, 138, 111, 0.12) !important;
+        }
+
+        #photo-upload button {
+          border-color: transparent !important;
+          background:
+            linear-gradient(
+              135deg,
+              #f49378,
+              #e97861
+            ) !important;
+          color: #ffffff !important;
+          box-shadow:
+            0 10px 24px
+            rgba(220, 104, 77, 0.18) !important;
+        }
+
+        .photo-card-image {
+          background: #fff5ef !important;
+        }
+
+        .photo-card-status span {
+          border:
+            1px solid rgba(203, 148, 115, 0.16);
+        }
         .photo-page-container {
           max-width: 1380px;
           margin: 0 auto;

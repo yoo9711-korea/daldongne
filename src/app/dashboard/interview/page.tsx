@@ -147,6 +147,190 @@ export default async function InterviewPage() {
       style={gridPaperPageStyle()}
     >
       <style>{`
+                .story-page-main {
+          min-height: 100vh;
+          color: #4a352b;
+          background-color: #fffdf9 !important;
+          background-image:
+            linear-gradient(
+              rgba(220, 167, 136, 0.035) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(220, 167, 136, 0.035) 1px,
+              transparent 1px
+            ) !important;
+          background-size: 32px 32px !important;
+        }
+
+        .story-hero {
+          position: relative;
+          overflow: hidden;
+          background:
+            radial-gradient(
+              circle at 90% 5%,
+              rgba(255, 211, 191, 0.58),
+              transparent 25rem
+            ),
+            radial-gradient(
+              circle at 5% 100%,
+              rgba(255, 241, 203, 0.52),
+              transparent 22rem
+            ),
+            linear-gradient(
+              135deg,
+              #fff8f3 0%,
+              #ffffff 52%,
+              #fff1e8 100%
+            ) !important;
+          color: #49352b !important;
+          border:
+            1px solid rgba(218, 143, 108, 0.22) !important;
+          box-shadow:
+            0 18px 48px
+            rgba(156, 91, 58, 0.08) !important;
+        }
+
+        .story-hero h1,
+        .story-hero strong {
+          color: #49352b !important;
+        }
+
+        .story-hero > p:first-of-type {
+          color: #dd765b !important;
+        }
+
+        .story-hero > p:not(:first-of-type) {
+          color: #725d52 !important;
+        }
+
+        .story-hero
+        > div:not(.story-hero-actions) {
+          border:
+            1px solid rgba(218, 143, 108, 0.2) !important;
+          background:
+            rgba(255, 255, 255, 0.78) !important;
+          box-shadow:
+            0 10px 26px
+            rgba(147, 87, 55, 0.045);
+        }
+
+        .story-hero
+        > div:not(.story-hero-actions)
+        p {
+          color: #80685c !important;
+        }
+
+        .story-hero
+        > div:not(.story-hero-actions)
+        p:first-child {
+          color: #d56f55 !important;
+        }
+
+        .story-hero-actions a {
+          border:
+            1px solid rgba(210, 126, 90, 0.3) !important;
+          background: #ffffff !important;
+          color: #a65f48 !important;
+          box-shadow:
+            0 9px 22px
+            rgba(181, 104, 71, 0.08);
+        }
+
+        .story-hero-actions a:first-child {
+          border-color: transparent !important;
+          background:
+            linear-gradient(
+              135deg,
+              #f49378,
+              #e97861
+            ) !important;
+          color: #ffffff !important;
+          box-shadow:
+            0 11px 25px
+            rgba(220, 104, 77, 0.2);
+        }
+
+        .story-section {
+          background: #ffffff !important;
+          border:
+            1px solid rgba(196, 139, 108, 0.18) !important;
+          box-shadow:
+            0 14px 34px
+            rgba(132, 79, 48, 0.055) !important;
+        }
+
+        .story-section > div > p:first-child,
+        .story-section > p:first-child {
+          color: #d67358 !important;
+        }
+
+        .story-section h2,
+        .story-section h3 {
+          color: #49352b !important;
+        }
+
+        .story-section input,
+        .story-section textarea,
+        .story-section select {
+          border:
+            1px solid rgba(192, 139, 108, 0.28) !important;
+          background: #fffdfb !important;
+          color: #49352b !important;
+          box-shadow: none !important;
+        }
+
+        .story-section input:focus,
+        .story-section textarea:focus,
+        .story-section select:focus {
+          border-color: #e68a6f !important;
+          outline:
+            3px solid rgba(230, 138, 111, 0.12) !important;
+        }
+
+        .story-section button {
+          border-color: transparent !important;
+          background:
+            linear-gradient(
+              135deg,
+              #f49378,
+              #e97861
+            ) !important;
+          color: #ffffff !important;
+          box-shadow:
+            0 10px 24px
+            rgba(220, 104, 77, 0.18) !important;
+        }
+
+        .story-section article {
+          background: #ffffff !important;
+          border-color:
+            rgba(191, 137, 106, 0.19) !important;
+          box-shadow:
+            0 12px 28px
+            rgba(127, 76, 47, 0.05) !important;
+        }
+
+        .story-photo-image {
+          background: #fff4ed !important;
+        }
+
+        .story-photo-grid article h3 {
+          color: #49352b !important;
+        }
+
+        .story-photo-grid article p {
+          color: #725d52;
+        }
+
+        .story-page-main
+        section:not(.story-hero)
+        > div
+        > span {
+          background: #fff1ea !important;
+          color: #a85f48 !important;
+        }
         .story-page-container {
           width: 100%;
           max-width: 1380px;
