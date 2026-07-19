@@ -439,18 +439,19 @@ const styles = `
   }
 
   .pricing-group-tag {
-    display: inline-flex;
-    min-height: 27px;
-    padding: 0 12px;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #dcad73;
-    border-radius: 999px;
-    color: #8a5a28;
-    background: rgba(255, 255, 255, 0.72);
-    font-size: 11px;
-    font-weight: 900;
-  }
+  display: inline-flex;
+  min-height: 36px;
+  padding: 0 16px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dcad73;
+  border-radius: 999px;
+  color: #8a5a28;
+  background: rgba(255, 255, 255, 0.72);
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
 
   .is-single-book .pricing-group-tag {
     border-color: #ed9e87;
@@ -618,11 +619,13 @@ const styles = `
   }
 
   .pricing-lower-grid {
-    margin-top: 32px;
-    display: grid;
-    grid-template-columns: minmax(0, 1.85fr) minmax(310px, 0.65fr);
-    gap: 34px;
-  }
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.7fr)
+    minmax(372px, 0.8fr);
+  gap: 34px;
+}
 
   .pricing-section-title {
     margin: 0;
@@ -693,41 +696,41 @@ const styles = `
   }
 
   .pricing-recommend-grid {
-    margin-top: 12px;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-  }
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
 
-  .pricing-recommend-card {
-    min-width: 0;
-    min-height: 123px;
-    padding: 12px 8px;
-    display: grid;
-    place-items: center;
-    border: 1px solid rgba(137, 94, 68, 0.12);
-    border-radius: 13px;
-    background: #ffffff;
-    text-align: center;
-    box-shadow: 0 7px 18px rgba(87, 56, 39, 0.05);
-  }
+.pricing-recommend-card {
+  min-width: 0;
+  min-height: 148px;
+  padding: 14px 10px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(137, 94, 68, 0.12);
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 8px 22px rgba(87, 56, 39, 0.07);
+}
 
-  .pricing-recommend-image {
-    position: relative;
-    width: 62px;
-    height: 62px;
-  }
+.pricing-recommend-image {
+  position: relative;
+  width: 74px;
+  height: 74px;
+}
 
-  .pricing-recommend-image img {
-    object-fit: contain;
-  }
+.pricing-recommend-image img {
+  object-fit: contain;
+}
 
-  .pricing-recommend-card strong {
-    color: #4d3a31;
-    font-size: 10px;
-    line-height: 1.45;
-    word-break: keep-all;
-  }
+.pricing-recommend-card strong {
+  color: #4d3a31;
+  font-size: 12px;
+  line-height: 1.45;
+  word-break: keep-all;
+}
 
   .pricing-notice {
     margin-top: 22px;

@@ -515,13 +515,14 @@ const homeStyles = `
   }
 
  .storybook-section-title {
-  margin: 0;
-  color: #4d392f;
-  font-family: "Gamja Flower", "MapoFlowerIsland", cursive;
-  font-size: 23px;
-  font-weight: 400;
-  line-height: 1.3;
+  margin: 0 0 24px;
+  font-family: 'Gowun Batang', serif;
+  font-size: clamp(29px, 2.73vw, 36px);
+  font-weight: 700;
+  line-height: 1.35;
   text-align: center;
+  letter-spacing: -0.04em;
+  word-break: keep-all;
 }
 
   .storybook-section-title span {
