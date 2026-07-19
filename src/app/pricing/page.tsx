@@ -12,14 +12,9 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-const PRODUCT_IMAGES: Record<
-  ProductPlanCode,
-  string
-> = {
-  LIFE_BOOK_BASIC:
-    '/home/storybook/example-1.webp',
-  MONTHLY_RECORD_BASIC:
-    '/home/storybook/example-2.webp',
+const PRODUCT_IMAGES: Record<ProductPlanCode, string> = {
+  LIFE_BOOK_BASIC: '/home/storybook/example-1.webp',
+  MONTHLY_RECORD_BASIC: '/home/storybook/example-2.webp',
   MONTHLY_RECORD_QUARTERLY_POSTCARD:
     '/home/storybook/example-3.webp',
   MONTHLY_RECORD_MONTHLY_POSTCARD:
@@ -72,44 +67,25 @@ const COMPARISON_ROWS: readonly ComparisonRow[] = [
     values: {
       LIFE_BOOK_BASIC: '한 번 결제',
       MONTHLY_RECORD_BASIC: '매월 결제',
-      MONTHLY_RECORD_QUARTERLY_POSTCARD:
-        '매월 결제',
-      MONTHLY_RECORD_MONTHLY_POSTCARD:
-        '매월 결제',
+      MONTHLY_RECORD_QUARTERLY_POSTCARD: '매월 결제',
+      MONTHLY_RECORD_MONTHLY_POSTCARD: '매월 결제',
       MONTHLY_RECORD_PREMIUM: '매월 결제',
-      BOOK_PUBLISHING_BASIC: '-',
-      BOOK_PUBLISHING_STANDARD: '-',
-      BOOK_PUBLISHING_PREMIUM: '-',
+      BOOK_PUBLISHING_BASIC: '한 번 결제',
+      BOOK_PUBLISHING_STANDARD: '한 번 결제',
+      BOOK_PUBLISHING_PREMIUM: '한 번 결제',
     },
   },
   {
-    label: '사진·이야기 정리',
+    label: '기록 방식',
     values: {
-      LIFE_BOOK_BASIC: '포함',
-      MONTHLY_RECORD_BASIC: '포함',
-      MONTHLY_RECORD_QUARTERLY_POSTCARD:
-        '포함',
-      MONTHLY_RECORD_MONTHLY_POSTCARD:
-        '포함',
-      MONTHLY_RECORD_PREMIUM: '포함',
-      BOOK_PUBLISHING_BASIC: '-',
-      BOOK_PUBLISHING_STANDARD: '-',
-      BOOK_PUBLISHING_PREMIUM: '-',
-    },
-  },
-  {
-    label: 'AI 글 다듬기',
-    values: {
-      LIFE_BOOK_BASIC: '포함',
-      MONTHLY_RECORD_BASIC: '포함',
-      MONTHLY_RECORD_QUARTERLY_POSTCARD:
-        '포함',
-      MONTHLY_RECORD_MONTHLY_POSTCARD:
-        '포함',
-      MONTHLY_RECORD_PREMIUM: '포함',
-      BOOK_PUBLISHING_BASIC: '-',
-      BOOK_PUBLISHING_STANDARD: '-',
-      BOOK_PUBLISHING_PREMIUM: '-',
+      LIFE_BOOK_BASIC: '사진·이야기 정리',
+      MONTHLY_RECORD_BASIC: '매달 기록',
+      MONTHLY_RECORD_QUARTERLY_POSTCARD: '매달 기록',
+      MONTHLY_RECORD_MONTHLY_POSTCARD: '매달 기록',
+      MONTHLY_RECORD_PREMIUM: '매달 기록',
+      BOOK_PUBLISHING_BASIC: '준비된 원고 제작',
+      BOOK_PUBLISHING_STANDARD: '준비된 원고 제작',
+      BOOK_PUBLISHING_PREMIUM: '준비된 원고 제작',
     },
   },
   {
@@ -117,61 +93,77 @@ const COMPARISON_ROWS: readonly ComparisonRow[] = [
     values: {
       LIFE_BOOK_BASIC: '없음',
       MONTHLY_RECORD_BASIC: '없음',
-      MONTHLY_RECORD_QUARTERLY_POSTCARD:
-        '분기별 1회',
-      MONTHLY_RECORD_MONTHLY_POSTCARD:
-        '매월 1회',
+      MONTHLY_RECORD_QUARTERLY_POSTCARD: '분기별 1회',
+      MONTHLY_RECORD_MONTHLY_POSTCARD: '매월 1회',
       MONTHLY_RECORD_PREMIUM: '매월 1회',
-      BOOK_PUBLISHING_BASIC: '-',
-      BOOK_PUBLISHING_STANDARD: '-',
-      BOOK_PUBLISHING_PREMIUM: '-',
+      BOOK_PUBLISHING_BASIC: '없음',
+      BOOK_PUBLISHING_STANDARD: '없음',
+      BOOK_PUBLISHING_PREMIUM: '없음',
     },
   },
   {
-    label: '사람 원고 검수',
+    label: '내지 인쇄',
     values: {
-      LIFE_BOOK_BASIC: '선택 옵션',
-      MONTHLY_RECORD_BASIC: '없음',
-      MONTHLY_RECORD_QUARTERLY_POSTCARD:
-        '없음',
-      MONTHLY_RECORD_MONTHLY_POSTCARD:
-        '없음',
-      MONTHLY_RECORD_PREMIUM: '포함',
-      BOOK_PUBLISHING_BASIC: '-',
-      BOOK_PUBLISHING_STANDARD: '-',
-      BOOK_PUBLISHING_PREMIUM: '-',
+      LIFE_BOOK_BASIC: '기본 사양',
+      MONTHLY_RECORD_BASIC: '기본 사양',
+      MONTHLY_RECORD_QUARTERLY_POSTCARD: '기본 사양',
+      MONTHLY_RECORD_MONTHLY_POSTCARD: '기본 사양',
+      MONTHLY_RECORD_PREMIUM: '기본 사양',
+      BOOK_PUBLISHING_BASIC: '흑백',
+      BOOK_PUBLISHING_STANDARD: '컬러',
+      BOOK_PUBLISHING_PREMIUM: '컬러',
     },
   },
   {
-    label: '책 제작',
+    label: '기본 규격',
     values: {
-      LIFE_BOOK_BASIC: '기본 책 1권',
-      MONTHLY_RECORD_BASIC:
-        '12개월 후 1권',
-      MONTHLY_RECORD_QUARTERLY_POSTCARD:
-        '12개월 후 1권',
-      MONTHLY_RECORD_MONTHLY_POSTCARD:
-        '12개월 후 1권',
-      MONTHLY_RECORD_PREMIUM:
-        '12개월 후 1권',
-      BOOK_PUBLISHING_BASIC: '-',
-      BOOK_PUBLISHING_STANDARD: '-',
-      BOOK_PUBLISHING_PREMIUM: '-',
+      LIFE_BOOK_BASIC: '기본 규격',
+      MONTHLY_RECORD_BASIC: '기본 규격',
+      MONTHLY_RECORD_QUARTERLY_POSTCARD: '기본 규격',
+      MONTHLY_RECORD_MONTHLY_POSTCARD: '기본 규격',
+      MONTHLY_RECORD_PREMIUM: '기본 규격',
+      BOOK_PUBLISHING_BASIC: 'A5',
+      BOOK_PUBLISHING_STANDARD: 'A5',
+      BOOK_PUBLISHING_PREMIUM: 'A5',
     },
   },
   {
-    label: '인쇄·택배',
+    label: '페이지',
     values: {
-      LIFE_BOOK_BASIC: '기본 포함',
-      MONTHLY_RECORD_BASIC: '기본 포함',
-      MONTHLY_RECORD_QUARTERLY_POSTCARD:
-        '기본 포함',
-      MONTHLY_RECORD_MONTHLY_POSTCARD:
-        '기본 포함',
-      MONTHLY_RECORD_PREMIUM: '기본 포함',
-      BOOK_PUBLISHING_BASIC: '-',
-      BOOK_PUBLISHING_STANDARD: '-',
-      BOOK_PUBLISHING_PREMIUM: '-',
+      LIFE_BOOK_BASIC: '50~80페이지',
+      MONTHLY_RECORD_BASIC: '12개월 후 제작',
+      MONTHLY_RECORD_QUARTERLY_POSTCARD: '12개월 후 제작',
+      MONTHLY_RECORD_MONTHLY_POSTCARD: '12개월 후 제작',
+      MONTHLY_RECORD_PREMIUM: '12개월 후 제작',
+      BOOK_PUBLISHING_BASIC: '50페이지 이하',
+      BOOK_PUBLISHING_STANDARD: '50페이지 이하',
+      BOOK_PUBLISHING_PREMIUM: '100페이지 이하',
+    },
+  },
+  {
+    label: '표지',
+    values: {
+      LIFE_BOOK_BASIC: '소프트커버',
+      MONTHLY_RECORD_BASIC: '기본 표지',
+      MONTHLY_RECORD_QUARTERLY_POSTCARD: '기본 표지',
+      MONTHLY_RECORD_MONTHLY_POSTCARD: '기본 표지',
+      MONTHLY_RECORD_PREMIUM: '기본 표지',
+      BOOK_PUBLISHING_BASIC: '소프트커버',
+      BOOK_PUBLISHING_STANDARD: '소프트커버',
+      BOOK_PUBLISHING_PREMIUM: '하드커버',
+    },
+  },
+  {
+    label: 'PDF',
+    values: {
+      LIFE_BOOK_BASIC: '포함',
+      MONTHLY_RECORD_BASIC: '책 제작 시 포함',
+      MONTHLY_RECORD_QUARTERLY_POSTCARD: '책 제작 시 포함',
+      MONTHLY_RECORD_MONTHLY_POSTCARD: '책 제작 시 포함',
+      MONTHLY_RECORD_PREMIUM: '책 제작 시 포함',
+      BOOK_PUBLISHING_BASIC: '포함',
+      BOOK_PUBLISHING_STANDARD: '포함',
+      BOOK_PUBLISHING_PREMIUM: '포함',
     },
   },
 ];
@@ -180,14 +172,9 @@ function createProductHref(
   product: ProductPlan,
   isLoggedIn: boolean,
 ) {
-  const destination =
-    product.category === 'LIFE_BOOK'
-      ? `/dashboard/library?product=${encodeURIComponent(
-          product.code,
-        )}`
-      : `/apply?product=${encodeURIComponent(
-          product.code,
-        )}`;
+  const destination = `/apply?product=${encodeURIComponent(
+    product.code,
+  )}`;
 
   if (isLoggedIn) {
     return destination;
@@ -196,6 +183,80 @@ function createProductHref(
   return `/login?callbackUrl=${encodeURIComponent(
     destination,
   )}`;
+}
+
+function ProductCard({
+  product,
+  index,
+  isLoggedIn,
+}: {
+  product: ProductPlan;
+  index: number;
+  isLoggedIn: boolean;
+}) {
+  return (
+    <article
+      className={[
+        'pricing-plan-card',
+        product.recommended ? 'is-recommended' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <div className="pricing-plan-topline">
+        <span className="pricing-plan-number">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+
+        <h3>{product.shortName}</h3>
+
+        {product.badge ? (
+          <span className="pricing-plan-badge">
+            {product.badge}
+          </span>
+        ) : null}
+      </div>
+
+      <div className="pricing-plan-body">
+        <div>
+          <p className="pricing-plan-description">
+            {product.description}
+          </p>
+
+          <p className="pricing-plan-feature">
+            {product.included.slice(0, 3).join(' · ')}
+          </p>
+        </div>
+
+        <div className="pricing-plan-image">
+          <Image
+            src={PRODUCT_IMAGES[product.code]}
+            alt={product.name}
+            fill
+            sizes="150px"
+          />
+        </div>
+      </div>
+
+      <strong className="pricing-plan-price">
+        {formatProductPrice(
+          product.price,
+          product.priceSuffix,
+        )}
+      </strong>
+
+      <span className="pricing-plan-billing">
+        {PRODUCT_BILLING_LABELS[product.billingType]}
+      </span>
+
+      <Link
+        href={createProductHref(product, isLoggedIn)}
+        className="pricing-card-button"
+      >
+        {product.ctaLabel}&nbsp; →
+      </Link>
+    </article>
+  );
 }
 
 const styles = `
@@ -210,8 +271,6 @@ const styles = `
     --pricing-ink: #4a3125;
     --pricing-soft: #725e52;
     --pricing-coral: #e97861;
-    --pricing-coral-dark: #d6604b;
-    --pricing-line: rgba(126, 86, 63, 0.15);
     width: 100%;
     min-height: 100vh;
     overflow-x: clip;
@@ -267,10 +326,7 @@ const styles = `
     width: min(1480px, 100%);
     min-height: 310px;
     margin: 0 auto;
-    padding:
-      42px
-      clamp(24px, 4vw, 62px)
-      39px
+    padding: 42px clamp(24px, 4vw, 62px) 39px
       clamp(185px, 14vw, 220px);
     display: flex;
     align-items: center;
@@ -283,10 +339,7 @@ const styles = `
   .pricing-hand-title,
   .pricing-section-title,
   .pricing-cta-title {
-    font-family:
-      'Gamja Flower',
-      'MapoFlowerIsland',
-      cursive;
+    font-family: 'Gamja Flower', 'MapoFlowerIsland', cursive;
     font-weight: 400;
     letter-spacing: 0.015em;
   }
@@ -322,9 +375,7 @@ const styles = `
     border-radius: 999px;
     font-weight: 900;
     text-decoration: none;
-    transition:
-      transform 160ms ease,
-      box-shadow 160ms ease;
+    transition: transform 160ms ease, box-shadow 160ms ease;
   }
 
   .pricing-primary-button {
@@ -333,15 +384,8 @@ const styles = `
     padding: 0 26px;
     border: 1px solid #e4735c;
     color: #ffffff !important;
-    background:
-      linear-gradient(
-        135deg,
-        #ee8b70,
-        #e56d55
-      );
-    box-shadow:
-      0 11px 25px
-      rgba(210, 97, 73, 0.2);
+    background: linear-gradient(135deg, #ee8b70, #e56d55);
+    box-shadow: 0 11px 25px rgba(210, 97, 73, 0.2);
     font-size: 13px;
   }
 
@@ -352,7 +396,7 @@ const styles = `
   }
 
   .pricing-content {
-    padding: 20px 24px 32px;
+    padding: 30px 24px 36px;
   }
 
   .pricing-content-inner {
@@ -360,45 +404,113 @@ const styles = `
     margin: 0 auto;
   }
 
+  .pricing-product-group {
+    padding: 25px;
+    overflow: hidden;
+    border: 1px solid rgba(138, 96, 70, 0.16);
+    border-radius: 22px;
+    box-shadow: 0 13px 34px rgba(91, 60, 43, 0.06);
+  }
+
+  .pricing-product-group + .pricing-product-group {
+    margin-top: 30px;
+  }
+
+  .pricing-product-group.is-subscription {
+    border-color: rgba(190, 147, 91, 0.3);
+    background: linear-gradient(145deg, #fffdf8 0%, #fff8ea 100%);
+  }
+
+  .pricing-product-group.is-single-book {
+    border-color: rgba(225, 126, 99, 0.3);
+    background: linear-gradient(145deg, #fffdfb 0%, #fff1eb 100%);
+  }
+
+  .pricing-group-heading {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 25px;
+  }
+
+  .pricing-group-heading > div {
+    min-width: 0;
+  }
+
+  .pricing-group-tag {
+    display: inline-flex;
+    min-height: 27px;
+    padding: 0 12px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dcad73;
+    border-radius: 999px;
+    color: #8a5a28;
+    background: rgba(255, 255, 255, 0.72);
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .is-single-book .pricing-group-tag {
+    border-color: #ed9e87;
+    color: #c45f49;
+  }
+
+  .pricing-group-title {
+    margin: 10px 0 0;
+    color: #3d2a20;
+    font-family: 'Noto Serif KR', serif;
+    font-size: 27px;
+    line-height: 1.35;
+    letter-spacing: -0.04em;
+  }
+
+  .pricing-group-description {
+    max-width: 720px;
+    margin: 8px 0 0;
+    color: #715e52;
+    font-size: 13px;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
+
+  .pricing-group-count {
+    flex: 0 0 auto;
+    padding-bottom: 3px;
+    color: #9b7a62;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
   .pricing-plan-grid {
     display: grid;
-    grid-template-columns:
-      repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 14px;
+  }
+
+  .is-single-book .pricing-plan-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .pricing-plan-card {
     position: relative;
     min-width: 0;
-    min-height: 255px;
+    min-height: 272px;
     padding: 17px 16px 15px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     border: 1px solid rgba(138, 96, 70, 0.18);
     border-radius: 15px;
-    background:
-      linear-gradient(
-        155deg,
-        #fffefd,
-        #fff8f0
-      );
-    box-shadow:
-      0 9px 25px
-      rgba(91, 60, 43, 0.06);
+    background: linear-gradient(155deg, #fffefd, #fff8f0);
+    box-shadow: 0 9px 25px rgba(91, 60, 43, 0.06);
   }
 
   .pricing-plan-card.is-recommended {
     border-color: #e5a886;
-    background:
-      linear-gradient(
-        155deg,
-        #fffdf8,
-        #fff1e7
-      );
-    box-shadow:
-      0 13px 29px
-      rgba(211, 104, 78, 0.12);
+    background: linear-gradient(155deg, #fffdf8, #fff1e7);
+    box-shadow: 0 13px 29px rgba(211, 104, 78, 0.12);
   }
 
   .pricing-plan-topline {
@@ -411,6 +523,7 @@ const styles = `
     display: inline-grid;
     width: 27px;
     height: 27px;
+    flex: 0 0 auto;
     place-items: center;
     border-radius: 50%;
     color: #ffffff;
@@ -419,7 +532,11 @@ const styles = `
     font-weight: 900;
   }
 
-  .pricing-plan-card h2 {
+  .is-single-book .pricing-plan-number {
+    background: #e48369;
+  }
+
+  .pricing-plan-card h3 {
     min-width: 0;
     margin: 0;
     color: #4a352c;
@@ -440,9 +557,7 @@ const styles = `
 
   .pricing-plan-body {
     display: grid;
-    grid-template-columns:
-      minmax(0, 1.05fr)
-      minmax(95px, 0.95fr);
+    grid-template-columns: minmax(0, 1.05fr) minmax(95px, 0.95fr);
     gap: 10px;
     margin-top: 10px;
     align-items: center;
@@ -462,9 +577,7 @@ const styles = `
     overflow: hidden;
     border-radius: 8px;
     background: #f3ece5;
-    box-shadow:
-      0 8px 18px
-      rgba(85, 55, 39, 0.09);
+    box-shadow: 0 8px 18px rgba(85, 55, 39, 0.09);
   }
 
   .pricing-plan-image img {
@@ -505,19 +618,17 @@ const styles = `
   }
 
   .pricing-lower-grid {
-    margin-top: 26px;
+    margin-top: 32px;
     display: grid;
-    grid-template-columns:
-      minmax(0, 1.85fr)
-      minmax(310px, 0.65fr);
+    grid-template-columns: minmax(0, 1.85fr) minmax(310px, 0.65fr);
     gap: 34px;
   }
 
   .pricing-section-title {
-  margin: 0;
-  font-size: 31px;
-  line-height: 1.25;
-}
+    margin: 0;
+    font-size: 31px;
+    line-height: 1.25;
+  }
 
   .pricing-comparison-wrap {
     margin-top: 12px;
@@ -529,26 +640,30 @@ const styles = `
 
   .pricing-comparison-table {
     width: 100%;
-    min-width: 830px;
+    min-width: 980px;
     border-collapse: collapse;
   }
 
   .pricing-comparison-table th,
-.pricing-comparison-table td {
-  padding: 12px 10px;
-  border-right: 1px solid rgba(139, 96, 69, 0.11);
-  border-bottom: 1px solid rgba(139, 96, 69, 0.11);
-  color: #5f4d43;
-  font-size: 11.5px;
-  line-height: 1.5;
-  text-align: center;
-}
+  .pricing-comparison-table td {
+    padding: 12px 10px;
+    border-right: 1px solid rgba(139, 96, 69, 0.11);
+    border-bottom: 1px solid rgba(139, 96, 69, 0.11);
+    color: #5f4d43;
+    font-size: 11.5px;
+    line-height: 1.5;
+    text-align: center;
+  }
 
   .pricing-comparison-table th:first-child,
   .pricing-comparison-table td:first-child {
-    width: 155px;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 150px;
     padding-left: 16px;
     color: #49362d;
+    background: #fffdf9;
     font-weight: 900;
     text-align: left;
   }
@@ -557,6 +672,10 @@ const styles = `
     color: #4b382e;
     background: #fff8ef;
     font-weight: 900;
+  }
+
+  .pricing-comparison-table th:first-child {
+    background: #fff8ef;
   }
 
   .pricing-comparison-table th:last-child,
@@ -576,8 +695,7 @@ const styles = `
   .pricing-recommend-grid {
     margin-top: 12px;
     display: grid;
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
   }
 
@@ -591,9 +709,7 @@ const styles = `
     border-radius: 13px;
     background: #ffffff;
     text-align: center;
-    box-shadow:
-      0 7px 18px
-      rgba(87, 56, 39, 0.05);
+    box-shadow: 0 7px 18px rgba(87, 56, 39, 0.05);
   }
 
   .pricing-recommend-image {
@@ -614,15 +730,15 @@ const styles = `
   }
 
   .pricing-notice {
-  margin-top: 22px;
-  padding: 20px 22px;
-  border: 1px solid rgba(146, 99, 70, 0.14);
-  border-radius: 14px;
-  color: #756157;
-  background: #fffaf5;
-  font-size: 12.5px;
-  line-height: 1.7;
-}
+    margin-top: 22px;
+    padding: 20px 22px;
+    border: 1px solid rgba(146, 99, 70, 0.14);
+    border-radius: 14px;
+    color: #756157;
+    background: #fffaf5;
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
 
   .pricing-cta {
     padding: 0 24px 40px;
@@ -634,10 +750,7 @@ const styles = `
     margin: 0 auto;
     padding: 18px 34px;
     display: grid;
-    grid-template-columns:
-      minmax(300px, 0.75fr)
-      minmax(0, 1.25fr)
-      minmax(230px, 0.5fr);
+    grid-template-columns: minmax(300px, 0.75fr) minmax(0, 1.25fr) minmax(230px, 0.5fr);
     align-items: center;
     gap: 28px;
     overflow: hidden;
@@ -649,11 +762,7 @@ const styles = `
         rgba(255, 255, 255, 0.86),
         transparent 18rem
       ),
-      linear-gradient(
-        135deg,
-        #fff4e8,
-        #f8ead8
-      );
+      linear-gradient(135deg, #fff4e8, #f8ead8);
   }
 
   .pricing-cta-image {
@@ -684,8 +793,7 @@ const styles = `
     gap: 8px;
   }
 
-  .pricing-cta-actions
-    .pricing-primary-button {
+  .pricing-cta-actions .pricing-primary-button {
     width: 100%;
     margin-top: 0;
   }
@@ -716,9 +824,9 @@ const styles = `
       width: 155px;
     }
 
-    .pricing-plan-grid {
-      grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+    .pricing-plan-grid,
+    .is-single-book .pricing-plan-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .pricing-lower-grid {
@@ -726,8 +834,7 @@ const styles = `
     }
 
     .pricing-cta-inner {
-      grid-template-columns:
-        230px minmax(0, 1fr) 220px;
+      grid-template-columns: 230px minmax(0, 1fr) 220px;
     }
 
     .pricing-cta-image {
@@ -769,14 +876,17 @@ const styles = `
       font-size: clamp(42px, 10vw, 55px);
     }
 
-    .pricing-plan-grid {
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+    .pricing-plan-grid,
+    .is-single-book .pricing-plan-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pricing-group-heading {
+      align-items: flex-start;
     }
 
     .pricing-cta-inner {
-      grid-template-columns:
-        170px minmax(0, 1fr);
+      grid-template-columns: 170px minmax(0, 1fr);
     }
 
     .pricing-cta-image {
@@ -806,7 +916,32 @@ const styles = `
       font-size: 41px;
     }
 
-    .pricing-plan-grid {
+    .pricing-product-group {
+      padding: 20px 14px;
+      border-radius: 18px;
+    }
+
+    .pricing-group-heading {
+      margin-bottom: 17px;
+      display: block;
+      text-align: center;
+    }
+
+    .pricing-group-title {
+      font-size: 25px;
+    }
+
+    .pricing-group-description {
+      font-size: 12px;
+    }
+
+    .pricing-group-count {
+      display: block;
+      margin-top: 9px;
+    }
+
+    .pricing-plan-grid,
+    .is-single-book .pricing-plan-grid {
       grid-template-columns: 1fr;
     }
 
@@ -819,13 +954,12 @@ const styles = `
     }
 
     .pricing-section-title {
-  font-size: 29px;
-  text-align: center;
-}
+      font-size: 29px;
+      text-align: center;
+    }
 
     .pricing-recommend-grid {
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .pricing-cta-inner {
@@ -849,13 +983,20 @@ const styles = `
 export default async function PricingPage() {
   const session = await auth();
 
-    const plans: readonly ProductPlan[] =
-  PRODUCT_PLANS.filter(
-    (product) =>
-      product.category === 'LIFE_BOOK' ||
-      product.category === 'MONTHLY_RECORD' ||
-      product.category === 'BOOK_PUBLISHING',
-  );
+  const subscriptionPlans: readonly ProductPlan[] =
+    PRODUCT_PLANS.filter(
+      (product) => product.category === 'MONTHLY_RECORD',
+    );
+
+  const singleBookPlans: readonly ProductPlan[] =
+    PRODUCT_PLANS.filter(
+      (product) => product.category === 'BOOK_PUBLISHING',
+    );
+
+  const plans: readonly ProductPlan[] = [
+    ...subscriptionPlans,
+    ...singleBookPlans,
+  ];
 
   const isLoggedIn = Boolean(session?.user);
 
@@ -901,17 +1042,15 @@ export default async function PricingPage() {
                 당신의 이야기에 맞는
                 <br />
                 스토리북을 선택하세요
-                <span className="pricing-heart">
-                  ♡
-                </span>
+                <span className="pricing-heart">♡</span>
               </h1>
 
               <p className="pricing-hero-description">
-                삶의 순간을 담아 세상에
-                하나뿐인 책으로 제작해 드립니다.
+                삶의 순간을 담아 세상에 하나뿐인 책으로
+                제작해 드립니다.
                 <br />
-                원하는 기록 방식과 서비스에 맞춰
-                가장 적합한 상품을 선택해보세요.
+                기록을 이어가는 구독형과 한 권을 만드는
+                단행본 중에서 선택하세요.
               </p>
 
               <Link
@@ -926,98 +1065,81 @@ export default async function PricingPage() {
 
         <section className="pricing-content">
           <div className="pricing-content-inner">
-            <div className="pricing-plan-grid">
-              {plans.map((product, index) => (
-                <article
-                  key={product.code}
-                  className={[
-                    'pricing-plan-card',
-                    product.recommended
-                      ? 'is-recommended'
-                      : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                >
-                  <div className="pricing-plan-topline">
-                    <span className="pricing-plan-number">
-                      {String(index + 1).padStart(
-                        2,
-                        '0',
-                      )}
-                    </span>
-
-                    <h2>{product.shortName}</h2>
-
-                    {product.badge ? (
-                      <span className="pricing-plan-badge">
-                        {product.badge}
-                      </span>
-                    ) : null}
-                  </div>
-
-                  <div className="pricing-plan-body">
-                    <div>
-                      <p className="pricing-plan-description">
-                        {product.description}
-                      </p>
-
-                      <p className="pricing-plan-feature">
-                        {product.included
-                          .slice(0, 2)
-                          .join(' · ')}
-                      </p>
-                    </div>
-
-                    <div className="pricing-plan-image">
-                      <Image
-                        src={
-                          PRODUCT_IMAGES[
-                            product.code
-                          ]
-                        }
-                        alt={product.name}
-                        fill
-                        sizes="150px"
-                      />
-                    </div>
-                  </div>
-
-                  <strong className="pricing-plan-price">
-                    {formatProductPrice(
-                      product.price,
-                      product.priceSuffix,
-                    )}
-                  </strong>
-
-                  <span className="pricing-plan-billing">
-                    {
-                      PRODUCT_BILLING_LABELS[
-                        product.billingType
-                      ]
-                    }
+            <section className="pricing-product-group is-subscription">
+              <div className="pricing-group-heading">
+                <div>
+                  <span className="pricing-group-tag">
+                    정기 구독
                   </span>
 
-                  <Link
-                    href={createProductHref(
-                      product,
-                      isLoggedIn,
-                    )}
-                    className="pricing-card-button"
-                  >
-                    {product.ctaLabel}&nbsp; →
-                  </Link>
-                </article>
-              ))}
-            </div>
+                  <h2 className="pricing-group-title">
+                    매달 기록하는 구독형
+                  </h2>
+
+                  <p className="pricing-group-description">
+                    매달 사진과 이야기를 차곡차곡 남기고,
+                    기록 정리와 실물 엽서 서비스를 함께
+                    이용하는 상품입니다.
+                  </p>
+                </div>
+
+                <strong className="pricing-group-count">
+                  {subscriptionPlans.length}가지 구독 상품
+                </strong>
+              </div>
+
+              <div className="pricing-plan-grid">
+                {subscriptionPlans.map((product, index) => (
+                  <ProductCard
+                    key={product.code}
+                    product={product}
+                    index={index}
+                    isLoggedIn={isLoggedIn}
+                  />
+                ))}
+              </div>
+            </section>
+
+            <section className="pricing-product-group is-single-book">
+              <div className="pricing-group-heading">
+                <div>
+                  <span className="pricing-group-tag">
+                    단행본 1권 제작
+                  </span>
+
+                  <h2 className="pricing-group-title">
+                    한 권으로 제작하는 단행본
+                  </h2>
+
+                  <p className="pricing-group-description">
+                    준비된 사진과 이야기를 표지와 본문으로
+                    편집하여 실제 책 1권과 PDF로 제작하는
+                    상품입니다.
+                  </p>
+                </div>
+
+                <strong className="pricing-group-count">
+                  {singleBookPlans.length}가지 제작 상품
+                </strong>
+              </div>
+
+              <div className="pricing-plan-grid">
+                {singleBookPlans.map((product, index) => (
+                  <ProductCard
+                    key={product.code}
+                    product={product}
+                    index={index}
+                    isLoggedIn={isLoggedIn}
+                  />
+                ))}
+              </div>
+            </section>
 
             <div className="pricing-lower-grid">
               <section>
                 <h2 className="pricing-section-title">
                   포함 서비스 비교
-                  <span className="pricing-heart">
-                    ♡
-                  </span>
+                  <span className="pricing-heart">♡</span>
                 </h2>
 
                 <div className="pricing-comparison-wrap">
@@ -1041,32 +1163,24 @@ export default async function PricingPage() {
                     </thead>
 
                     <tbody>
-                      {COMPARISON_ROWS.map(
-                        (row) => (
-                          <tr key={row.label}>
-                            <td>{row.label}</td>
+                      {COMPARISON_ROWS.map((row) => (
+                        <tr key={row.label}>
+                          <td>{row.label}</td>
 
-                            {plans.map(
-                              (product) => (
-                                <td
-                                  key={product.code}
-                                  className={
-                                    product.recommended
-                                      ? 'is-highlight'
-                                      : ''
-                                  }
-                                >
-                                  {
-                                    row.values[
-                                      product.code
-                                    ]
-                                  }
-                                </td>
-                              ),
-                            )}
-                          </tr>
-                        ),
-                      )}
+                          {plans.map((product) => (
+                            <td
+                              key={product.code}
+                              className={
+                                product.recommended
+                                  ? 'is-highlight'
+                                  : ''
+                              }
+                            >
+                              {row.values[product.code]}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -1075,51 +1189,38 @@ export default async function PricingPage() {
               <section>
                 <h2 className="pricing-section-title">
                   이런 순간에 추천드려요
-                  <span className="pricing-heart">
-                    ♡
-                  </span>
+                  <span className="pricing-heart">♡</span>
                 </h2>
 
                 <div className="pricing-recommend-grid">
-                  {RECOMMENDATIONS.map(
-                    (recommendation) => (
-                      <article
-                        key={
-                          recommendation.title
-                        }
-                        className="pricing-recommend-card"
-                      >
-                        <div className="pricing-recommend-image">
-                          <Image
-                            src={
-                              recommendation.image
-                            }
-                            alt=""
-                            fill
-                            sizes="62px"
-                          />
-                        </div>
+                  {RECOMMENDATIONS.map((recommendation) => (
+                    <article
+                      key={recommendation.title}
+                      className="pricing-recommend-card"
+                    >
+                      <div className="pricing-recommend-image">
+                        <Image
+                          src={recommendation.image}
+                          alt=""
+                          fill
+                          sizes="62px"
+                        />
+                      </div>
 
-                        <strong>
-                          {recommendation.title}
-                        </strong>
-                      </article>
-                    ),
-                  )}
+                      <strong>{recommendation.title}</strong>
+                    </article>
+                  ))}
                 </div>
               </section>
             </div>
 
             <div className="pricing-notice">
-              <strong>
-                상품 이용 전 확인해 주세요.
-              </strong>{' '}
-              사진 50장 또는 80페이지를 초과하는
-              경우, 하드커버·추가 인쇄·사람 검수
-              등 선택 옵션에 따라 추가 견적이
-              안내될 수 있습니다. 월간기록의 책
-              제작은 12개월 유지 고객을 기준으로
-              합니다.
+              <strong>상품 이용 전 확인해 주세요.</strong>{' '}
+              구독형 책 제작은 12개월 유지 고객을 기준으로
+              하며, 페이지 추가·규격 변경·추가 인쇄·사람
+              검수 등의 선택 옵션에 따라 추가 견적이 안내될
+              수 있습니다. 단행본 가격은 기본 사양의 책 1권
+              기준입니다.
             </div>
           </div>
         </section>
@@ -1137,17 +1238,14 @@ export default async function PricingPage() {
 
             <div className="pricing-cta-copy">
               <h2 className="pricing-cta-title">
-                원하는 구성대로,
-                세상에 하나뿐인 책을 만들어
-                드립니다.
-                <span className="pricing-heart">
-                  ♡
-                </span>
+                원하는 구성대로, 세상에 하나뿐인 책을
+                만들어 드립니다.
+                <span className="pricing-heart">♡</span>
               </h2>
 
               <p>
-                페이지 수 조정, 추가 옵션 등
-                궁금한 점을 편하게 문의해주세요.
+                페이지 수 조정, 추가 옵션 등 궁금한 점을
+                편하게 문의해주세요.
               </p>
             </div>
 
@@ -1169,9 +1267,8 @@ export default async function PricingPage() {
           </div>
 
           <p className="pricing-disclaimer">
-            ※ 표시된 가격은 기본 구성 기준이며,
-            페이지 수와 선택 옵션에 따라 달라질
-            수 있습니다.
+            ※ 표시된 가격은 기본 구성 기준이며, 페이지 수와
+            선택 옵션에 따라 달라질 수 있습니다.
           </p>
         </section>
       </main>
