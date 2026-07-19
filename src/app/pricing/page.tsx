@@ -11,24 +11,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-
-const PRODUCT_IMAGES: Record<ProductPlanCode, string> = {
-  LIFE_BOOK_BASIC: '/home/storybook/example-1.webp',
-  MONTHLY_RECORD_BASIC: '/home/storybook/example-2.webp',
-  MONTHLY_RECORD_QUARTERLY_POSTCARD:
-    '/home/storybook/example-3.webp',
-  MONTHLY_RECORD_MONTHLY_POSTCARD:
-    '/home/storybook/example-4.webp',
-  MONTHLY_RECORD_PREMIUM:
-    '/home/storybook/detail-hero.webp',
-  BOOK_PUBLISHING_BASIC:
-    '/home/storybook/example-1.webp',
-  BOOK_PUBLISHING_STANDARD:
-    '/home/storybook/example-2.webp',
-  BOOK_PUBLISHING_PREMIUM:
-    '/home/storybook/example-3.webp',
-};
-
 const RECOMMENDATIONS = [
   {
     image: '/home/storybook/recommend-1.webp',
@@ -194,18 +176,27 @@ function ProductCard({
   index: number;
   isLoggedIn: boolean;
 }) {
+  const isRecommended =
+    'recommended' in product &&
+    product.recommended === true;
+
   return (
     <article
       className={[
         'pricing-plan-card',
-        product.recommended ? 'is-recommended' : '',
+        isRecommended
+          ? 'is-recommended'
+          : '',
       ]
         .filter(Boolean)
         .join(' ')}
     >
       <div className="pricing-plan-topline">
         <span className="pricing-plan-number">
-          {String(index + 1).padStart(2, '0')}
+          {String(index + 1).padStart(
+            2,
+            '0',
+          )}
         </span>
 
         <h3>{product.shortName}</h3>
@@ -218,24 +209,15 @@ function ProductCard({
       </div>
 
       <div className="pricing-plan-body">
-        <div>
-          <p className="pricing-plan-description">
-            {product.description}
-          </p>
+        <p className="pricing-plan-description">
+          {product.description}
+        </p>
 
-          <p className="pricing-plan-feature">
-            {product.included.slice(0, 3).join(' · ')}
-          </p>
-        </div>
-
-        <div className="pricing-plan-image">
-          <Image
-            src={PRODUCT_IMAGES[product.code]}
-            alt={product.name}
-            fill
-            sizes="150px"
-          />
-        </div>
+        <p className="pricing-plan-feature">
+          {product.included
+            .slice(0, 2)
+            .join(' · ')}
+        </p>
       </div>
 
       <strong className="pricing-plan-price">
@@ -246,11 +228,18 @@ function ProductCard({
       </strong>
 
       <span className="pricing-plan-billing">
-        {PRODUCT_BILLING_LABELS[product.billingType]}
+        {
+          PRODUCT_BILLING_LABELS[
+            product.billingType
+          ]
+        }
       </span>
 
       <Link
-        href={createProductHref(product, isLoggedIn)}
+        href={createProductHref(
+          product,
+          isLoggedIn,
+        )}
         className="pricing-card-button"
       >
         {product.ctaLabel}&nbsp; →
@@ -557,40 +546,27 @@ const styles = `
   }
 
   .pricing-plan-body {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(95px, 0.95fr);
-    gap: 10px;
-    margin-top: 10px;
-    align-items: center;
-  }
+  min-height: 112px;
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+}
 
   .pricing-plan-description {
-    margin: 0;
-    color: #665248;
-    font-size: 10px;
-    line-height: 1.65;
-    word-break: keep-all;
-  }
-
-  .pricing-plan-image {
-    position: relative;
-    aspect-ratio: 0.88 / 1;
-    overflow: hidden;
-    border-radius: 8px;
-    background: #f3ece5;
-    box-shadow: 0 8px 18px rgba(85, 55, 39, 0.09);
-  }
-
-  .pricing-plan-image img {
-    object-fit: cover;
-  }
+  margin: 0;
+  color: #665248;
+  font-size: 13px;
+  line-height: 1.7;
+  word-break: keep-all;
+}
 
   .pricing-plan-feature {
-    margin: 10px 0 0;
-    color: #6f5c52;
-    font-size: 9px;
-    line-height: 1.6;
-  }
+  margin: 14px 0 0;
+  color: #8a6d5d;
+  font-size: 11px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
 
   .pricing-plan-price {
     margin-top: auto;
