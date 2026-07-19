@@ -1,3 +1,4 @@
+import StorybookPublicHeader from '@/components/storybook/StorybookPublicHeader';
 import { auth } from '@/auth';
 import HomeGuidePopup from '@/components/home/HomeGuidePopup';
 import { prisma } from '@/lib/prisma';
@@ -1383,61 +1384,8 @@ export default async function HomePage() {
       <style>{homeStyles}</style>
       <HomeGuidePopup />
 
-      <div className="storybook-home">
-        <header className="storybook-site-header">
-          <div className="storybook-site-header-inner">
-            <Link href="/" className="storybook-logo">
-              달동네 스토리북
-              <span className="storybook-logo-heart">♡</span>
-            </Link>
-
-            <nav className="storybook-nav" aria-label="메인 메뉴">
-              <Link href="/guide">스토리북 소개</Link>
-              <Link href="/pricing">상품안내</Link>
-              <Link href="/process">제작과정</Link>
-              <Link href="/trial">작품소개</Link>
-              <Link href="#reviews">이용후기</Link>
-              <Link href="/guide">질문답변</Link>
-            </nav>
-
-            <div className="storybook-header-actions">
-  {isAdmin ? (
-    <Link
-      href="/admin"
-      className="storybook-admin-link"
-    >
-      관리자
-    </Link>
-  ) : null}
-
-  {!session?.user ? (
-    <Link
-      href="/login?callbackUrl=/dashboard"
-      className="storybook-login-link"
-    >
-      로그인
-    </Link>
-  ) : null}
-
-  <Link
-    href={startHref}
-    className="storybook-header-cta"
-  >
-    {session?.user
-      ? '내 스토리북 열기'
-      : '스토리북 만들기'}
-  </Link>
-</div>
-          </div>
-
-          <nav className="storybook-mobile-nav" aria-label="모바일 메인 메뉴">
-            <Link href="/guide">소개</Link>
-            <Link href="/pricing">상품안내</Link>
-            <Link href="/process">제작과정</Link>
-            <Link href="/trial">작품소개</Link>
-            <Link href="#reviews">이용후기</Link>
-          </nav>
-        </header>
+      <div className="storybook-home storybook-public-page">
+        <StorybookPublicHeader ctaHref={startHref} />
 
         <main>
           <section className="storybook-hero">
