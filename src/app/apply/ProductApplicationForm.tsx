@@ -493,61 +493,154 @@ export default function ProductApplicationForm({
           box-shadow: 0 0 0 3px rgba(168, 108, 45, 0.12);
         }
 
-        .addon-list {
-          display: grid;
-          gap: 10px;
-          margin-top: 18px;
-        }
+        .application-addon-section {
+  position: relative;
+  margin-top: 28px;
+}
 
-        .addon-option {
-          display: grid;
-          grid-template-columns: auto 1fr;
-          gap: 11px;
-          padding: 15px;
-          border-radius: 16px;
-          border: 1px solid #dfc9a4;
-          background: #fff8e9;
-          cursor: pointer;
-        }
+.application-addon-section
+  .application-section-title {
+  margin-top: 0;
+  font-size: 20px;
+}
 
-        .addon-option input {
-          width: 18px;
-          height: 18px;
-          margin-top: 2px;
-          accent-color: #6e421d;
-        }
+.addon-dropdown {
+  position: relative;
+  margin-top: 16px;
+}
 
-        .addon-option strong {
-          display: block;
-          color: #3f2c1e;
-          font-size: 14px;
-        }
+.addon-dropdown summary {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  list-style: none;
+  border: 1px solid #dfc9a4;
+  border-radius: 15px;
+  color: #3f2c1e;
+  background: #fffdf9;
+  box-shadow:
+    0 7px 20px
+    rgba(79, 50, 27, 0.05);
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
 
-        .addon-option span {
-          display: block;
-          margin-top: 5px;
-          color: #75604d;
-          font-size: 12px;
-          line-height: 1.65;
-        }
+.addon-dropdown summary::-webkit-details-marker {
+  display: none;
+}
 
-        .addon-option small {
-          display: block;
-          margin-top: 6px;
-          color: #8a5a2c;
-          font-size: 11px;
-          font-weight: 900;
-        }
+.addon-dropdown[open] summary {
+  border-color: #e88773;
+  box-shadow:
+    0 0 0 3px
+    rgba(232, 135, 115, 0.13);
+}
 
-        .selected-addon-summary {
-          margin-top: 14px;
-          padding: 13px;
-          border-radius: 14px;
-          background: #f7eddc;
-          color: #604b39;
-          font-size: 12px;
-          line-height: 1.7;
-        }
+.addon-dropdown-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.addon-dropdown-arrow {
+  flex: 0 0 auto;
+  color: #76523a;
+  font-size: 20px;
+  line-height: 1;
+  transition: transform 160ms ease;
+}
+
+.addon-dropdown[open]
+  .addon-dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.addon-dropdown-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
+  max-height: 370px;
+  padding: 8px;
+  overflow-y: auto;
+  border: 1px solid #dfc9a4;
+  border-radius: 15px;
+  background: #fffdf9;
+  box-shadow:
+    0 18px 42px
+    rgba(67, 42, 23, 0.17);
+}
+
+.addon-dropdown-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 11px;
+  padding: 13px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
+}
+
+.addon-dropdown-option:hover {
+  background: #fff5e7;
+}
+
+.addon-dropdown-option.is-selected {
+  border-color: #e4b477;
+  background: #fff1d8;
+}
+
+.addon-dropdown-option input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: #6e421d;
+}
+
+.addon-dropdown-copy {
+  min-width: 0;
+}
+
+.addon-dropdown-copy strong {
+  display: block;
+  color: #3f2c1e;
+  font-size: 14px;
+}
+
+.addon-dropdown-copy > span {
+  display: block;
+  margin-top: 4px;
+  color: #75604d;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.addon-dropdown-copy small {
+  display: block;
+  margin-top: 5px;
+  color: #9a5e27;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.addon-selected-guide {
+  margin: 9px 2px 0;
+  color: #816d5c;
+  font-size: 11px;
+  line-height: 1.6;
+}
 
         .application-message {
           margin: 18px 0 0;
@@ -705,65 +798,78 @@ export default function ProductApplicationForm({
         </div>
 
         {addons.length > 0 ? (
-          <>
-            <h3
-              className="application-section-title"
-              style={{
-                marginTop: 28,
-                fontSize: 20,
-              }}
+  <div className="application-addon-section">
+    <h3 className="application-section-title">
+      추가 옵션
+    </h3>
+
+    <p className="application-section-description">
+      필요한 옵션을 선택하세요. 여러 옵션을 함께
+      선택할 수 있습니다.
+    </p>
+
+    <details className="addon-dropdown">
+      <summary>
+        <span className="addon-dropdown-label">
+          {selectedAddons.length > 0
+            ? `선택 ${selectedAddons.length}개 · ${selectedAddons
+                .map((addon) => addon.name)
+                .join(', ')}`
+            : '추가 옵션을 선택해 주세요'}
+        </span>
+
+        <span
+          className="addon-dropdown-arrow"
+          aria-hidden="true"
+        >
+         ⌄
+        </span>
+      </summary>
+
+      <div className="addon-dropdown-menu">
+        {addons.map((addon) => {
+          const isSelected =
+            selectedAddonCodes.includes(addon.code);
+
+          return (
+            <label
+              key={addon.code}
+              className={[
+                'addon-dropdown-option',
+                isSelected ? 'is-selected' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
             >
-              추가 옵션
-            </h3>
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() =>
+                  toggleAddon(addon.code)
+                }
+              />
 
-            <p className="application-section-description">
-              필요한 옵션만 선택하세요. 정확한 추가
-              금액은 상담 후 안내됩니다.
-            </p>
+              <span className="addon-dropdown-copy">
+                <strong>{addon.name}</strong>
 
-            <div className="addon-list">
-              {addons.map((addon) => (
-                <label
-                  key={addon.code}
-                  className="addon-option"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedAddonCodes.includes(
-                      addon.code,
-                    )}
-                    onChange={() =>
-                      toggleAddon(addon.code)
-                    }
-                  />
+                <span>{addon.description}</span>
 
-                  <span>
-                    <strong>
-                      {addon.name}
-                    </strong>
+                <small>{addon.priceLabel}</small>
+              </span>
+            </label>
+          );
+        })}
+      </div>
+    </details>
 
-                    <span>
-                      {addon.description}
-                    </span>
-
-                    <small>
-                      {addon.priceLabel}
-                    </small>
-                  </span>
-                </label>
-              ))}
-            </div>
-
-            {selectedAddons.length > 0 ? (
-              <div className="selected-addon-summary">
-                선택 옵션:{' '}
-                {selectedAddons
-                  .map((addon) => addon.name)
-                  .join(', ')}
-              </div>
-            ) : null}
-          </>
-        ) : null}
+    {selectedAddons.length > 0 ? (
+      <p className="addon-selected-guide">
+        선택한 옵션은 신청 내용에 함께
+        저장됩니다.
+      </p>
+    ) : null}
+  </div>
+) : null}
 
         <div
           className="application-field"
