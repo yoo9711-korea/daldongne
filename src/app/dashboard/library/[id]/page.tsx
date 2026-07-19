@@ -254,13 +254,216 @@ export default async function BookDetailPage({
       allPhotoStories.length;
   return (
     <main
-      style={{
+    className="book-detail-main"  
+    style={{
         minHeight: '100vh',
         ...gridPaperPageStyle(),
         color: '#24170f',
       }}
     >
       <style>{`
+                .book-detail-main {
+          min-height: 100vh;
+          color: #4a352b;
+          background-color: #fffdf9 !important;
+          background-image:
+            linear-gradient(
+              rgba(220, 167, 136, 0.032) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(220, 167, 136, 0.032) 1px,
+              transparent 1px
+            ) !important;
+          background-size: 32px 32px !important;
+          background-position: 0 0 !important;
+        }
+
+        .book-detail-panel {
+          background:
+            linear-gradient(
+              145deg,
+              #ffffff,
+              #fffaf7
+            ) !important;
+          border:
+            1px solid rgba(196, 139, 108, 0.19) !important;
+          box-shadow:
+            0 14px 34px
+            rgba(132, 79, 48, 0.055) !important;
+        }
+
+        .book-detail-hero {
+          position: relative;
+          overflow: hidden;
+          background:
+            radial-gradient(
+              circle at 92% 4%,
+              rgba(255, 210, 190, 0.58),
+              transparent 24rem
+            ),
+            radial-gradient(
+              circle at 4% 100%,
+              rgba(255, 241, 202, 0.52),
+              transparent 22rem
+            ),
+            linear-gradient(
+              135deg,
+              #fff8f3 0%,
+              #ffffff 52%,
+              #fff1e8 100%
+            ) !important;
+          border:
+            1px solid rgba(218, 143, 108, 0.22) !important;
+          box-shadow:
+            0 18px 48px
+            rgba(156, 91, 58, 0.08) !important;
+        }
+
+        .book-detail-hero h1,
+        .book-detail-hero h2,
+        .book-detail-hero strong {
+          color: #49352b !important;
+        }
+
+        .book-detail-hero > p:first-child {
+          color: #d56f55 !important;
+        }
+
+        .book-detail-hero p {
+          color: #725d52 !important;
+        }
+
+        .book-detail-actions a,
+        .book-detail-actions button {
+          border:
+            1px solid rgba(210, 126, 90, 0.18) !important;
+          background:
+            linear-gradient(
+              135deg,
+              #f49378,
+              #e97861
+            ) !important;
+          color: #ffffff !important;
+          box-shadow:
+            0 10px 23px
+            rgba(220, 104, 77, 0.17) !important;
+        }
+
+        .book-cover-card {
+          background:
+            radial-gradient(
+              circle at 88% 8%,
+              rgba(255, 205, 184, 0.64),
+              transparent 19rem
+            ),
+            linear-gradient(
+              145deg,
+              #fff7f1 0%,
+              #ffffff 54%,
+              #ffede4 100%
+            ) !important;
+          color: #49352b !important;
+          border:
+            1px solid rgba(218, 143, 108, 0.25) !important;
+          box-shadow:
+            0 18px 42px
+            rgba(166, 91, 56, 0.09) !important;
+        }
+
+        .book-cover-card h1,
+        .book-cover-card h2,
+        .book-cover-card h3,
+        .book-cover-card strong {
+          color: #49352b !important;
+        }
+
+        .book-cover-card p {
+          color: #725d52 !important;
+        }
+
+        .book-cover-card > p:first-child {
+          color: #d56f55 !important;
+        }
+
+        .book-cover-card > p:last-child {
+          border-color:
+            rgba(201, 126, 92, 0.22) !important;
+          color: #b2644c !important;
+        }
+
+        .book-content-paper {
+          background: #ffffff !important;
+          border:
+            1px solid rgba(196, 139, 108, 0.2) !important;
+          box-shadow:
+            0 12px 30px
+            rgba(132, 79, 48, 0.05) !important;
+        }
+
+        .book-content-paper h1,
+        .book-content-paper h2,
+        .book-content-paper h3 {
+          color: #49352b !important;
+        }
+
+        .book-content-paper p {
+          color: #584338;
+        }
+
+        .photo-story-card {
+          background: #ffffff !important;
+          border-color:
+            rgba(191, 137, 106, 0.19) !important;
+          box-shadow:
+            0 10px 26px
+            rgba(127, 76, 47, 0.045) !important;
+        }
+
+        .photo-story-image {
+          background: #fff3ed !important;
+        }
+
+        .book-next-section {
+          background:
+            linear-gradient(
+              135deg,
+              #fff8f3,
+              #ffffff
+            ) !important;
+        }
+
+        .book-detail-panel h1,
+        .book-detail-panel h2,
+        .book-detail-panel h3 {
+          color: #49352b;
+        }
+
+        .book-detail-panel
+        > p:first-child,
+        .book-detail-panel
+        > div
+        > p:first-child {
+          color: #d67358 !important;
+        }
+
+        .book-detail-panel input,
+        .book-detail-panel textarea,
+        .book-detail-panel select {
+          border:
+            1px solid rgba(192, 139, 108, 0.28) !important;
+          background: #fffdfb !important;
+          color: #49352b !important;
+        }
+
+        .book-detail-panel input:focus,
+        .book-detail-panel textarea:focus,
+        .book-detail-panel select:focus {
+          border-color: #e68a6f !important;
+          outline:
+            3px solid rgba(230, 138, 111, 0.12) !important;
+        }
         .book-detail-container {
           width: 100%;
           max-width: 1240px;
@@ -438,8 +641,8 @@ export default async function BookDetailPage({
 
       <div className="book-detail-container">
         <section
-          className="book-detail-panel"
-          style={{
+          className="book-detail-panel book-detail-hero"
+           style={{
             padding: 30,
             borderRadius: 30,
             border:
@@ -633,8 +836,8 @@ export default async function BookDetailPage({
           }}
         >
           <article
-            className="book-detail-panel"
-            style={{
+              className="book-detail-panel book-cover-card"
+              style={{
               minHeight: 350,
               padding: 34,
               borderRadius: 30,

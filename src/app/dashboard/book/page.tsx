@@ -233,6 +233,221 @@ export default async function BookPage() {
       style={gridPaperPageStyle()}
     >
       <style>{`
+                .book-page-main {
+          min-height: 100vh;
+          color: #4a352b;
+          background-color: #fffdf9 !important;
+          background-image:
+            linear-gradient(
+              rgba(220, 167, 136, 0.032) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(220, 167, 136, 0.032) 1px,
+              transparent 1px
+            ) !important;
+          background-size: 32px 32px !important;
+          background-position: 0 0 !important;
+        }
+
+        .book-hero {
+          position: relative;
+          overflow: hidden;
+          background:
+            radial-gradient(
+              circle at 90% 4%,
+              rgba(255, 210, 190, 0.58),
+              transparent 25rem
+            ),
+            radial-gradient(
+              circle at 5% 100%,
+              rgba(255, 241, 202, 0.52),
+              transparent 23rem
+            ),
+            linear-gradient(
+              135deg,
+              #fff8f3 0%,
+              #ffffff 52%,
+              #fff1e8 100%
+            ) !important;
+          color: #49352b !important;
+          border:
+            1px solid rgba(218, 143, 108, 0.22) !important;
+          box-shadow:
+            0 18px 48px
+            rgba(156, 91, 58, 0.08) !important;
+        }
+
+        .book-hero h1,
+        .book-hero strong {
+          color: #49352b !important;
+        }
+
+        .book-hero > p:first-of-type {
+          color: #dd765b !important;
+        }
+
+        .book-hero > p:not(:first-of-type) {
+          color: #725d52 !important;
+        }
+
+        .book-hero
+        > div:not(.book-hero-actions) {
+          border:
+            1px solid rgba(218, 143, 108, 0.2) !important;
+          background:
+            rgba(255, 255, 255, 0.78) !important;
+          box-shadow:
+            0 10px 26px
+            rgba(147, 87, 55, 0.045);
+        }
+
+        .book-hero
+        > div:not(.book-hero-actions)
+        p {
+          color: #80685c !important;
+        }
+
+        .book-hero
+        > div:not(.book-hero-actions)
+        p:first-child {
+          color: #d56f55 !important;
+        }
+
+        .book-hero-actions a {
+          border:
+            1px solid rgba(210, 126, 90, 0.3) !important;
+          background: #ffffff !important;
+          color: #a65f48 !important;
+          box-shadow:
+            0 9px 22px
+            rgba(181, 104, 71, 0.08);
+        }
+
+        .book-hero-actions a:first-child {
+          border-color: transparent !important;
+          background:
+            linear-gradient(
+              135deg,
+              #f49378,
+              #e97861
+            ) !important;
+          color: #ffffff !important;
+          box-shadow:
+            0 11px 25px
+            rgba(220, 104, 77, 0.2);
+        }
+
+        .book-page-container article {
+          background: #ffffff !important;
+          border-color:
+            rgba(191, 137, 106, 0.19) !important;
+          box-shadow:
+            0 12px 29px
+            rgba(127, 76, 47, 0.052) !important;
+        }
+
+        .book-page-section {
+          background:
+            linear-gradient(
+              145deg,
+              #ffffff,
+              #fffaf7
+            ) !important;
+          border:
+            1px solid rgba(196, 139, 108, 0.19) !important;
+          box-shadow:
+            0 14px 34px
+            rgba(132, 79, 48, 0.055) !important;
+        }
+
+        .book-page-section h2,
+        .book-page-section h3,
+        .book-outline-grid h3 {
+          color: #49352b !important;
+        }
+
+        .book-outline-grid > * {
+          background: #ffffff !important;
+          border-color:
+            rgba(192, 138, 107, 0.18) !important;
+          box-shadow:
+            0 10px 25px
+            rgba(127, 76, 47, 0.045) !important;
+        }
+
+        #book-material-selector {
+          background:
+            linear-gradient(
+              145deg,
+              #ffffff,
+              #fffaf7
+            ) !important;
+          border-color:
+            rgba(196, 139, 108, 0.2) !important;
+          box-shadow:
+            0 15px 36px
+            rgba(132, 79, 48, 0.06) !important;
+        }
+
+        #book-material-selector
+        input:not([type='checkbox']):not([type='radio']),
+        #book-material-selector textarea,
+        #book-material-selector select {
+          border:
+            1px solid rgba(192, 139, 108, 0.28) !important;
+          background: #fffdfb !important;
+          color: #49352b !important;
+          box-shadow: none !important;
+        }
+
+        #book-material-selector
+        input:not([type='checkbox']):not([type='radio']):focus,
+        #book-material-selector textarea:focus,
+        #book-material-selector select:focus {
+          border-color: #e68a6f !important;
+          outline:
+            3px solid rgba(230, 138, 111, 0.12) !important;
+        }
+
+        #book-material-selector button {
+          border:
+            1px solid rgba(210, 126, 90, 0.28) !important;
+          background: #fff5f0 !important;
+          color: #a65f48 !important;
+          box-shadow:
+            0 8px 19px
+            rgba(181, 104, 71, 0.07) !important;
+        }
+
+        #book-material-selector
+        button[type='submit'] {
+          border-color: transparent !important;
+          background:
+            linear-gradient(
+              135deg,
+              #f49378,
+              #e97861
+            ) !important;
+          color: #ffffff !important;
+          box-shadow:
+            0 11px 25px
+            rgba(220, 104, 77, 0.19) !important;
+        }
+
+        .book-page-main h2,
+        .book-page-main h3 {
+          color: #49352b;
+        }
+
+        .book-page-main
+        section:not(.book-hero)
+        > p:first-child,
+        .book-page-section
+        > p:first-child {
+          color: #d67358 !important;
+        }
         .book-page-container {
           width: 100%;
           max-width: 1380px;

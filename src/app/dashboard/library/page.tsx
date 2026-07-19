@@ -237,9 +237,182 @@ export default async function LibraryPage() {
 
   return (
     <main
-      style={gridPaperPageStyle()}
-    >
+  className="library-page-main"
+  style={gridPaperPageStyle()}
+>
       <style>{`
+                 .library-page-main {
+          min-height: 100vh;
+          color: #4a352b;
+          background-color: #fffdf9 !important;
+          background-image:
+            linear-gradient(
+              rgba(220, 167, 136, 0.032) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(220, 167, 136, 0.032) 1px,
+              transparent 1px
+            ) !important;
+          background-size: 32px 32px !important;
+          background-position: 0 0 !important;
+        }
+
+        .library-page-hero {
+          position: relative;
+          overflow: hidden;
+          background:
+            radial-gradient(
+              circle at 90% 5%,
+              rgba(255, 210, 190, 0.58),
+              transparent 25rem
+            ),
+            radial-gradient(
+              circle at 5% 100%,
+              rgba(255, 241, 202, 0.52),
+              transparent 23rem
+            ),
+            linear-gradient(
+              135deg,
+              #fff8f3 0%,
+              #ffffff 52%,
+              #fff1e8 100%
+            ) !important;
+          color: #49352b !important;
+          border:
+            1px solid rgba(218, 143, 108, 0.22) !important;
+          box-shadow:
+            0 18px 48px
+            rgba(156, 91, 58, 0.08) !important;
+        }
+
+        .library-page-hero h1,
+        .library-page-hero strong {
+          color: #49352b !important;
+        }
+
+        .library-page-hero > p:first-of-type {
+          color: #dd765b !important;
+        }
+
+        .library-page-hero > p:not(:first-of-type) {
+          color: #725d52 !important;
+        }
+
+        .library-page-hero
+        > div:not(.library-hero-actions) {
+          border:
+            1px solid rgba(218, 143, 108, 0.2) !important;
+          background:
+            rgba(255, 255, 255, 0.78) !important;
+          box-shadow:
+            0 10px 26px
+            rgba(147, 87, 55, 0.045);
+        }
+
+        .library-page-hero
+        > div:not(.library-hero-actions)
+        p {
+          color: #80685c !important;
+        }
+
+        .library-page-hero
+        > div:not(.library-hero-actions)
+        p:first-child {
+          color: #d56f55 !important;
+        }
+
+        .library-hero-actions a {
+          border:
+            1px solid rgba(210, 126, 90, 0.3) !important;
+          background: #ffffff !important;
+          color: #a65f48 !important;
+          box-shadow:
+            0 9px 22px
+            rgba(181, 104, 71, 0.08);
+        }
+
+        .library-hero-actions a:first-child {
+          border-color: transparent !important;
+          background:
+            linear-gradient(
+              135deg,
+              #f49378,
+              #e97861
+            ) !important;
+          color: #ffffff !important;
+          box-shadow:
+            0 11px 25px
+            rgba(220, 104, 77, 0.2);
+        }
+
+        .library-page-container
+        > section:nth-of-type(2)
+        > article {
+          background: #ffffff !important;
+          border-color:
+            rgba(191, 137, 106, 0.18) !important;
+          box-shadow:
+            0 11px 27px
+            rgba(127, 76, 47, 0.05) !important;
+        }
+
+        .library-page-section {
+          background:
+            linear-gradient(
+              145deg,
+              #ffffff,
+              #fffaf7
+            ) !important;
+          border:
+            1px solid rgba(196, 139, 108, 0.19) !important;
+          box-shadow:
+            0 14px 34px
+            rgba(132, 79, 48, 0.055) !important;
+        }
+
+        .library-page-section h2,
+        .library-page-section h3 {
+          color: #49352b !important;
+        }
+
+        .library-page-section
+        > div
+        > p:first-child {
+          color: #d67358 !important;
+        }
+
+        .library-page-section input,
+        .library-page-section select {
+          border:
+            1px solid rgba(192, 139, 108, 0.28) !important;
+          background: #fffdfb !important;
+          color: #49352b !important;
+        }
+
+        .library-page-section button {
+          border:
+            1px solid rgba(210, 126, 90, 0.28) !important;
+          background: #fff3ed !important;
+          color: #a65f48 !important;
+          box-shadow:
+            0 8px 19px
+            rgba(181, 104, 71, 0.07) !important;
+        }
+
+        .library-page-section article {
+          border-color:
+            rgba(191, 137, 106, 0.18) !important;
+          box-shadow:
+            0 10px 25px
+            rgba(127, 76, 47, 0.045) !important;
+        }
+
+        .library-page-main h2,
+        .library-page-main h3 {
+          color: #49352b;
+        }
         .library-page-container {
           width: 100%;
           max-width: 1380px;
