@@ -2028,6 +2028,96 @@ main samp {
 .storybook-public-page .about-heart,
 .storybook-public-page .trial-heart,
 .storybook-public-page .process-heart,
-.storybook-public-page [class*='heart'] {
+.storybook/* ========================================
+   스토리북 소개 페이지 히어로 겹침 방지
+   /about 페이지 전용
+   ======================================== */
+
+@media (min-width: 861px) {
+  /* 글 영역이 오른쪽 책 이미지까지 넘어가지 않도록 제한 */
+  .about-storybook-page .about-hero-copy {
+    width: min(390px, 36vw) !important;
+    max-width: 390px !important;
+    padding-right: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 제목이 이미지 위로 길게 뻗지 않고 자연스럽게 줄바꿈되도록 보정 */
+  .about-storybook-page .about-hand-title {
+    width: 100% !important;
+    max-width: 390px !important;
+    font-size: clamp(40px, 3.4vw, 50px) !important;
+    line-height: 1.18 !important;
+    letter-spacing: -0.015em !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+  }
+
+  /* 제목 옆 하트가 글 영역 밖으로 나가지 않도록 보정 */
+  .about-storybook-page .about-heart {
+    display: inline-block !important;
+    margin-left: 6px !important;
+  }
+
+  /* 하단 세 가지 안내 항목을 글 영역 안에 배치 */
+  .about-storybook-page .about-hero-benefits {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    align-items: start !important;
+    gap: 10px !important;
+  }
+
+  .about-storybook-page .about-hero-benefit {
+    min-width: 0 !important;
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .about-storybook-page .about-benefit-icon {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .about-storybook-page .about-hero-benefit span {
+    min-width: 0 !important;
+    font-size: 10px !important;
+    line-height: 1.4 !important;
+    white-space: normal !important;
+    word-break: keep-all !important;
+  }
+}
+
+/* 노트북과 작은 데스크톱 화면 추가 보정 */
+@media (min-width: 861px) and (max-width: 1240px) {
+  .about-storybook-page .about-hero-copy {
+    width: min(350px, 34vw) !important;
+    max-width: 350px !important;
+  }
+
+  .about-storybook-page .about-hand-title {
+    max-width: 350px !important;
+    font-size: clamp(38px, 3.7vw, 46px) !important;
+  }
+
+  .about-storybook-page .about-hero-benefits {
+    gap: 7px !important;
+  }
+
+  .about-storybook-page .about-hero-benefit {
+    grid-template-columns: 38px minmax(0, 1fr) !important;
+    gap: 5px !important;
+  }
+
+  .about-storybook-page .about-benefit-icon {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .about-storybook-page .about-hero-benefit span {
+    font-size: 9px !important;
+  }
+}-public-page [class*='heart'] {
   font-weight: 400 !important;
 }
+
