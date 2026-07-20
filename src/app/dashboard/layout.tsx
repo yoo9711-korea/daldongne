@@ -297,10 +297,10 @@ export default async function DashboardLayout({
           </p>
 
           <h1 className="dashboard-brand-title">
-            달동네
-            <br />
-            출판사
-          </h1>
+         달동네
+         <br />
+         스토리북
+        </h1>
 
           <span className="dashboard-brand-subtitle">
             나의 기억 작업실

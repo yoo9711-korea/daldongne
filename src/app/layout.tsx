@@ -6,7 +6,7 @@ import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: '달동네 출판사 — 삶의 인생책 제작 서비스',
+  title: '달동네 스토리 — 삶의 인생책 제작 서비스',
   description: '사진과 글을 모아, 가족의 삶을 한 권의 책으로 만들어드립니다.',
   applicationName: '달동네',
   manifest: '/manifest.webmanifest',
@@ -212,7 +212,7 @@ export default async function RootLayout({
   }}
 >
   <span style={brandNameStyle}>
-    달동네 출판사
+    달동네 스토리북
   </span>
 
   <small
@@ -321,7 +321,7 @@ export default async function RootLayout({
             }}
           >
             <p style={{ margin: 0 }}>
-              © 달동네 출판사. 사진과 이야기를 모아 삶의 기록을 만듭니다.
+              © 달동네 스토리. 사진과 이야기를 모아 삶의 기록을 만듭니다.
             </p>
 
             <nav
