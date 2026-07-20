@@ -1878,3 +1878,105 @@ main samp {
     'Noto Serif KR',
     serif !important;
 }
+
+/* ========================================
+   공개 페이지 손글씨 제목 반응형 보정
+   about / trial / process
+   ======================================== */
+
+/* 큰 제목이 글 영역을 벗어나지 않도록 조정 */
+.about-hand-title,
+.trial-hand-title,
+.process-hand-title {
+  font-size: clamp(44px, 4.1vw, 56px) !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.01em !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+}
+
+/* 제목과 설명이 들어가는 왼쪽 영역 확대 */
+.about-hero-copy,
+.trial-hero-copy,
+.process-hero-copy {
+  width: min(560px, 46vw) !important;
+  max-width: 100% !important;
+}
+
+/* 설명 문장은 큰 손글씨 제목보다 작게 유지 */
+.about-hero-description,
+.trial-hero-description,
+.process-hero-description {
+  font-size: 15px !important;
+  line-height: 1.75 !important;
+  letter-spacing: -0.01em !important;
+  word-break: keep-all !important;
+}
+
+/* 하트는 손글씨체 대신 동일한 기호 모양 유지 */
+.storybook-public-brand-heart,
+.about-heart,
+.trial-heart,
+.process-heart {
+  font-family: Arial, sans-serif !important;
+  font-weight: 400 !important;
+}
+
+/* 노트북·작은 데스크톱 화면 */
+@media (min-width: 861px) and (max-width: 1240px) {
+  .about-hero-inner,
+  .trial-hero-inner,
+  .process-hero-inner {
+    padding-left: clamp(105px, 12vw, 150px) !important;
+    padding-right: 24px !important;
+  }
+
+  .about-hero-copy,
+  .trial-hero-copy,
+  .process-hero-copy {
+    width: min(540px, 57vw) !important;
+  }
+
+  .about-hand-title,
+  .trial-hand-title,
+  .process-hand-title {
+    font-size: clamp(42px, 4.8vw, 50px) !important;
+    line-height: 1.2 !important;
+  }
+}
+
+/* 태블릿 화면 */
+@media (max-width: 860px) {
+  .about-hero-copy,
+  .trial-hero-copy,
+  .process-hero-copy {
+    width: min(650px, 100%) !important;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    text-align: center !important;
+  }
+
+  .about-hand-title,
+  .trial-hand-title,
+  .process-hand-title {
+    font-size: clamp(39px, 8vw, 50px) !important;
+    line-height: 1.2 !important;
+  }
+}
+
+/* 휴대전화 화면 */
+@media (max-width: 560px) {
+  .about-hand-title,
+  .trial-hand-title,
+  .process-hand-title {
+    font-size: 38px !important;
+    line-height: 1.22 !important;
+  }
+
+  .about-hero-description,
+  .trial-hero-description,
+  .process-hero-description {
+    font-size: 14px !important;
+    line-height: 1.7 !important;
+  }
+}

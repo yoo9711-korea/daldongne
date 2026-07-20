@@ -248,7 +248,7 @@ const styles = `
     }
   }
 
-  @media (max-width: 930px) {
+  @media (max-width: 1240px) {
     .storybook-public-header-inner {
       min-height: 66px;
       padding: 9px 17px;
