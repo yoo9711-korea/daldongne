@@ -1980,3 +1980,54 @@ main samp {
     line-height: 1.7 !important;
   }
 }
+/* ========================================
+   홈페이지·공개 페이지 글씨 굵기 강화
+   ======================================== */
+
+/* 일반 본문과 설명 */
+.storybook-public-page main p,
+.storybook-public-page main li,
+.storybook-public-page main small,
+.storybook-public-page main label,
+.storybook-public-page main blockquote,
+.storybook-public-page main figcaption,
+.storybook-public-page main span {
+  font-weight: 600 !important;
+}
+
+/* 큰 제목과 카드 제목 */
+.storybook-public-page main h1,
+.storybook-public-page main h2,
+.storybook-public-page main h3,
+.storybook-public-page main h4,
+.storybook-public-page main h5,
+.storybook-public-page main h6,
+.storybook-public-page main [class*='title'],
+.storybook-public-page main [class*='heading'] {
+  font-weight: 700 !important;
+}
+
+/* 헤더 로고와 메뉴 */
+.storybook-public-header .storybook-public-brand-name {
+  font-weight: 700 !important;
+}
+
+.storybook-public-header .storybook-public-nav-link,
+.storybook-public-header .storybook-public-cta {
+  font-weight: 800 !important;
+}
+
+/* 공개 페이지 버튼과 링크 */
+.storybook-public-page main a,
+.storybook-public-page main button {
+  font-weight: 800 !important;
+}
+
+/* 하트와 그림 기호는 원래 굵기 유지 */
+.storybook-public-brand-heart,
+.storybook-public-page .about-heart,
+.storybook-public-page .trial-heart,
+.storybook-public-page .process-heart,
+.storybook-public-page [class*='heart'] {
+  font-weight: 400 !important;
+}
