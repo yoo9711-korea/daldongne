@@ -732,52 +732,145 @@ const pageStyles = `
     }
   }
 
-  /* ========================================
-     데스크톱: 글 영역을 오른쪽 이미지 옆에 배치
+    /* ========================================
+     데스크톱 히어로 글과 이미지 균형 재배치
      ======================================== */
 
-  @media (min-width: 1181px) {
-    /* 오른쪽 이미지 시작 위치 */
-    .about-hero-art {
-      inset: 0 0 0 60% !important;
+  @media (min-width: 861px) {
+    .about-hero {
+      display: grid;
+      grid-template-columns:
+        minmax(0, 58%)
+        minmax(0, 42%);
+      min-height: 500px;
+      overflow: hidden;
     }
 
-    /* 제목·설명·버튼 전체를 이미지 바로 왼쪽에 고정 */
+    /* 왼쪽 장식 이미지는 기존 위치 유지 */
+    .about-hero-left-decoration {
+      z-index: 3;
+    }
+
+    /* 글 영역 */
+    .about-hero-inner {
+      position: relative;
+      grid-column: 1;
+      grid-row: 1;
+      width: 100%;
+      min-height: 500px;
+      margin: 0;
+      padding:
+        52px
+        36px
+        46px
+        clamp(195px, 15vw, 235px);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
     .about-hero-copy {
-      position: absolute !important;
-      top: 50% !important;
-      right: calc(40% + 24px) !important;
-      left: auto !important;
-      width: 400px !important;
-      max-width: 400px !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      transform: translateY(-50%) !important;
+      position: relative;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      left: auto;
+      width: min(480px, 100%);
+      max-width: 480px;
+      margin: 0;
+      padding: 0;
+      transform: none;
     }
 
-    /* 제목을 정확히 두 줄로 유지 */
+    /* 오른쪽 이미지 영역 */
+    .about-hero-art {
+      position: relative;
+      inset: auto;
+      grid-column: 2;
+      grid-row: 1;
+      width: 100%;
+      min-width: 0;
+      min-height: 500px;
+    }
+
+    .about-hero-art img {
+      object-fit: cover;
+      object-position: center 58%;
+    }
+
+    /* 제목을 자연스러운 두 줄로 표시 */
     .about-hand-title {
-      width: 100% !important;
-      max-width: 400px !important;
-      font-size: clamp(38px, 3.1vw, 44px) !important;
-      line-height: 1.18 !important;
-      letter-spacing: -0.015em !important;
-      white-space: nowrap !important;
-      word-break: keep-all !important;
-      overflow-wrap: normal !important;
+      width: 100%;
+      max-width: 480px;
+      font-size: clamp(44px, 3.3vw, 56px);
+      line-height: 1.15;
+      letter-spacing: 0;
+      white-space: normal;
+      word-break: keep-all;
+      overflow-wrap: normal;
     }
 
     .about-hero-description {
-      width: 100% !important;
-      max-width: 400px !important;
+      width: 100%;
+      max-width: 460px;
     }
 
+    /* 하단 안내 세 항목 */
     .about-hero-benefits {
-      width: 100% !important;
-      max-width: 400px !important;
+      width: 100%;
+      max-width: 480px;
+      display: grid;
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-items: center;
+    }
+
+    .about-hero-benefit {
+      min-width: 0;
+      gap: 6px;
+    }
+
+    .about-hero-benefit span {
+      min-width: 0;
+      font-size: 10px;
+      line-height: 1.35;
+      white-space: normal;
+      word-break: keep-all;
     }
   }
 
+  /* 노트북과 작은 데스크톱 */
+  @media (min-width: 861px) and (max-width: 1180px) {
+    .about-hero {
+      grid-template-columns:
+        minmax(0, 62%)
+        minmax(0, 38%);
+    }
+
+    .about-hero-inner {
+      padding:
+        44px
+        28px
+        40px
+        180px;
+    }
+
+    .about-hero-copy {
+      width: min(420px, 100%);
+      max-width: 420px;
+    }
+
+    .about-hand-title {
+      max-width: 420px;
+      font-size: clamp(38px, 4vw, 48px);
+    }
+
+    .about-hero-description,
+    .about-hero-benefits {
+      max-width: 420px;
+    }
+  }
   /* 노트북·작은 데스크톱 화면 */
   @media (min-width: 861px) and (max-width: 1180px) {
     .about-hero-art {
