@@ -167,9 +167,9 @@ const pageStyles = `
   }
 
   .about-hero-art img {
-    object-fit: cover;
-    object-position: center center;
-  }
+  object-fit: cover;
+  object-position: center 62%;
+}
 
   .about-hero-inner {
     position: relative;
@@ -933,14 +933,14 @@ export default async function AboutPage() {
           </div>
 
           <div className="about-hero-art">
-            <Image
-              src="/home/storybook/hero-book.webp"
-              alt="가족의 이야기가 담긴 펼쳐진 스토리북"
-              fill
-              priority
-              sizes="(max-width: 860px) 100vw, 60vw"
-            />
-          </div>
+  <Image
+    src="/home/storybook/about-hero-writing.webp"
+    alt="가족사진과 이야기를 따뜻한 손글씨로 기록하는 스토리북"
+    fill
+    priority
+    sizes="(max-width: 860px) 100vw, 60vw"
+  />
+</div>
 
           <div className="about-hero-inner">
             <div className="about-hero-copy">
