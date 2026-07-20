@@ -732,6 +732,88 @@ const pageStyles = `
     }
   }
 
+  /* ========================================
+     데스크톱: 글 영역을 오른쪽 이미지 옆에 배치
+     ======================================== */
+
+  @media (min-width: 1181px) {
+    /* 오른쪽 이미지 시작 위치 */
+    .about-hero-art {
+      inset: 0 0 0 60% !important;
+    }
+
+    /* 제목·설명·버튼 전체를 이미지 바로 왼쪽에 고정 */
+    .about-hero-copy {
+      position: absolute !important;
+      top: 50% !important;
+      right: calc(40% + 24px) !important;
+      left: auto !important;
+      width: 400px !important;
+      max-width: 400px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      transform: translateY(-50%) !important;
+    }
+
+    /* 제목을 정확히 두 줄로 유지 */
+    .about-hand-title {
+      width: 100% !important;
+      max-width: 400px !important;
+      font-size: clamp(38px, 3.1vw, 44px) !important;
+      line-height: 1.18 !important;
+      letter-spacing: -0.015em !important;
+      white-space: nowrap !important;
+      word-break: keep-all !important;
+      overflow-wrap: normal !important;
+    }
+
+    .about-hero-description {
+      width: 100% !important;
+      max-width: 400px !important;
+    }
+
+    .about-hero-benefits {
+      width: 100% !important;
+      max-width: 400px !important;
+    }
+  }
+
+  /* 노트북·작은 데스크톱 화면 */
+  @media (min-width: 861px) and (max-width: 1180px) {
+    .about-hero-art {
+      inset: 0 0 0 63% !important;
+    }
+
+    .about-hero-copy {
+      position: absolute !important;
+      top: 50% !important;
+      right: calc(37% + 20px) !important;
+      left: auto !important;
+      width: 360px !important;
+      max-width: 360px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      transform: translateY(-50%) !important;
+    }
+
+    .about-hand-title {
+      width: 100% !important;
+      max-width: 360px !important;
+      font-size: clamp(34px, 3.4vw, 39px) !important;
+      line-height: 1.2 !important;
+      letter-spacing: -0.015em !important;
+      white-space: nowrap !important;
+      word-break: keep-all !important;
+      overflow-wrap: normal !important;
+    }
+
+    .about-hero-description,
+    .about-hero-benefits {
+      width: 100% !important;
+      max-width: 360px !important;
+    }
+  }
+
   @media (max-width: 860px) {
     .about-hero {
       display: grid;
