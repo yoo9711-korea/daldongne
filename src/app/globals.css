@@ -2120,4 +2120,55 @@ main samp {
 }-public-page [class*='heart'] {
   font-weight: 400 !important;
 }
+/* ========================================
+   스토리북 소개 제목과 오른쪽 이미지 간격 보정
+   ======================================== */
 
+@media (min-width: 861px) {
+  /* 전체 글 영역을 왼쪽으로 이동 */
+  .about-storybook-page .about-hero-copy {
+    width: 350px !important;
+    max-width: 350px !important;
+    margin-left: -35px !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* 제목이 오른쪽 이미지 안으로 넘어가지 않도록 제한 */
+  .about-storybook-page .about-hand-title {
+    width: 350px !important;
+    max-width: 350px !important;
+    font-size: clamp(39px, 3.25vw, 46px) !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-break: keep-all !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* 설명과 버튼도 제목 폭에 맞춤 */
+  .about-storybook-page .about-hero-description,
+  .about-storybook-page .about-primary-button,
+  .about-storybook-page .about-hero-benefits {
+    position: relative !important;
+    z-index: 3 !important;
+  }
+}
+
+/* 현재 화면과 비슷한 노트북·작은 데스크톱 */
+@media (min-width: 861px) and (max-width: 1400px) {
+  .about-storybook-page .about-hero-copy {
+    width: 330px !important;
+    max-width: 330px !important;
+    margin-left: -45px !important;
+  }
+
+  .about-storybook-page .about-hand-title {
+    width: 330px !important;
+    max-width: 330px !important;
+    font-size: clamp(37px, 3.15vw, 43px) !important;
+  }
+
+  .about-storybook-page .about-hero-art {
+    inset: 0 0 0 58% !important;
+  }
+}
