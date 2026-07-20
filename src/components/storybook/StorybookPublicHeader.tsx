@@ -333,6 +333,101 @@ const styles = `
       font-size: 12px;
     }
   }
+  /* 로그인·스토리북 만들기 버튼 영역 */
+  .storybook-public-header-actions {
+    min-width: max-content;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    justify-self: end;
+    gap: 10px;
+  }
+
+  .storybook-public-login {
+    display: inline-flex;
+    min-height: 45px;
+    padding: 0 20px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(217, 104, 82, 0.48);
+    border-radius: 999px;
+    color: #c85f49 !important;
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 7px 18px rgba(137, 79, 58, 0.08);
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      transform 160ms ease,
+      background 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .storybook-public-login:hover,
+  .storybook-public-login:focus-visible {
+    transform: translateY(-2px);
+    background: #fff6f2;
+    box-shadow: 0 10px 22px rgba(137, 79, 58, 0.13);
+  }
+
+  /* 오른쪽 버튼 두 개가 들어갈 공간 확보 */
+  @media (min-width: 1241px) {
+    .storybook-public-header-inner {
+      grid-template-columns:
+        minmax(245px, 0.75fr)
+        minmax(560px, 1.5fr)
+        minmax(315px, 0.65fr);
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 1240px) {
+    .storybook-public-header-actions {
+      margin-left: auto;
+      gap: 8px;
+    }
+
+    .storybook-public-login {
+      min-height: 42px;
+      padding: 0 17px;
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .storybook-public-header-inner {
+      padding-right: 10px;
+      padding-left: 10px;
+      gap: 8px;
+    }
+
+    .storybook-public-brand-name {
+      font-size: 20px;
+    }
+
+    .storybook-public-brand-heart {
+      display: none;
+    }
+
+    .storybook-public-header-actions {
+      gap: 6px;
+    }
+
+    .storybook-public-login {
+      min-height: 37px;
+      padding: 0 12px;
+      font-size: 11px;
+    }
+
+    .storybook-public-cta {
+      min-height: 37px;
+      padding: 0 11px;
+      font-size: 11px;
+    }
+  }
+
 `;
 
 function HeaderNavigation({
@@ -371,6 +466,17 @@ export default function StorybookPublicHeader({
   activeKey,
   ctaHref,
 }: StorybookPublicHeaderProps) {
+  const isLoggedIn =
+    !ctaHref.startsWith('/login');
+
+  const accountHref = isLoggedIn
+    ? '/dashboard'
+    : '/login';
+
+  const accountLabel = isLoggedIn
+    ? '내 작업실'
+    : '로그인';
+
   return (
     <header className="storybook-public-header">
       <div className="storybook-public-header-inner">
@@ -413,12 +519,21 @@ export default function StorybookPublicHeader({
           />
         </nav>
 
-        <Link
-          href={ctaHref}
-          className="storybook-public-cta"
-        >
-          스토리북 만들기&nbsp; ♡
-        </Link>
+        <div className="storybook-public-header-actions">
+  <Link
+    href={accountHref}
+    className="storybook-public-login"
+  >
+    {accountLabel}
+  </Link>
+
+  <Link
+    href={ctaHref}
+    className="storybook-public-cta"
+  >
+    스토리북 만들기&nbsp; ♡
+  </Link>
+</div>
       </div>
 
       <nav
