@@ -1827,22 +1827,54 @@ body > footer {
   font-display: swap;
 }
 
-/* 모든 페이지 헤더와 메인 글씨체 통일 */
+/* 모든 페이지의 헤더 글씨를 손글씨체로 통일 */
 header,
-header *,
-main,
-main * {
-  font-family: 'Noto Serif KR', serif !important;
+header * {
+  font-family:
+    'MapoFlowerIsland',
+    'Gamja Flower',
+    cursive !important;
 }
 
-/* 버튼과 입력창도 동일한 글씨체 적용 */
-header button,
-header input,
-header select,
-header textarea,
-main button,
+/* 공개 페이지의 메인 영역 전체를 손글씨체로 통일 */
+.storybook-public-page main,
+.storybook-public-page main * {
+  font-family:
+    'MapoFlowerIsland',
+    'Gamja Flower',
+    cursive !important;
+}
+
+/* 대시보드·관리자·로그인 페이지의 주요 제목 */
+main h1,
+main h2,
+main h3,
+main h4,
+main h5,
+main h6,
+main .dash-greeting,
+main [class*='title'],
+main [class*='heading'] {
+  font-family:
+    'MapoFlowerIsland',
+    'Gamja Flower',
+    cursive !important;
+  font-weight: 400 !important;
+}
+
+/* 업무용 정보는 기존 글씨체를 유지 */
 main input,
+main textarea,
 main select,
-main textarea {
-  font-family: 'Noto Serif KR', serif !important;
+main option,
+main table,
+main th,
+main td,
+main code,
+main pre,
+main kbd,
+main samp {
+  font-family:
+    'Noto Serif KR',
+    serif !important;
 }
