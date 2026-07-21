@@ -132,8 +132,6 @@ async function getApprovedCustomerReviews() {
 }
 
 const homeStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
-
   body:has(.storybook-home) > [role='banner'] {
     display: none !important;
   }
@@ -1442,8 +1440,8 @@ export default async function HomePage() {
 
               <div className="storybook-hero-art">
                 <Image
-  src="/home/storybook/hero-vintage-desk.png"
-  alt=" 달동네 스토리북 메인 이미지"
+  src="/home/storybook/hero-bright-v2.webp"
+  alt="밝은 햇살 아래 사진과 스토리북이 놓인 달동네 메인 이미지"
   fill
   priority
   sizes="(max-width: 1024px) 100vw, 58vw"

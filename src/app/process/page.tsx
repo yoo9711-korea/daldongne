@@ -118,8 +118,6 @@ const RECOMMENDED_MOMENTS = [
 ] as const;
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
-
   .process-storybook-page,
   .process-storybook-page * {
     box-sizing: border-box;
@@ -923,7 +921,7 @@ export default async function ProcessPage() {
 
         <div className="process-hero-image">
   <Image
-    src="/home/storybook/process-hero-bright.png"
+    src="/home/storybook/process-hero-bright-v2.webp"
     alt="오래된 사진과 카메라, 추억의 앨범이 놓인 밝고 따뜻한 책상"
     fill
     priority
@@ -1088,7 +1086,7 @@ export default async function ProcessPage() {
   <div className="process-cta-inner">
     <div className="process-cta-image">
       <Image
-        src="/home/storybook/process-hero-bright.png"
+        src="/home/storybook/process-hero-bright-v2.webp"
         alt="추억의 사진과 앨범, 카메라가 놓인 따뜻한 책상"
         fill
         sizes="(max-width: 560px) 220px, 315px"

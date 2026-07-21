@@ -24,7 +24,7 @@ const PRODUCT_IMAGES: Record<
   string
 > = {
   LIFE_BOOK_BASIC:
-    '/home/storybook/detail-hero.webp',
+    '/home/storybook/detail-hero-bright-v2.webp',
   MONTHLY_RECORD_BASIC:
     '/home/storybook/example-2.webp',
   MONTHLY_RECORD_QUARTERLY_POSTCARD:
@@ -32,7 +32,7 @@ const PRODUCT_IMAGES: Record<
   MONTHLY_RECORD_MONTHLY_POSTCARD:
     '/home/storybook/example-4.webp',
   MONTHLY_RECORD_PREMIUM:
-    '/home/storybook/detail-hero.webp',
+    '/home/storybook/detail-hero-bright-v2.webp',
   BOOK_PUBLISHING_BASIC:
     '/home/storybook/example-1.webp',
   BOOK_PUBLISHING_STANDARD:
@@ -42,8 +42,6 @@ const PRODUCT_IMAGES: Record<
 };
 
 const pageStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
-
   .apply-storybook-page,
   .apply-storybook-page * {
     box-sizing: border-box;

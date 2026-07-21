@@ -108,8 +108,6 @@ async function getApprovedReviews() {
 }
 
 const pageStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
-
   .about-storybook-page,
   .about-storybook-page * {
     box-sizing: border-box;

@@ -88,7 +88,7 @@ const ARTWORKS: readonly Artwork[] = [
     subtitle: '서로를 만나, 함께 걸어온 시간',
     category: 'couple',
     categoryLabel: '부부·연인 이야기',
-    image: '/home/storybook/detail-hero.webp',
+    image: '/home/storybook/new/home-example-couple.webp',
     order: 2,
   },
   {
@@ -170,8 +170,6 @@ function createFilterHref(
 }
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
-
   .trial-storybook-page,
   .trial-storybook-page * {
     box-sizing: border-box;

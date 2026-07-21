@@ -57,8 +57,6 @@ const NAV_ITEMS: ReadonlyArray<{
 ];
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
-
   body:has(.storybook-public-page) > [role='banner'],
   body:has(.storybook-public-page) > footer {
     display: none !important;

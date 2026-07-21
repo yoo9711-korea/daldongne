@@ -265,8 +265,6 @@ type GuidePageProps = {
 };
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
-
   .guide-storybook-page,
   .guide-storybook-page * {
     box-sizing: border-box;
@@ -1202,8 +1200,8 @@ export default async function GuidePage({
 
           <div className="guide-hero-image">
             <Image
-              src="/home/storybook/detail-hero.webp"
-              alt="가족의 빛나는 순간을 담은 펼쳐진 스토리북"
+              src="/home/storybook/detail-hero-bright-v2.webp"
+              alt="가족사진을 담은 밝은 아이보리 스토리북"
               fill
               priority
               sizes="(max-width: 860px) 100vw, 60vw"
@@ -1607,7 +1605,7 @@ export default async function GuidePage({
           <div className="guide-cta-inner">
             <div className="guide-cta-image">
               <Image
-                src="/home/storybook/detail-hero.webp"
+                src="/home/storybook/detail-hero-bright-v2.webp"
                 alt="꽃과 추억 사진이 놓인 따뜻한 책상"
                 fill
                 sizes="315px"

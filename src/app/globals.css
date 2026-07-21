@@ -1827,38 +1827,43 @@ body > footer {
   font-display: swap;
 }
 
-/* 모든 페이지의 헤더 글씨를 손글씨체로 통일 */
-header,
-header * {
-  font-family:
+/* 손글씨는 감성 제목에만 사용합니다.
+   본문·버튼·가격·관리 화면까지 손글씨로 바꾸면 가독성이 떨어집니다. */
+:root {
+  --font-handwriting:
+    'Nanum Pen Script',
     'MapoFlowerIsland',
     'Gamja Flower',
-    cursive !important;
+    cursive;
 }
 
-/* 공개 페이지의 메인 영역 전체를 손글씨체로 통일 */
-.storybook-public-page main,
-.storybook-public-page main * {
-  font-family:
-    'MapoFlowerIsland',
-    'Gamja Flower',
-    cursive !important;
-}
-
-/* 대시보드·관리자·로그인 페이지의 주요 제목 */
-main h1,
-main h2,
-main h3,
-main h4,
-main h5,
-main h6,
-main .dash-greeting,
-main [class*='title'],
-main [class*='heading'] {
-  font-family:
-    'MapoFlowerIsland',
-    'Gamja Flower',
-    cursive !important;
+.storybook-public-brand-name,
+.storybook-title,
+.storybook-section-title,
+.storybook-recommend-title,
+.storybook-review-title,
+.about-hand-title,
+.about-process-heading,
+.about-section-title,
+.about-cta-title,
+.process-hand-title,
+.process-section-title,
+.process-recommend-heading,
+.process-cta-title,
+.process-strip-title,
+.guide-hand-title,
+.guide-section-title,
+.guide-review-heading,
+.guide-cta-title,
+.apply-storybook-title,
+.pricing-hand-title,
+.pricing-section-title,
+.pricing-cta-title,
+.trial-hand-title,
+.trial-strip-title,
+.trial-cta-title,
+.review-hero h1 {
+  font-family: var(--font-handwriting) !important;
   font-weight: 400 !important;
 }
 
@@ -1992,7 +1997,7 @@ main samp {
 .storybook-public-page main blockquote,
 .storybook-public-page main figcaption,
 .storybook-public-page main span {
-  font-weight: 600 !important;
+  font-weight: 500 !important;
 }
 
 /* 큰 제목과 카드 제목 */
@@ -2023,12 +2028,47 @@ main samp {
   font-weight: 800 !important;
 }
 
+/* 감성 제목은 억지로 굵게 만들지 않아야 손글씨의 획이 자연스럽습니다. */
+.storybook-public-header .storybook-public-brand-name,
+.storybook-public-page main .storybook-title,
+.storybook-public-page main .storybook-section-title,
+.storybook-public-page main .storybook-recommend-title,
+.storybook-public-page main .storybook-review-title,
+.storybook-public-page main .about-hand-title,
+.storybook-public-page main .about-process-heading,
+.storybook-public-page main .about-section-title,
+.storybook-public-page main .about-cta-title,
+.storybook-public-page main .process-hand-title,
+.storybook-public-page main .process-section-title,
+.storybook-public-page main .process-recommend-heading,
+.storybook-public-page main .process-cta-title,
+.storybook-public-page main .process-strip-title,
+.storybook-public-page main .guide-hand-title,
+.storybook-public-page main .guide-section-title,
+.storybook-public-page main .guide-review-heading,
+.storybook-public-page main .guide-cta-title,
+.storybook-public-page main .apply-storybook-title,
+.storybook-public-page main .pricing-hand-title,
+.storybook-public-page main .pricing-section-title,
+.storybook-public-page main .pricing-cta-title,
+.storybook-public-page main .trial-hand-title,
+.storybook-public-page main .trial-strip-title,
+.storybook-public-page main .trial-cta-title,
+.storybook-public-page main .review-hero h1 {
+  font-family: var(--font-handwriting) !important;
+  font-weight: 400 !important;
+}
+
 /* 하트와 그림 기호는 원래 굵기 유지 */
 .storybook-public-brand-heart,
 .storybook-public-page .about-heart,
 .storybook-public-page .trial-heart,
 .storybook-public-page .process-heart,
-.storybook/* ========================================
+.storybook-public-page [class*='heart'] {
+  font-weight: 400 !important;
+}
+
+/* ========================================
    스토리북 소개 페이지 히어로 겹침 방지
    /about 페이지 전용
    ======================================== */
@@ -2117,8 +2157,6 @@ main samp {
   .about-storybook-page .about-hero-benefit span {
     font-size: 9px !important;
   }
-}-public-page [class*='heart'] {
-  font-weight: 400 !important;
 }
 /* ========================================
    스토리북 소개 제목과 오른쪽 이미지 간격 보정
@@ -2170,5 +2208,25 @@ main samp {
 
   .about-storybook-page .about-hero-art {
     inset: 0 0 0 58% !important;
+  }
+}
+
+/* 키보드 사용자에게 현재 위치가 보이도록 공통 초점 표시를 제공합니다. */
+.storybook-public-page a:focus-visible,
+.storybook-public-page button:focus-visible,
+.storybook-public-header a:focus-visible,
+.storybook-public-header button:focus-visible {
+  outline: 3px solid rgba(225, 111, 84, 0.72);
+  outline-offset: 4px;
+}
+
+/* 움직임에 민감한 사용자는 장식 애니메이션 없이 내용을 볼 수 있습니다. */
+@media (prefers-reduced-motion: reduce) {
+  .storybook-public-page *,
+  .storybook-public-header * {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

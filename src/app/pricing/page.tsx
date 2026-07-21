@@ -249,8 +249,6 @@ function ProductCard({
 }
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
-
   .pricing-storybook-page,
   .pricing-storybook-page * {
     box-sizing: border-box;
@@ -1007,7 +1005,7 @@ export default async function PricingPage() {
 
           <div className="pricing-hero-image">
             <Image
-              src="/home/storybook/detail-hero.webp"
+              src="/home/storybook/detail-hero-bright-v2.webp"
               alt="가족 사진이 담긴 인생책과 따뜻한 차"
               fill
               priority
