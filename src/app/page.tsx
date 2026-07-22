@@ -1357,6 +1357,130 @@ const homeStyles = `
       transition-duration: 0.01ms !important;
     }
   }
+/* 새 메인 이미지에 맞춘 히어로 최종 배치 */
+@media (min-width: 1241px) {
+  .storybook-hero {
+    width: min(1590px, 100%);
+    min-height: 538px;
+    margin: 0 auto;
+    overflow: hidden;
+    background: #fffaf5;
+  }
+
+  .storybook-hero-inner {
+    width: 100%;
+    min-height: 538px;
+    display: grid;
+    grid-template-columns: 42% 58%;
+  }
+
+  .storybook-hero-copy {
+    min-width: 0;
+    min-height: 538px;
+    padding: 56px 42px 50px 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(
+        circle at 78% 20%,
+        rgba(255, 255, 255, 0.92),
+        transparent 22rem
+      ),
+      linear-gradient(
+        90deg,
+        #fffdf9 0%,
+        #fffaf5 100%
+      );
+  }
+
+  .storybook-hero-left-decoration {
+    display: none;
+  }
+
+  .storybook-hero-copy-content {
+    width: min(500px, 100%);
+    margin: 0;
+  }
+
+  .storybook-hero-art {
+    position: relative;
+    min-width: 0;
+    min-height: 538px;
+    overflow: hidden;
+  }
+
+  .storybook-hero-art::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 2;
+    width: 135px;
+    content: '';
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      #fffaf5 0%,
+      rgba(255, 250, 245, 0.72) 38%,
+      rgba(255, 250, 245, 0) 100%
+    );
+  }
+
+  .storybook-hero-art img {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  .storybook-title {
+    font-size: clamp(48px, 3vw, 58px);
+    line-height: 1.2;
+  }
+
+  .storybook-description {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  .storybook-quick-steps {
+    margin-top: 24px;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1240px) {
+  .storybook-hero {
+    min-height: 480px;
+  }
+
+  .storybook-hero-inner {
+    min-height: 480px;
+    display: grid;
+    grid-template-columns: 48% 52%;
+  }
+
+  .storybook-hero-copy {
+    min-height: 480px;
+    padding: 46px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .storybook-hero-left-decoration {
+    display: none;
+  }
+
+  .storybook-hero-copy-content {
+    width: min(450px, 100%);
+    margin: 0;
+  }
+
+  .storybook-hero-art {
+    min-height: 480px;
+  }
+
+  .storybook-title {
+    font-size: 42px;
+  }
+}
 `;
 
 export default async function HomePage() {
