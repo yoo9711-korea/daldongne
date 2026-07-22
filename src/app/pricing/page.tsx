@@ -319,8 +319,96 @@ const styles = `
     align-items: center;
   }
 
+    .pricing-hero {
+    position: relative;
+    width: min(1590px, 100%);
+    min-height: 538px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(133, 91, 69, 0.11);
+    background:
+      radial-gradient(
+        circle at 33% 18%,
+        rgba(255, 255, 255, 0.94),
+        transparent 25rem
+      ),
+      linear-gradient(
+        90deg,
+        #fffdf9 0%,
+        #fffaf5 44.4%,
+        #f5f6ef 100%
+      );
+  }
+
+  .pricing-hero-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: 538px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 44.4% 55.6%;
+  }
+
   .pricing-hero-copy {
-    width: min(515px, 43vw);
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+    min-height: 538px;
+    padding: 58px 34px 52px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .pricing-hero-decoration {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 238px;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0.95;
+  }
+
+  .pricing-hero-decoration img {
+    object-fit: cover;
+    object-position: left center;
+  }
+
+  .pricing-hero-copy-content {
+    position: relative;
+    z-index: 2;
+    width: min(430px, 100%);
+    margin-left: 230px;
+  }
+
+  .pricing-hero-image {
+    position: relative;
+    min-width: 0;
+    min-height: 538px;
+    overflow: hidden;
+  }
+
+  .pricing-hero-image img {
+    object-fit: cover;
+    object-position: center 58%;
+  }
+
+  .pricing-hero-image::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    width: 105px;
+    content: '';
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        #fffaf5,
+        rgba(255, 250, 245, 0)
+      );
   }
 
   .pricing-hand-title,
@@ -792,13 +880,36 @@ const styles = `
     text-align: center;
   }
 
-  @media (max-width: 1180px) {
+    @media (max-width: 1240px) {
+    .pricing-hero {
+      min-height: 460px;
+    }
+
     .pricing-hero-inner {
-      padding-left: 175px;
+      min-height: 460px;
+      grid-template-columns: 56% 44%;
+    }
+
+    .pricing-hero-copy {
+      min-height: 460px;
+      padding: 48px 24px 43px;
     }
 
     .pricing-hero-decoration {
       width: 155px;
+    }
+
+    .pricing-hero-copy-content {
+      width: min(430px, 100%);
+      margin-left: 145px;
+    }
+
+    .pricing-hero-image {
+      min-height: 460px;
+    }
+
+    .pricing-hand-title {
+      font-size: clamp(42px, 4.3vw, 50px);
     }
 
     .pricing-plan-grid,
@@ -849,6 +960,59 @@ const styles = `
       text-align: center;
     }
 
+        .pricing-hero {
+      display: block;
+      width: 100%;
+      min-height: auto;
+      background: #fff8f0;
+    }
+
+    .pricing-hero-inner {
+      min-height: auto;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .pricing-hero-copy {
+      order: 1;
+      min-height: auto;
+      padding: 45px 22px 38px;
+    }
+
+    .pricing-hero-decoration {
+      display: none;
+    }
+
+    .pricing-hero-copy-content {
+      width: min(650px, 100%);
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .pricing-hero-image {
+      position: relative;
+      inset: auto;
+      order: 2;
+      min-height: 0;
+      aspect-ratio: 1.55 / 1;
+    }
+
+    .pricing-hero-image::before {
+      top: 0;
+      right: 0;
+      bottom: auto;
+      left: 0;
+      width: auto;
+      height: 70px;
+      background:
+        linear-gradient(
+          180deg,
+          #fff8f0,
+          rgba(255, 248, 240, 0)
+        );
+    }
+
     .pricing-hand-title {
       font-size: clamp(42px, 10vw, 55px);
     }
@@ -885,7 +1049,7 @@ const styles = `
       padding-left: 16px;
     }
 
-    .pricing-hero-inner {
+       .pricing-hero-copy {
       padding: 37px 17px 32px;
     }
 
@@ -989,53 +1153,57 @@ export default async function PricingPage() {
       />
 
       <main>
-        <section className="pricing-hero">
-          <div
-            className="pricing-hero-decoration"
-            aria-hidden="true"
-          >
-            <Image
-              src="/home/storybook/hero-left.webp"
-              alt=""
-              fill
-              priority
-              sizes="175px"
-            />
-          </div>
-
-          <div className="pricing-hero-image">
-            <Image
-              src="/home/storybook/detail-hero-bright-v2.webp"
-              alt="가족 사진이 담긴 인생책과 따뜻한 차"
-              fill
-              priority
-              sizes="(max-width: 860px) 100vw, 55vw"
-            />
-          </div>
-
+               <section className="pricing-hero">
           <div className="pricing-hero-inner">
             <div className="pricing-hero-copy">
-              <h1 className="pricing-hand-title">
-                당신의 이야기에 맞는
-                <br />
-                스토리북을 선택하세요
-                <span className="pricing-heart">♡</span>
-              </h1>
-
-              <p className="pricing-hero-description">
-                삶의 순간을 담아 세상에 하나뿐인 책으로
-                제작해 드립니다.
-                <br />
-                기록을 이어가는 구독형과 한 권을 만드는
-                단행본 중에서 선택하세요.
-              </p>
-
-              <Link
-                href="/guide#contact"
-                className="pricing-primary-button"
+              <div
+                className="pricing-hero-decoration"
+                aria-hidden="true"
               >
-                상담 받고 맞춤 제안 받기&nbsp; →
-              </Link>
+                <Image
+                  src="/home/storybook/hero-left.webp"
+                  alt=""
+                  fill
+                  priority
+                  sizes="(max-width: 1240px) 155px, 238px"
+                />
+              </div>
+
+              <div className="pricing-hero-copy-content">
+                <h1 className="pricing-hand-title">
+                  당신의 이야기에 맞는
+                  <br />
+                  스토리북을 선택하세요
+                  <span className="pricing-heart">
+                    ♡
+                  </span>
+                </h1>
+
+                <p className="pricing-hero-description">
+                  삶의 순간을 담아 세상에 하나뿐인 책으로
+                  제작해 드립니다.
+                  <br />
+                  기록을 이어가는 구독형과 한 권을 만드는
+                  단행본 중에서 선택하세요.
+                </p>
+
+                <Link
+                  href="/guide#contact"
+                  className="pricing-primary-button"
+                >
+                  상담 받고 맞춤 제안 받기&nbsp; →
+                </Link>
+              </div>
+            </div>
+
+            <div className="pricing-hero-image">
+              <Image
+                src="/home/storybook/detail-hero-bright-v2.webp"
+                alt="가족사진을 담은 밝은 아이보리 스토리북"
+                fill
+                priority
+                sizes="(max-width: 860px) 100vw, 56vw"
+              />
             </div>
           </div>
         </section>
