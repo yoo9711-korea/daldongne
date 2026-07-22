@@ -3,13 +3,13 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 const menuItems = [
-  { href: '/dashboard', label: '내 작업실', icon: '⌂' },
-  { href: '/dashboard/timeline', label: '사진 모으기', icon: '▣' },
-  { href: '/dashboard/interview', label: '이야기 남기기', icon: '✎' },
-  { href: '/dashboard/book', label: '책 원고 만들기', icon: '▤' },
+  { href: '/process', label: '제작과정', icon: '✦' },
+  { href: '/trial', label: '작품소개', icon: '▣' },
+  { href: '/#reviews', label: '이용후기', icon: '♡' },
+  { href: '/guide#faq', label: 'FAQ', icon: '?' },
+  { href: '/guide#contact', label: '문의하기', icon: '✉' },
+  { href: '/pricing', label: '상품안내', icon: '▤' },
   { href: '/dashboard/library', label: '내 책장', icon: '▥' },
-  { href: '/dashboard/applications', label: '내 상품 신청', icon: '♡' },
-  { href: '/dashboard/family', label: '가족 공간', icon: '⌘' },
 ];
 
 const styles = `
