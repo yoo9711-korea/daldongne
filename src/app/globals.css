@@ -2230,3 +2230,17 @@ main samp {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* 모든 페이지의 대표 제목을 메인 히어로 손글씨체로 통일 */
+.storybook-title,
+.storybook-public-page section[class*='hero'] h1,
+.dashboard-content h1 {
+  font-family:
+    'Gamja Flower',
+    'MapoFlowerIsland',
+    cursive !important;
+  font-weight: 400 !important;
+  font-style: normal;
+  letter-spacing: 0.015em;
+  word-break: keep-all;
+}
