@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import StorybookPublicHeader from '@/components/storybook/StorybookPublicHeader';
 import { prisma } from '@/lib/prisma';
@@ -1073,6 +1074,7 @@ const pageStyles = `
 `;
 
 export default async function AboutPage() {
+  redirect('/');
   const [session, reviews] =
     await Promise.all([
       auth(),

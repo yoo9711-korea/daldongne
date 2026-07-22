@@ -19,12 +19,7 @@ const NAV_ITEMS: ReadonlyArray<{
   href: string;
   label: string;
 }> = [
-  {
-    key: 'about',
-    href: '/about',
-    label: '스토리북 소개',
-  },
-  {
+   {
     key: 'pricing',
     href: '/pricing',
     label: '상품안내',
