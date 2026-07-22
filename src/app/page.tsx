@@ -496,6 +496,173 @@ const homeStyles = `
     pointer-events: none;
   }
 
+    .storybook-product-choice {
+    border-bottom: 1px solid rgba(133, 91, 69, 0.12);
+    background:
+      radial-gradient(
+        circle at 12% 15%,
+        rgba(255, 255, 255, 0.82),
+        transparent 20rem
+      ),
+      linear-gradient(180deg, #fffaf5 0%, #fff5ec 100%);
+  }
+
+  .storybook-product-choice-inner {
+    width: min(1240px, 100%);
+    margin: 0 auto;
+    padding: 32px 34px 34px;
+  }
+
+  .storybook-product-choice-heading {
+    margin-bottom: 22px;
+    text-align: center;
+  }
+
+  .storybook-product-choice-kicker {
+    margin: 0;
+    color: #dc735b;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .storybook-product-choice-title {
+    margin: 7px 0 0;
+    color: #4f382e;
+    font-family: 'Gowun Batang', serif;
+    font-size: clamp(28px, 2.4vw, 36px);
+    font-weight: 700;
+    line-height: 1.35;
+    word-break: keep-all;
+  }
+
+  .storybook-product-choice-description {
+    margin: 8px 0 0;
+    color: #766158;
+    font-size: 13px;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
+
+  .storybook-product-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .storybook-product-choice-card {
+    min-width: 0;
+    min-height: 190px;
+    display: grid;
+    grid-template-columns: minmax(170px, 38%) minmax(0, 1fr);
+    overflow: hidden;
+    border: 1px solid rgba(177, 122, 89, 0.16);
+    border-radius: 20px;
+    color: #4f392f !important;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 12px 28px rgba(91, 58, 42, 0.07);
+    text-decoration: none;
+    transition:
+      transform 170ms ease,
+      border-color 170ms ease,
+      box-shadow 170ms ease;
+  }
+
+  .storybook-product-choice-card:hover,
+  .storybook-product-choice-card:focus-visible {
+    transform: translateY(-3px);
+    border-color: #e59a82;
+    box-shadow: 0 17px 34px rgba(181, 93, 65, 0.12);
+    outline: none;
+  }
+
+  .storybook-product-choice-image {
+    position: relative;
+    min-width: 0;
+    min-height: 190px;
+    overflow: hidden;
+    background: #f4e9de;
+  }
+
+  .storybook-product-choice-image img {
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  .storybook-product-choice-copy {
+    min-width: 0;
+    padding: 22px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .storybook-product-choice-badge {
+    width: max-content;
+    padding: 5px 10px;
+    border-radius: 999px;
+    color: #c7654f;
+    background: #fff0e9;
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .storybook-product-choice-copy h3 {
+    margin: 10px 0 0;
+    font-family: 'Gowun Batang', serif;
+    font-size: 24px;
+    line-height: 1.35;
+  }
+
+  .storybook-product-choice-copy p {
+    margin: 8px 0 0;
+    color: #756057;
+    font-size: 12px;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
+
+  .storybook-product-choice-action {
+    margin-top: 13px;
+    color: #c75f49;
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  @media (max-width: 930px) {
+    .storybook-product-choice-inner {
+      padding: 28px 20px 30px;
+    }
+
+    .storybook-product-choice-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .storybook-product-choice-inner {
+      padding: 25px 16px 27px;
+    }
+
+    .storybook-product-choice-card {
+      grid-template-columns: 120px minmax(0, 1fr);
+      min-height: 160px;
+    }
+
+    .storybook-product-choice-image {
+      min-height: 160px;
+    }
+
+    .storybook-product-choice-copy {
+      padding: 17px 15px;
+    }
+
+    .storybook-product-choice-copy h3 {
+      font-size: 20px;
+    }
+  }
+
+
   .storybook-main-grid {
     width: min(1536px, 100%);
     margin: 0 auto;
@@ -1502,6 +1669,21 @@ export default async function HomePage() {
     ? '/dashboard'
     : '/login?callbackUrl=/dashboard';
 
+     const createHomeProductHref = (
+    productCode: string,
+  ) => {
+    const destination =
+      `/apply?product=${encodeURIComponent(productCode)}`;
+
+    if (session?.user) {
+      return destination;
+    }
+
+    return `/login?callbackUrl=${encodeURIComponent(
+      destination,
+    )}`;
+  };
+
   return (
     <>
       <style>{homeStyles}</style>
@@ -1576,6 +1758,93 @@ export default async function HomePage() {
             </div>
           </section>
 
+           <section
+            className="storybook-product-choice"
+            aria-labelledby="product-choice-title"
+          >
+            <div className="storybook-product-choice-inner">
+              <div className="storybook-product-choice-heading">
+                <p className="storybook-product-choice-kicker">
+                  나에게 맞는 기록 방법
+                </p>
+
+                <h2
+                  id="product-choice-title"
+                  className="storybook-product-choice-title"
+                >
+                  어떤 방식으로 이야기를 남기고 싶으신가요?
+                </h2>
+
+                <p className="storybook-product-choice-description">
+                  한 번에 책으로 완성하거나, 매달 천천히 기록할 수 있습니다.
+                </p>
+              </div>
+
+              <div className="storybook-product-choice-grid">
+                <Link
+                  href={createHomeProductHref('LIFE_BOOK_BASIC')}
+                  className="storybook-product-choice-card"
+                >
+                  <div className="storybook-product-choice-image">
+                    <Image
+                      src="/home/storybook/detail-hero-bright-v2.webp"
+                      alt="사진과 이야기를 한 권의 인생책으로 만드는 서비스"
+                      fill
+                      sizes="(max-width: 680px) 120px, 240px"
+                    />
+                  </div>
+
+                  <div className="storybook-product-choice-copy">
+                    <span className="storybook-product-choice-badge">
+                      한 번 제작
+                    </span>
+
+                    <h3>인생책 제작</h3>
+
+                    <p>
+                      사진과 이야기를 정리해 50~80페이지의 한 권의
+                      스토리북으로 완성합니다.
+                    </p>
+
+                    <span className="storybook-product-choice-action">
+                      인생책 상품 보기 →
+                    </span>
+                  </div>
+                </Link>
+
+                <Link
+                  href={createHomeProductHref('MONTHLY_RECORD_BASIC')}
+                  className="storybook-product-choice-card"
+                >
+                  <div className="storybook-product-choice-image">
+                    <Image
+                      src="/home/storybook/process-hero-bright-v2.webp"
+                      alt="사진과 이야기를 매달 기록하는 월간기록 서비스"
+                      fill
+                      sizes="(max-width: 680px) 120px, 240px"
+                    />
+                  </div>
+
+                  <div className="storybook-product-choice-copy">
+                    <span className="storybook-product-choice-badge">
+                      매월 기록
+                    </span>
+
+                    <h3>월간기록 구독</h3>
+
+                    <p>
+                      매달 사진과 이야기를 차곡차곡 기록하고,
+                      12개월 후 한 권의 책으로 이어갑니다.
+                    </p>
+
+                    <span className="storybook-product-choice-action">
+                      월간기록 상품 보기 →
+                    </span>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </section>
           <section className="storybook-main-grid">
             <div className="storybook-column" id="process">
               <h2 className="storybook-section-title">
