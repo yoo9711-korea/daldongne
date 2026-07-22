@@ -483,6 +483,7 @@ const homeStyles = `
     object-position: center center;
   }
 
+
   .storybook-hero-art::before {
     position: absolute;
     top: 0;
@@ -1236,8 +1237,8 @@ const homeStyles = `
   @media (min-width: 931px) {
     .storybook-hero,
     .storybook-hero-inner {
-      height: 520px;
-      min-height: 520px;
+      height: 490px;
+      min-height: 490px;
     }
 
     .storybook-hero-inner {
@@ -1251,9 +1252,9 @@ const homeStyles = `
       min-width: 0;
       overflow: hidden;
       padding:
-        48px
-        24px
         42px
+        22px
+        36px
         clamp(220px, 17vw, 270px);
       justify-content: center;
     }
@@ -1302,15 +1303,15 @@ const homeStyles = `
     }
 
     .storybook-hero-art {
-      height: 520px;
-      min-height: 520px;
+      height: 490px;
+      min-height: 490px;
     }
 
     .storybook-hero-art img {
       object-fit: cover;
       object-position: center center;
     }
-
+  }
   @media (min-width: 931px) and (max-width: 1180px) {
     .storybook-hero-inner {
       grid-template-columns:
@@ -1347,6 +1348,7 @@ const homeStyles = `
     .storybook-quick-step p {
       white-space: normal;
     }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .storybook-home *,
@@ -1377,7 +1379,7 @@ const homeStyles = `
   .storybook-hero-copy {
     min-width: 0;
     min-height: 538px;
-    padding: 56px 42px 50px 64px;
+    padding: 44px 36px 40px 58px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1458,7 +1460,7 @@ const homeStyles = `
 
   .storybook-hero-copy {
     min-height: 480px;
-    padding: 46px 30px;
+    padding: 40px 26px;
     display: flex;
     align-items: center;
     justify-content: center;
