@@ -18,8 +18,9 @@ const styles = `
     box-sizing: border-box;
   }
 
-  .dashboard-shell {
-    min-height: 100vh;
+ .dashboard-shell {
+  min-height: 100vh;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
     display: grid;
     grid-template-columns: 248px minmax(0, 1fr);
     color: #4a342a;
@@ -59,7 +60,7 @@ const styles = `
   .dashboard-brand-title {
     margin: 7px 0 0;
     color: #4a3329;
-    font-family: 'MapoFlowerIsland', 'Noto Serif KR', serif;
+    font-family: 'Gamja Flower', 'MapoFlowerIsland', cursive;
     font-size: 28px;
     font-weight: 400;
     line-height: 1.12;
@@ -170,6 +171,23 @@ const styles = `
   }
 
   .dashboard-content > * {
+  .dashboard-shell button,
+.dashboard-shell input,
+.dashboard-shell textarea,
+.dashboard-shell select {
+  font-family: inherit;
+}
+
+.dashboard-content h1,
+.dashboard-content h2,
+.dashboard-content h3,
+.dashboard-content h4,
+.dashboard-content [style*='Noto Serif KR'],
+.dashboard-content [style*='--font-display'] {
+  font-family: 'Gamja Flower', 'MapoFlowerIsland', cursive !important;
+  font-weight: 400;
+  letter-spacing: 0.015em;
+}
     min-width: 0;
   }
 
