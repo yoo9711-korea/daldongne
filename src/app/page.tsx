@@ -507,7 +507,7 @@ const homeStyles = `
 
   .storybook-column {
     min-width: 0;
-    padding: 34px 30px 30px;
+    padding: 28px 24px 24px;
   }
 
   .storybook-column + .storybook-column {
@@ -515,7 +515,7 @@ const homeStyles = `
   }
 
  .storybook-section-title {
-  margin: 0 0 24px;
+  margin: 0 0 18px;
   font-family: 'Gowun Batang', serif;
   font-size: clamp(29px, 2.73vw, 36px);
   font-weight: 700;
@@ -583,7 +583,7 @@ const homeStyles = `
 
   .storybook-outline-button {
     min-height: 38px;
-    margin: 25px auto 0;
+    margin: 20px auto 0;
     padding: 0 20px;
     border: 1px solid rgba(112, 78, 62, 0.35);
     background: rgba(255, 255, 255, 0.72);
@@ -631,8 +631,8 @@ const homeStyles = `
 
   .storybook-review-card {
     position: relative;
-    min-height: 150px;
-    padding: 28px 20px 20px;
+    min-height: 140px;
+    padding: 25px 18px 17px;
     border: 1px solid rgba(133, 91, 69, 0.09);
     border-radius: 16px;
     background: #ffffff;
@@ -667,10 +667,10 @@ const homeStyles = `
   }
  
   .storybook-side-cta {
-    min-height: 132px;
-    padding: 16px 20px;
+    min-height: 120px;
+    padding: 14px 16px;
     display: grid;
-    grid-template-columns: 132px minmax(0, 1fr);
+    grid-template-columns: 120px minmax(0, 1fr);
     align-items: center;
     gap: 14px;
     overflow: hidden;
@@ -682,10 +682,9 @@ const homeStyles = `
 
   .storybook-side-cta-image {
     position: relative;
-    width: 132px;
-    height: 103px;
+    width: 120px;
+    height: 94px;
   }
-
   .storybook-side-cta-image img {
   border-radius: 12px;
   object-fit: cover;
@@ -717,11 +716,11 @@ const homeStyles = `
   .storybook-recommend-inner {
     width: min(1390px, 100%);
     margin: 0 auto;
-    padding: 28px 34px;
+    padding: 22px 28px;
     display: grid;
     grid-template-columns: minmax(180px, 0.54fr) minmax(0, 2.46fr) minmax(290px, 0.95fr);
     align-items: center;
-    gap: 24px;
+    gap: 20px;
   }
 
   .storybook-recommend-title {
@@ -757,7 +756,7 @@ const homeStyles = `
   position: relative;
   width: 86px;
   height: 68px;
-  margin: 16px auto 6px;
+  margin: 10px auto 5px;
 }
 
   .storybook-recommend-image img {
@@ -777,10 +776,10 @@ const homeStyles = `
   }
 
   .storybook-bottom-cta {
-    min-height: 116px;
-    padding: 18px 22px;
+    min-height: 106px;
+    padding: 14px 18px;
     display: grid;
-    grid-template-columns: 90px minmax(0, 1fr);
+    grid-template-columns: 82px minmax(0, 1fr);
     align-items: center;
     gap: 13px;
     border: 1px solid rgba(133, 91, 69, 0.1);
@@ -791,8 +790,8 @@ const homeStyles = `
 
   .storybook-bottom-cta-image {
     position: relative;
-    width: 90px;
-    height: 74px;
+    width: 82px;
+    height: 68px;
   }
 
   .storybook-bottom-cta-image img {
