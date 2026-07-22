@@ -1440,7 +1440,7 @@ export default async function HomePage() {
 
               <div className="storybook-hero-art">
                 <Image
-  src="/home/storybook/hero-bright-v2.webp"
+  src="/home/storybook/home-hero-family-story-v3.webp"
   alt="밝은 햇살 아래 사진과 스토리북이 놓인 달동네 메인 이미지"
   fill
   priority
