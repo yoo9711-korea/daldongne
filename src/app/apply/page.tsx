@@ -26,7 +26,7 @@ const PRODUCT_IMAGES: Record<
   LIFE_BOOK_BASIC:
     '/home/storybook/detail-hero-bright-v2.webp',
   MONTHLY_RECORD_BASIC:
-   '/home/storybook/application-monthly-basic-v2.webp',
+    '/home/storybook/process-hero-bright-v2.webp',
   MONTHLY_RECORD_QUARTERLY_POSTCARD:
     '/home/storybook/example-3.webp',
   MONTHLY_RECORD_MONTHLY_POSTCARD:
