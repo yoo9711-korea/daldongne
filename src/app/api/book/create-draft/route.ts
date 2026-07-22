@@ -281,7 +281,11 @@ export async function POST(request: Request) {
       })
       .join('\n\n');
 
-    const response = await openai.responses.create({
+    let aiText = '';
+    let usedFallback = false;
+
+    try {
+      const response = await openai.responses.create({
       model: 'gpt-4.1-mini',
       input: [
         {
@@ -344,17 +348,20 @@ export async function POST(request: Request) {
           ].join('\n'),
         },
       ],
-    });
+          });
 
-    const aiText = response.output_text?.trim();
+      aiText = response.output_text?.trim() || '';
+    } catch (error) {
+      console.error(
+        '[AI_BOOK_DRAFT_FALLBACK]',
+        error,
+      );
+    }
 
     if (!aiText) {
-      return NextResponse.json(
-        {
-          ok: false,
-          message: 'AI가 책 원고를 만들지 못했습니다.',
-        },
-        { status: 500 },
+      usedFallback = true;
+      aiText = createFallbackBookDraft(
+        timelineSourceMemories,
       );
     }
 
@@ -438,7 +445,9 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       bookId: book.id,
-      message: 'AI가 책 원고 초안을 만들었습니다.',
+      message: usedFallback
+        ? 'AI 연결이 원활하지 않아 기본 책 원고 초안을 만들었습니다.'
+        : 'AI가 책 원고 초안을 만들었습니다.',
     });
                
   } catch (error) {
@@ -457,6 +466,73 @@ export async function POST(request: Request) {
 function isLegacyAiInterviewTitle(title: string) {
   return title.startsWith('AI 인터뷰') || title.includes('AI 인터뷰 -');
 }
+
+type FallbackMemory = {
+  type: string;
+  title: string | null;
+  description: string | null;
+  occurredAt: Date | null;
+  createdAt: Date;
+};
+
+function createFallbackBookDraft(
+  memories: FallbackMemory[],
+) {
+  const sections = memories
+    .slice(0, 60)
+    .map((memory, index) => {
+      const isPhoto =
+        String(memory.type) === 'PHOTO';
+
+      const kindLabel = isPhoto
+        ? '사진'
+        : '이야기';
+
+      const title =
+        memory.title?.trim() ||
+        `${kindLabel} 기록 ${index + 1}`;
+
+      const description =
+        memory.description?.trim() || '';
+
+      const dateLine = memory.occurredAt
+        ? `기록된 날짜는 ${formatDate(
+            memory.occurredAt,
+          )}입니다.`
+        : '';
+
+      const content = description
+        ? description
+        : isPhoto
+          ? '한 장의 사진이 남아 있습니다. 이 장면에 대한 이야기는 앞으로 더 채워갈 수 있습니다.'
+          : '이 기록에 대한 이야기는 앞으로 더 채워갈 수 있습니다.';
+
+      return [
+        `## ${title}`,
+        dateLine,
+        content,
+      ]
+        .filter(Boolean)
+        .join('\n\n');
+    })
+    .join('\n\n');
+
+  return [
+    '제목: 우리들의 이야기',
+    '부제: 사진과 이야기로 엮은 인생책',
+    '요약: 선택한 사진과 이야기를 시간의 흐름에 따라 정리한 책 원고 초안입니다.',
+    '표지문구: 사진은 순간을 남기고, 이야기는 시간을 남깁니다.',
+    '본문:',
+    '## 프롤로그 — 이 기록을 남기는 이유',
+    '사진과 이야기를 한자리에 모으면 흩어져 있던 시간이 한 권의 기록으로 이어집니다. 이 원고는 사용자가 남긴 내용만을 바탕으로 정리한 기본 초안입니다.',
+    sections,
+    '## 에필로그 — 앞으로 더해질 이야기',
+    '아직 적지 못한 기억은 앞으로 천천히 더해갈 수 있습니다. 새로운 사진과 이야기가 모일 때마다 이 원고도 함께 깊어집니다.',
+  ]
+    .filter(Boolean)
+    .join('\n\n');
+}
+
 
 function parseBookDraft(text: string) {
   const title = pickLineValue(text, '제목');
