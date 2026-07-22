@@ -19,10 +19,36 @@ const NAV_ITEMS: ReadonlyArray<{
   href: string;
   label: string;
 }> = [
+  
   {
-    key: 'about',
-    href: '/',
-    label: '홈',
+    key: 'process',
+    href: '/process',
+    label: '제작과정',
+  },
+  {
+    key: 'trial',
+    href: '/trial',
+    label: '작품소개',
+  },
+  {
+    key: 'reviews',
+    href: '/#reviews',
+    label: '이용후기',
+  },
+  {
+    key: 'guide',
+    href: '/guide#faq',
+    label: 'FAQ',
+  },
+  {
+    key: 'contact',
+    href: '/guide#contact',
+    label: '문의하기',
+  },
+ {
+    key: 'pricing',
+    href: '/pricing',
+    label: '상품안내',
   },
 ];
 
@@ -56,8 +82,9 @@ const styles = `
     padding: 10px clamp(22px, 3.2vw, 48px);
     display: grid;
     grid-template-columns:
-      minmax(245px, 1fr)
-      auto;
+      minmax(245px, 0.75fr)
+      minmax(620px, 1.65fr)
+      minmax(170px, 0.45fr);
     align-items: center;
     gap: 24px;
   }
@@ -106,7 +133,7 @@ const styles = `
     min-width: 0;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     gap: clamp(21px, 2.1vw, 38px);
     white-space: nowrap;
   }
@@ -343,8 +370,9 @@ const styles = `
   @media (min-width: 1241px) {
     .storybook-public-header-inner {
       grid-template-columns:
-        minmax(245px, 1fr)
-        auto;
+        minmax(245px, 0.75fr)
+        minmax(560px, 1.5fr)
+        minmax(315px, 0.65fr);
       gap: 20px;
     }
   }
@@ -430,7 +458,19 @@ function HeaderNavigation({
 
 export default function StorybookPublicHeader({
   activeKey,
+  ctaHref,
 }: StorybookPublicHeaderProps) {
+  const isLoggedIn =
+    !ctaHref.startsWith('/login');
+
+  const accountHref = isLoggedIn
+    ? '/dashboard'
+    : '/login';
+
+  const accountLabel = isLoggedIn
+    ? '내 작업실'
+    : '로그인';
+
   return (
     <header className="storybook-public-header">
       <div className="storybook-public-header-inner">
@@ -473,7 +513,22 @@ export default function StorybookPublicHeader({
           />
         </nav>
 
-        </div>
+        <div className="storybook-public-header-actions">
+  <Link
+    href={accountHref}
+    className="storybook-public-login"
+  >
+    {accountLabel}
+  </Link>
+
+  <Link
+    href={ctaHref}
+    className="storybook-public-cta"
+  >
+    스토리북 만들기&nbsp; ♡
+  </Link>
+</div>
+      </div>
 
       <nav
         className="storybook-public-mobile-nav"
