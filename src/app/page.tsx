@@ -753,11 +753,11 @@ const homeStyles = `
   }
 
   .storybook-recommend-image {
-    position: relative;
-    width: 86px;
-    height: 68px;
-    margin: 0 auto 6px;
-  }
+  position: relative;
+  width: 86px;
+  height: 68px;
+  margin: 16px auto 6px;
+}
 
   .storybook-recommend-image img {
   border-radius: 10px;
