@@ -2244,3 +2244,352 @@ main samp {
   letter-spacing: 0.015em;
   word-break: keep-all;
 }
+
+/* =========================================================
+   공개 페이지 히어로 공통 규격
+   데스크톱: 1590 × 538 / 문구 42% / 이미지 58%
+   ========================================================= */
+
+/* 중복되는 왼쪽 장식 이미지 제거 */
+.storybook-hero-left-decoration,
+.pricing-hero-decoration,
+.guide-hero-decoration,
+.process-hero-left {
+  display: none !important;
+}
+
+@media (min-width: 1241px) {
+  .storybook-hero,
+  .pricing-hero,
+  .guide-hero,
+  .process-hero,
+  .trial-hero,
+  .apply-storybook-hero {
+    position: relative !important;
+    width: min(1590px, 100%) !important;
+    height: 538px !important;
+    min-height: 538px !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+    background: #fffaf5 !important;
+    border-bottom: 1px solid rgba(133, 91, 69, 0.11);
+  }
+
+  /* 내부에 이미지가 포함된 메인·상품 안내 */
+  .storybook-hero-inner,
+  .pricing-hero-inner {
+    width: 100% !important;
+    height: 538px !important;
+    min-height: 538px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-columns: 42% 58% !important;
+  }
+
+  /* 이미지가 별도 배치된 나머지 페이지 */
+  .guide-hero-inner,
+  .process-hero-inner,
+  .trial-hero-inner,
+  .apply-storybook-hero-inner {
+    position: relative !important;
+    z-index: 2 !important;
+    width: 100% !important;
+    height: 538px !important;
+    min-height: 538px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 모든 히어로 문구 영역 */
+  .storybook-hero-copy,
+  .pricing-hero-copy,
+  .guide-hero-copy,
+  .process-hero-copy,
+  .trial-hero-copy,
+  .apply-storybook-hero-copy {
+    position: relative !important;
+    z-index: 3 !important;
+    width: 42% !important;
+    height: 538px !important;
+    min-height: 538px !important;
+    margin: 0 !important;
+    padding: 54px 42px 50px 64px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    text-align: left !important;
+    overflow: visible !important;
+    background:
+      radial-gradient(
+        circle at 76% 18%,
+        rgba(255, 255, 255, 0.94),
+        transparent 23rem
+      ),
+      linear-gradient(
+        90deg,
+        #fffdf9 0%,
+        #fffaf5 100%
+      ) !important;
+  }
+
+  /* 메인·상품 안내는 grid 안에서 너비가 결정됨 */
+  .storybook-hero-inner > .storybook-hero-copy,
+  .pricing-hero-inner > .pricing-hero-copy {
+    width: 100% !important;
+  }
+
+  .storybook-hero-copy-content,
+  .pricing-hero-copy-content {
+    width: min(500px, 100%) !important;
+    margin: 0 !important;
+  }
+
+  /* 별도 배치형 이미지 */
+  .guide-hero-image,
+  .process-hero-image,
+  .trial-hero-image,
+  .apply-storybook-hero-image {
+    position: absolute !important;
+    inset: 0 0 0 42% !important;
+    z-index: 1 !important;
+    width: auto !important;
+    height: 538px !important;
+    min-height: 538px !important;
+    overflow: hidden !important;
+  }
+
+  /* grid 내부 이미지 */
+  .storybook-hero-art,
+  .pricing-hero-image {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 538px !important;
+    min-height: 538px !important;
+    overflow: hidden !important;
+  }
+
+  /* 모든 히어로 이미지 표시 방식 통일 */
+  .storybook-hero-art img,
+  .pricing-hero-image img,
+  .guide-hero-image img,
+  .process-hero-image img,
+  .trial-hero-image img,
+  .apply-storybook-hero-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  /* 문구와 이미지 사이의 자연스러운 연결 */
+  .storybook-hero-art::before,
+  .pricing-hero-image::before,
+  .guide-hero-image::before,
+  .process-hero-image::before,
+  .trial-hero-image::before,
+  .apply-storybook-hero-image::before {
+    position: absolute !important;
+    inset: 0 auto 0 0 !important;
+    z-index: 2 !important;
+    width: 130px !important;
+    height: auto !important;
+    content: '' !important;
+    pointer-events: none !important;
+    background: linear-gradient(
+      90deg,
+      #fffaf5 0%,
+      rgba(255, 250, 245, 0.7) 38%,
+      rgba(255, 250, 245, 0) 100%
+    ) !important;
+  }
+}
+
+/* 태블릿 */
+@media (min-width: 1025px) and (max-width: 1240px) {
+  .storybook-hero,
+  .pricing-hero,
+  .guide-hero,
+  .process-hero,
+  .trial-hero,
+  .apply-storybook-hero {
+    position: relative !important;
+    width: 100% !important;
+    height: 480px !important;
+    min-height: 480px !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+    background: #fffaf5 !important;
+  }
+
+  .storybook-hero-inner,
+  .pricing-hero-inner {
+    height: 480px !important;
+    min-height: 480px !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-columns: 48% 52% !important;
+  }
+
+  .guide-hero-inner,
+  .process-hero-inner,
+  .trial-hero-inner,
+  .apply-storybook-hero-inner {
+    width: 100% !important;
+    height: 480px !important;
+    min-height: 480px !important;
+    padding: 0 !important;
+  }
+
+  .storybook-hero-copy,
+  .pricing-hero-copy,
+  .guide-hero-copy,
+  .process-hero-copy,
+  .trial-hero-copy,
+  .apply-storybook-hero-copy {
+    width: 48% !important;
+    height: 480px !important;
+    min-height: 480px !important;
+    margin: 0 !important;
+    padding: 42px 28px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .storybook-hero-inner > .storybook-hero-copy,
+  .pricing-hero-inner > .pricing-hero-copy {
+    width: 100% !important;
+  }
+
+  .storybook-hero-copy-content,
+  .pricing-hero-copy-content {
+    width: min(440px, 100%) !important;
+    margin: 0 !important;
+  }
+
+  .guide-hero-image,
+  .process-hero-image,
+  .trial-hero-image,
+  .apply-storybook-hero-image {
+    position: absolute !important;
+    inset: 0 0 0 48% !important;
+    height: 480px !important;
+  }
+
+  .storybook-hero-art,
+  .pricing-hero-image {
+    position: relative !important;
+    inset: auto !important;
+    height: 480px !important;
+    min-height: 480px !important;
+  }
+}
+
+/* 모바일 */
+@media (max-width: 1024px) {
+  .storybook-hero,
+  .pricing-hero,
+  .guide-hero,
+  .process-hero,
+  .trial-hero,
+  .apply-storybook-hero {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    display: block !important;
+    overflow: hidden !important;
+    background: #fff8f0 !important;
+  }
+
+  .storybook-hero-inner,
+  .pricing-hero-inner {
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .guide-hero-inner,
+  .process-hero-inner,
+  .trial-hero-inner,
+  .apply-storybook-hero-inner {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+
+  .storybook-hero-copy,
+  .pricing-hero-copy,
+  .guide-hero-copy,
+  .process-hero-copy,
+  .trial-hero-copy,
+  .apply-storybook-hero-copy {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 44px 22px 38px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .storybook-hero-copy-content,
+  .pricing-hero-copy-content {
+    width: min(650px, 100%) !important;
+    margin: 0 auto !important;
+  }
+
+  .storybook-hero-art,
+  .pricing-hero-image,
+  .guide-hero-image,
+  .process-hero-image,
+  .trial-hero-image,
+  .apply-storybook-hero-image {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 1.55 / 1 !important;
+    overflow: hidden !important;
+  }
+
+  .storybook-hero-art img,
+  .pricing-hero-image img,
+  .guide-hero-image img,
+  .process-hero-image img,
+  .trial-hero-image img,
+  .apply-storybook-hero-image img {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  .storybook-hero-art::before,
+  .pricing-hero-image::before,
+  .guide-hero-image::before,
+  .process-hero-image::before,
+  .trial-hero-image::before,
+  .apply-storybook-hero-image::before {
+    position: absolute !important;
+    inset: 0 0 auto !important;
+    z-index: 2 !important;
+    width: auto !important;
+    height: 70px !important;
+    content: '' !important;
+    background: linear-gradient(
+      180deg,
+      #fff8f0 0%,
+      rgba(255, 248, 240, 0) 100%
+    ) !important;
+  }
+}
