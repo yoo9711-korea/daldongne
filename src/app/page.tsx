@@ -54,27 +54,27 @@ const storybookExamples = [
 const recommendationItems = [
   {
     image:
-      '/home/storybook/new/home-recommend-parent.webp',
+      '/home/storybook/recommend-parents.webp',
     text: '부모님의 인생 이야기를\n선물하고 싶을 때',
   },
   {
     image:
-      '/home/storybook/new/home-recommend-couple.webp',
+      '/home/storybook/recommend-couple.webp',
     text: '연인과의 추억을\n오래 간직하고 싶을 때',
   },
   {
     image:
-      '/home/storybook/new/home-recommend-child.webp',
+      '/home/storybook/recommend-child.webp',
     text: '아이의 성장 과정을\n기록하고 싶을 때',
   },
   {
     image:
-      '/home/storybook/new/home-recommend-pet.webp',
+      '/home/storybook/recommend-pet.webp',
     text: '반려동물과 함께한 시간을\n남기고 싶을 때',
   },
   {
     image:
-      '/home/storybook/new/home-recommend-friends.webp',
+      '/home/storybook/recommend-friend.webp',
     text: '친구와의 우정을\n특별한 선물로 만들 때',
   },
 ];
