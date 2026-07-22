@@ -19,11 +19,7 @@ const NAV_ITEMS: ReadonlyArray<{
   href: string;
   label: string;
 }> = [
-   {
-    key: 'pricing',
-    href: '/pricing',
-    label: '상품안내',
-  },
+  
   {
     key: 'process',
     href: '/process',
@@ -48,6 +44,11 @@ const NAV_ITEMS: ReadonlyArray<{
     key: 'contact',
     href: '/guide#contact',
     label: '문의하기',
+  },
+ {
+    key: 'pricing',
+    href: '/pricing',
+    label: '상품안내',
   },
 ];
 
