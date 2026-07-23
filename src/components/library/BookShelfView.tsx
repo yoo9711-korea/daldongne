@@ -49,14 +49,14 @@ export default function BookShelfView({ books = [] }: Props) {
         style={{
           padding: '30px 32px 22px',
           background:
-            'linear-gradient(135deg, #3a2a1f 0%, #5b3f29 58%, #8a6238 100%)',
-          color: '#fff8ec',
+            'linear-gradient(135deg, #fff8f3 0%, #fffdfb 55%, #ffede3 100%)',
+          color: '#49352b',
         }}
       >
         <p
           style={{
             margin: '0 0 12px',
-            color: '#f0c36a',
+            color: '#e4775e',
             fontWeight: 900,
             letterSpacing: '0.08em',
           }}
@@ -84,7 +84,7 @@ export default function BookShelfView({ books = [] }: Props) {
             maxWidth: 760,
             fontSize: 17,
             lineHeight: 1.75,
-            color: 'rgba(255, 248, 236, 0.82)',
+            color: '#725d52',
           }}
         >
           사진과 이야기가 한 권의 책으로 완성되면,
@@ -95,16 +95,16 @@ export default function BookShelfView({ books = [] }: Props) {
       <div
         style={{
           padding: '42px 32px 48px',
-          background: 'linear-gradient(180deg, #fff8ec 0%, #efe0c4 100%)',
+          background: 'linear-gradient(180deg, #fffdf9 0%, #fff3e9 100%)',
         }}
       >
         <div
           style={{
             padding: '34px 28px 42px',
             borderRadius: 28,
-            background: 'linear-gradient(180deg, #6b4428 0%, #4a2f1d 100%)',
+            background: 'linear-gradient(180deg, #fff5ed 0%, #f5d9c7 100%)',
             boxShadow:
-              'inset 0 8px 18px rgba(255,255,255,0.08), 0 24px 60px rgba(91,66,43,0.22)',
+              'inset 0 8px 18px rgba(255,255,255,0.62), 0 20px 45px rgba(178,112,76,0.14)',
             overflow: 'hidden',
           }}
         >
@@ -126,13 +126,13 @@ export default function BookShelfView({ books = [] }: Props) {
                 borderRadius: '10px 10px 5px 5px',
                 background:
                   index % 3 === 0
-                    ? 'linear-gradient(180deg, #efe0c4 0%, #b98642 100%)'
+                    ? 'linear-gradient(180deg, #fff1d9 0%, #e7a96f 100%)'
                     : index % 3 === 1
-                      ? 'linear-gradient(180deg, #fff8ec 0%, #8a6238 100%)'
-                      : 'linear-gradient(180deg, #d7b06a 0%, #5b3f29 100%)',
+                      ? 'linear-gradient(180deg, #fffdf8 0%, #e9c29a 100%)'
+                      : 'linear-gradient(180deg, #ffe6c8 0%, #dc9671 100%)',
                 boxShadow:
-                  'inset -8px 0 14px rgba(0,0,0,0.18), inset 5px 0 10px rgba(255,255,255,0.18), 0 14px 24px rgba(0,0,0,0.22)',
-                border: '1px solid rgba(255,248,236,0.28)',
+                  'inset -7px 0 12px rgba(116,69,45,0.12), inset 5px 0 10px rgba(255,255,255,0.5), 0 12px 22px rgba(135,78,48,0.14)',
+                border: '1px solid rgba(157,96,65,0.2)',
                 position: 'relative' as const,
                 writingMode: 'vertical-rl' as const,
                 textOrientation: 'mixed' as const,
@@ -140,7 +140,7 @@ export default function BookShelfView({ books = [] }: Props) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '18px 10px',
-                color: index % 3 === 1 ? '#33271d' : '#fff8ec',
+                color: '#49352b',
                 fontWeight: 900,
                 fontFamily: 'Noto Serif KR, serif',
                 fontSize: 18,
@@ -169,8 +169,8 @@ export default function BookShelfView({ books = [] }: Props) {
             style={{
               height: 24,
               borderRadius: 10,
-              background: 'linear-gradient(180deg, #8a6238 0%, #3a2517 100%)',
-              boxShadow: '0 -8px 18px rgba(0,0,0,0.22)',
+              background: 'linear-gradient(180deg, #e0a271 0%, #b96f4f 100%)',
+              boxShadow: '0 -7px 16px rgba(132,76,47,0.16)',
             }}
           />
         </div>

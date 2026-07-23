@@ -233,31 +233,7 @@ export default async function RootLayout({
                 홈
               </Link>
 
-              <Link href="/guide" style={linkStyle}>
-                이용 가이드
-              </Link>
-
-              <Link href={bookHref} style={linkStyle}>
-                인생책 만들기
-              </Link>
-
-              <Link href="/pricing" style={linkStyle}>
-                상품안내
-              </Link>
-
-              <Link href="/process" style={linkStyle}>
-                제작 과정
-              </Link>
-
-              <Link href="/trial" style={linkStyle}>
-                제작 사례
-              </Link>
-
-              <Link href={bookHref} style={linkStyle}>
-                인생책 만들기
-              </Link>
-
-              {isLoggedIn ? (
+                {isLoggedIn ? (
                 <>
                   {isAdmin ? (
                     <Link href="/admin" style={buttonStyle}>

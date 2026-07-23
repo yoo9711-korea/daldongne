@@ -36,12 +36,12 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 const TYPE_SPINE: Record<string, string> = {
-  LIFE_BOOK: '#6e2a36',
-  FAMILY_BOOK: '#2e3f52',
-  COUPLE_BOOK: '#5c3a52',
-  BABY_BOOK: '#5c6b4f',
-  TRAVEL_BOOK: '#8c4a2d',
-  AI_MOVIE: '#b6892f',
+  LIFE_BOOK: '#c8666e',
+  FAMILY_BOOK: '#607f9b',
+  COUPLE_BOOK: '#9b6785',
+  BABY_BOOK: '#71835e',
+  TRAVEL_BOOK: '#bb6f4b',
+  AI_MOVIE: '#b88a2f',
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -360,7 +360,7 @@ export default function LibraryBookList({
               justifyContent:
                 'center',
               borderRadius: 999,
-              background: '#33271d',
+              background: '#eb8268',
               color: '#fff8ec',
               fontSize: 30,
               lineHeight: 1,
@@ -371,7 +371,7 @@ export default function LibraryBookList({
 
           <strong
             style={{
-              color: '#33271d',
+              color: '#49352b',
               fontFamily:
                 'Noto Serif KR, serif',
               fontSize: 22,
@@ -410,7 +410,7 @@ function BookCard({
 }) {
   const spine =
     TYPE_SPINE[book.type] ||
-    '#6e2a36';
+    '#c8666e';
 
   return (
     <article
@@ -425,15 +425,15 @@ function BookCard({
         padding: 22,
         borderRadius: 24,
         background:
-          'linear-gradient(145deg, #211710 0%, #120d09 100%)',
+          'linear-gradient(145deg, #ffffff 0%, #fff7f1 100%)',
         borderLeft: `8px solid ${spine}`,
         outline: selected
           ? '4px solid #d6a43b'
-          : '1px solid rgba(255,255,255,0.08)',
+          : '1px solid rgba(198,139,106,0.2)',
         boxShadow: selected
-          ? '0 16px 36px rgba(180, 130, 35, 0.28)'
-          : '0 14px 30px rgba(60, 38, 18, 0.14)',
-        color: '#fffaf0',
+          ? '0 16px 34px rgba(222, 126, 91, 0.19)'
+          : '0 14px 30px rgba(132, 79, 48, 0.08)',
+        color: '#49352b',
         overflow: 'hidden',
       }}
     >
@@ -450,10 +450,10 @@ function BookCard({
           borderRadius: 999,
           background: selected
             ? '#f3d28a'
-            : 'rgba(255, 250, 240, 0.12)',
+            : '#fff1e9',
           color: selected
             ? '#3b260e'
-            : '#fffaf0',
+            : '#6a4a3c',
           fontSize: 11,
           fontWeight: 900,
           cursor: 'pointer',
@@ -478,7 +478,7 @@ function BookCard({
           style={{
             margin: 0,
             paddingRight: 82,
-            color: '#f3d28a',
+            color: '#d86f55',
             fontSize: 11,
             fontWeight: 900,
             letterSpacing: '0.08em',
@@ -491,7 +491,7 @@ function BookCard({
         <h3
           style={{
             margin: '16px 0 0',
-            color: '#fffaf0',
+            color: '#49352b',
             fontFamily:
               'Noto Serif KR, serif',
             fontSize: 22,
@@ -534,7 +534,7 @@ function BookCard({
           <p
             style={{
               margin: '11px 0 0',
-              color: '#a99880',
+              color: '#90786c',
               fontSize: 11,
             }}
           >
@@ -549,7 +549,7 @@ function BookCard({
           style={{
             margin: '15px 0 0',
             minHeight: 70,
-            color: '#c8b79e',
+            color: '#6f594e',
             fontSize: 13,
             lineHeight: 1.75,
             wordBreak: 'break-word',
@@ -593,7 +593,7 @@ function BookCard({
             marginTop: 16,
             paddingTop: 14,
             borderTop:
-              '1px solid rgba(255, 250, 240, 0.14)',
+              '1px solid rgba(198, 139, 106, 0.2)',
           }}
         >
           <Link
@@ -635,7 +635,7 @@ function EmptyLibrary() {
       <h3
         style={{
           margin: 0,
-          color: '#33271d',
+          color: '#49352b',
           fontFamily:
             'Noto Serif KR, serif',
           fontSize: 25,
@@ -716,7 +716,7 @@ function EmptyStepLink({
         border:
           '1px solid rgba(91, 66, 43, 0.12)',
         background: '#fffaf1',
-        color: '#33271d',
+        color: '#49352b',
         textDecoration: 'none',
       }}
     >
@@ -728,7 +728,7 @@ function EmptyStepLink({
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: 999,
-          background: '#33271d',
+          background: '#eb8268',
           color: '#fff8ec',
           fontSize: 11,
           fontWeight: 900,
@@ -925,8 +925,8 @@ function getProductionBadgeColors(
 
   return {
     background:
-      'rgba(255,255,255,0.12)',
-    color: '#d7c8b3',
+      '#f3ece7',
+    color: '#806c62',
   };
 }
 
@@ -952,8 +952,8 @@ function pageBadgeStyle(): CSSProperties {
     padding: '0 10px',
     borderRadius: 999,
     background:
-      'rgba(255,255,255,0.12)',
-    color: '#d7c8b3',
+      '#f3ece7',
+    color: '#806c62',
     fontSize: 11,
     fontWeight: 900,
   };
@@ -971,7 +971,7 @@ function detailButtonStyle(
     borderRadius: 999,
     background: '#fffaf0',
     border:
-      '1px solid #fffaf0',
+      '1px solid #efd2c4',
     color: spine,
     fontSize: 12,
     fontWeight: 900,
@@ -1014,7 +1014,7 @@ function newBookCardStyle(): CSSProperties {
     border:
       '1px dashed #c9ad7b',
     background: '#f7eddc',
-    color: '#33271d',
+    color: '#49352b',
     textDecoration: 'none',
   };
 }
