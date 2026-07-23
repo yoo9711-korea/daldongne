@@ -48,7 +48,7 @@ export async function PATCH(
         {
           ok: false,
           message:
-            '취소할 상담 신청을 찾을 수 없습니다.',
+            '취소할 주문 신청을 찾을 수 없습니다.',
         },
         {
           status: 400,
@@ -76,7 +76,7 @@ export async function PATCH(
         {
           ok: false,
           message:
-            '취소할 상담 신청을 찾을 수 없습니다.',
+            '취소할 주문 신청을 찾을 수 없습니다.',
         },
         {
           status: 404,
@@ -92,7 +92,7 @@ export async function PATCH(
         {
           ok: false,
           message:
-            '이미 상담이 완료된 신청은 직접 취소할 수 없습니다. 관리자에게 문의해 주세요.',
+            '이미 주문 상담이 완료된 신청은 직접 취소할 수 없습니다. 관리자에게 문의해 주세요.',
         },
         {
           status: 400,
@@ -108,7 +108,7 @@ export async function PATCH(
         ok: true,
         request: productionRequest,
         message:
-          '이미 취소된 상담 신청입니다.',
+          '이미 취소된 주문 신청입니다.',
       });
     }
 
@@ -239,7 +239,7 @@ export async function PATCH(
       {
         ok: false,
         message:
-          '제작 상담 신청을 취소하는 중 오류가 발생했습니다.',
+          '책 제작 주문 신청을 취소하는 중 오류가 발생했습니다.',
       },
       {
         status: 500,
@@ -257,13 +257,13 @@ function getCancelMessage(
   otherActiveRequestCount: number,
 ) {
   if (bookStatus === null) {
-    return '제작 상담 신청을 취소했습니다. 연결된 책은 현재 존재하지 않습니다.';
+    return '제작 주문 신청을 취소했습니다. 연결된 책은 현재 존재하지 않습니다.';
   }
 
   if (
     bookStatus === 'PUBLISHED'
   ) {
-    return '제작 상담 신청을 취소했습니다. 완성된 책의 상태는 유지됩니다.';
+    return '책 제작 주문 가능을 취소했습니다. 완성된 책의 상태는 유지됩니다.';
   }
 
   if (
@@ -271,8 +271,8 @@ function getCancelMessage(
       'IN_PRODUCTION' &&
     otherActiveRequestCount > 0
   ) {
-    return '제작 상담 신청을 취소했습니다. 다른 진행 중 상담이 있어 책 상태는 제작 진행 중으로 유지됩니다.';
+    return '책 제작 주문 가능을 취소했습니다. 다른 진행 중인 주문 신청이 있어 책 상태는 제작 진행 중으로 유지됩니다.';
   }
 
-  return '제작 상담 신청을 취소했습니다. 책 상태는 원고 초안으로 돌아갑니다.';
+  return '책 제작 주문 가능을 취소했습니다. 책 상태는 원고 초안으로 돌아갑니다.';
 }
