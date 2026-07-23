@@ -156,6 +156,33 @@ export async function PATCH(
         },
       });
 
+          const oldRevisions =
+        await transaction.bookRevision.findMany({
+          where: {
+            bookId: book.id,
+            authorId: userId,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          skip: 30,
+          select: {
+            id: true,
+          },
+        });
+
+      if (oldRevisions.length > 0) {
+        await transaction.bookRevision.deleteMany({
+          where: {
+            id: {
+              in: oldRevisions.map(
+                (revision) => revision.id,
+              ),
+            },
+          },
+        });
+      }
+
       return transaction.book.update({
         where: {
           id: book.id,

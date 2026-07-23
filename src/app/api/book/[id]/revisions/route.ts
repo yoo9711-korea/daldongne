@@ -240,6 +240,33 @@ export async function POST(
             },
           });
 
+                   const oldRevisions =
+            await transaction.bookRevision.findMany({
+              where: {
+                bookId: book.id,
+                authorId: userId,
+              },
+              orderBy: {
+                createdAt: 'desc',
+              },
+              skip: 30,
+              select: {
+                id: true,
+              },
+            });
+
+          if (oldRevisions.length > 0) {
+            await transaction.bookRevision.deleteMany({
+              where: {
+                id: {
+                  in: oldRevisions.map(
+                    (item) => item.id,
+                  ),
+                },
+              },
+            });
+          }
+
           return transaction.book.update({
             where: {
               id: book.id,
