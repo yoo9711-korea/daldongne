@@ -52,8 +52,28 @@ export async function GET(
       );
     }
 
-    const revision =
-      await prisma.bookRevision.findFirst({
+    const [
+      currentBook,
+      revision,
+    ] = await Promise.all([
+      prisma.book.findFirst({
+        where: {
+          id: bookId,
+          authorId: userId,
+        },
+        select: {
+          id: true,
+          title: true,
+          subtitle: true,
+          summary: true,
+          coverText: true,
+          content: true,
+          pageCount: true,
+          updatedAt: true,
+        },
+      }),
+
+      prisma.bookRevision.findFirst({
         where: {
           id: historyId,
           bookId,
@@ -69,7 +89,19 @@ export async function GET(
           pageCount: true,
           createdAt: true,
         },
-      });
+      }),
+    ]);
+
+    if (!currentBook) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            '현재 책을 찾을 수 없거나 확인 권한이 없습니다.',
+        },
+        { status: 404 },
+      );
+    }
 
     if (!revision) {
       return NextResponse.json(
@@ -84,6 +116,7 @@ export async function GET(
 
     return NextResponse.json({
       ok: true,
+      currentBook,
       revision,
     });
   } catch (error) {
@@ -96,7 +129,7 @@ export async function GET(
       {
         ok: false,
         message:
-          '이전 원고를 불러오는 중 오류가 발생했습니다.',
+          '원고 비교 자료를 불러오는 중 오류가 발생했습니다.',
       },
       { status: 500 },
     );
