@@ -1039,7 +1039,7 @@ function getProductionLabel(
     book.productionRequestStatus ===
     'REQUESTED'
   ) {
-    return '상담 신청 접수';
+    return '주문 신청 접수';
   }
 
   if (
@@ -1053,30 +1053,30 @@ function getProductionLabel(
     book.productionRequestStatus ===
     'IN_PROGRESS'
   ) {
-    return '제작 상담 진행 중';
+    return '제작 견적 협의 중';
   }
 
   if (
     book.productionRequestStatus ===
     'COMPLETED'
   ) {
-    return '상담 완료';
+    return '주문 상담 완료';
   }
 
   if (
     book.productionRequestStatus ===
     'CANCELED'
   ) {
-    return '상담 취소';
+    return '주문 신청 취소';
   }
 
   if (
     book.hasProductionRequest
   ) {
-    return '상담 신청됨';
+    return '주문 신청됨';
   }
 
-  return '제작 상담 가능';
+  return '책 제작 주문 가능';
 }
 
 
