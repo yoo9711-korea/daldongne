@@ -2,14 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import {
+  useCallback,
   useEffect,
   useState,
 } from 'react';
-
-import type {
-  CSSProperties,
-  FormEvent,
-} from 'react';
+import type { FormEvent } from 'react';
 
 type Props = {
   bookId: string;
@@ -18,6 +15,15 @@ type Props = {
   initialSummary?: string | null;
   initialCoverText?: string | null;
   initialContent?: string | null;
+};
+
+type LocalBookDraft = {
+  title: string;
+  subtitle: string;
+  summary: string;
+  coverText: string;
+  content: string;
+  savedAt: string;
 };
 
 export default function EditBookDraftButton({
@@ -32,132 +38,258 @@ export default function EditBookDraftButton({
 
   const [isOpen, setIsOpen] =
     useState(false);
-
   const [isSaving, setIsSaving] =
     useState(false);
+  const [
+    localSavedAt,
+    setLocalSavedAt,
+  ] = useState<string | null>(null);
 
   const [title, setTitle] =
     useState(initialTitle);
-
   const [subtitle, setSubtitle] =
     useState(initialSubtitle || '');
-
   const [summary, setSummary] =
     useState(initialSummary || '');
-
   const [coverText, setCoverText] =
     useState(initialCoverText || '');
-
   const [content, setContent] =
     useState(initialContent || '');
 
-   const hasUnsavedChanges =
-  title.trim() !==
-    initialTitle.trim() ||
-  subtitle.trim() !==
-    (initialSubtitle || '').trim() ||
-  summary.trim() !==
-    (initialSummary || '').trim() ||
-  coverText.trim() !==
-    (initialCoverText || '').trim() ||
-  content.trim() !==
-    (initialContent || '').trim();
+  const localDraftKey =
+    `daldongne-book-draft:${bookId}`;
 
-  const openEditor = () => {
+  const hasUnsavedChanges =
+    title.trim() !==
+      initialTitle.trim() ||
+    subtitle.trim() !==
+      (initialSubtitle || '').trim() ||
+    summary.trim() !==
+      (initialSummary || '').trim() ||
+    coverText.trim() !==
+      (initialCoverText || '').trim() ||
+    content.trim() !==
+      (initialContent || '').trim();
+
+  const resetToServerBook = () => {
     setTitle(initialTitle);
     setSubtitle(initialSubtitle || '');
     setSummary(initialSummary || '');
     setCoverText(initialCoverText || '');
     setContent(initialContent || '');
-    setIsOpen(true);
+    setLocalSavedAt(null);
   };
 
-  const closeEditor = () => {
-  if (isSaving) {
-    return;
-  }
+  const openEditor = () => {
+    const localDraft =
+      readLocalBookDraft(localDraftKey);
 
-  if (hasUnsavedChanges) {
-    const confirmed = window.confirm(
-      '저장하지 않은 수정 내용이 있습니다.\n\n저장하지 않고 편집창을 닫을까요?',
-    );
-
-    if (!confirmed) {
-      return;
-    }
-  }
-
-  setIsOpen(false);
-};
-
-useEffect(() => {
-  if (!isOpen) {
-    return;
-  }
-
-  const handleEscape = (
-    event: KeyboardEvent,
-  ) => {
-    if (
-      event.key !== 'Escape' ||
-      isSaving
-    ) {
-      return;
-    }
-
-    if (hasUnsavedChanges) {
-      const confirmed = window.confirm(
-        '저장하지 않은 수정 내용이 있습니다.\n\n저장하지 않고 편집창을 닫을까요?',
+    const draftIsDifferent =
+      localDraft &&
+      (
+        localDraft.title.trim() !==
+          initialTitle.trim() ||
+        localDraft.subtitle.trim() !==
+          (
+            initialSubtitle || ''
+          ).trim() ||
+        localDraft.summary.trim() !==
+          (
+            initialSummary || ''
+          ).trim() ||
+        localDraft.coverText.trim() !==
+          (
+            initialCoverText || ''
+          ).trim() ||
+        localDraft.content.trim() !==
+          (
+            initialContent || ''
+          ).trim()
       );
 
-      if (!confirmed) {
+    if (
+      localDraft &&
+      draftIsDifferent
+    ) {
+      const savedDate =
+        formatLocalDraftDate(
+          localDraft.savedAt,
+        );
+
+      const recover =
+        window.confirm(
+          `저장하지 못한 임시 원고가 있습니다.\n임시저장 시간: ${savedDate}\n\n이 내용을 복구할까요?`,
+        );
+
+      if (recover) {
+        setTitle(localDraft.title);
+        setSubtitle(
+          localDraft.subtitle,
+        );
+        setSummary(localDraft.summary);
+        setCoverText(
+          localDraft.coverText,
+        );
+        setContent(localDraft.content);
+        setLocalSavedAt(
+          localDraft.savedAt,
+        );
+        setIsOpen(true);
         return;
       }
     }
 
-    setIsOpen(false);
+    clearLocalBookDraft(localDraftKey);
+    resetToServerBook();
+    setIsOpen(true);
   };
 
-  const handleBeforeUnload = (
-    event: BeforeUnloadEvent,
-  ) => {
-    if (
-      !hasUnsavedChanges ||
-      isSaving
-    ) {
+  const closeEditor =
+    useCallback(() => {
+      if (isSaving) {
+        return;
+      }
+
+      if (hasUnsavedChanges) {
+        const confirmed =
+          window.confirm(
+            '저장하지 않은 수정 내용이 있습니다.\n\n저장하지 않고 편집창을 닫을까요?',
+          );
+
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      clearLocalBookDraft(
+        localDraftKey,
+      );
+      setLocalSavedAt(null);
+      setIsOpen(false);
+    }, [
+      isSaving,
+      hasUnsavedChanges,
+      localDraftKey,
+    ]);
+
+  useEffect(() => {
+    if (!isOpen) {
       return;
     }
 
-    event.preventDefault();
-    event.returnValue = '';
-  };
+    const previousOverflow =
+      document.body.style.overflow;
 
-  window.addEventListener(
-    'keydown',
-    handleEscape,
-  );
+    document.body.style.overflow =
+      'hidden';
 
-  window.addEventListener(
-    'beforeunload',
-    handleBeforeUnload,
-  );
+    const handleEscape = (
+      event: KeyboardEvent,
+    ) => {
+      if (event.key === 'Escape') {
+        closeEditor();
+      }
+    };
 
-  return () => {
-    window.removeEventListener(
+    const handleBeforeUnload = (
+      event: BeforeUnloadEvent,
+    ) => {
+      if (
+        !hasUnsavedChanges ||
+        isSaving
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener(
       'keydown',
       handleEscape,
     );
-
-    window.removeEventListener(
+    window.addEventListener(
       'beforeunload',
       handleBeforeUnload,
     );
-  };
-}, [
-  isOpen,
-  isSaving,
-  hasUnsavedChanges,
-]);
+
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+
+      window.removeEventListener(
+        'keydown',
+        handleEscape,
+      );
+      window.removeEventListener(
+        'beforeunload',
+        handleBeforeUnload,
+      );
+    };
+  }, [
+    isOpen,
+    isSaving,
+    hasUnsavedChanges,
+    closeEditor,
+  ]);
+
+  useEffect(() => {
+    if (!isOpen || isSaving) {
+      return;
+    }
+
+    if (!hasUnsavedChanges) {
+      clearLocalBookDraft(
+        localDraftKey,
+      );
+      setLocalSavedAt(null);
+      return;
+    }
+
+    const timeoutId =
+      window.setTimeout(() => {
+        const savedAt =
+          new Date().toISOString();
+
+        const localDraft:
+          LocalBookDraft = {
+            title,
+            subtitle,
+            summary,
+            coverText,
+            content,
+            savedAt,
+          };
+
+        try {
+          window.localStorage.setItem(
+            localDraftKey,
+            JSON.stringify(
+              localDraft,
+            ),
+          );
+          setLocalSavedAt(savedAt);
+        } catch {
+          // 브라우저 저장소를 사용할 수 없으면
+          // 서버 저장 기능은 유지합니다.
+        }
+      }, 1000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [
+    isOpen,
+    isSaving,
+    hasUnsavedChanges,
+    localDraftKey,
+    title,
+    subtitle,
+    summary,
+    coverText,
+    content,
+  ]);
 
   const handleSubmit = async (
     event: FormEvent<HTMLFormElement>,
@@ -182,7 +314,9 @@ useEffect(() => {
 
     try {
       const response = await fetch(
-        `/api/book/${bookId}`,
+        `/api/book/${encodeURIComponent(
+          bookId,
+        )}`,
         {
           method: 'PATCH',
           headers: {
@@ -191,9 +325,11 @@ useEffect(() => {
           },
           body: JSON.stringify({
             title: title.trim(),
-            subtitle: subtitle.trim(),
+            subtitle:
+              subtitle.trim(),
             summary: summary.trim(),
-            coverText: coverText.trim(),
+            coverText:
+              coverText.trim(),
             content: content.trim(),
           }),
         },
@@ -205,13 +341,21 @@ useEffect(() => {
           message?: string;
         };
 
-      if (!response.ok || !result.ok) {
+      if (
+        !response.ok ||
+        !result.ok
+      ) {
         alert(
           result.message ||
             '책 원고를 저장하지 못했습니다.',
         );
         return;
       }
+
+      clearLocalBookDraft(
+        localDraftKey,
+      );
+      setLocalSavedAt(null);
 
       alert(
         result.message ||
@@ -234,13 +378,14 @@ useEffect(() => {
       <button
         type="button"
         onClick={openEditor}
-        style={openButtonStyle}
+        className="book-draft-editor-open"
       >
         원고 직접 수정
       </button>
 
       {isOpen ? (
         <div
+          className="book-draft-editor-overlay"
           role="dialog"
           aria-modal="true"
           aria-label="책 원고 직접 수정"
@@ -252,65 +397,15 @@ useEffect(() => {
               closeEditor();
             }
           }}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 10000,
-            padding: 20,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflowY: 'auto',
-            background:
-              'rgba(54, 34, 24, 0.58)',
-          }}
         >
           <form
+            className="book-draft-editor-form"
             onSubmit={handleSubmit}
-            style={{
-              width: 'min(900px, 100%)',
-              maxHeight: '92vh',
-              padding: 26,
-              overflowY: 'auto',
-              borderRadius: 26,
-              border:
-                '1px solid #efc9b8',
-              background: '#fffdfb',
-              boxShadow:
-                '0 24px 70px rgba(66, 38, 24, 0.25)',
-            }}
           >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent:
-                  'space-between',
-                alignItems: 'flex-start',
-                gap: 16,
-              }}
-            >
+            <div className="book-draft-editor-header">
               <div>
-                <p
-                  style={{
-                    margin: 0,
-                    color: '#d56f55',
-                    fontSize: 12,
-                    fontWeight: 900,
-                  }}
-                >
-                  책 원고 편집
-                </p>
-
-                <h2
-                  style={{
-                    margin: '7px 0 0',
-                    color: '#49352b',
-                    fontSize: 28,
-                    lineHeight: 1.35,
-                  }}
-                >
-                  제목과 본문을 직접 수정합니다
-                </h2>
+                <p>원고 편집실</p>
+                <h2>원고 직접 수정</h2>
               </div>
 
               <button
@@ -318,131 +413,134 @@ useEffect(() => {
                 onClick={closeEditor}
                 disabled={isSaving}
                 aria-label="원고 편집 창 닫기"
-                style={closeButtonStyle}
+                className="book-draft-editor-close"
               >
                 ×
               </button>
             </div>
 
-            <p
-              style={{
-                margin: '12px 0 20px',
-                color: '#725d52',
-                fontSize: 13,
-                lineHeight: 1.7,
-              }}
-            >
-              저장한 내용은 책 상세,
-              전자책, 인쇄용 원고에
-              함께 반영됩니다.
+            <p className="book-draft-editor-guide">
+              제목부터 본문까지 직접 수정할
+              수 있습니다. 서버에 저장하기 전
+              변경 내용은 이 브라우저에 자동으로
+              임시 저장됩니다.
             </p>
 
-            <label style={labelStyle}>
-              책 제목
-            </label>
+            <div className="book-draft-autosave-status">
+              {localSavedAt ? (
+                <>
+                  <span aria-hidden="true">
+                    ✓
+                  </span>
+                  임시저장 완료:{' '}
+                  {formatLocalDraftDate(
+                    localSavedAt,
+                  )}
+                </>
+              ) : hasUnsavedChanges ? (
+                '변경 내용을 잠시 후 임시 저장합니다.'
+              ) : (
+                '현재 서버 원고와 동일합니다.'
+              )}
+            </div>
 
-            <input
-              value={title}
-              onChange={(event) =>
-                setTitle(event.target.value)
-              }
-              maxLength={120}
-              style={inputStyle}
-            />
+            <div className="book-draft-editor-fields">
+              <label>
+                <span>책 제목</span>
+                <input
+                  value={title}
+                  onChange={(event) =>
+                    setTitle(
+                      event.target.value,
+                    )
+                  }
+                  maxLength={120}
+                  required
+                />
+                <small>
+                  {title.length}/120
+                </small>
+              </label>
 
-            <label style={labelStyle}>
-              부제
-            </label>
+              <label>
+                <span>부제</span>
+                <input
+                  value={subtitle}
+                  onChange={(event) =>
+                    setSubtitle(
+                      event.target.value,
+                    )
+                  }
+                  maxLength={200}
+                />
+                <small>
+                  {subtitle.length}/200
+                </small>
+              </label>
 
-            <input
-              value={subtitle}
-              onChange={(event) =>
-                setSubtitle(
-                  event.target.value,
-                )
-              }
-              maxLength={200}
-              style={inputStyle}
-            />
+              <label className="is-full">
+                <span>책 소개</span>
+                <textarea
+                  value={summary}
+                  onChange={(event) =>
+                    setSummary(
+                      event.target.value,
+                    )
+                  }
+                  maxLength={2000}
+                  rows={5}
+                />
+                <small>
+                  {summary.length}/2,000
+                </small>
+              </label>
 
-            <label style={labelStyle}>
-              책 소개
-            </label>
+              <label className="is-full">
+                <span>표지 문구</span>
+                <textarea
+                  value={coverText}
+                  onChange={(event) =>
+                    setCoverText(
+                      event.target.value,
+                    )
+                  }
+                  maxLength={500}
+                  rows={4}
+                />
+                <small>
+                  {coverText.length}/500
+                </small>
+              </label>
 
-            <textarea
-              value={summary}
-              onChange={(event) =>
-                setSummary(
-                  event.target.value,
-                )
-              }
-              maxLength={2000}
-              style={{
-                ...inputStyle,
-                minHeight: 110,
-                padding: 14,
-                resize: 'vertical',
-              }}
-            />
+              <label className="is-full">
+                <span>책 본문</span>
+                <textarea
+                  value={content}
+                  onChange={(event) =>
+                    setContent(
+                      event.target.value,
+                    )
+                  }
+                  maxLength={200000}
+                  rows={20}
+                  required
+                  className="book-draft-content-input"
+                />
+                <small>
+                  {content.length.toLocaleString(
+                    'ko-KR',
+                  )}
+                  /200,000
+                </small>
+              </label>
+            </div>
 
-            <label style={labelStyle}>
-              표지 문구
-            </label>
-
-            <textarea
-              value={coverText}
-              onChange={(event) =>
-                setCoverText(
-                  event.target.value,
-                )
-              }
-              maxLength={500}
-              style={{
-                ...inputStyle,
-                minHeight: 90,
-                padding: 14,
-                resize: 'vertical',
-              }}
-            />
-
-            <label style={labelStyle}>
-              책 본문
-            </label>
-
-            <textarea
-              value={content}
-              onChange={(event) =>
-                setContent(
-                  event.target.value,
-                )
-              }
-              maxLength={200000}
-              style={{
-                ...inputStyle,
-                minHeight: 360,
-                padding: 16,
-                resize: 'vertical',
-                fontFamily:
-                  'Noto Serif KR, serif',
-                fontSize: 15,
-                lineHeight: 1.85,
-              }}
-            />
-
-            <div
-              style={{
-                marginTop: 20,
-                display: 'flex',
-                justifyContent: 'flex-end',
-                flexWrap: 'wrap',
-                gap: 9,
-              }}
-            >
+            <div className="book-draft-editor-actions">
               <button
                 type="button"
                 onClick={closeEditor}
                 disabled={isSaving}
-                style={cancelButtonStyle}
+                className="is-cancel"
               >
                 취소
               </button>
@@ -450,7 +548,7 @@ useEffect(() => {
               <button
                 type="submit"
                 disabled={isSaving}
-                style={saveButtonStyle}
+                className="is-save"
               >
                 {isSaving
                   ? '저장 중...'
@@ -460,78 +558,333 @@ useEffect(() => {
           </form>
         </div>
       ) : null}
+
+      <style>{`
+        .book-draft-editor-open {
+          min-height: 46px;
+          padding: 0 22px;
+          border: 1px solid #d88770;
+          border-radius: 999px;
+          background: #ef8268;
+          color: #ffffff;
+          font-size: 14px;
+          font-weight: 900;
+          cursor: pointer;
+        }
+
+        .book-draft-editor-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 10000;
+          padding: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow-y: auto;
+          background:
+            rgba(54, 34, 24, 0.58);
+          backdrop-filter: blur(5px);
+        }
+
+        .book-draft-editor-form {
+          width: min(920px, 100%);
+          max-height: calc(100vh - 40px);
+          padding: 26px;
+          overflow-y: auto;
+          border: 1px solid #efc9b8;
+          border-radius: 26px;
+          background: #fffdfb;
+          box-shadow:
+            0 28px 80px
+            rgba(75, 42, 27, 0.25);
+          color: #49352b;
+        }
+
+        .book-draft-editor-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 20px;
+        }
+
+        .book-draft-editor-header p {
+          margin: 0;
+          color: #db765c;
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+        }
+
+        .book-draft-editor-header h2 {
+          margin: 6px 0 0;
+          color: #49352b;
+          font-size: 30px;
+        }
+
+        .book-draft-editor-close {
+          width: 42px;
+          height: 42px;
+          border: 1px solid #efd1c2;
+          border-radius: 50%;
+          background: #fff4ee;
+          color: #744c3d;
+          font-size: 25px;
+          cursor: pointer;
+        }
+
+        .book-draft-editor-guide {
+          margin: 18px 0 10px;
+          padding: 14px 16px;
+          border-radius: 15px;
+          background: #fff3ec;
+          color: #725d52;
+          font-size: 13px;
+          line-height: 1.7;
+        }
+
+        .book-draft-autosave-status {
+          min-height: 34px;
+          margin-bottom: 18px;
+          padding: 8px 12px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          border: 1px solid #ead9cf;
+          border-radius: 12px;
+          background: #fffdfb;
+          color: #7d685e;
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        .book-draft-autosave-status span {
+          color: #56805b;
+        }
+
+        .book-draft-editor-fields {
+          display: grid;
+          grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .book-draft-editor-fields label {
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          color: #5d4439;
+          font-size: 13px;
+          font-weight: 900;
+        }
+
+        .book-draft-editor-fields
+        label.is-full {
+          grid-column: 1 / -1;
+        }
+
+        .book-draft-editor-fields input,
+        .book-draft-editor-fields textarea {
+          width: 100%;
+          box-sizing: border-box;
+          border: 1px solid #dfc2b4;
+          border-radius: 14px;
+          background: #ffffff;
+          color: #49352b;
+          font-family:
+            'Pretendard',
+            'Noto Sans KR',
+            sans-serif;
+          font-size: 14px;
+          line-height: 1.7;
+          outline: none;
+        }
+
+        .book-draft-editor-fields input {
+          height: 46px;
+          padding: 0 14px;
+        }
+
+        .book-draft-editor-fields textarea {
+          padding: 13px 14px;
+          resize: vertical;
+        }
+
+        .book-draft-editor-fields
+        input:focus,
+        .book-draft-editor-fields
+        textarea:focus {
+          border-color: #e3876e;
+          box-shadow:
+            0 0 0 3px
+            rgba(227, 135, 110, 0.12);
+        }
+
+        .book-draft-editor-fields small {
+          align-self: flex-end;
+          color: #a18a7f;
+          font-size: 11px;
+          font-weight: 700;
+        }
+
+        .book-draft-content-input {
+          min-height: 420px;
+          font-family:
+            'Noto Serif KR',
+            serif !important;
+          font-size: 15px !important;
+          line-height: 1.95 !important;
+        }
+
+        .book-draft-editor-actions {
+          margin-top: 22px;
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+        }
+
+        .book-draft-editor-actions button {
+          min-height: 44px;
+          padding: 0 20px;
+          border-radius: 999px;
+          font-size: 13px;
+          font-weight: 900;
+          cursor: pointer;
+        }
+
+        .book-draft-editor-actions
+        button.is-cancel {
+          border: 1px solid #ddc5b9;
+          background: #ffffff;
+          color: #654b40;
+        }
+
+        .book-draft-editor-actions
+        button.is-save {
+          border: 1px solid #df7157;
+          background: #ed7e63;
+          color: #ffffff;
+        }
+
+        .book-draft-editor-actions
+        button:disabled,
+        .book-draft-editor-close:disabled {
+          cursor: not-allowed;
+          opacity: 0.55;
+        }
+
+        @media (max-width: 700px) {
+          .book-draft-editor-overlay {
+            padding: 10px;
+            align-items: flex-start;
+          }
+
+          .book-draft-editor-form {
+            max-height:
+              calc(100vh - 20px);
+            padding: 20px 15px;
+            border-radius: 22px;
+          }
+
+          .book-draft-editor-header h2 {
+            font-size: 25px;
+          }
+
+          .book-draft-editor-fields {
+            grid-template-columns: 1fr;
+          }
+
+          .book-draft-editor-fields
+          label.is-full {
+            grid-column: auto;
+          }
+
+          .book-draft-content-input {
+            min-height: 340px;
+          }
+
+          .book-draft-editor-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+          }
+
+          .book-draft-editor-actions button {
+            width: 100%;
+          }
+        }
+      `}</style>
     </>
   );
 }
 
-const openButtonStyle: CSSProperties = {
-  minHeight: 46,
-  padding: '0 22px',
-  borderRadius: 999,
-  border: '1px solid #df8f74',
-  background: '#fff3ed',
-  color: '#a65f48',
-  fontSize: 14,
-  fontWeight: 900,
-  cursor: 'pointer',
-};
+function readLocalBookDraft(
+  key: string,
+): LocalBookDraft | null {
+  try {
+    const raw =
+      window.localStorage.getItem(key);
 
-const labelStyle: CSSProperties = {
-  display: 'block',
-  marginTop: 15,
-  marginBottom: 7,
-  color: '#49352b',
-  fontSize: 13,
-  fontWeight: 900,
-};
+    if (!raw) {
+      return null;
+    }
 
-const inputStyle: CSSProperties = {
-  width: '100%',
-  minHeight: 46,
-  boxSizing: 'border-box',
-  padding: '0 14px',
-  borderRadius: 13,
-  border: '1px solid #dfb5a2',
-  background: '#fffaf7',
-  color: '#49352b',
-  fontSize: 14,
-  outline: 'none',
-};
+    const value =
+      JSON.parse(raw) as
+        Partial<LocalBookDraft>;
 
-const closeButtonStyle: CSSProperties = {
-  width: 38,
-  height: 38,
-  flexShrink: 0,
-  borderRadius: 999,
-  border: '1px solid #dfb5a2',
-  background: '#fff7f2',
-  color: '#7f4d3c',
-  fontSize: 22,
-  fontWeight: 900,
-  cursor: 'pointer',
-};
+    const isValid =
+      typeof value.title ===
+        'string' &&
+      typeof value.subtitle ===
+        'string' &&
+      typeof value.summary ===
+        'string' &&
+      typeof value.coverText ===
+        'string' &&
+      typeof value.content ===
+        'string' &&
+      typeof value.savedAt ===
+        'string';
 
-const cancelButtonStyle: CSSProperties = {
-  minHeight: 43,
-  padding: '0 19px',
-  borderRadius: 999,
-  border: '1px solid #dfb5a2',
-  background: '#ffffff',
-  color: '#6c4d41',
-  fontSize: 13,
-  fontWeight: 900,
-  cursor: 'pointer',
-};
+    if (!isValid) {
+      clearLocalBookDraft(key);
+      return null;
+    }
 
-const saveButtonStyle: CSSProperties = {
-  minHeight: 43,
-  padding: '0 21px',
-  borderRadius: 999,
-  border: '1px solid #e97861',
-  background:
-    'linear-gradient(135deg, #f49378, #e97861)',
-  color: '#ffffff',
-  fontSize: 13,
-  fontWeight: 900,
-  cursor: 'pointer',
-};
+    return value as LocalBookDraft;
+  } catch {
+    clearLocalBookDraft(key);
+    return null;
+  }
+}
+
+function clearLocalBookDraft(
+  key: string,
+) {
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // 브라우저 저장소를 사용할 수 없으면 무시합니다.
+  }
+}
+
+function formatLocalDraftDate(
+  value: string,
+) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return '시간 확인 필요';
+  }
+
+  return new Intl.DateTimeFormat(
+    'ko-KR',
+    {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    },
+  ).format(date);
+}
