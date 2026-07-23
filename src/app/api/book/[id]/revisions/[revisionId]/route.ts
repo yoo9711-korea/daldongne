@@ -14,7 +14,7 @@ type RouteContext = {
   }>;
 };
 
-export async function GET(
+export async function DELETE(
   _request: NextRequest,
   context: RouteContext,
 ) {
@@ -46,34 +46,14 @@ export async function GET(
         {
           ok: false,
           message:
-            '확인할 원고 이력을 찾을 수 없습니다.',
+            '삭제할 원고 이력을 찾을 수 없습니다.',
         },
         { status: 400 },
       );
     }
 
-    const [
-      currentBook,
-      revision,
-    ] = await Promise.all([
-      prisma.book.findFirst({
-        where: {
-          id: bookId,
-          authorId: userId,
-        },
-        select: {
-          id: true,
-          title: true,
-          subtitle: true,
-          summary: true,
-          coverText: true,
-          content: true,
-          pageCount: true,
-          updatedAt: true,
-        },
-      }),
-
-      prisma.bookRevision.findFirst({
+    const revision =
+      await prisma.bookRevision.findFirst({
         where: {
           id: historyId,
           bookId,
@@ -82,48 +62,65 @@ export async function GET(
         select: {
           id: true,
           title: true,
-          subtitle: true,
-          summary: true,
-          coverText: true,
-          content: true,
-          pageCount: true,
           label: true,
           isPinned: true,
-          createdAt: true,
         },
-      }),
-    ]);
-
-    if (!currentBook) {
-      return NextResponse.json(
-        {
-          ok: false,
-          message:
-            '현재 책을 찾을 수 없거나 확인 권한이 없습니다.',
-        },
-        { status: 404 },
-      );
-    }
+      });
 
     if (!revision) {
       return NextResponse.json(
         {
           ok: false,
           message:
-            '원고 이력을 찾을 수 없거나 확인 권한이 없습니다.',
+            '삭제할 원고 이력을 찾을 수 없거나 권한이 없습니다.',
         },
         { status: 404 },
       );
     }
 
+    if (revision.isPinned) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            '중요 버전은 삭제할 수 없습니다. 먼저 중요 버전 고정을 해제해 주세요.',
+        },
+        { status: 409 },
+      );
+    }
+
+    const deleted =
+      await prisma.bookRevision.deleteMany({
+        where: {
+          id: revision.id,
+          bookId,
+          authorId: userId,
+          isPinned: false,
+        },
+      });
+
+    if (deleted.count === 0) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            '원고 이력을 삭제하지 못했습니다.',
+        },
+        { status: 409 },
+      );
+    }
+
     return NextResponse.json({
       ok: true,
-      currentBook,
-      revision,
+      deletedId: revision.id,
+      message: `"${
+        revision.label ||
+        revision.title
+      }" 원고 이력을 삭제했습니다.`,
     });
   } catch (error) {
     console.error(
-      '[BOOK_REVISION_DETAIL_ERROR]',
+      '[BOOK_REVISION_DELETE_ERROR]',
       error,
     );
 
@@ -131,7 +128,7 @@ export async function GET(
       {
         ok: false,
         message:
-          '원고 비교 자료를 불러오는 중 오류가 발생했습니다.',
+          '원고 이력을 삭제하는 중 오류가 발생했습니다.',
       },
       { status: 500 },
     );

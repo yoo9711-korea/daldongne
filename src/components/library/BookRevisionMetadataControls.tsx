@@ -133,6 +133,73 @@ export default function BookRevisionMetadataControls({
     });
   };
 
+ const handleDelete = async () => {
+  if (isSaving) {
+    return;
+  }
+
+  if (isPinned) {
+    alert(
+      '중요 버전은 삭제할 수 없습니다. 먼저 고정을 해제해 주세요.',
+    );
+    return;
+  }
+
+  const displayName =
+    initialLabel ||
+    '이름 없는 원고 이력';
+
+  const confirmed = window.confirm(
+    `"${displayName}"을 삭제할까요?\n\n삭제한 원고 이력은 다시 복구할 수 없습니다.`,
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  setIsSaving(true);
+
+  try {
+    const response = await fetch(
+      `/api/book/${encodeURIComponent(
+        bookId,
+      )}/revisions/${encodeURIComponent(
+        revisionId,
+      )}`,
+      {
+        method: 'DELETE',
+      },
+    );
+
+    const result =
+      (await response.json()) as {
+        ok?: boolean;
+        message?: string;
+      };
+
+    if (!response.ok || !result.ok) {
+      alert(
+        result.message ||
+          '원고 이력을 삭제하지 못했습니다.',
+      );
+      return;
+    }
+
+    alert(
+      result.message ||
+        '원고 이력을 삭제했습니다.',
+    );
+
+    onSaved();
+  } catch {
+    alert(
+      '원고 이력을 삭제하는 중 오류가 발생했습니다.',
+    );
+  } finally {
+    setIsSaving(false);
+  }
+};
+
   return (
     <div className="book-revision-metadata">
       <div className="book-revision-metadata-labels">
@@ -180,6 +247,21 @@ export default function BookRevisionMetadataControls({
               ? '고정 해제'
               : '중요 버전 고정'}
         </button>
+
+       <button
+  type="button"
+  className="is-delete"
+  onClick={handleDelete}
+  disabled={isSaving || isPinned}
+  title={
+    isPinned
+      ? '중요 버전 고정을 먼저 해제해 주세요.'
+      : '이 원고 이력을 삭제합니다.'
+  }
+>
+  이력 삭제
+</button>
+
       </div>
 
       <style>{`
@@ -248,6 +330,13 @@ export default function BookRevisionMetadataControls({
           color: #705247;
         }
 
+       .book-revision-metadata-actions
+        button.is-delete {
+        border-color: #e3b7ad;
+        background: #fff1ee;
+       color: #aa4938;
+       }
+
         .book-revision-metadata-actions
         button:disabled {
           cursor: not-allowed;
@@ -262,8 +351,7 @@ export default function BookRevisionMetadataControls({
 
           .book-revision-metadata-actions {
             display: grid;
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+            grid-template-columns: 1fr;
           }
 
           .book-revision-metadata-actions button {
