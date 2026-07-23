@@ -15,6 +15,13 @@ type BookRevision = {
   createdAt: string;
 };
 
+type BookRevisionDetail =
+  BookRevision & {
+    subtitle: string | null;
+    coverText: string | null;
+    content: string | null;
+  };
+
 export default function BookRevisionHistoryButton({
   bookId,
 }: Props) {
@@ -29,11 +36,27 @@ export default function BookRevisionHistoryButton({
   const [restoringId, setRestoringId] =
     useState<string | null>(null);
 
+  const [
+    previewLoadingId,
+    setPreviewLoadingId,
+  ] = useState<string | null>(null);
+
+  const [
+    previewRevision,
+    setPreviewRevision,
+  ] = useState<BookRevisionDetail | null>(
+    null,
+  );
+
   const [errorMessage, setErrorMessage] =
     useState('');
 
   const [revisions, setRevisions] =
     useState<BookRevision[]>([]);
+
+  const isBusy = Boolean(
+    restoringId || previewLoadingId,
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -50,11 +73,18 @@ export default function BookRevisionHistoryButton({
       event: KeyboardEvent,
     ) => {
       if (
-        event.key === 'Escape' &&
-        !restoringId
+        event.key !== 'Escape' ||
+        isBusy
       ) {
-        setIsOpen(false);
+        return;
       }
+
+      if (previewRevision) {
+        setPreviewRevision(null);
+        return;
+      }
+
+      setIsOpen(false);
     };
 
     window.addEventListener(
@@ -71,7 +101,11 @@ export default function BookRevisionHistoryButton({
         handleEscape,
       );
     };
-  }, [isOpen, restoringId]);
+  }, [
+    isOpen,
+    isBusy,
+    previewRevision,
+  ]);
 
   const loadRevisions = async () => {
     setIsLoading(true);
@@ -79,7 +113,9 @@ export default function BookRevisionHistoryButton({
 
     try {
       const response = await fetch(
-        `/api/book/${bookId}/revisions`,
+        `/api/book/${encodeURIComponent(
+          bookId,
+        )}/revisions`,
         {
           method: 'GET',
           cache: 'no-store',
@@ -116,22 +152,79 @@ export default function BookRevisionHistoryButton({
   };
 
   const openModal = () => {
+    setPreviewRevision(null);
+    setErrorMessage('');
     setIsOpen(true);
     void loadRevisions();
   };
 
   const closeModal = () => {
-    if (restoringId) {
+    if (isBusy) {
       return;
     }
 
+    setPreviewRevision(null);
     setIsOpen(false);
+  };
+
+  const loadPreview = async (
+    revision: BookRevision,
+  ) => {
+    if (isBusy) {
+      return;
+    }
+
+    setPreviewLoadingId(revision.id);
+    setErrorMessage('');
+
+    try {
+      const response = await fetch(
+        `/api/book/${encodeURIComponent(
+          bookId,
+        )}/revisions/${encodeURIComponent(
+          revision.id,
+        )}`,
+        {
+          method: 'GET',
+          cache: 'no-store',
+        },
+      );
+
+      const result =
+        (await response.json()) as {
+          ok?: boolean;
+          message?: string;
+          revision?: BookRevisionDetail;
+        };
+
+      if (
+        !response.ok ||
+        !result.ok ||
+        !result.revision
+      ) {
+        setErrorMessage(
+          result.message ||
+            '이전 원고를 불러오지 못했습니다.',
+        );
+        return;
+      }
+
+      setPreviewRevision(
+        result.revision,
+      );
+    } catch {
+      setErrorMessage(
+        '이전 원고를 불러오는 중 오류가 발생했습니다.',
+      );
+    } finally {
+      setPreviewLoadingId(null);
+    }
   };
 
   const restoreRevision = async (
     revision: BookRevision,
   ) => {
-    if (restoringId) {
+    if (isBusy) {
       return;
     }
 
@@ -148,7 +241,9 @@ export default function BookRevisionHistoryButton({
 
     try {
       const response = await fetch(
-        `/api/book/${bookId}/revisions`,
+        `/api/book/${encodeURIComponent(
+          bookId,
+        )}/revisions`,
         {
           method: 'POST',
           headers: {
@@ -180,6 +275,7 @@ export default function BookRevisionHistoryButton({
           '이전 원고로 복원했습니다.',
       );
 
+      setPreviewRevision(null);
       setIsOpen(false);
       router.refresh();
     } catch {
@@ -209,7 +305,7 @@ export default function BookRevisionHistoryButton({
             if (
               event.target ===
                 event.currentTarget &&
-              !restoringId
+              !isBusy
             ) {
               closeModal();
             }
@@ -226,16 +322,16 @@ export default function BookRevisionHistoryButton({
                 <p>원고 안전 보관함</p>
 
                 <h2 id="book-revision-title">
-                  수정 이력·복원
+                  {previewRevision
+                    ? '이전 원고 미리보기'
+                    : '수정 이력·복원'}
                 </h2>
               </div>
 
               <button
                 type="button"
                 onClick={closeModal}
-                disabled={Boolean(
-                  restoringId,
-                )}
+                disabled={isBusy}
                 aria-label="수정 이력 닫기"
               >
                 ×
@@ -243,18 +339,30 @@ export default function BookRevisionHistoryButton({
             </div>
 
             <p className="book-revision-guide">
-              원고를 저장하기 전의 내용이
-              보관되어 있습니다. 복원해도 현재
-              원고는 다시 이력에 보관됩니다.
+              {previewRevision
+                ? '복원하기 전에 제목, 표지 문구와 본문 전체를 확인하세요.'
+                : '원고를 저장하기 전 내용이 보관되어 있습니다. 복원해도 현재 원고는 다시 이력에 보관됩니다.'}
             </p>
 
             {errorMessage ? (
-              <p className="book-revision-error">
+              <p
+                className="book-revision-error"
+                aria-live="polite"
+              >
                 {errorMessage}
               </p>
             ) : null}
 
-            {isLoading ? (
+            {previewLoadingId ? (
+              <div className="book-revision-empty">
+                이전 원고 전체 내용을
+                불러오는 중입니다.
+              </div>
+            ) : previewRevision ? (
+              <RevisionPreview
+                revision={previewRevision}
+              />
+            ) : isLoading ? (
               <div className="book-revision-empty">
                 수정 이력을 불러오는 중입니다.
               </div>
@@ -272,7 +380,7 @@ export default function BookRevisionHistoryButton({
                       key={revision.id}
                       className="book-revision-card"
                     >
-                      <div>
+                      <div className="book-revision-card-meta">
                         <span>
                           {index === 0
                             ? '가장 최근 이력'
@@ -304,22 +412,35 @@ export default function BookRevisionHistoryButton({
                           )}
                         </small>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            restoreRevision(
-                              revision,
-                            )
-                          }
-                          disabled={Boolean(
-                            restoringId,
-                          )}
-                        >
-                          {restoringId ===
-                          revision.id
-                            ? '복원 중...'
-                            : '이 원고로 복원'}
-                        </button>
+                        <div className="book-revision-card-actions">
+                          <button
+                            type="button"
+                            className="is-preview"
+                            onClick={() =>
+                              loadPreview(
+                                revision,
+                              )
+                            }
+                            disabled={isBusy}
+                          >
+                            원고 미리보기
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              restoreRevision(
+                                revision,
+                              )
+                            }
+                            disabled={isBusy}
+                          >
+                            {restoringId ===
+                            revision.id
+                              ? '복원 중...'
+                              : '이 원고로 복원'}
+                          </button>
+                        </div>
                       </div>
                     </article>
                   ),
@@ -328,15 +449,44 @@ export default function BookRevisionHistoryButton({
             )}
 
             <div className="book-revision-bottom">
-              <button
-                type="button"
-                onClick={closeModal}
-                disabled={Boolean(
-                  restoringId,
-                )}
-              >
-                닫기
-              </button>
+              {previewRevision ? (
+                <>
+                  <button
+                    type="button"
+                    className="is-secondary"
+                    onClick={() =>
+                      setPreviewRevision(null)
+                    }
+                    disabled={isBusy}
+                  >
+                    이력 목록으로
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      restoreRevision(
+                        previewRevision,
+                      )
+                    }
+                    disabled={isBusy}
+                  >
+                    {restoringId ===
+                    previewRevision.id
+                      ? '복원 중...'
+                      : '이 원고로 복원'}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="is-secondary"
+                  onClick={closeModal}
+                  disabled={isBusy}
+                >
+                  닫기
+                </button>
+              )}
             </div>
           </section>
         </div>
@@ -368,7 +518,7 @@ export default function BookRevisionHistoryButton({
         }
 
         .book-revision-modal {
-          width: min(720px, 100%);
+          width: min(860px, 100%);
           max-height: calc(100vh - 48px);
           padding: 26px;
           overflow-y: auto;
@@ -446,7 +596,7 @@ export default function BookRevisionHistoryButton({
             linear-gradient(145deg, #ffffff, #fff8f4);
         }
 
-        .book-revision-card > div:first-child {
+        .book-revision-card-meta {
           display: flex;
           justify-content: space-between;
           gap: 12px;
@@ -461,7 +611,7 @@ export default function BookRevisionHistoryButton({
           font-size: 18px;
         }
 
-        .book-revision-card p {
+        .book-revision-card > p {
           margin: 8px 0 0;
           color: #725d52;
           font-size: 13px;
@@ -481,7 +631,15 @@ export default function BookRevisionHistoryButton({
           font-weight: 800;
         }
 
-        .book-revision-card-footer button,
+        .book-revision-card-actions,
+        .book-revision-bottom {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+          gap: 8px;
+        }
+
+        .book-revision-card-actions button,
         .book-revision-bottom button {
           min-height: 40px;
           padding: 0 17px;
@@ -494,8 +652,16 @@ export default function BookRevisionHistoryButton({
           cursor: pointer;
         }
 
-        .book-revision-card-footer button:disabled,
-        .book-revision-bottom button:disabled {
+        .book-revision-card-actions .is-preview,
+        .book-revision-bottom .is-secondary {
+          border-color: #ddbeb0;
+          background: #ffffff;
+          color: #704f42;
+        }
+
+        .book-revision-card-actions button:disabled,
+        .book-revision-bottom button:disabled,
+        .book-revision-header button:disabled {
           cursor: not-allowed;
           opacity: 0.55;
         }
@@ -511,16 +677,76 @@ export default function BookRevisionHistoryButton({
           text-align: center;
         }
 
-        .book-revision-bottom {
-          margin-top: 20px;
-          display: flex;
-          justify-content: flex-end;
+        .book-revision-preview {
+          display: grid;
+          gap: 14px;
         }
 
-        .book-revision-bottom button {
-          border-color: #d8c0b3;
+        .book-revision-preview-meta {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 10px;
+          color: #9b7565;
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        .book-revision-preview-cover,
+        .book-revision-preview-summary,
+        .book-revision-preview-content {
+          padding: 20px;
+          border: 1px solid #edd6ca;
+          border-radius: 18px;
           background: #ffffff;
-          color: #60483d;
+        }
+
+        .book-revision-preview-cover {
+          background:
+            linear-gradient(145deg, #fff6f0, #ffffff);
+        }
+
+        .book-revision-preview-label {
+          margin: 0 0 8px;
+          color: #d56f55;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.06em;
+        }
+
+        .book-revision-preview h3 {
+          margin: 0;
+          color: #49352b;
+          font-size: 26px;
+          line-height: 1.35;
+        }
+
+        .book-revision-preview-subtitle {
+          margin: 8px 0 0;
+          color: #795f53;
+          font-size: 15px;
+          line-height: 1.6;
+        }
+
+        .book-revision-preview-text {
+          margin: 0;
+          color: #5e493f;
+          font-size: 14px;
+          line-height: 1.85;
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+        }
+
+        .book-revision-preview-content
+        .book-revision-preview-text {
+          font-family:
+            'Noto Serif KR', serif;
+          font-size: 15px;
+          line-height: 1.95;
+        }
+
+        .book-revision-bottom {
+          margin-top: 20px;
         }
 
         @media (max-width: 700px) {
@@ -544,12 +770,92 @@ export default function BookRevisionHistoryButton({
             flex-direction: column;
           }
 
-          .book-revision-card-footer button {
+          .book-revision-card-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+          }
+
+          .book-revision-card-actions button {
             width: 100%;
+          }
+
+          .book-revision-bottom {
+            display: grid;
+            grid-template-columns: 1fr;
+          }
+
+          .book-revision-preview h3 {
+            font-size: 22px;
           }
         }
       `}</style>
     </>
+  );
+}
+
+function RevisionPreview({
+  revision,
+}: {
+  revision: BookRevisionDetail;
+}) {
+  return (
+    <div className="book-revision-preview">
+      <div className="book-revision-preview-meta">
+        <time>
+          {formatRevisionDate(
+            revision.createdAt,
+          )}
+        </time>
+
+        <span>
+          {getPageCountLabel(
+            revision.pageCount,
+          )}
+        </span>
+      </div>
+
+      <section className="book-revision-preview-cover">
+        <p className="book-revision-preview-label">
+          제목과 표지 문구
+        </p>
+
+        <h3>{revision.title}</h3>
+
+        {revision.subtitle ? (
+          <p className="book-revision-preview-subtitle">
+            {revision.subtitle}
+          </p>
+        ) : null}
+
+        {revision.coverText ? (
+          <p className="book-revision-preview-text">
+            {revision.coverText}
+          </p>
+        ) : null}
+      </section>
+
+      <section className="book-revision-preview-summary">
+        <p className="book-revision-preview-label">
+          책 소개
+        </p>
+
+        <p className="book-revision-preview-text">
+          {revision.summary ||
+            '책 소개가 없는 원고입니다.'}
+        </p>
+      </section>
+
+      <section className="book-revision-preview-content">
+        <p className="book-revision-preview-label">
+          본문
+        </p>
+
+        <p className="book-revision-preview-text">
+          {revision.content ||
+            '본문 내용이 없는 원고입니다.'}
+        </p>
+      </section>
+    </div>
   );
 }
 
