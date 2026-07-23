@@ -2,8 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import {
+  useEffect,
   useState,
 } from 'react';
+
 import type {
   CSSProperties,
   FormEvent,
@@ -49,6 +51,18 @@ export default function EditBookDraftButton({
   const [content, setContent] =
     useState(initialContent || '');
 
+   const hasUnsavedChanges =
+  title.trim() !==
+    initialTitle.trim() ||
+  subtitle.trim() !==
+    (initialSubtitle || '').trim() ||
+  summary.trim() !==
+    (initialSummary || '').trim() ||
+  coverText.trim() !==
+    (initialCoverText || '').trim() ||
+  content.trim() !==
+    (initialContent || '').trim();
+
   const openEditor = () => {
     setTitle(initialTitle);
     setSubtitle(initialSubtitle || '');
@@ -59,10 +73,91 @@ export default function EditBookDraftButton({
   };
 
   const closeEditor = () => {
-    if (!isSaving) {
-      setIsOpen(false);
+  if (isSaving) {
+    return;
+  }
+
+  if (hasUnsavedChanges) {
+    const confirmed = window.confirm(
+      '저장하지 않은 수정 내용이 있습니다.\n\n저장하지 않고 편집창을 닫을까요?',
+    );
+
+    if (!confirmed) {
+      return;
     }
+  }
+
+  setIsOpen(false);
+};
+
+useEffect(() => {
+  if (!isOpen) {
+    return;
+  }
+
+  const handleEscape = (
+    event: KeyboardEvent,
+  ) => {
+    if (
+      event.key !== 'Escape' ||
+      isSaving
+    ) {
+      return;
+    }
+
+    if (hasUnsavedChanges) {
+      const confirmed = window.confirm(
+        '저장하지 않은 수정 내용이 있습니다.\n\n저장하지 않고 편집창을 닫을까요?',
+      );
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    setIsOpen(false);
   };
+
+  const handleBeforeUnload = (
+    event: BeforeUnloadEvent,
+  ) => {
+    if (
+      !hasUnsavedChanges ||
+      isSaving
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    event.returnValue = '';
+  };
+
+  window.addEventListener(
+    'keydown',
+    handleEscape,
+  );
+
+  window.addEventListener(
+    'beforeunload',
+    handleBeforeUnload,
+  );
+
+  return () => {
+    window.removeEventListener(
+      'keydown',
+      handleEscape,
+    );
+
+    window.removeEventListener(
+      'beforeunload',
+      handleBeforeUnload,
+    );
+  };
+}, [
+  isOpen,
+  isSaving,
+  hasUnsavedChanges,
+]);
 
   const handleSubmit = async (
     event: FormEvent<HTMLFormElement>,
