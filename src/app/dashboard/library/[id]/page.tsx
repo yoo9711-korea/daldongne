@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import BookProductionRequestButton from '@/components/library/BookProductionRequestButton';
 import DeleteBookButton from '@/components/library/DeleteBookButton';
+import EditBookDraftButton from '@/components/library/EditBookDraftButton';
 import RefreshBookDraftButton from '@/components/library/RefreshBookDraftButton';
 import DeleteMemoryButton from '@/components/memory/DeleteMemoryButton';
 import EditMemoryButton from '@/components/memory/EditMemoryButton';
@@ -335,8 +336,8 @@ export default async function BookDetailPage({
           color: #725d52 !important;
         }
 
-        .book-detail-actions a,
-        .book-detail-actions button {
+        .book-detail-actions > a,
+        .book-detail-actions > button {
           border:
             1px solid rgba(210, 126, 90, 0.18) !important;
           background:
@@ -766,6 +767,17 @@ export default async function BookDetailPage({
             </div>
 
             <div className="book-detail-actions">
+              {String(book.status) !== 'PUBLISHED' ? (
+            <EditBookDraftButton
+               bookId={book.id}
+               initialTitle={book.title}
+               initialSubtitle={book.subtitle}
+               initialSummary={summary}
+               initialCoverText={coverText}
+               initialContent={content}
+              />
+              ) : null}
+
               <RefreshBookDraftButton
                 bookId={book.id}
                 selectedMemoryIds={
