@@ -59,6 +59,9 @@ export default function EditBookDraftButton({
   const localDraftKey =
     `daldongne-book-draft:${bookId}`;
 
+  const editorFormId =
+    `book-draft-editor-form-${bookId}`;
+
   const hasUnsavedChanges =
     title.trim() !==
       initialTitle.trim() ||
@@ -183,9 +186,33 @@ export default function EditBookDraftButton({
     document.body.style.overflow =
       'hidden';
 
-    const handleEscape = (
+    const handleKeyboardShortcut = (
       event: KeyboardEvent,
     ) => {
+      if (
+        (
+          event.ctrlKey ||
+          event.metaKey
+        ) &&
+        event.key.toLowerCase() === 's'
+      ) {
+        event.preventDefault();
+
+        if (
+          !isSaving &&
+          hasUnsavedChanges
+        ) {
+          const editorForm =
+            document.getElementById(
+              editorFormId,
+            ) as HTMLFormElement | null;
+
+          editorForm?.requestSubmit();
+        }
+
+        return;
+      }
+
       if (event.key === 'Escape') {
         closeEditor();
       }
@@ -207,7 +234,7 @@ export default function EditBookDraftButton({
 
     window.addEventListener(
       'keydown',
-      handleEscape,
+      handleKeyboardShortcut,
     );
     window.addEventListener(
       'beforeunload',
@@ -220,7 +247,7 @@ export default function EditBookDraftButton({
 
       window.removeEventListener(
         'keydown',
-        handleEscape,
+        handleKeyboardShortcut,
       );
       window.removeEventListener(
         'beforeunload',
@@ -232,6 +259,7 @@ export default function EditBookDraftButton({
     isSaving,
     hasUnsavedChanges,
     closeEditor,
+    editorFormId,
   ]);
 
   useEffect(() => {
@@ -399,6 +427,7 @@ export default function EditBookDraftButton({
           }}
         >
           <form
+            id={editorFormId}
             className="book-draft-editor-form"
             onSubmit={handleSubmit}
           >
@@ -423,11 +452,23 @@ export default function EditBookDraftButton({
               제목부터 본문까지 직접 수정할
               수 있습니다. 서버에 저장하기 전
               변경 내용은 이 브라우저에 자동으로
-              임시 저장됩니다.
+              임시 저장됩니다. Ctrl+S를 누르면
+              서버에 즉시 저장됩니다.
             </p>
 
-            <div className="book-draft-autosave-status">
-              {localSavedAt ? (
+            <div
+              className="book-draft-autosave-status"
+              aria-live="polite"
+            >
+              {isSaving ? (
+                <>
+                  <span aria-hidden="true">
+                    ●
+                  </span>
+                  서버에 원고를 저장하는
+                  중입니다.
+                </>
+              ) : localSavedAt ? (
                 <>
                   <span aria-hidden="true">
                     ✓
