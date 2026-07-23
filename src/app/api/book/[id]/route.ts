@@ -103,15 +103,21 @@ export async function PATCH(
     }
 
     const book = await prisma.book.findFirst({
-      where: {
-        id,
-        authorId: userId,
-      },
-      select: {
-        id: true,
-        status: true,
-      },
-    });
+  where: {
+    id,
+    authorId: userId,
+  },
+  select: {
+    id: true,
+    status: true,
+    title: true,
+    subtitle: true,
+    summary: true,
+    coverText: true,
+    content: true,
+    pageCount: true,
+  },
+});
 
     if (!book) {
       return NextResponse.json(
@@ -134,29 +140,50 @@ export async function PATCH(
       );
     }
 
-    const updatedBook = await prisma.book.update({
-      where: {
-        id: book.id,
-      },
-      data: {
-        title,
-        subtitle: subtitle || null,
-        summary: summary || null,
-        coverText: coverText || null,
-        content,
-        pageCount: estimateEditedBookPageCount(content),
-      },
-      select: {
-        id: true,
-        title: true,
-        subtitle: true,
-        summary: true,
-        coverText: true,
-        content: true,
-        pageCount: true,
-        updatedAt: true,
-      },
-    });
+    const updatedBook =
+  await prisma.$transaction(
+    async (transaction) => {
+      await transaction.bookRevision.create({
+        data: {
+          bookId: book.id,
+          authorId: userId,
+          title: book.title,
+          subtitle: book.subtitle,
+          summary: book.summary,
+          coverText: book.coverText,
+          content: book.content,
+          pageCount: book.pageCount,
+        },
+      });
+
+      return transaction.book.update({
+        where: {
+          id: book.id,
+        },
+        data: {
+          title,
+          subtitle: subtitle || null,
+          summary: summary || null,
+          coverText: coverText || null,
+          content,
+          pageCount:
+            estimateEditedBookPageCount(
+              content,
+            ),
+        },
+        select: {
+          id: true,
+          title: true,
+          subtitle: true,
+          summary: true,
+          coverText: true,
+          content: true,
+          pageCount: true,
+          updatedAt: true,
+        },
+      });
+    },
+  );
 
     return NextResponse.json({
       ok: true,

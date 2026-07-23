@@ -193,9 +193,10 @@ model Book {
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
-  author       User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  bookMemories BookMemory[]
-  bookOrders   BookOrder[]
+  author        User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  bookMemories  BookMemory[]
+  bookOrders    BookOrder[]
+  bookRevisions BookRevision[]
 
   @@index([authorId])
   @@map("books")
@@ -255,6 +256,25 @@ model BookOrder {
   @@index([productionStage])
   @@index([trackingNumber])
   @@map("book_orders")
+}
+
+model BookRevision {
+  id        String   @id @default(cuid())
+  bookId    String
+  authorId  String
+  title     String
+  subtitle  String?
+  summary   String?
+  content   String?
+  coverText String?
+  pageCount Int?
+  createdAt DateTime @default(now())
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId, createdAt])
+  @@index([authorId])
+  @@map("book_revisions")
 }
 
 model BookMemory {

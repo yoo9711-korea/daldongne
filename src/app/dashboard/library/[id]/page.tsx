@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import BookProductionRequestButton from '@/components/library/BookProductionRequestButton';
 import DeleteBookButton from '@/components/library/DeleteBookButton';
 import EditBookDraftButton from '@/components/library/EditBookDraftButton';
+import BookRevisionHistoryButton from '@/components/library/BookRevisionHistoryButton';
 import RefreshBookDraftButton from '@/components/library/RefreshBookDraftButton';
 import DeleteMemoryButton from '@/components/memory/DeleteMemoryButton';
 import EditMemoryButton from '@/components/memory/EditMemoryButton';
@@ -777,6 +778,12 @@ export default async function BookDetailPage({
                initialContent={content}
               />
               ) : null}
+            
+              {String(book.status) !== 'PUBLISHED' ? (
+              <BookRevisionHistoryButton
+               bookId={book.id}
+                />
+              ) : null}             
 
               <RefreshBookDraftButton
                 bookId={book.id}
