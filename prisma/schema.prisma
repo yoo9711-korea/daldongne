@@ -268,11 +268,14 @@ model BookRevision {
   content   String?
   coverText String?
   pageCount Int?
+  label     String?
+  isPinned  Boolean  @default(false)
   createdAt DateTime @default(now())
 
   book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@index([bookId, createdAt])
+  @@index([bookId, isPinned, createdAt])
   @@index([authorId])
   @@map("book_revisions")
 }

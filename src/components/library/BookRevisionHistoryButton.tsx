@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import BookRevisionMetadataControls from '@/components/library/BookRevisionMetadataControls';
 
 type Props = {
   bookId: string;
@@ -12,6 +13,8 @@ type BookRevision = {
   title: string;
   summary: string | null;
   pageCount: number | null;
+  label: string | null;
+  isPinned: boolean;
   createdAt: string;
 };
 
@@ -464,6 +467,16 @@ export default function BookRevisionHistoryButton({
                           )}
                         </time>
                       </div>
+
+                     <BookRevisionMetadataControls
+                        bookId={bookId}
+                        revisionId={revision.id}
+                        initialLabel={revision.label}
+                        isPinned={revision.isPinned}
+                        onSaved={() => {
+                        void loadRevisions();
+                            }}
+                         />
 
                       <h3>
                         {revision.title}

@@ -64,24 +64,56 @@ export async function GET(
       );
     }
 
-    const revisions =
-      await prisma.bookRevision.findMany({
-        where: {
-          bookId: book.id,
-          authorId: userId,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        take: 30,
-        select: {
-  id: true,
-  title: true,
-  summary: true,
-  pageCount: true,
-  createdAt: true,
-},
-      });
+    const [
+  pinnedRevisions,
+  recentRevisions,
+] = await Promise.all([
+  prisma.bookRevision.findMany({
+    where: {
+      bookId: book.id,
+      authorId: userId,
+      isPinned: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    select: {
+      id: true,
+      title: true,
+      summary: true,
+      pageCount: true,
+      label: true,
+      isPinned: true,
+      createdAt: true,
+    },
+  }),
+
+  prisma.bookRevision.findMany({
+    where: {
+      bookId: book.id,
+      authorId: userId,
+      isPinned: false,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: 30,
+    select: {
+      id: true,
+      title: true,
+      summary: true,
+      pageCount: true,
+      label: true,
+      isPinned: true,
+      createdAt: true,
+    },
+  }),
+]);
+
+const revisions = [
+  ...pinnedRevisions,
+  ...recentRevisions,
+];
 
     return NextResponse.json({
       ok: true,
@@ -243,9 +275,10 @@ export async function POST(
                    const oldRevisions =
             await transaction.bookRevision.findMany({
               where: {
-                bookId: book.id,
-                authorId: userId,
-              },
+  bookId: book.id,
+  authorId: userId,
+  isPinned: false,
+},
               orderBy: {
                 createdAt: 'desc',
               },

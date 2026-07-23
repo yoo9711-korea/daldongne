@@ -161,6 +161,7 @@ export async function PATCH(
           where: {
             bookId: book.id,
             authorId: userId,
+            isPinned: false,
           },
           orderBy: {
             createdAt: 'desc',
