@@ -72,7 +72,7 @@ export async function POST(
         {
           ok: false,
           message:
-            '상담 신청할 책을 찾을 수 없습니다.',
+            '주문 신청할 책을 찾을 수 없습니다.',
         },
         {
           status: 400,
@@ -165,7 +165,7 @@ export async function POST(
         {
           ok: false,
           message:
-            '상담 신청할 책을 찾을 수 없습니다.',
+            '주문 신청할 책을 찾을 수 없습니다.',
         },
         {
           status: 404,
@@ -210,7 +210,7 @@ export async function POST(
 
     const requestMessage =
       message ||
-      `"${book.title}" 책 제작 상담을 신청합니다.`;
+      `"${book.title}" 책 제작 주문을 신청합니다.`;
 
     const activeRequest =
       await prisma.bookProductionRequest.findFirst(
@@ -352,8 +352,8 @@ export async function POST(
       action: saved.action,
       message:
         saved.action === 'UPDATED'
-          ? '제작 상담 신청 내용이 수정되었습니다.'
-          : '제작 상담 신청이 접수되었습니다. 관리자가 내용을 확인한 뒤 연락드리겠습니다.',
+          ? '책 제작 주문 신청 내용이 수정되었습니다.'
+          : '책 제작 주문 신청이 접수되었습니다. 관리자가 원고와 신청 내용을 1차 검토한 뒤 연락드리겠습니다.',
     });
   } catch (error) {
     console.error(
@@ -365,7 +365,7 @@ export async function POST(
       {
         ok: false,
         message:
-          '제작 상담 신청 중 오류가 발생했습니다.',
+          '책 제작 주문 신청 중 오류가 발생했습니다.',
       },
       {
         status: 500,
@@ -421,8 +421,8 @@ async function sendProductionRequestEmail(
 
     const actionLabel =
       payload.action === 'UPDATED'
-        ? '상담 신청 내용이 수정되었습니다'
-        : '새 제작 상담 신청이 접수되었습니다';
+        ? '주문 신청 내용이 수정되었습니다'
+        : '새 책 제작 주문 신청이 접수되었습니다';
 
     await resend.emails.send({
       from:
@@ -433,8 +433,8 @@ async function sendProductionRequestEmail(
 
       subject:
         payload.action === 'UPDATED'
-          ? `[달동네] 제작 상담 내용 수정 - ${payload.bookTitle}`
-          : `[달동네] 새 제작 상담 신청 - ${payload.bookTitle}`,
+          ? `[달동네] 책 제작 주문 신청 수정 - ${payload.bookTitle}`
+          : `[달동네] 새 책 제작 주문 신청 - ${payload.bookTitle}`,
 
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.7; color: #24170f;">
@@ -443,7 +443,7 @@ async function sendProductionRequestEmail(
           </h2>
 
           <p style="margin: 0 0 20px;">
-            달동네 출판사 관리자 화면에서 상담 내용을 확인해 주세요.
+            달동네 출판사 관리자 화면에서 주문 신청 내용을 1차 검토한 뒤 고객에게 연락해 주세요.
           </p>
 
           <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
@@ -459,7 +459,7 @@ async function sendProductionRequestEmail(
 
               <tr>
                 <td style="padding: 10px; border: 1px solid #ead7b7; font-weight: bold;">
-                  상담 상태
+                  주문 신청 상태
                 </td>
                 <td style="padding: 10px; border: 1px solid #ead7b7;">
                   ${escapeHtml(
@@ -524,7 +524,7 @@ async function sendProductionRequestEmail(
               href="${escapeHtml(adminRequestUrl)}"
               style="display: inline-block; padding: 12px 18px; border-radius: 999px; background: #24170f; color: #fffaf0; text-decoration: none; font-weight: bold;"
             >
-              제작 상담 목록 보기
+              주문 신청 목록 보기
             </a>
           </p>
 
@@ -572,7 +572,7 @@ function getProductionRequestStatusLabel(
   status: string,
 ) {
   if (status === 'REQUESTED') {
-    return '상담 신청 접수';
+    return '주문 신청 접수';
   }
 
   if (status === 'CONTACTED') {
@@ -580,18 +580,18 @@ function getProductionRequestStatusLabel(
   }
 
   if (status === 'IN_PROGRESS') {
-    return '제작 상담 진행 중';
+    return '제작 견적 협의 중';
   }
 
   if (status === 'COMPLETED') {
-    return '상담 완료';
+    return '주문 상담 완료';
   }
 
   if (status === 'CANCELED') {
     return '상담 취소';
   }
 
-  return '상담 상태 확인 필요';
+  return '주문 신청 상태 확인 필요';
 }
 
 function escapeHtml(

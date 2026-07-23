@@ -713,7 +713,7 @@ export default async function BookDetailPage({
                           productionRequest.status,
                         ),
                       )
-                    : '제작 상담 미신청'}
+                    : '주문 신청 전'}
                 </span>
               </div>
 
@@ -950,7 +950,7 @@ export default async function BookDetailPage({
               />
 
               <InfoCard
-                title="제작 상담"
+                title="주문 신청"
                 value={
                   productionRequest
                     ? getProductionRequestStatusLabel(
@@ -958,7 +958,7 @@ export default async function BookDetailPage({
                           productionRequest.status,
                         ),
                       )
-                    : '미신청'
+                    : '신청 전'
                 }
               />
 
@@ -1189,7 +1189,7 @@ export default async function BookDetailPage({
                     fontWeight: 900,
                   }}
                 >
-                  제작 상담 현황
+                  주문 신청 현황'
                 </p>
 
                 <strong
@@ -1242,10 +1242,10 @@ export default async function BookDetailPage({
                   fontWeight: 800,
                 }}
               >
-                이 책은 아직 제작 상담을
+                이 책은 아직 책 제작 주문을
                 신청하지 않았습니다. 상단의
-                제작 상담 버튼에서 실제 책
-                제작을 문의할 수 있습니다.
+                책 제작 주문 신청 버튼을 누르면
+                관리자가 1차 검토 후 연락드립니다.
               </div>
             )}
 
@@ -2720,7 +2720,7 @@ function getProductionRequestStatusLabel(
   if (
     status === 'REQUESTED'
   ) {
-    return '상담 신청 접수';
+    return '주문 신청 접수';
   }
 
   if (
@@ -2732,22 +2732,22 @@ function getProductionRequestStatusLabel(
   if (
     status === 'IN_PROGRESS'
   ) {
-    return '제작 상담 진행 중';
+    return '제작 견적 협의 중';
   }
 
   if (
     status === 'COMPLETED'
   ) {
-    return '상담 완료';
+    return '주문 상담 완료';
   }
 
   if (
     status === 'CANCELED'
   ) {
-    return '상담 취소';
+    return '주문 신청 취소';
   }
 
-  return '상담 상태 확인 필요';
+  return '주문 신청 상태 확인 필요';
 }
 
 function gridPaperPageStyle(): CSSProperties {

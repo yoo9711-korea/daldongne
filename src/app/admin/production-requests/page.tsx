@@ -439,8 +439,8 @@ export default async function AdminProductionRequestsPage({
               lineHeight: 1.75,
             }}
           >
-            고객이 책 상세 페이지에서 신청한 제작 상담
-            내용을 확인하고 상담 진행 상태를 관리합니다.
+            고객이 책 상세 페이지에서 신청한 주문 내용을
+            1차 검토하고 고객 연락 및 제작 상태를 관리합니다.
           </p>
         </div>
 
