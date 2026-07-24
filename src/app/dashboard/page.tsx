@@ -100,7 +100,7 @@ export default async function DashboardPage() {
       orderBy: {
         createdAt: "desc",
       },
-      take: 5,
+      take: 3,
       select: {
         id: true,
         title: true,
