@@ -1,63 +1,65 @@
 @font-face {
-  font-family: 'Daldongne Sans';
-  src:
-    url('./fonts/NanumSquareNeo-Regular.woff2')
-    format('woff2');
+  font-family: "Daldongne Sans";
+  src: url("./fonts/NanumSquareNeo-Regular.woff2") format("woff2");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Daldongne Sans';
-  src:
-    url('./fonts/NanumSquareNeo-Bold.woff2')
-    format('woff2');
+  font-family: "Daldongne Sans";
+  src: url("./fonts/NanumSquareNeo-Bold.woff2") format("woff2");
   font-style: normal;
   font-weight: 700;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Daldongne Sans';
-  src:
-    url('./fonts/NanumSquareNeo-ExtraBold.woff2')
-    format('woff2');
+  font-family: "Daldongne Sans";
+  src: url("./fonts/NanumSquareNeo-ExtraBold.woff2") format("woff2");
   font-style: normal;
   font-weight: 800;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Daldongne Serif';
-  src:
-    url('./fonts/MaruBuri-Regular.woff2')
-    format('woff2');
+  font-family: "Daldongne Serif";
+  src: url("./fonts/MaruBuri-Regular.woff2") format("woff2");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Daldongne Serif';
-  src:
-    url('./fonts/MaruBuri-SemiBold.woff2')
-    format('woff2');
+  font-family: "Daldongne Serif";
+  src: url("./fonts/MaruBuri-SemiBold.woff2") format("woff2");
   font-style: normal;
   font-weight: 600;
   font-display: swap;
 }
 
-:root {
-  --font-daldongne-sans:
-    'Daldongne Sans',
-    Arial,
-    sans-serif;
+@font-face {
+  font-family: "Daldongne Hand";
+  src: url("./fonts/NanumBarunpen-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
 
-  --font-daldongne-serif:
-    'Daldongne Serif',
-    Batang,
-    serif;
+@font-face {
+  font-family: "Daldongne Hand";
+  src: url("./fonts/NanumBarunpen-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --font-daldongne-sans: "Daldongne Sans", Arial, sans-serif;
+
+  --font-daldongne-serif: "Daldongne Serif", Batang, serif;
+
+  --font-daldongne-hand: "Daldongne Hand", "NanumBarunpen", cursive;
 }
 
 html,
@@ -88,6 +90,25 @@ select {
 .storybook-bottom-cta h3 {
   font-family: var(--font-daldongne-serif);
   font-weight: 600;
+}
+
+.bright-home-title,
+.bright-home-section-heading,
+.bright-home-step h3,
+.bright-home-memory-copy strong,
+.bright-home-final h2 {
+  font-family: var(--font-daldongne-hand);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.bright-home-kicker,
+.bright-home-visual-note,
+.bright-home-flow-note,
+.bright-home-final-label {
+  font-family: var(--font-daldongne-hand);
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 @media (max-width: 700px) {
