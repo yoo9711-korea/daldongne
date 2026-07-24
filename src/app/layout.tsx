@@ -234,6 +234,10 @@ export default async function RootLayout({
                 홈
               </Link>
 
+              <Link href="/pricing" style={linkStyle}>
+                상품안내
+              </Link>
+
                 {isLoggedIn ? (
                 <>
                   {isAdmin ? (
