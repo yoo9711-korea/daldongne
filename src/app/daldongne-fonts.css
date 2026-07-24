@@ -111,6 +111,68 @@ select {
   letter-spacing: 0;
 }
 
+/*
+ * 홈페이지 가독성 보정
+ * 모든 본문 글자는 최소 700 굵기로 표시하고,
+ * 버튼과 강조 문구는 800 굵기로 한 단계 더 선명하게 표시합니다.
+ */
+.bright-home {
+  font-weight: 700;
+}
+
+.bright-home
+  :is(
+    h1,
+    h2,
+    h3,
+    p,
+    li,
+    span,
+    strong,
+    small,
+    a,
+    button
+  ) {
+  font-weight: 700 !important;
+}
+
+.bright-home
+  :is(
+    .bright-home-kicker,
+    .bright-home-primary,
+    .bright-home-secondary,
+    .bright-home-step-number,
+    .bright-home-step-link,
+    .bright-home-audience span,
+    .bright-home-final-label,
+    .bright-home-final-link
+  ) {
+  font-weight: 800 !important;
+}
+
+.bright-home
+  :is(
+    .bright-home-description,
+    .bright-home-section-copy,
+    .bright-home-step p,
+    .bright-home-trust,
+    .bright-home-final p
+  ) {
+  color: #4f3b33 !important;
+}
+
+.bright-home .bright-home-flow-note {
+  color: #66483a !important;
+}
+
+.bright-home .bright-home-memory-copy span {
+  color: #526d61 !important;
+}
+
+.bright-home .bright-home-step-number {
+  color: #765b4f !important;
+}
+
 @media (max-width: 700px) {
   body {
     text-rendering: optimizeLegibility;
