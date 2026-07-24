@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import type { FormEvent } from 'react';
@@ -24,6 +25,11 @@ type LocalBookDraft = {
   coverText: string;
   content: string;
   savedAt: string;
+};
+
+type TextMatchRange = {
+  start: number;
+  end: number;
 };
 
 export default function EditBookDraftButton({
@@ -56,11 +62,42 @@ export default function EditBookDraftButton({
   const [content, setContent] =
     useState(initialContent || '');
 
+  const [findText, setFindText] =
+    useState('');
+  const [replaceText, setReplaceText] =
+    useState('');
+  const [
+    currentMatchIndex,
+    setCurrentMatchIndex,
+  ] = useState(-1);
+
+  const contentTextareaRef =
+    useRef<HTMLTextAreaElement>(
+      null,
+    );
+
   const localDraftKey =
     `daldongne-book-draft:${bookId}`;
 
   const editorFormId =
     `book-draft-editor-form-${bookId}`;
+
+  const contentMatchRanges =
+    getTextMatchRanges(
+      content,
+      findText,
+    );
+
+  const safeCurrentMatchIndex =
+    contentMatchRanges.length > 0
+      ? currentMatchIndex >= 0
+        ? Math.min(
+            currentMatchIndex,
+            contentMatchRanges.length -
+              1,
+          )
+        : 0
+      : 0;
 
   const hasUnsavedChanges =
     title.trim() !==
@@ -74,6 +111,12 @@ export default function EditBookDraftButton({
     content.trim() !==
       (initialContent || '').trim();
 
+  const resetFindReplace = () => {
+    setFindText('');
+    setReplaceText('');
+    setCurrentMatchIndex(-1);
+  };
+
   const resetToServerBook = () => {
     setTitle(initialTitle);
     setSubtitle(initialSubtitle || '');
@@ -84,6 +127,8 @@ export default function EditBookDraftButton({
   };
 
   const openEditor = () => {
+    resetFindReplace();
+
     const localDraft =
       readLocalBookDraft(localDraftKey);
 
@@ -174,6 +219,178 @@ export default function EditBookDraftButton({
       hasUnsavedChanges,
       localDraftKey,
     ]);
+
+  const selectTextMatch = (
+    range: TextMatchRange,
+  ) => {
+    window.requestAnimationFrame(
+      () => {
+        const textarea =
+          contentTextareaRef.current;
+
+        if (!textarea) {
+          return;
+        }
+
+        textarea.focus();
+        textarea.setSelectionRange(
+          range.start,
+          range.end,
+        );
+
+        const scrollRatio =
+          content.length > 0
+            ? range.start /
+              content.length
+            : 0;
+
+        textarea.scrollTop =
+          Math.max(
+            0,
+            textarea.scrollHeight *
+              scrollRatio -
+              textarea.clientHeight /
+                2,
+          );
+      },
+    );
+  };
+
+  const moveToTextMatch = (
+    direction: -1 | 1,
+  ) => {
+    if (
+      contentMatchRanges.length === 0
+    ) {
+      return;
+    }
+
+    let nextIndex = 0;
+
+    if (currentMatchIndex < 0) {
+      nextIndex =
+        direction === 1
+          ? 0
+          : contentMatchRanges.length -
+            1;
+    } else {
+      nextIndex =
+        (
+          safeCurrentMatchIndex +
+          direction +
+          contentMatchRanges.length
+        ) %
+        contentMatchRanges.length;
+    }
+
+    setCurrentMatchIndex(nextIndex);
+    selectTextMatch(
+      contentMatchRanges[nextIndex],
+    );
+  };
+
+  const replaceCurrentTextMatch =
+    () => {
+      if (
+        contentMatchRanges.length ===
+        0
+      ) {
+        return;
+      }
+
+      const currentRange =
+        contentMatchRanges[
+          safeCurrentMatchIndex
+        ];
+
+      const nextContent =
+        content.slice(
+          0,
+          currentRange.start,
+        ) +
+        replaceText +
+        content.slice(
+          currentRange.end,
+        );
+
+      const nextMatchRanges =
+        getTextMatchRanges(
+          nextContent,
+          findText,
+        );
+
+      const nextSearchStart =
+        currentRange.start +
+        replaceText.length;
+
+      const followingMatchIndex =
+        nextMatchRanges.findIndex(
+          (range) =>
+            range.start >=
+            nextSearchStart,
+        );
+
+      const nextIndex =
+        nextMatchRanges.length === 0
+          ? -1
+          : followingMatchIndex >= 0
+            ? followingMatchIndex
+            : 0;
+
+      setContent(nextContent);
+      setCurrentMatchIndex(nextIndex);
+
+      if (nextIndex >= 0) {
+        window.requestAnimationFrame(
+          () => {
+            selectTextMatch(
+              nextMatchRanges[
+                nextIndex
+              ],
+            );
+          },
+        );
+      }
+    };
+
+  const replaceAllTextMatches =
+    () => {
+      const matchCount =
+        contentMatchRanges.length;
+
+      if (matchCount === 0) {
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          `본문에서 "${findText}" 문구 ${matchCount}곳을 모두 바꿀까요?`,
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      const nextContent =
+        replaceAllExactText(
+          content,
+          findText,
+          replaceText,
+        );
+
+      setContent(nextContent);
+      setCurrentMatchIndex(-1);
+
+      window.alert(
+        `${matchCount}곳을 바꾸었습니다. 서버에 저장하기 전까지는 임시저장 상태입니다.`,
+      );
+
+      window.requestAnimationFrame(
+        () => {
+          contentTextareaRef.current?.focus();
+        },
+      );
+    };
 
   useEffect(() => {
     if (!isOpen) {
@@ -485,6 +702,158 @@ export default function EditBookDraftButton({
               )}
             </div>
 
+            <section
+              className="book-draft-find-panel"
+              aria-label="책 본문 찾기와 바꾸기"
+            >
+              <div className="book-draft-find-header">
+                <div>
+                  <strong>
+                    본문 찾기·바꾸기
+                  </strong>
+                  <small>
+                    책 본문에서 같은 문구를
+                    찾아 선택하거나 바꿉니다.
+                  </small>
+                </div>
+
+                <span
+                  aria-live="polite"
+                >
+                  {contentMatchRanges.length >
+                  0
+                    ? `${
+                        currentMatchIndex >=
+                        0
+                          ? safeCurrentMatchIndex +
+                            1
+                          : 0
+                      } / ${
+                        contentMatchRanges.length
+                      }`
+                    : '0개'}
+                </span>
+              </div>
+
+              <div className="book-draft-find-row">
+                <label>
+                  <span>찾을 문구</span>
+                  <input
+                    type="text"
+                    value={findText}
+                    onChange={(event) => {
+                      setFindText(
+                        event.target.value,
+                      );
+                      setCurrentMatchIndex(
+                        -1,
+                      );
+                    }}
+                    onKeyDown={(event) => {
+                      if (
+                        event.key ===
+                        'Enter'
+                      ) {
+                        event.preventDefault();
+                        moveToTextMatch(
+                          event.shiftKey
+                            ? -1
+                            : 1,
+                        );
+                      }
+                    }}
+                    placeholder="본문에서 찾을 문구"
+                    disabled={isSaving}
+                  />
+                </label>
+
+                <div className="book-draft-find-navigation">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      moveToTextMatch(-1)
+                    }
+                    disabled={
+                      isSaving ||
+                      contentMatchRanges.length ===
+                        0
+                    }
+                  >
+                    이전
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      moveToTextMatch(1)
+                    }
+                    disabled={
+                      isSaving ||
+                      contentMatchRanges.length ===
+                        0
+                    }
+                  >
+                    다음
+                  </button>
+                </div>
+              </div>
+
+              <div className="book-draft-find-row is-replace">
+                <label>
+                  <span>바꿀 문구</span>
+                  <input
+                    type="text"
+                    value={replaceText}
+                    onChange={(event) =>
+                      setReplaceText(
+                        event.target.value,
+                      )
+                    }
+                    placeholder="새 문구를 입력하세요"
+                    disabled={isSaving}
+                  />
+                </label>
+
+                <div className="book-draft-replace-actions">
+                  <button
+                    type="button"
+                    onClick={
+                      replaceCurrentTextMatch
+                    }
+                    disabled={
+                      isSaving ||
+                      contentMatchRanges.length ===
+                        0
+                    }
+                  >
+                    한 번 바꾸기
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={
+                      replaceAllTextMatches
+                    }
+                    disabled={
+                      isSaving ||
+                      contentMatchRanges.length ===
+                        0
+                    }
+                    className="is-all"
+                  >
+                    모두 바꾸기
+                  </button>
+                </div>
+              </div>
+
+              <p>
+                찾기·바꾸기로 변경한 내용도
+                자동 임시저장됩니다. 최종
+                반영하려면 아래 저장 버튼이나
+                Ctrl+S를 눌러주세요.
+              </p>
+            </section>
+
             <div className="book-draft-editor-fields">
               <label>
                 <span>책 제목</span>
@@ -556,6 +925,7 @@ export default function EditBookDraftButton({
               <label className="is-full">
                 <span>책 본문</span>
                 <textarea
+                  ref={contentTextareaRef}
                   value={content}
                   onChange={(event) =>
                     setContent(
@@ -702,6 +1072,146 @@ export default function EditBookDraftButton({
           color: #56805b;
         }
 
+        .book-draft-find-panel {
+          margin-bottom: 20px;
+          padding: 17px;
+          border: 1px solid #ecd4c8;
+          border-radius: 17px;
+          background:
+            linear-gradient(
+              135deg,
+              #fff8f4,
+              #fffdfb
+            );
+        }
+
+        .book-draft-find-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 16px;
+        }
+
+        .book-draft-find-header
+        > div {
+          min-width: 0;
+        }
+
+        .book-draft-find-header strong {
+          display: block;
+          color: #573e33;
+          font-size: 14px;
+          font-weight: 900;
+        }
+
+        .book-draft-find-header small {
+          display: block;
+          margin-top: 4px;
+          color: #8c756a;
+          font-size: 11px;
+          font-weight: 700;
+          line-height: 1.55;
+        }
+
+        .book-draft-find-header
+        > span {
+          flex: 0 0 auto;
+          min-width: 58px;
+          padding: 6px 10px;
+          border: 1px solid #edcbbb;
+          border-radius: 999px;
+          background: #ffffff;
+          color: #d36f56;
+          font-size: 12px;
+          font-weight: 900;
+          text-align: center;
+        }
+
+        .book-draft-find-row {
+          margin-top: 13px;
+          display: grid;
+          grid-template-columns:
+            minmax(0, 1fr) auto;
+          align-items: end;
+          gap: 10px;
+        }
+
+        .book-draft-find-row label {
+          min-width: 0;
+          display: grid;
+          gap: 6px;
+        }
+
+        .book-draft-find-row
+        label > span {
+          color: #644c41;
+          font-size: 12px;
+          font-weight: 900;
+        }
+
+        .book-draft-find-row input {
+          width: 100%;
+          height: 42px;
+          box-sizing: border-box;
+          padding: 0 13px;
+          border: 1px solid #dfc2b4;
+          border-radius: 12px;
+          background: #ffffff;
+          color: #49352b;
+          font-size: 13px;
+          outline: none;
+        }
+
+        .book-draft-find-row
+        input:focus {
+          border-color: #e3876e;
+          box-shadow:
+            0 0 0 3px
+            rgba(227, 135, 110, 0.12);
+        }
+
+        .book-draft-find-navigation,
+        .book-draft-replace-actions {
+          display: flex;
+          gap: 7px;
+        }
+
+        .book-draft-find-panel button {
+          min-height: 42px;
+          padding: 0 14px;
+          border: 1px solid #ddc2b5;
+          border-radius: 12px;
+          background: #ffffff;
+          color: #654b40;
+          font-size: 12px;
+          font-weight: 900;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+
+        .book-draft-find-panel
+        button.is-all {
+          border-color: #dd8067;
+          background: #ed856c;
+          color: #ffffff;
+        }
+
+        .book-draft-find-panel
+        button:disabled,
+        .book-draft-find-panel
+        input:disabled {
+          cursor: not-allowed;
+          opacity: 0.5;
+        }
+
+        .book-draft-find-panel > p {
+          margin: 12px 0 0;
+          color: #8b7469;
+          font-size: 11px;
+          font-weight: 700;
+          line-height: 1.65;
+        }
+
         .book-draft-editor-fields {
           display: grid;
           grid-template-columns:
@@ -831,6 +1341,24 @@ export default function EditBookDraftButton({
             font-size: 25px;
           }
 
+          .book-draft-find-row {
+            grid-template-columns: 1fr;
+          }
+
+          .book-draft-find-navigation,
+          .book-draft-replace-actions {
+            display: grid;
+            grid-template-columns:
+              repeat(
+                2,
+                minmax(0, 1fr)
+              );
+          }
+
+          .book-draft-find-panel button {
+            width: 100%;
+          }
+
           .book-draft-editor-fields {
             grid-template-columns: 1fr;
           }
@@ -856,6 +1384,61 @@ export default function EditBookDraftButton({
       `}</style>
     </>
   );
+}
+
+function getTextMatchRanges(
+  text: string,
+  searchText: string,
+): TextMatchRange[] {
+  if (!searchText) {
+    return [];
+  }
+
+  const ranges: TextMatchRange[] =
+    [];
+
+  let searchStart = 0;
+
+  while (
+    searchStart <= text.length
+  ) {
+    const matchStart =
+      text.indexOf(
+        searchText,
+        searchStart,
+      );
+
+    if (matchStart < 0) {
+      break;
+    }
+
+    ranges.push({
+      start: matchStart,
+      end:
+        matchStart +
+        searchText.length,
+    });
+
+    searchStart =
+      matchStart +
+      searchText.length;
+  }
+
+  return ranges;
+}
+
+function replaceAllExactText(
+  text: string,
+  searchText: string,
+  replacementText: string,
+) {
+  if (!searchText) {
+    return text;
+  }
+
+  return text
+    .split(searchText)
+    .join(replacementText);
 }
 
 function readLocalBookDraft(
