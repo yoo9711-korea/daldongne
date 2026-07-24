@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { auth, signOut } from '@/auth';
 import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
 import './globals.css';
+import './daldongne-fonts.css';
 
 export const metadata: Metadata = {
   title: '달동네 스토리 — 삶의 인생책 제작 서비스',

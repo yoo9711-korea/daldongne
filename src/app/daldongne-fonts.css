@@ -1,0 +1,98 @@
+@font-face {
+  font-family: 'Daldongne Sans';
+  src:
+    url('./fonts/NanumSquareNeo-Regular.woff2')
+    format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Daldongne Sans';
+  src:
+    url('./fonts/NanumSquareNeo-Bold.woff2')
+    format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Daldongne Sans';
+  src:
+    url('./fonts/NanumSquareNeo-ExtraBold.woff2')
+    format('woff2');
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Daldongne Serif';
+  src:
+    url('./fonts/MaruBuri-Regular.woff2')
+    format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Daldongne Serif';
+  src:
+    url('./fonts/MaruBuri-SemiBold.woff2')
+    format('woff2');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+:root {
+  --font-daldongne-sans:
+    'Daldongne Sans',
+    Arial,
+    sans-serif;
+
+  --font-daldongne-serif:
+    'Daldongne Serif',
+    Batang,
+    serif;
+}
+
+html,
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-daldongne-sans);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.storybook-home,
+.storybook-public-page {
+  font-family: var(--font-daldongne-sans);
+}
+
+.storybook-title,
+.storybook-section-title,
+.storybook-recommend-title,
+.storybook-side-cta-copy h3,
+.storybook-bottom-cta h3 {
+  font-family: var(--font-daldongne-serif);
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+}
