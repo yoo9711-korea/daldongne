@@ -52,22 +52,22 @@ const steps: {
 
 const memoryCards = [
   {
-    image: "/home/storybook/example-1.webp",
+    image: "/home/storybook/memory-v4/everyday.webp",
     label: "나의 평범한 하루",
     detail: "오늘의 작은 장면부터",
   },
   {
-    image: "/home/storybook/example-2.webp",
+    image: "/home/storybook/memory-v4/people.webp",
     label: "함께한 사람들",
     detail: "가족·친구·연인의 시간",
   },
   {
-    image: "/home/storybook/example-3.webp",
+    image: "/home/storybook/memory-v4/child.webp",
     label: "아이의 성장 기록",
     detail: "잊고 싶지 않은 변화",
   },
   {
-    image: "/home/storybook/example-4.webp",
+    image: "/home/storybook/memory-v4/pet.webp",
     label: "반려동물과의 추억",
     detail: "강아지와 고양이도 주인공",
   },
