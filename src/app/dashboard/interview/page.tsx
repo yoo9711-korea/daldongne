@@ -1,15 +1,13 @@
-import { auth } from '@/auth';
-import PageGuideBox from '@/components/guide/PageGuideBox';
-import StoryPhotoUploadBox from '@/components/interview/StoryPhotoUploadBox';
-import DeleteMemoryButton from '@/components/memory/DeleteMemoryButton';
-import EditMemoryButton from '@/components/memory/EditMemoryButton';
-import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
-import Image from 'next/image';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import type { CSSProperties } from 'react';
-import InterviewClient from './InterviewClient';
+import { auth } from "@/auth";
+import StoryPhotoUploadBox from "@/components/interview/StoryPhotoUploadBox";
+import DeleteMemoryButton from "@/components/memory/DeleteMemoryButton";
+import EditMemoryButton from "@/components/memory/EditMemoryButton";
+import { prisma } from "@/lib/prisma";
+import Image from "next/image";
+import Link from "next/link";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import InterviewClient from "./InterviewClient";
 
 const REQUIRED_STORY_COUNT = 3;
 
@@ -17,7 +15,7 @@ export default async function InterviewPage() {
   const session = await auth();
 
   if (!session?.user?.id) {
-    redirect('/login');
+    redirect("/login");
   }
 
   const userId = session.user.id;
@@ -27,10 +25,10 @@ export default async function InterviewPage() {
       prisma.memory.findMany({
         where: {
           authorId: userId,
-          type: 'TEXT',
+          type: "TEXT",
         },
         orderBy: {
-          createdAt: 'asc',
+          createdAt: "desc",
         },
         select: {
           id: true,
@@ -43,17 +41,17 @@ export default async function InterviewPage() {
       prisma.memory.findMany({
         where: {
           authorId: userId,
-          type: 'PHOTO',
+          type: "PHOTO",
           fileUrl: {
             not: null,
           },
         },
         orderBy: [
           {
-            occurredAt: 'desc',
+            occurredAt: "desc",
           },
           {
-            createdAt: 'desc',
+            createdAt: "desc",
           },
         ],
         take: 24,
@@ -71,7 +69,7 @@ export default async function InterviewPage() {
       prisma.memory.count({
         where: {
           authorId: userId,
-          type: 'PHOTO',
+          type: "PHOTO",
         },
       }),
 
@@ -102,846 +100,251 @@ export default async function InterviewPage() {
     totalStoryCount >= REQUIRED_STORY_COUNT;
 
   async function submitAnswer(formData: FormData) {
-    'use server';
+    "use server";
 
     const currentSession = await auth();
 
     if (!currentSession?.user?.id) {
-      redirect('/login');
+      redirect("/login");
     }
 
-    const answer = String(
-      formData.get('answer') || '',
+    const storyTitle = String(
+      formData.get("storyTitle") || "",
     ).trim();
 
-    const question = String(
-      formData.get('question') || '',
+    const whenText = String(
+      formData.get("whenText") || "",
     ).trim();
 
-    if (!answer) {
+    const peopleText = String(
+      formData.get("peopleText") || "",
+    ).trim();
+
+    const memoryText = String(
+      formData.get("memoryText") || "",
+    ).trim();
+
+    const selectedPhotoTitle = String(
+      formData.get("selectedPhotoTitle") || "",
+    ).trim();
+
+    if (!memoryText) {
       return;
     }
 
+    const descriptionParts = [
+      whenText
+        ? `언제: ${whenText}`
+        : "",
+      peopleText
+        ? `함께한 사람: ${peopleText}`
+        : "",
+      memoryText,
+    ].filter(Boolean);
+
     const title =
-      question || '우리 가족의 기억';
+      storyTitle ||
+      selectedPhotoTitle ||
+      "사진 속 소중한 이야기";
 
     await prisma.memory.create({
       data: {
-        type: 'TEXT',
+        type: "TEXT",
         title: `이야기 · ${title.slice(0, 40)}`,
-        description: answer,
+        description: descriptionParts.join("\n\n"),
         authorId: currentSession.user.id,
         occurredAt: new Date(),
       },
     });
 
-    revalidatePath('/dashboard');
-    revalidatePath('/dashboard/interview');
-    revalidatePath('/dashboard/book');
-    revalidatePath('/dashboard/library');
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/interview");
+    revalidatePath("/dashboard/book");
+    revalidatePath("/dashboard/library");
   }
 
   return (
-    <main
-      className="story-page-main"
-      style={gridPaperPageStyle()}
-    >
-      <style>{`
-                .story-page-main {
-          min-height: 100vh;
-          color: #4a352b;
-          background-color: #fffdf9 !important;
-          background-image:
-            linear-gradient(
-              rgba(220, 167, 136, 0.035) 1px,
-              transparent 1px
-            ),
-            linear-gradient(
-              90deg,
-              rgba(220, 167, 136, 0.035) 1px,
-              transparent 1px
-            ) !important;
-          background-size: 32px 32px !important;
-        }
+    <main className="interview-reference-page">
+      <style>{interviewReferenceStyles}</style>
 
-        .story-hero {
-          position: relative;
-          overflow: hidden;
-          background:
-            radial-gradient(
-              circle at 90% 5%,
-              rgba(255, 211, 191, 0.58),
-              transparent 25rem
-            ),
-            radial-gradient(
-              circle at 5% 100%,
-              rgba(255, 241, 203, 0.52),
-              transparent 22rem
-            ),
-            linear-gradient(
-              135deg,
-              #fff8f3 0%,
-              #ffffff 52%,
-              #fff1e8 100%
-            ) !important;
-          color: #49352b !important;
-          border:
-            1px solid rgba(218, 143, 108, 0.22) !important;
-          box-shadow:
-            0 18px 48px
-            rgba(156, 91, 58, 0.08) !important;
-        }
+      <div className="interview-reference-shell">
+        <section className="interview-reference-heading">
+          <p>책 만들기 2단계</p>
 
-        .story-hero h1,
-        .story-hero strong {
-          color: #49352b !important;
-        }
-
-        .story-hero > p:first-of-type {
-          color: #dd765b !important;
-        }
-
-        .story-hero > p:not(:first-of-type) {
-          color: #725d52 !important;
-        }
-
-        .story-hero
-        > div:not(.story-hero-actions) {
-          border:
-            1px solid rgba(218, 143, 108, 0.2) !important;
-          background:
-            rgba(255, 255, 255, 0.78) !important;
-          box-shadow:
-            0 10px 26px
-            rgba(147, 87, 55, 0.045);
-        }
-
-        .story-hero
-        > div:not(.story-hero-actions)
-        p {
-          color: #80685c !important;
-        }
-
-        .story-hero
-        > div:not(.story-hero-actions)
-        p:first-child {
-          color: #d56f55 !important;
-        }
-
-        .story-hero-actions a {
-          border:
-            1px solid rgba(210, 126, 90, 0.3) !important;
-          background: #ffffff !important;
-          color: #a65f48 !important;
-          box-shadow:
-            0 9px 22px
-            rgba(181, 104, 71, 0.08);
-        }
-
-        .story-hero-actions a:first-child {
-          border-color: transparent !important;
-          background:
-            linear-gradient(
-              135deg,
-              #f49378,
-              #e97861
-            ) !important;
-          color: #ffffff !important;
-          box-shadow:
-            0 11px 25px
-            rgba(220, 104, 77, 0.2);
-        }
-
-        .story-section {
-          background: #ffffff !important;
-          border:
-            1px solid rgba(196, 139, 108, 0.18) !important;
-          box-shadow:
-            0 14px 34px
-            rgba(132, 79, 48, 0.055) !important;
-        }
-
-        .story-section > div > p:first-child,
-        .story-section > p:first-child {
-          color: #d67358 !important;
-        }
-
-        .story-section h2,
-        .story-section h3 {
-          color: #49352b !important;
-        }
-
-        .story-section input,
-        .story-section textarea,
-        .story-section select {
-          border:
-            1px solid rgba(192, 139, 108, 0.28) !important;
-          background: #fffdfb !important;
-          color: #49352b !important;
-          box-shadow: none !important;
-        }
-
-        .story-section input:focus,
-        .story-section textarea:focus,
-        .story-section select:focus {
-          border-color: #e68a6f !important;
-          outline:
-            3px solid rgba(230, 138, 111, 0.12) !important;
-        }
-
-        .story-section button {
-          border-color: transparent !important;
-          background:
-            linear-gradient(
-              135deg,
-              #f49378,
-              #e97861
-            ) !important;
-          color: #ffffff !important;
-          box-shadow:
-            0 10px 24px
-            rgba(220, 104, 77, 0.18) !important;
-        }
-
-        .story-section article {
-          background: #ffffff !important;
-          border-color:
-            rgba(191, 137, 106, 0.19) !important;
-          box-shadow:
-            0 12px 28px
-            rgba(127, 76, 47, 0.05) !important;
-        }
-
-        .story-photo-image {
-          background: #fff4ed !important;
-        }
-
-        .story-photo-grid article h3 {
-          color: #49352b !important;
-        }
-
-        .story-photo-grid article p {
-          color: #725d52;
-        }
-
-        .story-page-main
-        section:not(.story-hero)
-        > div
-        > span {
-          background: #fff1ea !important;
-          color: #a85f48 !important;
-        }
-        .story-page-container {
-          width: 100%;
-          max-width: 1380px;
-          margin: 0 auto;
-          padding: 28px;
-        }
-
-        .story-photo-grid {
-          display: grid;
-          grid-template-columns:
-            repeat(auto-fit, minmax(245px, 1fr));
-          gap: 16px;
-        }
-
-        .story-photo-actions {
-          display: flex;
-          justify-content: flex-end;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        @media (max-width: 700px) {
-          .story-page-container {
-            padding: 16px;
-          }
-
-          .story-hero {
-            padding: 26px 20px !important;
-            border-radius: 24px !important;
-          }
-
-          .story-hero-actions {
-            display: grid !important;
-            grid-template-columns: 1fr !important;
-          }
-
-          .story-hero-actions a {
-            width: 100%;
-          }
-
-          .story-section {
-            padding: 20px 16px !important;
-            border-radius: 24px !important;
-          }
-
-          .story-photo-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .story-photo-image {
-            height: 230px !important;
-          }
-        }
-      `}</style>
-
-      <div className="story-page-container">
-        <section
-          className="story-hero"
-          style={{
-            borderRadius: 34,
-            padding: 38,
-            background:
-              'linear-gradient(135deg, #33271d 0%, #5b422c 52%, #8a6238 100%)',
-            color: '#fff8ec',
-            boxShadow:
-              '0 22px 60px rgba(51, 39, 29, 0.18)',
-          }}
-        >
-          <p
-            style={{
-              margin: '0 0 13px',
-              color: '#f0c36a',
-              fontSize: 13,
-              fontWeight: 900,
-              letterSpacing: '0.08em',
-            }}
-          >
-            책 만들기 2단계
-          </p>
-
-          <h1
-            style={{
-              margin: 0,
-              maxWidth: 900,
-              fontFamily: 'Noto Serif KR, serif',
-              fontSize:
-                'clamp(34px, 5vw, 56px)',
-              lineHeight: 1.2,
-              letterSpacing: '-0.05em',
-            }}
-          >
-            사진 속 기억과
-           <br />
-           소중한 삶의 이야기를 남깁니다.
+          <h1>
+            사진 속 이야기를
+            <br className="interview-reference-mobile-break" />
+            들려주세요
           </h1>
 
-          <p
-            style={{
-              margin: '22px 0 0',
-              maxWidth: 820,
-              fontSize: 18,
-              lineHeight: 1.8,
-              color:
-                'rgba(255, 248, 236, 0.86)',
-            }}
-          >
-            좋은 글을 쓰려고 애쓰지 않아도
-            괜찮습니다. 사진을 보며 떠오르는
-            사람, 장소, 사건과 그때의 감정을
-            편하게 남겨주세요. 짧은 기억도
-            책의 중요한 문장이 됩니다.
-          </p>
+          <span>
+            완벽한 글보다 지금 기억나는 한 문장이
+            더 소중합니다.
+          </span>
+        </section>
 
-          <div
-            style={{
-              marginTop: 26,
-              padding: '18px 20px',
-              borderRadius: 20,
-              border:
-                '1px solid rgba(255,255,255,0.2)',
-              background:
-                'rgba(255,255,255,0.08)',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: '#f0c36a',
-                fontSize: 12,
-                fontWeight: 900,
-              }}
-            >
-              현재 준비 상태
-            </p>
+        <section className="interview-reference-status">
+          <StatusCard
+            label="모은 사진"
+            value={photoCount}
+            unit="장"
+          />
 
-            <strong
-              style={{
-                display: 'block',
-                marginTop: 7,
-                fontSize: 21,
-                lineHeight: 1.45,
-              }}
-            >
+          <StatusCard
+            label="사진 속 이야기"
+            value={photoStoryCount}
+            unit="개"
+          />
+
+          <StatusCard
+            label="직접 남긴 이야기"
+            value={writtenStoryCount}
+            unit="개"
+          />
+
+          <StatusCard
+            label="전체 이야기"
+            value={totalStoryCount}
+            unit="개"
+          />
+
+          <StatusCard
+            label="만든 책"
+            value={bookCount}
+            unit="권"
+          />
+        </section>
+
+        <section className="interview-reference-ready">
+          <div>
+            <p>현재 준비 상태</p>
+
+            <strong>
               {storyReady
                 ? `이야기 자료 ${totalStoryCount}개가 준비되었습니다.`
                 : `이야기를 ${remainingStoryCount}개 더 남겨보세요.`}
             </strong>
 
-            <p
-              style={{
-                margin: '6px 0 0',
-                color:
-                  'rgba(255, 248, 236, 0.75)',
-                fontSize: 14,
-                lineHeight: 1.7,
-              }}
-            >
-              사진 설명과 직접 작성한 이야기를
-              합쳐 3개 이상이면 책 원고 만들기를
-              시작할 수 있습니다.
-            </p>
-          </div>
-
-          <div
-            className="story-hero-actions"
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 10,
-              marginTop: 22,
-            }}
-          >
-            <a
-              href="#story-writing"
-              style={heroPrimaryButtonStyle()}
-            >
-              이야기 작성하기
-            </a>
-
-            <a
-              href="#photo-story"
-              style={heroSecondaryButtonStyle()}
-            >
-              사진 이야기 확인
-            </a>
-
-            <Link
-              href="/dashboard/timeline"
-              style={heroSecondaryButtonStyle()}
-            >
-              사진 모으기로 돌아가기
-            </Link>
-          </div>
-        </section>
-
-        <section
-          style={{
-            display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fit, minmax(170px, 1fr))',
-            gap: 14,
-            marginTop: 24,
-          }}
-        >
-          <SummaryCard
-            label="모은 사진"
-            value={photoCount}
-            unit="장"
-            description="이야기를 연결할 수 있는 사진"
-            color="#7b4f2a"
-          />
-
-          <SummaryCard
-            label="사진 속 이야기"
-            value={photoStoryCount}
-            unit="개"
-            description="사진 설명으로 남긴 기억"
-            color="#9b6d2f"
-          />
-
-          <SummaryCard
-            label="직접 남긴 이야기"
-            value={writtenStoryCount}
-            unit="개"
-            description="질문에 답하며 작성한 이야기"
-            color="#62438a"
-          />
-
-          <SummaryCard
-            label="전체 이야기 자료"
-            value={totalStoryCount}
-            unit="개"
-            description="책 원고에 사용할 수 있는 자료"
-            color="#3e5f3a"
-          />
-
-          <SummaryCard
-            label="만든 책"
-            value={bookCount}
-            unit="권"
-            description="내 책장에 저장된 책 원고"
-            color="#2e3f52"
-          />
-        </section>
-
-        <section
-          style={{
-            marginTop: 24,
-            padding: '20px 22px',
-            borderRadius: 22,
-            border: storyReady
-              ? '1px solid #9dcca4'
-              : '1px solid #e3bd7a',
-            background: storyReady
-              ? '#edf8ee'
-              : '#fff4df',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent:
-                'space-between',
-              flexWrap: 'wrap',
-              gap: 14,
-            }}
-          >
-            <div>
-              <p
-                style={{
-                  margin: 0,
-                  color: storyReady
-                    ? '#2f6b38'
-                    : '#83540d',
-                  fontSize: 12,
-                  fontWeight: 900,
-                }}
-              >
-                다음 단계 안내
-              </p>
-
-              <strong
-                style={{
-                  display: 'block',
-                  marginTop: 6,
-                  color: '#33271d',
-                  fontSize: 19,
-                  lineHeight: 1.5,
-                }}
-              >
-                {storyReady
-                  ? '사진과 이야기가 준비되었습니다. 책 원고를 만들어보세요.'
-                  : '사진 속 기억이나 삶의 이야기를 조금 더 남겨주세요.'}
-              </strong>
-            </div>
-
-            {storyReady ? (
-              <Link
-                href="/dashboard/book"
-                style={nextStepButtonStyle()}
-              >
-                책 원고 만들기
-              </Link>
-            ) : (
-              <a
-                href="#story-writing"
-                style={nextStepButtonStyle()}
-              >
-                이야기 더 남기기
-              </a>
-            )}
-          </div>
-        </section>
-
-        <div
-          style={{
-            marginTop: 24,
-          }}
-        >
-          <PageGuideBox
-            label="이야기 남기기 안내"
-            title="사진을 보고 떠오르는 기억부터 편하게 남겨주세요"
-            description="완성된 문장이나 긴 글이 아니어도 괜찮습니다. 날짜, 장소, 사람, 사건과 그때의 감정을 짧게 적으면 책 원고의 중요한 재료가 됩니다."
-            steps={[
-              '먼저 이야기를 남기고 싶은 사진을 고릅니다.',
-              '사진의 제목과 촬영 시기를 확인합니다.',
-              '사진 속 사람과 장소를 적습니다.',
-              '그날 있었던 일과 기억나는 말을 남깁니다.',
-              '그때 느꼈던 감정이나 지금의 생각을 덧붙입니다.',
-              '이야기 자료가 3개 이상 모이면 책 원고 만들기로 이동합니다.',
-            ]}
-            note="사진 설명과 직접 작성한 이야기는 모두 책 원고의 재료로 사용할 수 있습니다."
-          />
-        </div>
-
-        <section
-          className="story-section"
-          style={{
-            marginTop: 24,
-            padding: 28,
-            borderRadius: 30,
-            border:
-              '1px solid rgba(91, 66, 43, 0.12)',
-            background: '#fffaf1',
-            boxShadow:
-              '0 12px 30px rgba(91, 66, 43, 0.08)',
-          }}
-        >
-          <div>
-            <p
-              style={{
-                margin: 0,
-                color: '#9b6d2f',
-                fontSize: 12,
-                fontWeight: 900,
-                letterSpacing: '0.08em',
-              }}
-            >
-              새 사진과 이야기 추가
-            </p>
-
-            <h2
-              style={{
-                margin: '9px 0 0',
-                fontFamily:
-                  'Noto Serif KR, serif',
-                fontSize: 30,
-                lineHeight: 1.4,
-                letterSpacing: '-0.04em',
-                color: '#33271d',
-              }}
-            >
-              이야기를 남길 사진을
-              바로 추가할 수 있습니다.
-            </h2>
-
-            <p
-              style={{
-                margin: '11px 0 0',
-                maxWidth: 760,
-                color: '#6b5845',
-                fontSize: 14,
-                lineHeight: 1.75,
-              }}
-            >
-              사진이 아직 등록되지 않았다면
-              이곳에서 사진과 설명을 함께
-              올려주세요.
-            </p>
-          </div>
-
-          <div
-            style={{
-              marginTop: 20,
-            }}
-          >
-            <StoryPhotoUploadBox />
-          </div>
-        </section>
-
-        <section
-          id="photo-story"
-          className="story-section"
-          style={{
-            marginTop: 24,
-            padding: 28,
-            borderRadius: 30,
-            border:
-              '1px solid rgba(91, 66, 43, 0.12)',
-            background: '#fffaf1',
-            boxShadow:
-              '0 12px 30px rgba(91, 66, 43, 0.08)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent:
-                'space-between',
-              flexWrap: 'wrap',
-              gap: 12,
-            }}
-          >
-            <div>
-              <p
-                style={{
-                  margin: 0,
-                  color: '#9b6d2f',
-                  fontSize: 12,
-                  fontWeight: 900,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                사진 속 이야기
-              </p>
-
-              <h2
-                style={{
-                  margin: '9px 0 0',
-                  fontFamily:
-                    'Noto Serif KR, serif',
-                  fontSize: 30,
-                  lineHeight: 1.4,
-                  letterSpacing: '-0.04em',
-                  color: '#33271d',
-                }}
-              >
-                사진에 남겨 둔 이야기를
-                확인합니다.
-              </h2>
-
-              <p
-                style={{
-                  margin: '9px 0 0',
-                  color: '#6b5845',
-                  fontSize: 14,
-                  lineHeight: 1.7,
-                }}
-              >
-                설명이 부족한 사진은 수정 버튼으로
-                이야기를 보완할 수 있습니다.
-              </p>
-            </div>
-
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                minHeight: 35,
-                padding: '0 13px',
-                borderRadius: 999,
-                background: '#f4ead8',
-                color: '#6b5845',
-                fontSize: 12,
-                fontWeight: 900,
-              }}
-            >
-              전체 {storyPhotos.length}장
+            <span>
+              사진 설명과 직접 작성한 이야기를 합쳐
+              3개 이상이면 책 원고 만들기를 시작할 수
+              있습니다.
             </span>
           </div>
 
+          {storyReady ? (
+            <Link href="/dashboard/book">
+              책 원고 만들기
+              <span aria-hidden="true">→</span>
+            </Link>
+          ) : (
+            <a href="#story-composer">
+              이야기 작성하기
+              <span aria-hidden="true">↓</span>
+            </a>
+          )}
+        </section>
+
+        <section
+          id="story-composer"
+          className="interview-reference-composer"
+        >
+          <InterviewClient
+            photos={storyPhotos.map((photo) => ({
+              id: photo.id,
+              title: photo.title || "",
+              occurredAt: photo.occurredAt
+                ? photo.occurredAt.toISOString()
+                : null,
+              createdAt: photo.createdAt.toISOString(),
+            }))}
+            answers={answers.map((answer) => ({
+              id: answer.id,
+              title: answer.title || "",
+              description: answer.description || "",
+              createdAt: answer.createdAt.toISOString(),
+            }))}
+            submitAnswer={submitAnswer}
+          />
+        </section>
+
+        <section className="interview-reference-photo-stories">
+          <div className="interview-reference-section-head">
+            <div>
+              <p>사진 속 이야기</p>
+              <h2>사진에 남긴 기억을 확인합니다</h2>
+              <span>
+                설명이 부족한 사진은 수정 버튼으로
+                이야기를 보완할 수 있습니다.
+              </span>
+            </div>
+
+            <strong>전체 {storyPhotos.length}장</strong>
+          </div>
+
           {storyPhotos.length > 0 ? (
-            <div
-              className="story-photo-grid"
-              style={{
-                marginTop: 22,
-              }}
-            >
+            <div className="interview-reference-photo-grid">
               {storyPhotos.map((photo) => {
-                const hasDescription =
-                  Boolean(
-                    photo.description?.trim(),
-                  );
+                const hasDescription = Boolean(
+                  photo.description?.trim(),
+                );
 
                 return (
                   <article
                     key={photo.id}
-                    style={{
-                      overflow: 'hidden',
-                      borderRadius: 22,
-                      border: hasDescription
-                        ? '1px solid #9dcca4'
-                        : '1px solid #ead7b7',
-                      background: '#ffffff',
-                      boxShadow:
-                        '0 10px 26px rgba(91, 66, 43, 0.06)',
-                    }}
+                    data-complete={
+                      hasDescription ? "true" : "false"
+                    }
                   >
-                    <div
-                      className="story-photo-image"
-                      style={{
-                        position: 'relative',
-                        width: '100%',
-                        height: 205,
-                        overflow: 'hidden',
-                        background: '#eadcc5',
-                      }}
-                    >
+                    <div className="interview-reference-photo-image">
                       <Image
                         src={`/api/blob/${photo.id}`}
                         alt={
                           photo.title ||
-                          '이야기 사진'
+                          "이야기 사진"
                         }
                         fill
                         unoptimized
-                        sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
-                        style={{
-                          objectFit: 'contain',
-                        }}
+                        sizes="(max-width: 680px) 100vw, (max-width: 1050px) 50vw, 33vw"
                       />
 
-                      <span
-                        style={{
-                          position: 'absolute',
-                          top: 12,
-                          right: 12,
-                          display: 'inline-flex',
-                          padding: '5px 9px',
-                          borderRadius: 999,
-                          background: hasDescription
-                            ? '#3e5f3a'
-                            : 'rgba(51,39,29,0.82)',
-                          color: '#fff8ec',
-                          fontSize: 10,
-                          fontWeight: 900,
-                        }}
-                      >
+                      <span>
                         {hasDescription
-                          ? '이야기 있음'
-                          : '이야기 필요'}
+                          ? "이야기 있음"
+                          : "이야기 필요"}
                       </span>
                     </div>
 
-                    <div
-                      style={{
-                        padding: 18,
-                      }}
-                    >
-                      <p
-                        style={{
-                          margin: 0,
-                          color: '#9b6d2f',
-                          fontSize: 11,
-                          fontWeight: 900,
-                        }}
-                      >
+                    <div className="interview-reference-photo-content">
+                      <time>
                         {photo.occurredAt
                           ? `촬영일 ${formatDate(photo.occurredAt)}`
                           : `등록일 ${formatDate(photo.createdAt)}`}
-                      </p>
+                      </time>
 
-                      <h3
-                        style={{
-                          margin: '8px 0 0',
-                          color: '#33271d',
-                          fontSize: 18,
-                          lineHeight: 1.45,
-                          letterSpacing: '-0.03em',
-                          wordBreak: 'break-word',
-                        }}
-                      >
+                      <h3>
                         {photo.title ||
-                          '제목 없는 사진'}
+                          "제목 없는 사진"}
                       </h3>
 
-                      <p
-                        style={{
-                          margin: '9px 0 0',
-                          minHeight: 68,
-                          whiteSpace: 'pre-line',
-                          color: '#5f4a35',
-                          fontSize: 13,
-                          lineHeight: 1.7,
-                          wordBreak: 'break-word',
-                        }}
-                      >
+                      <p>
                         {photo.description ||
-                          '아직 이 사진에 대한 이야기가 없습니다.'}
+                          "아직 이 사진에 대한 이야기가 없습니다."}
                       </p>
 
-                      <div className="story-photo-actions">
+                      <div className="interview-reference-photo-actions">
                         <EditMemoryButton
                           memoryId={photo.id}
                           initialTitle={
-                            photo.title || ''
+                            photo.title || ""
                           }
                           initialDescription={
-                            photo.description || ''
+                            photo.description || ""
+                          }
+                          initialOccurredAt={
+                            photo.occurredAt
+                              ? photo.occurredAt.toISOString()
+                              : null
                           }
                           label="사진 이야기 수정"
                         />
@@ -952,369 +355,733 @@ export default async function InterviewPage() {
                         />
                       </div>
 
-                      <p
-                        style={{
-                          margin: '12px 0 0',
-                          paddingTop: 11,
-                          borderTop:
-                            '1px solid rgba(91, 66, 43, 0.09)',
-                          color: '#8b7a67',
-                          fontSize: 10,
-                        }}
-                      >
-                        최근 수정{' '}
-                        {formatDate(
-                          photo.updatedAt,
-                        )}
-                      </p>
+                      <small>
+                        최근 수정{" "}
+                        {formatDate(photo.updatedAt)}
+                      </small>
                     </div>
                   </article>
                 );
               })}
             </div>
           ) : (
-            <div
-              style={{
-                marginTop: 20,
-                padding: 30,
-                borderRadius: 22,
-                background: '#ffffff',
-                border:
-                  '1px dashed rgba(91, 66, 43, 0.28)',
-                color: '#6b5845',
-                fontSize: 15,
-                lineHeight: 1.75,
-                textAlign: 'center',
-              }}
-            >
-              아직 등록된 사진이 없습니다.
-              <br />
-              위의 사진 추가 영역이나 사진 모으기
-              화면에서 첫 사진을 올려주세요.
-
-              <div
-                style={{
-                  marginTop: 16,
-                }}
-              >
-                <Link
-                  href="/dashboard/timeline"
-                  style={nextStepButtonStyle()}
-                >
-                  사진 모으기로 이동
-                </Link>
+            <div className="interview-reference-empty-photo">
+              <div>
+                <Image
+                  src="/dashboard/interview-reference-v1/sample-family-story.webp"
+                  alt="할머니, 엄마와 아이들이 함께 웃는 가족 사진 예시"
+                  fill
+                  sizes="(max-width: 700px) 100vw, 460px"
+                />
               </div>
+
+              <section>
+                <p>사진이 아직 없습니다</p>
+
+                <h3>
+                  먼저 이야기할 사진을
+                  올려주세요.
+                </h3>
+
+                <span>
+                  사진을 올린 뒤 날짜와 함께한 사람,
+                  기억나는 일을 차례로 적을 수 있습니다.
+                </span>
+
+                <Link href="/dashboard/timeline">
+                  사진 올리기로 이동
+                </Link>
+              </section>
             </div>
           )}
         </section>
 
-        <section
-          id="story-writing"
-          className="story-section"
-          style={{
-            marginTop: 24,
-            padding: 28,
-            borderRadius: 30,
-            border:
-              '1px solid rgba(91, 66, 43, 0.12)',
-            background: '#fffaf1',
-            boxShadow:
-              '0 12px 30px rgba(91, 66, 43, 0.08)',
-          }}
-        >
-          <div>
-            <p
-              style={{
-                margin: 0,
-                color: '#9b6d2f',
-                fontSize: 12,
-                fontWeight: 900,
-                letterSpacing: '0.08em',
-              }}
-            >
-              직접 이야기 남기기
-            </p>
-
-            <h2
-              style={{
-                margin: '9px 0 0',
-                fontFamily:
-                  'Noto Serif KR, serif',
-                fontSize: 30,
-                lineHeight: 1.4,
-                letterSpacing: '-0.04em',
-                color: '#33271d',
-              }}
-            >
-              질문을 따라 기억나는 이야기를
-              적어보세요.
-            </h2>
-
-            <p
-              style={{
-                margin: '10px 0 0',
-                maxWidth: 760,
-                color: '#6b5845',
-                fontSize: 14,
-                lineHeight: 1.75,
-              }}
-            >
-              답변은 저장한 뒤에도 수정하거나
-              삭제할 수 있습니다.
-            </p>
+        <section className="interview-reference-upload-more">
+          <div className="interview-reference-section-head">
+            <div>
+              <p>새 사진과 이야기 추가</p>
+              <h2>이 화면에서도 사진을 추가할 수 있습니다</h2>
+              <span>
+                새로운 사진을 올리면서 이야기를 함께
+                저장할 수 있습니다.
+              </span>
+            </div>
           </div>
 
-          <div
-            style={{
-              marginTop: 20,
-            }}
-          >
-            <InterviewClient
-              answers={answers.map((answer) => ({
-                id: answer.id,
-                title: answer.title || '',
-                description:
-                  answer.description || '',
-              }))}
-              submitAnswer={submitAnswer}
-            />
-          </div>
+          <StoryPhotoUploadBox />
         </section>
 
-        {storyReady ? (
-          <section
-            style={{
-              marginTop: 24,
-              padding: '22px 24px',
-              borderRadius: 24,
-              border: '1px solid #9dcca4',
-              background: '#edf8ee',
-            }}
+        <footer className="interview-reference-footer">
+          <Link href="/dashboard/timeline">
+            이전 단계
+          </Link>
+
+          <Link
+            href={
+              storyReady
+                ? "/dashboard/book"
+                : "/dashboard/interview#story-composer"
+            }
+            className="interview-reference-next"
           >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent:
-                  'space-between',
-                flexWrap: 'wrap',
-                gap: 14,
-              }}
-            >
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    color: '#2f6b38',
-                    fontSize: 12,
-                    fontWeight: 900,
-                  }}
-                >
-                  이야기 남기기 완료
-                </p>
-
-                <strong
-                  style={{
-                    display: 'block',
-                    marginTop: 6,
-                    color: '#33271d',
-                    fontSize: 19,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  사진과 이야기를 바탕으로 책
-                  원고를 만들 수 있습니다.
-                </strong>
-              </div>
-
-              <Link
-                href="/dashboard/book"
-                style={nextStepButtonStyle()}
-              >
-                책 원고 만들기
-              </Link>
-            </div>
-          </section>
-        ) : null}
+            {storyReady
+              ? "이야기 저장하고 다음으로"
+              : "이야기를 더 남겨주세요"}
+            <span aria-hidden="true">→</span>
+          </Link>
+        </footer>
       </div>
     </main>
   );
 }
 
-function SummaryCard({
+function StatusCard({
   label,
   value,
   unit,
-  description,
-  color,
 }: {
   label: string;
   value: number;
   unit: string;
-  description: string;
-  color: string;
 }) {
   return (
-    <article
-      style={{
-        padding: 21,
-        borderRadius: 23,
-        background: '#fffaf1',
-        border:
-          '1px solid rgba(91, 66, 43, 0.12)',
-        boxShadow:
-          '0 10px 25px rgba(91, 66, 43, 0.07)',
-      }}
-    >
-      <p
-        style={{
-          margin: 0,
-          color: '#9b6d2f',
-          fontSize: 12,
-          fontWeight: 900,
-        }}
-      >
-        {label}
-      </p>
+    <article>
+      <span>{label}</span>
 
-      <strong
-        style={{
-          display: 'block',
-          marginTop: 8,
-          color,
-          fontSize: 33,
-          lineHeight: 1.1,
-        }}
-      >
+      <strong>
         {value.toLocaleString()}
-
-        <span
-          style={{
-            marginLeft: 4,
-            color: '#6b5845',
-            fontSize: 13,
-          }}
-        >
-          {unit}
-        </span>
+        <small>{unit}</small>
       </strong>
-
-      <p
-        style={{
-          margin: '11px 0 0',
-          color: '#6b5845',
-          fontSize: 12,
-          lineHeight: 1.55,
-        }}
-      >
-        {description}
-      </p>
     </article>
   );
 }
 
-function heroPrimaryButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 46,
-    padding: '0 21px',
-    borderRadius: 999,
-    background: '#f0c36a',
-    color: '#2b2118',
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: 'none',
-    textAlign: 'center',
-  };
-}
-
-function heroSecondaryButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 46,
-    padding: '0 21px',
-    borderRadius: 999,
-    border:
-      '1px solid rgba(255,255,255,0.42)',
-    background: 'transparent',
-    color: '#fff8ec',
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: 'none',
-    textAlign: 'center',
-  };
-}
-
-function nextStepButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-    padding: '0 15px',
-    borderRadius: 999,
-    border: '1px solid #33271d',
-    background: '#33271d',
-    color: '#fff8ec',
-    fontSize: 12,
-    fontWeight: 900,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-  };
-}
-
-function gridPaperPageStyle(): CSSProperties {
-  return {
-    minHeight: '100vh',
-    backgroundColor: '#f7eddc',
-    backgroundImage: `
-      linear-gradient(
-        rgba(154, 106, 36, 0.08) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        rgba(154, 106, 36, 0.08) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        rgba(154, 106, 36, 0.14) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        rgba(154, 106, 36, 0.14) 1px,
-        transparent 1px
-      )
-    `,
-    backgroundSize:
-      '24px 24px, 24px 24px, 120px 120px, 120px 120px',
-    backgroundPosition: '0 0',
-  };
-}
-
-function formatDate(
-  value: Date | string,
-) {
+function formatDate(value: Date | string) {
   const date =
     value instanceof Date
       ? value
       : new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return '-';
+    return "-";
   }
 
-  return new Intl.DateTimeFormat(
-    'ko-KR',
-    {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    },
-  ).format(date);
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
 }
+
+const interviewReferenceStyles = `
+  .interview-reference-page,
+  .interview-reference-page * {
+    box-sizing: border-box;
+  }
+
+  .interview-reference-page {
+    min-height: 100vh;
+    padding: 32px 24px 54px;
+    color: #4a342b;
+    background:
+      radial-gradient(
+        circle at 7% 8%,
+        rgba(255, 231, 216, 0.56),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 94% 14%,
+        rgba(231, 244, 231, 0.52),
+        transparent 25rem
+      ),
+      linear-gradient(
+        180deg,
+        #fffdf8,
+        #fff9f3
+      );
+    font-family:
+      var(--font-daldongne-sans),
+      "Noto Sans KR",
+      sans-serif;
+  }
+
+  .interview-reference-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .interview-reference-page a,
+  .interview-reference-page button {
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .interview-reference-page a:hover,
+  .interview-reference-page button:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  .interview-reference-page a:focus-visible,
+  .interview-reference-page button:focus-visible,
+  .interview-reference-page input:focus-visible,
+  .interview-reference-page textarea:focus-visible {
+    outline:
+      4px solid
+      rgba(239, 105, 83, 0.2);
+    outline-offset: 3px;
+  }
+
+  .interview-reference-shell {
+    width:
+      min(1380px, 100%);
+    margin: 0 auto;
+  }
+
+  .interview-reference-heading {
+    text-align: center;
+  }
+
+  .interview-reference-heading > p {
+    margin: 0;
+    color: #ef6c55;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .interview-reference-heading h1 {
+    margin: 11px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size:
+      clamp(40px, 5vw, 61px);
+    line-height: 1.18;
+    letter-spacing: -0.06em;
+  }
+
+  .interview-reference-heading > span {
+    display: block;
+    margin-top: 12px;
+    color: #7b665d;
+    font-size:
+      clamp(14px, 1.5vw, 19px);
+    line-height: 1.7;
+  }
+
+  .interview-reference-mobile-break {
+    display: none;
+  }
+
+  .interview-reference-status {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .interview-reference-status article {
+    min-width: 0;
+    padding: 14px 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border:
+      1px solid
+      rgba(135, 94, 74, 0.11);
+    border-radius: 15px;
+    background:
+      rgba(255, 255, 255, 0.82);
+    box-shadow:
+      0 8px 20px
+      rgba(95, 62, 46, 0.035);
+  }
+
+  .interview-reference-status article > span {
+    color: #806c63;
+    font-size: 11px;
+    font-weight: 850;
+  }
+
+  .interview-reference-status article > strong {
+    color: #e46750;
+    font-size: 22px;
+  }
+
+  .interview-reference-status article small {
+    margin-left: 3px;
+    color: #8f7c72;
+    font-size: 10px;
+  }
+
+  .interview-reference-ready {
+    margin-top: 17px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    border:
+      1px solid #c9d9ad;
+    border-radius: 19px;
+    background:
+      linear-gradient(
+        135deg,
+        #f3f8e9,
+        #fffdf7
+      );
+  }
+
+  .interview-reference-ready p {
+    margin: 0;
+    color: #4f7a3e;
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .interview-reference-ready strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  .interview-reference-ready div > span {
+    display: block;
+    margin-top: 3px;
+    color: #75816d;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .interview-reference-ready > a {
+    min-height: 43px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    flex: 0 0 auto;
+    border-radius: 12px;
+    color: #ffffff;
+    background: #769451;
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .interview-reference-composer,
+  .interview-reference-photo-stories,
+  .interview-reference-upload-more {
+    margin-top: 18px;
+    padding: 25px;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.12);
+    border-radius: 28px;
+    background:
+      rgba(255, 255, 255, 0.92);
+    box-shadow:
+      0 20px 48px
+      rgba(92, 61, 47, 0.07);
+  }
+
+  .interview-reference-section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .interview-reference-section-head p {
+    margin: 0;
+    color: #ea6b54;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+  }
+
+  .interview-reference-section-head h2 {
+    margin: 7px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 28px;
+    line-height: 1.4;
+    letter-spacing: -0.045em;
+  }
+
+  .interview-reference-section-head div > span {
+    display: block;
+    margin-top: 6px;
+    color: #7b685f;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .interview-reference-section-head > strong {
+    min-height: 36px;
+    padding: 0 13px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    color: #765c4f;
+    background: #fff1e9;
+    font-size: 11px;
+  }
+
+  .interview-reference-photo-grid {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .interview-reference-photo-grid article {
+    min-width: 0;
+    overflow: hidden;
+    border:
+      1px solid
+      rgba(131, 92, 72, 0.13);
+    border-radius: 19px;
+    background: #ffffff;
+    box-shadow:
+      0 10px 25px
+      rgba(80, 52, 40, 0.055);
+  }
+
+  .interview-reference-photo-grid
+  article[data-complete="true"] {
+    border-color: #a8ca9c;
+  }
+
+  .interview-reference-photo-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.25 / 1;
+    overflow: hidden;
+    background: #f1ebe7;
+  }
+
+  .interview-reference-photo-image img {
+    object-fit: contain;
+  }
+
+  .interview-reference-photo-image > span {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    min-height: 26px;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    color: #ffffff;
+    background:
+      rgba(89, 65, 54, 0.85);
+    font-size: 8px;
+    font-weight: 900;
+  }
+
+  .interview-reference-photo-grid
+  article[data-complete="true"]
+  .interview-reference-photo-image > span {
+    background: #66885b;
+  }
+
+  .interview-reference-photo-content {
+    padding: 15px;
+  }
+
+  .interview-reference-photo-content > time {
+    color: #d0624c;
+    font-size: 9px;
+    font-weight: 850;
+  }
+
+  .interview-reference-photo-content h3 {
+    margin: 6px 0 0;
+    overflow: hidden;
+    font-size: 16px;
+    line-height: 1.45;
+    letter-spacing: -0.025em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .interview-reference-photo-content > p {
+    min-height: 59px;
+    margin: 7px 0 0;
+    display: -webkit-box;
+    overflow: hidden;
+    color: #756158;
+    font-size: 11px;
+    line-height: 1.7;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .interview-reference-photo-actions {
+    margin-top: 11px;
+    padding-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    border-top:
+      1px solid
+      rgba(119, 84, 67, 0.09);
+  }
+
+  .interview-reference-photo-actions button {
+    min-height: 31px !important;
+    padding: 0 10px !important;
+    border-radius: 9px !important;
+    font-size: 10px !important;
+  }
+
+  .interview-reference-photo-content > small {
+    display: block;
+    margin-top: 8px;
+    color: #a08c82;
+    font-size: 8px;
+  }
+
+  .interview-reference-empty-photo {
+    margin-top: 20px;
+    padding: 18px;
+    display: grid;
+    grid-template-columns:
+      minmax(260px, 0.8fr)
+      minmax(0, 1.2fr);
+    gap: 22px;
+    align-items: center;
+    border:
+      1px dashed #e3ad9c;
+    border-radius: 21px;
+    background: #fffaf7;
+  }
+
+  .interview-reference-empty-photo > div {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.45 / 1;
+    overflow: hidden;
+    border-radius: 16px;
+  }
+
+  .interview-reference-empty-photo img {
+    object-fit: cover;
+  }
+
+  .interview-reference-empty-photo section > p {
+    margin: 0;
+    color: #e36c55;
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .interview-reference-empty-photo h3 {
+    margin: 8px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 25px;
+    line-height: 1.45;
+    letter-spacing: -0.04em;
+  }
+
+  .interview-reference-empty-photo section > span {
+    display: block;
+    margin-top: 8px;
+    color: #746057;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .interview-reference-empty-photo section > a {
+    min-height: 43px;
+    margin-top: 15px;
+    padding: 0 15px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 12px;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ed5e4f
+      );
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .interview-reference-upload-more
+  > section {
+    margin-top: 20px !important;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.12) !important;
+    background:
+      linear-gradient(
+        145deg,
+        #fffaf6,
+        #fff5ed
+      ) !important;
+    box-shadow: none !important;
+  }
+
+  .interview-reference-upload-more
+  input,
+  .interview-reference-upload-more
+  textarea {
+    border-color:
+      rgba(142, 99, 78, 0.24) !important;
+    background: #fffdfb !important;
+  }
+
+  .interview-reference-upload-more button {
+    border-color: transparent !important;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ed5e4f
+      ) !important;
+    color: #ffffff !important;
+  }
+
+  .interview-reference-footer {
+    margin-top: 18px;
+    padding: 17px 22px;
+    display: grid;
+    grid-template-columns:
+      minmax(180px, 0.55fr)
+      minmax(300px, 1.45fr);
+    gap: 14px;
+    border:
+      1px solid
+      rgba(135, 94, 74, 0.12);
+    border-radius: 21px;
+    background:
+      rgba(255, 255, 255, 0.9);
+  }
+
+  .interview-reference-footer > a {
+    min-height: 53px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    border:
+      1px solid #d3ae9e;
+    border-radius: 14px;
+    color: #705448;
+    background: #ffffff;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .interview-reference-footer
+  .interview-reference-next {
+    border-color: transparent;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7765,
+        #ed604f
+      );
+    box-shadow:
+      0 13px 27px
+      rgba(220, 83, 63, 0.18);
+  }
+
+  @media (max-width: 980px) {
+    .interview-reference-photo-grid {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 780px) {
+    .interview-reference-page {
+      padding: 22px 13px 38px;
+    }
+
+    .interview-reference-status {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+
+    .interview-reference-ready {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .interview-reference-ready > a {
+      justify-content: center;
+    }
+
+    .interview-reference-composer,
+    .interview-reference-photo-stories,
+    .interview-reference-upload-more {
+      padding: 17px;
+      border-radius: 21px;
+    }
+
+    .interview-reference-empty-photo {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .interview-reference-mobile-break {
+      display: block;
+    }
+
+    .interview-reference-heading h1 {
+      font-size: 37px;
+    }
+
+    .interview-reference-status article {
+      padding: 11px;
+    }
+
+    .interview-reference-status article > span {
+      font-size: 9px;
+    }
+
+    .interview-reference-status article > strong {
+      font-size: 18px;
+    }
+
+    .interview-reference-section-head {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .interview-reference-photo-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .interview-reference-footer {
+      padding: 12px;
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .interview-reference-page a,
+    .interview-reference-page button {
+      transition: none;
+    }
+  }
+`;

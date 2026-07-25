@@ -1,54 +1,19 @@
-import { auth } from '@/auth';
-import PageGuideBox from '@/components/guide/PageGuideBox';
-import { prisma } from '@/lib/prisma';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import type { CSSProperties } from 'react';
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import BookMaterialSelector, {
   type BookMaterialItem,
-} from './BookMaterialSelector';
+} from "./BookMaterialSelector";
 
 const REQUIRED_PHOTO_COUNT = 3;
 const RECOMMENDED_STORY_COUNT = 3;
-
-const OUTLINE = [
-  {
-    chapter: '1장',
-    title: '이야기의 시작과 배경',
-    text: '태어난 곳, 성장한 환경과 이야기의 출발점을 정리합니다.',
-  },
-  {
-    chapter: '2장',
-    title: '사람과 관계',
-    text: '삶에 영향을 준 가족과 주변 사람들의 이야기를 담습니다.',
-  },
-  {
-    chapter: '3장',
-    title: '변화의 순간',
-    text: '삶의 방향을 바꾸었던 사건과 중요한 선택을 기록합니다.',
-  },
-  {
-    chapter: '4장',
-    title: '일과 삶의 시간',
-    text: '일터와 생활 속에서 겪었던 노력과 책임을 돌아봅니다.',
-  },
-  {
-    chapter: '5장',
-    title: '기억에 남은 말과 장면',
-    text: '오랫동안 기억하고 싶은 말, 장소와 순간을 모읍니다.',
-  },
-  {
-    chapter: '6장',
-    title: '지금 전하고 싶은 마음',
-    text: '현재의 생각과 다음 세대에게 남기고 싶은 마음을 담습니다.',
-  },
-];
 
 export default async function BookPage() {
   const session = await auth();
 
   if (!session?.user?.id) {
-    redirect('/login');
+    redirect("/login");
   }
 
   const userId = session.user.id;
@@ -75,13 +40,13 @@ export default async function BookPage() {
         authorId: userId,
         OR: [
           {
-            type: 'PHOTO',
+            type: "PHOTO",
             fileUrl: {
               not: null,
             },
           },
           {
-            type: 'TEXT',
+            type: "TEXT",
             description: {
               not: null,
             },
@@ -90,10 +55,10 @@ export default async function BookPage() {
       },
       orderBy: [
         {
-          occurredAt: 'desc',
+          occurredAt: "desc",
         },
         {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
       ],
       take: 100,
@@ -107,23 +72,23 @@ export default async function BookPage() {
     }),
   ]);
 
-    const usableMemories =
+  const usableMemories =
     materialMemories.filter((memory) => {
       const title =
-        memory.title?.trim() || '';
+        memory.title?.trim() || "";
 
       if (
-        memory.type === 'TEXT' &&
+        memory.type === "TEXT" &&
         isLegacyAiInterviewTitle(title)
       ) {
         return false;
       }
 
-      if (memory.type === 'PHOTO') {
+      if (memory.type === "PHOTO") {
         return Boolean(memory.fileUrl);
       }
 
-            if (memory.type === 'TEXT') {
+      if (memory.type === "TEXT") {
         return (
           memory.description?.trim().length ??
           0
@@ -136,13 +101,13 @@ export default async function BookPage() {
   const photoCount =
     usableMemories.filter(
       (memory) =>
-        memory.type === 'PHOTO',
+        memory.type === "PHOTO",
     ).length;
 
   const photoStoryCount =
     usableMemories.filter(
       (memory) =>
-        memory.type === 'PHOTO' &&
+        memory.type === "PHOTO" &&
         (memory.description?.trim().length ??
           0) >= 10,
     ).length;
@@ -150,7 +115,7 @@ export default async function BookPage() {
   const writtenStoryCount =
     usableMemories.filter(
       (memory) =>
-        memory.type === 'TEXT' &&
+        memory.type === "TEXT" &&
         Boolean(
           memory.description?.trim(),
         ),
@@ -163,21 +128,21 @@ export default async function BookPage() {
   const materials: BookMaterialItem[] =
     usableMemories.map((memory) => {
       const isPhoto =
-        memory.type === 'PHOTO';
+        memory.type === "PHOTO";
 
       const description =
-        memory.description || '';
+        memory.description || "";
 
       return {
         id: memory.id,
         kind: isPhoto
-          ? 'photo'
-          : 'story',
+          ? "photo"
+          : "story",
         title: cleanMaterialTitle(
-          memory.title || '',
+          memory.title || "",
         ),
         description,
-                hasStory:
+        hasStory:
           description.trim().length >= 10,
       };
     });
@@ -201,1073 +166,152 @@ export default async function BookPage() {
     0,
   );
 
-  const photoProgress = Math.min(
-    100,
-    Math.round(
-      (photoCount /
-        REQUIRED_PHOTO_COUNT) *
-        100,
-    ),
-  );
-
-  const storyProgress = Math.min(
-    100,
-    Math.round(
-      (storyCount /
-        RECOMMENDED_STORY_COUNT) *
-        100,
-    ),
-  );
-
-  const readiness =
-    getReadiness({
-      canCreateDraft,
-      recommendedReady,
-      missingPhotoCount,
-      missingStoryCount,
-    });
-
   return (
-    <main
-      className="book-page-main"
-      style={gridPaperPageStyle()}
-    >
-      <style>{`
-                .book-page-main {
-          min-height: 100vh;
-          color: #4a352b;
-          background-color: #fffdf9 !important;
-          background-image:
-            linear-gradient(
-              rgba(220, 167, 136, 0.032) 1px,
-              transparent 1px
-            ),
-            linear-gradient(
-              90deg,
-              rgba(220, 167, 136, 0.032) 1px,
-              transparent 1px
-            ) !important;
-          background-size: 32px 32px !important;
-          background-position: 0 0 !important;
-        }
+    <main className="book-reference-page">
+      <style>{bookReferenceStyles}</style>
 
-        .book-hero {
-          position: relative;
-          overflow: hidden;
-          background:
-            radial-gradient(
-              circle at 90% 4%,
-              rgba(255, 210, 190, 0.58),
-              transparent 25rem
-            ),
-            radial-gradient(
-              circle at 5% 100%,
-              rgba(255, 241, 202, 0.52),
-              transparent 23rem
-            ),
-            linear-gradient(
-              135deg,
-              #fff8f3 0%,
-              #ffffff 52%,
-              #fff1e8 100%
-            ) !important;
-          color: #49352b !important;
-          border:
-            1px solid rgba(218, 143, 108, 0.22) !important;
-          box-shadow:
-            0 18px 48px
-            rgba(156, 91, 58, 0.08) !important;
-        }
+      <div className="book-reference-shell">
+        <section className="book-reference-heading">
+          <p>책 만들기 3단계</p>
 
-        .book-hero h1,
-        .book-hero strong {
-          color: #49352b !important;
-        }
-
-        .book-hero > p:first-of-type {
-          color: #dd765b !important;
-        }
-
-        .book-hero > p:not(:first-of-type) {
-          color: #725d52 !important;
-        }
-
-        .book-hero
-        > div:not(.book-hero-actions) {
-          border:
-            1px solid rgba(218, 143, 108, 0.2) !important;
-          background:
-            rgba(255, 255, 255, 0.78) !important;
-          box-shadow:
-            0 10px 26px
-            rgba(147, 87, 55, 0.045);
-        }
-
-        .book-hero
-        > div:not(.book-hero-actions)
-        p {
-          color: #80685c !important;
-        }
-
-        .book-hero
-        > div:not(.book-hero-actions)
-        p:first-child {
-          color: #d56f55 !important;
-        }
-
-        .book-hero-actions a {
-          border:
-            1px solid rgba(210, 126, 90, 0.3) !important;
-          background: #ffffff !important;
-          color: #a65f48 !important;
-          box-shadow:
-            0 9px 22px
-            rgba(181, 104, 71, 0.08);
-        }
-
-        .book-hero-actions a:first-child {
-          border-color: transparent !important;
-          background:
-            linear-gradient(
-              135deg,
-              #f49378,
-              #e97861
-            ) !important;
-          color: #ffffff !important;
-          box-shadow:
-            0 11px 25px
-            rgba(220, 104, 77, 0.2);
-        }
-
-        .book-page-container article {
-          background: #ffffff !important;
-          border-color:
-            rgba(191, 137, 106, 0.19) !important;
-          box-shadow:
-            0 12px 29px
-            rgba(127, 76, 47, 0.052) !important;
-        }
-
-        .book-page-section {
-          background:
-            linear-gradient(
-              145deg,
-              #ffffff,
-              #fffaf7
-            ) !important;
-          border:
-            1px solid rgba(196, 139, 108, 0.19) !important;
-          box-shadow:
-            0 14px 34px
-            rgba(132, 79, 48, 0.055) !important;
-        }
-
-        .book-page-section h2,
-        .book-page-section h3,
-        .book-outline-grid h3 {
-          color: #49352b !important;
-        }
-
-        .book-outline-grid > * {
-          background: #ffffff !important;
-          border-color:
-            rgba(192, 138, 107, 0.18) !important;
-          box-shadow:
-            0 10px 25px
-            rgba(127, 76, 47, 0.045) !important;
-        }
-
-        #book-material-selector {
-          background:
-            linear-gradient(
-              145deg,
-              #ffffff,
-              #fffaf7
-            ) !important;
-          border-color:
-            rgba(196, 139, 108, 0.2) !important;
-          box-shadow:
-            0 15px 36px
-            rgba(132, 79, 48, 0.06) !important;
-        }
-
-        #book-material-selector
-        input:not([type='checkbox']):not([type='radio']),
-        #book-material-selector textarea,
-        #book-material-selector select {
-          border:
-            1px solid rgba(192, 139, 108, 0.28) !important;
-          background: #fffdfb !important;
-          color: #49352b !important;
-          box-shadow: none !important;
-        }
-
-        #book-material-selector
-        input:not([type='checkbox']):not([type='radio']):focus,
-        #book-material-selector textarea:focus,
-        #book-material-selector select:focus {
-          border-color: #e68a6f !important;
-          outline:
-            3px solid rgba(230, 138, 111, 0.12) !important;
-        }
-
-        #book-material-selector button {
-          border:
-            1px solid rgba(210, 126, 90, 0.28) !important;
-          background: #fff5f0 !important;
-          color: #a65f48 !important;
-          box-shadow:
-            0 8px 19px
-            rgba(181, 104, 71, 0.07) !important;
-        }
-
-        #book-material-selector
-        button[type='submit'] {
-          border-color: transparent !important;
-          background:
-            linear-gradient(
-              135deg,
-              #f49378,
-              #e97861
-            ) !important;
-          color: #ffffff !important;
-          box-shadow:
-            0 11px 25px
-            rgba(220, 104, 77, 0.19) !important;
-        }
-
-        .book-page-main h2,
-        .book-page-main h3 {
-          color: #49352b;
-        }
-
-        .book-page-main
-        section:not(.book-hero)
-        > p:first-child,
-        .book-page-section
-        > p:first-child {
-          color: #d67358 !important;
-        }
-        .book-page-container {
-          width: 100%;
-          max-width: 1380px;
-          margin: 0 auto;
-          padding: 28px;
-        }
-
-        .book-readiness-grid {
-          display: grid;
-          grid-template-columns:
-            minmax(0, 1fr)
-            minmax(280px, 0.72fr);
-          gap: 22px;
-          align-items: stretch;
-        }
-
-        .book-outline-grid {
-          display: grid;
-          grid-template-columns:
-            repeat(auto-fit, minmax(245px, 1fr));
-          gap: 14px;
-        }
-
-        @media (max-width: 900px) {
-          .book-readiness-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 700px) {
-          .book-page-container {
-            padding: 16px;
-          }
-
-          .book-hero {
-            padding: 26px 20px !important;
-            border-radius: 24px !important;
-          }
-
-          .book-hero-actions {
-            display: grid !important;
-            grid-template-columns: 1fr !important;
-          }
-
-          .book-hero-actions a {
-            width: 100%;
-          }
-
-          .book-page-section {
-            padding: 20px 16px !important;
-            border-radius: 24px !important;
-          }
-
-          .book-outline-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
-
-      <div className="book-page-container">
-        <section
-          className="book-hero"
-          style={{
-            padding: 38,
-            borderRadius: 34,
-            background:
-              'linear-gradient(135deg, #33271d 0%, #5b422c 52%, #8a6238 100%)',
-            color: '#fff8ec',
-            boxShadow:
-              '0 22px 60px rgba(51, 39, 29, 0.18)',
-          }}
-        >
-          <p
-            style={{
-              margin: '0 0 13px',
-              color: '#f0c36a',
-              fontSize: 13,
-              fontWeight: 900,
-              letterSpacing: '0.08em',
-            }}
-          >
-            책 만들기 3단계
-          </p>
-
-          <h1
-            style={{
-              margin: 0,
-              maxWidth: 930,
-              fontFamily:
-                'Noto Serif KR, serif',
-              fontSize:
-                'clamp(34px, 5vw, 56px)',
-              lineHeight: 1.2,
-              letterSpacing: '-0.05em',
-            }}
-          >
-            모아 둔 사진과 이야기를
-            <br />
-            한 권의 책 원고로 만듭니다.
+          <h1>
+            모은 사진과 이야기로
+            <br className="book-reference-mobile-break" />
+            책을 만들어요
           </h1>
 
-          <p
-            style={{
-              margin: '22px 0 0',
-              maxWidth: 830,
-              fontSize: 18,
-              lineHeight: 1.8,
-              color:
-                'rgba(255, 248, 236, 0.86)',
-            }}
-          >
-            책에 넣을 자료를 고르고 책의
-            종류, 문체와 원고 길이를
-            선택하세요. 선택한 사진과
-            이야기만 사용해 원고를 만들고
-            완성된 결과는 내 책장에
-            저장합니다.
-          </p>
-
-          <div
-            style={{
-              marginTop: 26,
-              padding: '18px 20px',
-              borderRadius: 20,
-              border:
-                '1px solid rgba(255,255,255,0.2)',
-              background:
-                'rgba(255,255,255,0.08)',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: '#f0c36a',
-                fontSize: 12,
-                fontWeight: 900,
-              }}
-            >
-              현재 원고 준비 상태
-            </p>
-
-            <strong
-              style={{
-                display: 'block',
-                marginTop: 7,
-                fontSize: 21,
-                lineHeight: 1.45,
-              }}
-            >
-              {readiness.title}
-            </strong>
-
-            <p
-              style={{
-                margin: '6px 0 0',
-                color:
-                  'rgba(255, 248, 236, 0.75)',
-                fontSize: 14,
-                lineHeight: 1.7,
-              }}
-            >
-              {readiness.description}
-            </p>
-          </div>
-
-          <div
-  className="book-hero-actions"
-  style={{
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 22,
-  }}
->
-  <a
-    href="#book-material-selector"
-    style={heroPrimaryButtonStyle()}
-  >
-    자료 선택
-  </a>
-
-  <a
-    href="#book-material-selector"
-    style={heroSecondaryButtonStyle()}
-  >
-    책 만들기
-  </a>
-
-  <Link
-    href="/dashboard/library"
-    style={heroSecondaryButtonStyle()}
-  >
-    내 책장
-  </Link>
-</div>
+          <span>
+            책에 담을 자료와 문체를 고르면
+            AI가 한 권의 원고로 정리합니다.
+          </span>
         </section>
 
-        <section
-          style={{
-            display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fit, minmax(170px, 1fr))',
-            gap: 14,
-            marginTop: 24,
-          }}
-        >
-          <SummaryCard
+        <section className="book-reference-status">
+          <StatusCard
             label="사용 가능한 사진"
             value={photoCount}
             unit="장"
-            description="원고 자료로 선택할 수 있는 사진"
-            color="#7b4f2a"
           />
 
-          <SummaryCard
+          <StatusCard
             label="사진 속 이야기"
             value={photoStoryCount}
             unit="개"
-            description="설명이 충분히 작성된 사진"
-            color="#9b6d2f"
           />
 
-          <SummaryCard
+          <StatusCard
             label="직접 남긴 이야기"
             value={writtenStoryCount}
             unit="개"
-            description="질문과 기록으로 남긴 이야기"
-            color="#62438a"
           />
 
-          <SummaryCard
-            label="전체 이야기 자료"
-            value={storyCount}
-            unit="개"
-            description="책의 문장으로 활용할 이야기"
-            color="#3e5f3a"
-          />
-
-          <SummaryCard
+          <StatusCard
             label="전체 기록"
             value={memoryCount}
             unit="개"
-            description="계정에 저장된 모든 기록"
-            color="#2e3f52"
           />
 
-          <SummaryCard
+          <StatusCard
             label="만든 책"
             value={bookCount}
             unit="권"
-            description="내 책장에 저장된 책 원고"
-            color="#245d8c"
           />
         </section>
 
         <section
-          className="book-readiness-grid"
-          style={{
-            marginTop: 24,
-          }}
+          className="book-reference-ready"
+          data-ready={
+            recommendedReady
+              ? "complete"
+              : canCreateDraft
+                ? "possible"
+                : "waiting"
+          }
         >
-          <article
-            className="book-page-section"
-            style={{
-              padding: 28,
-              borderRadius: 30,
-              border: recommendedReady
-                ? '1px solid #9dcca4'
+          <div>
+            <p>현재 준비 상태</p>
+
+            <strong>
+              {recommendedReady
+                ? "사진과 이야기가 충분히 준비되었습니다."
                 : canCreateDraft
-                  ? '1px solid #e3bd7a'
-                  : '1px solid #d09a8a',
-              background: recommendedReady
-                ? '#edf8ee'
+                  ? "지금도 기본 책 원고를 만들 수 있습니다."
+                  : `사진을 ${missingPhotoCount}장 더 모아주세요.`}
+            </strong>
+
+            <span>
+              {recommendedReady
+                ? "선택한 자료를 바탕으로 풍부한 원고를 만들 수 있습니다."
                 : canCreateDraft
-                  ? '#fff4df'
-                  : '#fff3ef',
-              boxShadow:
-                '0 12px 30px rgba(91, 66, 43, 0.07)',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: recommendedReady
-                  ? '#2f6b38'
-                  : canCreateDraft
-                    ? '#83540d'
-                    : '#9a3f2e',
-                fontSize: 12,
-                fontWeight: 900,
-                letterSpacing: '0.06em',
-              }}
-            >
-              {readiness.label}
-            </p>
-
-            <h2
-              style={{
-                margin: '9px 0 0',
-                fontFamily:
-                  'Noto Serif KR, serif',
-                fontSize: 31,
-                lineHeight: 1.4,
-                letterSpacing: '-0.04em',
-                color: '#33271d',
-              }}
-            >
-              {readiness.title}
-            </h2>
-
-            <p
-              style={{
-                margin: '13px 0 0',
-                maxWidth: 760,
-                color: '#6b5845',
-                fontSize: 15,
-                lineHeight: 1.75,
-              }}
-            >
-              {readiness.description}
-            </p>
-
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 9,
-                marginTop: 20,
-              }}
-            >
-              {!canCreateDraft ? (
-                <Link
-                  href="/dashboard/timeline"
-                  style={darkButtonStyle()}
-                >
-                  사진 {missingPhotoCount}장 더 모으기
-                </Link>
-              ) : null}
-
-              {canCreateDraft &&
-              !recommendedReady ? (
-                <Link
-                  href="/dashboard/interview"
-                  style={darkButtonStyle()}
-                >
-                  이야기 {missingStoryCount}개 더 남기기
-                </Link>
-              ) : null}
-
-              {canCreateDraft ? (
-                <a
-                  href="#book-material-selector"
-                  style={goldButtonStyle()}
-                >
-                  자료 선택 시작
-                </a>
-              ) : null}
-
-              <Link
-                href="/dashboard/library"
-                style={outlineButtonStyle()}
-              >
-                내 책장 보기
-              </Link>
-            </div>
-          </article>
-
-          <aside
-            className="book-page-section"
-            style={{
-              padding: 28,
-              borderRadius: 30,
-              background: '#f4ead8',
-              border:
-                '1px solid rgba(91, 66, 43, 0.12)',
-              boxShadow:
-                '0 12px 30px rgba(91, 66, 43, 0.07)',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: '#9b6d2f',
-                fontSize: 12,
-                fontWeight: 900,
-                letterSpacing: '0.06em',
-              }}
-            >
-              원고 준비율
-            </p>
-
-            <ProgressBar
-              label="사진 준비"
-              value={photoProgress}
-              current={`${photoCount}장`}
-              target="기본 3장"
-            />
-
-            <ProgressBar
-              label="이야기 준비"
-              value={storyProgress}
-              current={`${storyCount}개`}
-              target="권장 3개"
-            />
-
-            <p
-              style={{
-                margin: '20px 0 0',
-                color: '#6b5845',
-                fontSize: 13,
-                lineHeight: 1.7,
-              }}
-            >
-              사진 3장이 있으면 원고를
-              만들 수 있습니다. 이야기 자료
-              3개 이상을 함께 선택하면 더
-              구체적이고 풍부한 원고를 만들 수
-              있습니다.
-            </p>
-          </aside>
-        </section>
-
-        <div
-          style={{
-            marginTop: 24,
-          }}
-        >
-          <PageGuideBox
-            label="책 원고 만들기 안내"
-            title="자료를 고른 뒤 책의 방향을 선택하세요"
-            description="이 화면에서는 원본 사진과 이야기를 삭제하지 않습니다. 책 원고에 사용할 자료만 선택하고 책 종류, 문체와 원고 길이를 정하는 단계입니다."
-            steps={[
-              '책에 넣을 사진과 이야기를 확인합니다.',
-              '필요한 자료만 선택하고 불필요한 자료는 선택 해제합니다.',
-              '인생책, 가족 이야기책, 부부·아이·여행책 등 원하는 책 종류를 선택합니다.',
-              '따뜻한 문체, 담백한 문체, 편지체 또는 자서전 문체를 선택합니다.',
-              '짧은 소책자, 보통 분량 또는 긴 원고를 선택합니다.',
-              '원고 만들기 버튼을 누르면 완성된 원고가 내 책장에 저장됩니다.',
-            ]}
-            note="원본 자료를 수정하거나 삭제하려면 사진 모으기 또는 이야기 남기기 화면으로 이동하세요."
-          />
-        </div>
-
-        <div
-          id="book-material-selector"
-          style={{
-            marginTop: 24,
-            scrollMarginTop: 24,
-          }}
-        >
-          <BookMaterialSelector
-            materials={materials}
-          />
-        </div>
-
-        <section
-          className="book-page-section"
-          style={{
-            marginTop: 24,
-            padding: 28,
-            borderRadius: 30,
-            background: '#fffaf1',
-            border:
-              '1px solid rgba(91, 66, 43, 0.12)',
-            boxShadow:
-              '0 12px 30px rgba(91, 66, 43, 0.07)',
-          }}
-        >
-          <p
-            style={{
-              margin: 0,
-              color: '#9b6d2f',
-              fontSize: 12,
-              fontWeight: 900,
-              letterSpacing: '0.08em',
-            }}
-          >
-            책의 기본 구성
-          </p>
-
-          <h2
-            style={{
-              margin: '9px 0 0',
-              fontFamily:
-                'Noto Serif KR, serif',
-              fontSize: 31,
-              lineHeight: 1.4,
-              letterSpacing: '-0.04em',
-              color: '#33271d',
-            }}
-          >
-            선택한 자료에 따라 목차와
-            내용은 달라집니다.
-          </h2>
-
-          <p
-            style={{
-              margin: '10px 0 0',
-              maxWidth: 800,
-              color: '#6b5845',
-              fontSize: 14,
-              lineHeight: 1.75,
-            }}
-          >
-            아래 구성은 원고의 기본 흐름입니다.
-            실제 목차와 장 제목은 선택한 사진,
-            이야기와 책 종류를 바탕으로
-            자동으로 조정됩니다.
-          </p>
-
-          <div
-            className="book-outline-grid"
-            style={{
-              marginTop: 21,
-            }}
-          >
-            {OUTLINE.map((item) => (
-              <article
-                key={item.chapter}
-                style={{
-                  padding: 20,
-                  borderRadius: 20,
-                  background: '#ffffff',
-                  border:
-                    '1px solid rgba(91, 66, 43, 0.1)',
-                }}
-              >
-                <p
-                  style={{
-                    margin: 0,
-                    color: '#9b6d2f',
-                    fontSize: 11,
-                    fontWeight: 900,
-                    letterSpacing: '0.07em',
-                  }}
-                >
-                  {item.chapter}
-                </p>
-
-                <h3
-                  style={{
-                    margin: '8px 0 0',
-                    color: '#33271d',
-                    fontSize: 20,
-                    lineHeight: 1.45,
-                    letterSpacing: '-0.03em',
-                  }}
-                >
-                  {item.title}
-                </h3>
-
-                <p
-                  style={{
-                    margin: '9px 0 0',
-                    color: '#6b5845',
-                    fontSize: 13,
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {item.text}
-                </p>
-              </article>
-            ))}
+                  ? `이야기를 ${missingStoryCount}개 더 남기면 원고가 더욱 풍부해집니다.`
+                  : "사진 3장 이상부터 책 원고 만들기를 시작할 수 있습니다."}
+            </span>
           </div>
-        </section>
 
-        <section
-          style={{
-            marginTop: 24,
-            padding: '22px 24px',
-            borderRadius: 24,
-            border:
-              '1px solid rgba(91, 66, 43, 0.14)',
-            background: '#f4ead8',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent:
-                'space-between',
-              flexWrap: 'wrap',
-              gap: 14,
-            }}
-          >
-            <div>
-              <p
-                style={{
-                  margin: 0,
-                  color: '#9b6d2f',
-                  fontSize: 12,
-                  fontWeight: 900,
-                }}
-              >
-                원고를 만든 후
-              </p>
-
-              <strong
-                style={{
-                  display: 'block',
-                  marginTop: 6,
-                  color: '#33271d',
-                  fontSize: 19,
-                  lineHeight: 1.5,
-                }}
-              >
-                완성된 원고는 내 책장에서
-                확인하고 다시 정리할 수 있습니다.
-              </strong>
-            </div>
-
-            <Link
-              href="/dashboard/library"
-              style={darkButtonStyle()}
-            >
-              내 책장 보기
+          {!canCreateDraft ? (
+            <Link href="/dashboard/timeline">
+              사진 더 모으기
+              <span aria-hidden="true">→</span>
             </Link>
-          </div>
+          ) : !recommendedReady ? (
+            <Link href="/dashboard/interview">
+              이야기 더 남기기
+              <span aria-hidden="true">→</span>
+            </Link>
+          ) : (
+            <a href="#book-material-selector">
+              책 구성 시작
+              <span aria-hidden="true">↓</span>
+            </a>
+          )}
         </section>
+
+        <BookMaterialSelector
+          materials={materials}
+        />
+
+        <footer className="book-reference-footer">
+          <Link href="/dashboard/interview">
+            이전 단계
+          </Link>
+
+          <Link href="/dashboard/library">
+            내 책장 보기
+            <span aria-hidden="true">→</span>
+          </Link>
+        </footer>
       </div>
     </main>
   );
 }
 
-function SummaryCard({
+function StatusCard({
   label,
   value,
   unit,
-  description,
-  color,
 }: {
   label: string;
   value: number;
   unit: string;
-  description: string;
-  color: string;
 }) {
   return (
-    <article
-      style={{
-        padding: 21,
-        borderRadius: 23,
-        background: '#fffaf1',
-        border:
-          '1px solid rgba(91, 66, 43, 0.12)',
-        boxShadow:
-          '0 10px 25px rgba(91, 66, 43, 0.07)',
-      }}
-    >
-      <p
-        style={{
-          margin: 0,
-          color: '#9b6d2f',
-          fontSize: 12,
-          fontWeight: 900,
-        }}
-      >
-        {label}
-      </p>
+    <article>
+      <span>{label}</span>
 
-      <strong
-        style={{
-          display: 'block',
-          marginTop: 8,
-          color,
-          fontSize: 33,
-          lineHeight: 1.1,
-        }}
-      >
+      <strong>
         {value.toLocaleString()}
-
-        <span
-          style={{
-            marginLeft: 4,
-            color: '#6b5845',
-            fontSize: 13,
-          }}
-        >
-          {unit}
-        </span>
+        <small>{unit}</small>
       </strong>
-
-      <p
-        style={{
-          margin: '11px 0 0',
-          color: '#6b5845',
-          fontSize: 12,
-          lineHeight: 1.55,
-        }}
-      >
-        {description}
-      </p>
     </article>
   );
-}
-
-function ProgressBar({
-  label,
-  value,
-  current,
-  target,
-}: {
-  label: string;
-  value: number;
-  current: string;
-  target: string;
-}) {
-  return (
-    <div
-      style={{
-        marginTop: 20,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent:
-            'space-between',
-          gap: 12,
-          marginBottom: 8,
-        }}
-      >
-        <strong
-          style={{
-            color: '#33271d',
-            fontSize: 13,
-          }}
-        >
-          {label}
-        </strong>
-
-        <span
-          style={{
-            color: '#6b5845',
-            fontSize: 11,
-          }}
-        >
-          {current} · {target}
-        </span>
-      </div>
-
-      <div
-        style={{
-          height: 10,
-          overflow: 'hidden',
-          borderRadius: 999,
-          background:
-            'rgba(51, 39, 29, 0.12)',
-        }}
-      >
-        <div
-          style={{
-            width: `${value}%`,
-            height: '100%',
-            borderRadius: 999,
-            background: '#c18a23',
-          }}
-        />
-      </div>
-
-      <p
-        style={{
-          margin: '6px 0 0',
-          color: '#8b7a67',
-          fontSize: 10,
-          textAlign: 'right',
-        }}
-      >
-        {value}%
-      </p>
-    </div>
-  );
-}
-
-function getReadiness({
-  canCreateDraft,
-  recommendedReady,
-  missingPhotoCount,
-  missingStoryCount,
-}: {
-  canCreateDraft: boolean;
-  recommendedReady: boolean;
-  missingPhotoCount: number;
-  missingStoryCount: number;
-}) {
-  if (recommendedReady) {
-    return {
-      label: '권장 자료 준비 완료',
-      title:
-        '사진과 이야기가 충분히 준비되었습니다.',
-      description:
-        '책에 넣을 자료를 선택하고 책 종류, 문체와 원고 길이를 정해 원고를 만들어보세요.',
-    };
-  }
-
-  if (canCreateDraft) {
-    return {
-      label: '기본 원고 만들기 가능',
-      title:
-        '지금도 책 원고를 만들 수 있습니다.',
-      description: `사진은 준비되었습니다. 이야기를 ${missingStoryCount}개 더 남기면 더 구체적이고 풍부한 원고를 만들 수 있습니다.`,
-    };
-  }
-
-  return {
-    label: '사진 자료 준비 필요',
-    title: `사진을 ${missingPhotoCount}장 더 모아주세요.`,
-    description:
-      '책 원고를 만들려면 선택 가능한 사진이 최소 3장 필요합니다. 사진 모으기 화면에서 사진을 추가해주세요.',
-  };
 }
 
 function isLegacyAiInterviewTitle(
   title: string,
 ) {
   return (
-    title.startsWith('AI 인터뷰') ||
-    title.includes('AI 인터뷰 -')
+    title.startsWith("AI 인터뷰") ||
+    title.includes("AI 인터뷰 -")
   );
 }
 
@@ -1275,139 +319,337 @@ function cleanMaterialTitle(
   title: string,
 ) {
   return title
-    .replace(
-      /^이야기\s*[·:\-]?\s*/i,
-      '',
-    )
-    .replace(
-      /^AI\s*인터뷰\s*[·:\-]?\s*/i,
-      '',
-    )
-    .replace(
-      /^AI\s*Interview\s*[·:\-]?\s*/i,
-      '',
-    )
+    .replace(/^AI 인터뷰:\s*/, "")
+    .replace(/^이야기 ·\s*/, "")
     .trim();
 }
 
-function heroPrimaryButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 46,
-    padding: '0 21px',
-    borderRadius: 999,
-    background: '#f0c36a',
-    color: '#2b2118',
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: 'none',
-    textAlign: 'center',
-  };
-}
+const bookReferenceStyles = `
+  .book-reference-page,
+  .book-reference-page * {
+    box-sizing: border-box;
+  }
 
-function heroSecondaryButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 46,
-    padding: '0 21px',
-    borderRadius: 999,
-    border:
-      '1px solid rgba(255,255,255,0.42)',
-    background: 'transparent',
-    color: '#fff8ec',
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: 'none',
-    textAlign: 'center',
-  };
-}
-
-function darkButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-    padding: '0 15px',
-    borderRadius: 999,
-    border: '1px solid #33271d',
-    background: '#33271d',
-    color: '#fff8ec',
-    fontSize: 12,
-    fontWeight: 900,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-  };
-}
-
-function goldButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-    padding: '0 15px',
-    borderRadius: 999,
-    border: '1px solid #c18a23',
-    background: '#c18a23',
-    color: '#fffaf0',
-    fontSize: 12,
-    fontWeight: 900,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-  };
-}
-
-function outlineButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-    padding: '0 15px',
-    borderRadius: 999,
-    border:
-      '1px solid rgba(51, 39, 29, 0.28)',
+  .book-reference-page {
+    min-height: 100vh;
+    padding: 32px 24px 54px;
+    color: #4a342b;
     background:
-      'rgba(255,255,255,0.38)',
-    color: '#5a3a18',
-    fontSize: 12,
-    fontWeight: 900,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-  };
-}
+      radial-gradient(
+        circle at 7% 8%,
+        rgba(255, 230, 213, 0.58),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 94% 13%,
+        rgba(233, 244, 225, 0.58),
+        transparent 25rem
+      ),
+      linear-gradient(
+        180deg,
+        #fffdf8,
+        #fff9f3
+      );
+    font-family:
+      var(--font-daldongne-sans),
+      "Noto Sans KR",
+      sans-serif;
+  }
 
-function gridPaperPageStyle(): CSSProperties {
-  return {
-    minHeight: '100vh',
-    backgroundColor: '#f7eddc',
-    backgroundImage: `
+  .book-reference-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .book-reference-page a,
+  .book-reference-page button {
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .book-reference-page a:hover,
+  .book-reference-page button:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  .book-reference-page a:focus-visible,
+  .book-reference-page button:focus-visible,
+  .book-reference-page select:focus-visible,
+  .book-reference-page input:focus-visible {
+    outline:
+      4px solid
+      rgba(239, 105, 83, 0.2);
+    outline-offset: 3px;
+  }
+
+  .book-reference-shell {
+    width:
+      min(1380px, 100%);
+    margin: 0 auto;
+  }
+
+  .book-reference-heading {
+    text-align: center;
+  }
+
+  .book-reference-heading > p {
+    margin: 0;
+    color: #ef6c55;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .book-reference-heading h1 {
+    margin: 11px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size:
+      clamp(40px, 5vw, 61px);
+    line-height: 1.18;
+    letter-spacing: -0.06em;
+  }
+
+  .book-reference-heading > span {
+    display: block;
+    margin-top: 12px;
+    color: #7b665d;
+    font-size:
+      clamp(14px, 1.5vw, 19px);
+    line-height: 1.7;
+  }
+
+  .book-reference-mobile-break {
+    display: none;
+  }
+
+  .book-reference-status {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .book-reference-status article {
+    min-width: 0;
+    padding: 14px 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border:
+      1px solid
+      rgba(135, 94, 74, 0.11);
+    border-radius: 15px;
+    background:
+      rgba(255, 255, 255, 0.82);
+    box-shadow:
+      0 8px 20px
+      rgba(95, 62, 46, 0.035);
+  }
+
+  .book-reference-status article > span {
+    color: #806c63;
+    font-size: 11px;
+    font-weight: 850;
+  }
+
+  .book-reference-status article > strong {
+    color: #e46750;
+    font-size: 22px;
+  }
+
+  .book-reference-status article small {
+    margin-left: 3px;
+    color: #8f7c72;
+    font-size: 10px;
+  }
+
+  .book-reference-ready {
+    margin-top: 17px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    border:
+      1px solid #d5bda7;
+    border-radius: 19px;
+    background:
       linear-gradient(
-        rgba(154, 106, 36, 0.08) 1px,
-        transparent 1px
-      ),
+        135deg,
+        #fff4e9,
+        #fffdf7
+      );
+  }
+
+  .book-reference-ready[data-ready="complete"] {
+    border-color: #c7d8aa;
+    background:
       linear-gradient(
-        90deg,
-        rgba(154, 106, 36, 0.08) 1px,
-        transparent 1px
-      ),
+        135deg,
+        #f3f8e9,
+        #fffdf7
+      );
+  }
+
+  .book-reference-ready[data-ready="waiting"] {
+    border-color: #e4b7aa;
+    background:
       linear-gradient(
-        rgba(154, 106, 36, 0.14) 1px,
-        transparent 1px
-      ),
+        135deg,
+        #fff1ec,
+        #fffdf8
+      );
+  }
+
+  .book-reference-ready p {
+    margin: 0;
+    color: #d7654f;
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .book-reference-ready[data-ready="complete"] p {
+    color: #4f7a3e;
+  }
+
+  .book-reference-ready strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  .book-reference-ready div > span {
+    display: block;
+    margin-top: 3px;
+    color: #75816d;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .book-reference-ready > a {
+    min-height: 43px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    flex: 0 0 auto;
+    border-radius: 12px;
+    color: #ffffff;
+    background:
       linear-gradient(
-        90deg,
-        rgba(154, 106, 36, 0.14) 1px,
-        transparent 1px
-      )
-    `,
-    backgroundSize:
-      '24px 24px, 24px 24px, 120px 120px, 120px 120px',
-    backgroundPosition: '0 0',
-  };
-}
+        135deg,
+        #ff7664,
+        #ed5e4f
+      );
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .book-reference-footer {
+    margin-top: 18px;
+    padding: 17px 22px;
+    display: grid;
+    grid-template-columns:
+      minmax(180px, 0.55fr)
+      minmax(300px, 1.45fr);
+    gap: 14px;
+    border:
+      1px solid
+      rgba(135, 94, 74, 0.12);
+    border-radius: 21px;
+    background:
+      rgba(255, 255, 255, 0.9);
+  }
+
+  .book-reference-footer > a {
+    min-height: 53px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    border:
+      1px solid #d3ae9e;
+    border-radius: 14px;
+    color: #705448;
+    background: #ffffff;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .book-reference-footer > a:last-child {
+    border-color: transparent;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7765,
+        #ed604f
+      );
+    box-shadow:
+      0 13px 27px
+      rgba(220, 83, 63, 0.18);
+  }
+
+  @media (max-width: 780px) {
+    .book-reference-page {
+      padding: 22px 13px 38px;
+    }
+
+    .book-reference-status {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+
+    .book-reference-ready {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .book-reference-ready > a {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .book-reference-mobile-break {
+      display: block;
+    }
+
+    .book-reference-heading h1 {
+      font-size: 37px;
+    }
+
+    .book-reference-status article {
+      padding: 11px;
+    }
+
+    .book-reference-status article > span {
+      font-size: 9px;
+    }
+
+    .book-reference-status article > strong {
+      font-size: 18px;
+    }
+
+    .book-reference-footer {
+      padding: 12px;
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book-reference-page a,
+    .book-reference-page button {
+      transition: none;
+    }
+  }
+`;

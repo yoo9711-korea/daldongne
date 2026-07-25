@@ -6,7 +6,6 @@ import BookRevisionHistoryButton from '@/components/library/BookRevisionHistoryB
 import RefreshBookDraftButton from '@/components/library/RefreshBookDraftButton';
 import DeleteMemoryButton from '@/components/memory/DeleteMemoryButton';
 import EditMemoryButton from '@/components/memory/EditMemoryButton';
-import TossPaymentWidget from '@/components/payment/TossPaymentWidget';
 import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -1170,33 +1169,37 @@ export default async function BookDetailPage({
                 </div>
 
                 {[
-                   'READY',
-                    'FAILED',
-                    ].includes(
-                    productionRequest.bookOrder.status,
-                   ) ? (
-                  <TossPaymentWidget
-                    bookId={book.id}
-                    orderId={
-                      productionRequest.bookOrder.orderId
-                    }
-                    orderName={
-                      productionRequest.bookOrder.productName
-                    }
-                    amount={
-                      productionRequest.bookOrder.totalAmount
-                    }
-                    customerKey={userId}
-                    customerName={
-                      productionRequest.name
-                    }
-                    customerEmail={
-                      productionRequest.email
-                    }
-                    customerMobilePhone={
-                      productionRequest.phone
-                    }
-                  />
+                  'READY',
+                  'FAILED',
+                ].includes(
+                  productionRequest.bookOrder.status,
+                ) ? (
+                  <Link
+                    href={`/dashboard/library/${book.id}/checkout`}
+                    style={{
+                      minHeight: 54,
+                      marginTop: 16,
+                      padding: '0 20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 12,
+                      borderRadius: 14,
+                      color: '#ffffff',
+                      background:
+                        'linear-gradient(135deg, #ff7664, #ed5e4f)',
+                      boxShadow:
+                        '0 14px 28px rgba(218, 82, 63, 0.19)',
+                      fontSize: 14,
+                      fontWeight: 900,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    검토·결제 화면으로 이동
+                    <span aria-hidden="true">
+                      →
+                    </span>
+                  </Link>
                 ) : null}
               </section>
             ) : null}
