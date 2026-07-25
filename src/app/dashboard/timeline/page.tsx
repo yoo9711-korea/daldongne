@@ -1,12 +1,46 @@
-import { auth } from '@/auth';
-import { prisma } from '@/lib/prisma';
-import Image from 'next/image';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import type { CSSProperties } from 'react';
-import UploadForm from './UploadForm';
+import { auth } from "@/auth";
+import DeleteMemoryButton from "@/components/memory/DeleteMemoryButton";
+import EditMemoryButton from "@/components/memory/EditMemoryButton";
+import { prisma } from "@/lib/prisma";
+import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import UploadForm from "./UploadForm";
 
 const REQUIRED_PHOTO_COUNT = 3;
+
+const samplePhotos = [
+  {
+    src: "/dashboard/timeline-reference-v1/sample-elderly.webp",
+    title: "함께한 봄날",
+    date: "2024.04.15",
+  },
+  {
+    src: "/dashboard/timeline-reference-v1/sample-street.webp",
+    title: "그 시절 우리 동네",
+    date: "2024.04.16",
+  },
+  {
+    src: "/dashboard/timeline-reference-v1/sample-flowers.webp",
+    title: "마당에 핀 꽃",
+    date: "2024.04.17",
+  },
+  {
+    src: "/dashboard/timeline-reference-v1/sample-children.webp",
+    title: "아이들의 웃음",
+    date: "2024.04.18",
+  },
+  {
+    src: "/dashboard/timeline-reference-v1/sample-sunset.webp",
+    title: "노을진 저녁",
+    date: "2024.04.19",
+  },
+  {
+    src: "/dashboard/timeline-reference-v1/sample-cat.webp",
+    title: "햇살 아래 고양이",
+    date: "2024.04.20",
+  },
+];
 
 function isInterviewMemory(title: string | null) {
   if (!title) {
@@ -14,8 +48,8 @@ function isInterviewMemory(title: string | null) {
   }
 
   return (
-    title.startsWith('AI 인터뷰') ||
-    title.startsWith('AI Interview')
+    title.startsWith("AI 인터뷰") ||
+    title.startsWith("AI Interview")
   );
 }
 
@@ -23,7 +57,7 @@ export default async function TimelinePage() {
   const session = await auth();
 
   if (!session?.user?.id) {
-    redirect('/login');
+    redirect("/login");
   }
 
   const memories = await prisma.memory.findMany({
@@ -32,10 +66,10 @@ export default async function TimelinePage() {
     },
     orderBy: [
       {
-        occurredAt: 'desc',
+        occurredAt: "desc",
       },
       {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     ],
     take: 200,
@@ -52,25 +86,23 @@ export default async function TimelinePage() {
   });
 
   const visibleMemories = memories.filter(
-    (memory) =>
-      !isInterviewMemory(memory.title),
+    (memory) => !isInterviewMemory(memory.title),
   );
 
   const photos = visibleMemories.filter(
-    (memory) => memory.type === 'PHOTO',
+    (memory) => memory.type === "PHOTO",
   );
 
   const storyCount = visibleMemories.filter(
-    (memory) => memory.type === 'TEXT',
+    (memory) => memory.type === "TEXT",
   ).length;
 
-  const describedPhotoCount = photos.filter(
-    (photo) =>
-      Boolean(photo.description?.trim()),
+  const describedPhotoCount = photos.filter((photo) =>
+    Boolean(photo.description?.trim()),
   ).length;
 
-  const datedPhotoCount = photos.filter(
-    (photo) => Boolean(photo.occurredAt),
+  const datedPhotoCount = photos.filter((photo) =>
+    Boolean(photo.occurredAt),
   ).length;
 
   const completePhotoCount = photos.filter(
@@ -83,27 +115,19 @@ export default async function TimelinePage() {
   const groupedPhotos = photos.reduce<
     Record<string, typeof photos>
   >((groups, photo) => {
-    const date =
-      photo.occurredAt ?? photo.createdAt;
-
-    const year = String(
-      date.getFullYear(),
-    );
+    const date = photo.occurredAt ?? photo.createdAt;
+    const year = String(date.getFullYear());
 
     if (!groups[year]) {
       groups[year] = [];
     }
 
     groups[year].push(photo);
-
     return groups;
   }, {});
 
-  const years = Object.keys(
-    groupedPhotos,
-  ).sort(
-    (first, second) =>
-      Number(second) - Number(first),
+  const years = Object.keys(groupedPhotos).sort(
+    (first, second) => Number(second) - Number(first),
   );
 
   const remainingPhotoCount = Math.max(
@@ -115,1184 +139,343 @@ export default async function TimelinePage() {
     photos.length >= REQUIRED_PHOTO_COUNT;
 
   return (
-    <main
-      style={{
-        padding: 28,
-      }}
-    >
-      <style>{`
-               .photo-page-main {
-          min-height: 100vh;
-          color: #4a352b;
-        }
+    <main className="timeline-reference-page">
+      <style>{timelineReferenceStyles}</style>
 
-        .photo-hero {
-          position: relative;
-          overflow: hidden;
-          background:
-            radial-gradient(
-              circle at 90% 5%,
-              rgba(255, 209, 188, 0.56),
-              transparent 24rem
-            ),
-            radial-gradient(
-              circle at 5% 100%,
-              rgba(255, 240, 196, 0.5),
-              transparent 22rem
-            ),
-            linear-gradient(
-              135deg,
-              #fff8f3 0%,
-              #ffffff 52%,
-              #fff1e8 100%
-            ) !important;
-          color: #4a352b !important;
-          border:
-            1px solid rgba(218, 143, 108, 0.22) !important;
-          box-shadow:
-            0 18px 48px
-            rgba(156, 91, 58, 0.08) !important;
-        }
+      <div className="timeline-reference-shell">
+        <section className="timeline-reference-heading">
+          <p>책 만들기 1단계</p>
 
-        .photo-hero h1,
-        .photo-hero strong {
-          color: #49352b !important;
-        }
+          <h1>사진을 올려주세요</h1>
 
-        .photo-hero > p:first-of-type {
-          color: #dd765b !important;
-        }
+          <span>
+            휴대폰이나 컴퓨터에 있는 소중한 사진을
+            선택하세요.
+          </span>
+        </section>
 
-        .photo-hero > p:not(:first-of-type) {
-          color: #725d52 !important;
-        }
+        <section className="timeline-reference-status">
+          <StatusItem
+            label="모은 사진"
+            value={photos.length}
+            unit="장"
+          />
 
-        .photo-hero > div:not(.photo-hero-actions) {
-          border:
-            1px solid rgba(218, 143, 108, 0.2) !important;
-          background:
-            rgba(255, 255, 255, 0.76) !important;
-          box-shadow:
-            0 10px 26px
-            rgba(147, 87, 55, 0.045);
-        }
+          <StatusItem
+            label="설명 작성"
+            value={describedPhotoCount}
+            unit="장"
+          />
 
-        .photo-hero
-        > div:not(.photo-hero-actions)
-        p {
-          color: #80685c !important;
-        }
+          <StatusItem
+            label="날짜 입력"
+            value={datedPhotoCount}
+            unit="장"
+          />
 
-        .photo-hero
-        > div:not(.photo-hero-actions)
-        p:first-child {
-          color: #d56f55 !important;
-        }
+          <StatusItem
+            label="준비 완료"
+            value={completePhotoCount}
+            unit="장"
+          />
 
-        .photo-hero-actions a {
-          border:
-            1px solid rgba(210, 126, 90, 0.3) !important;
-          background: #ffffff !important;
-          color: #a65f48 !important;
-          box-shadow:
-            0 9px 22px
-            rgba(181, 104, 71, 0.08);
-        }
+          <StatusItem
+            label="남긴 이야기"
+            value={storyCount}
+            unit="개"
+          />
+        </section>
 
-        .photo-hero-actions a:first-child {
-          border-color: transparent !important;
-          background:
-            linear-gradient(
-              135deg,
-              #f49378,
-              #e97861
-            ) !important;
-          color: #ffffff !important;
-          box-shadow:
-            0 11px 25px
-            rgba(220, 104, 77, 0.2);
-        }
-
-        .photo-upload-section,
-        .photo-tip-section,
-        .photo-list-section {
-          background: #ffffff !important;
-          border:
-            1px solid rgba(196, 139, 108, 0.18) !important;
-          box-shadow:
-            0 14px 34px
-            rgba(132, 79, 48, 0.055) !important;
-        }
-
-        .photo-page-main article {
-          background: #ffffff !important;
-          border-color:
-            rgba(191, 137, 106, 0.18) !important;
-          box-shadow:
-            0 12px 28px
-            rgba(127, 76, 47, 0.05) !important;
-        }
-
-        .photo-page-main h2,
-        .photo-page-main h3 {
-          color: #49352b !important;
-        }
-
-        .photo-page-main
-        section:not(.photo-hero)
-        > p:first-child,
-        .photo-upload-section
-        > p:first-child,
-        .photo-list-section
-        > p:first-child {
-          color: #d67358 !important;
-        }
-
-        #photo-upload input,
-        #photo-upload textarea,
-        #photo-upload select {
-          border:
-            1px solid rgba(192, 139, 108, 0.28) !important;
-          background: #fffdfb !important;
-          color: #49352b !important;
-          box-shadow: none !important;
-        }
-
-        #photo-upload input:focus,
-        #photo-upload textarea:focus,
-        #photo-upload select:focus {
-          border-color: #e68a6f !important;
-          outline:
-            3px solid rgba(230, 138, 111, 0.12) !important;
-        }
-
-        #photo-upload button {
-          border-color: transparent !important;
-          background:
-            linear-gradient(
-              135deg,
-              #f49378,
-              #e97861
-            ) !important;
-          color: #ffffff !important;
-          box-shadow:
-            0 10px 24px
-            rgba(220, 104, 77, 0.18) !important;
-        }
-
-        .photo-card-image {
-          background: #fff5ef !important;
-        }
-
-        .photo-card-status span {
-          border:
-            1px solid rgba(203, 148, 115, 0.16);
-        }
-        .photo-page-container {
-          max-width: 1380px;
-          margin: 0 auto;
-        }
-
-        .photo-upload-grid {
-          display: grid;
-          grid-template-columns:
-            minmax(0, 1.05fr)
-            minmax(300px, 0.95fr);
-          gap: 24px;
-          align-items: start;
-        }
-
-        .photo-list-grid {
-          display: grid;
-          grid-template-columns:
-            repeat(auto-fit, minmax(245px, 1fr));
-          gap: 16px;
-        }
-
-        .photo-card-status {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 6px;
-        }
-
-        @media (max-width: 920px) {
-          .photo-upload-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 700px) {
-          .photo-page-main {
-            padding: 16px !important;
-          }
-
-          .photo-hero {
-            padding: 26px 20px !important;
-            border-radius: 24px !important;
-          }
-
-          .photo-hero-actions {
-            display: grid !important;
-            grid-template-columns: 1fr !important;
-          }
-
-          .photo-hero-actions a {
-            width: 100%;
-          }
-
-          .photo-upload-section,
-          .photo-tip-section,
-          .photo-list-section {
-            padding: 20px 16px !important;
-            border-radius: 24px !important;
-          }
-
-          .photo-list-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .photo-card-image {
-            height: 225px !important;
-          }
-        }
-      `}</style>
-
-      <div
-        className="photo-page-main photo-page-container"
-      >
         <section
-          className="photo-hero"
-          style={{
-            borderRadius: 34,
-            padding: 38,
-            background:
-              'linear-gradient(135deg, #33271d 0%, #5b422c 52%, #8a6238 100%)',
-            color: '#fff8ec',
-            boxShadow:
-              '0 22px 60px rgba(51, 39, 29, 0.18)',
-          }}
+          id="photo-upload"
+          className="timeline-reference-upload"
         >
-          <p
-            style={{
-              margin: '0 0 13px',
-              color: '#f0c36a',
-              fontSize: 13,
-              fontWeight: 900,
-              letterSpacing: '0.08em',
-            }}
-          >
-            책 만들기 1단계
-          </p>
+          <UploadForm />
 
-          <h1
-            style={{
-              margin: 0,
-              maxWidth: 900,
-              fontFamily:
-                'Noto Serif KR, serif',
-              fontSize:
-                'clamp(34px, 5vw, 56px)',
-              lineHeight: 1.2,
-              letterSpacing: '-0.05em',
-            }}
-          >
-            소중한 사진과
-           <br />
-            삶의 시간을 모읍니다.
-          </h1>
+          <div className="timeline-reference-upload-help">
+            <div className="timeline-reference-help-icon">
+              <PhotoStackIcon />
+            </div>
 
-          <p
-            style={{
-              margin: '22px 0 0',
-              maxWidth: 800,
-              fontSize: 18,
-              lineHeight: 1.8,
-              color:
-                'rgba(255, 248, 236, 0.86)',
-            }}
-          >
-            오래된 앨범 사진부터 최근의
-            가족사진까지 차례로 올려주세요.
-            사진의 제목, 날짜와 기억나는
-            설명을 함께 남기면 책의 중요한
-            장면으로 활용할 수 있습니다.
-          </p>
+            <div>
+              <p>사진을 고를 때 참고하세요</p>
 
-          <div
-            style={{
-              marginTop: 26,
-              padding: '18px 20px',
-              borderRadius: 20,
-              border:
-                '1px solid rgba(255,255,255,0.2)',
-              background:
-                'rgba(255,255,255,0.08)',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: '#f0c36a',
-                fontSize: 12,
-                fontWeight: 900,
-              }}
-            >
-              현재 준비 상태
-            </p>
+              <h2>
+                잘 찍은 사진보다
+                <br />
+                이야기가 있는 사진이 좋습니다.
+              </h2>
 
-            <strong
-              style={{
-                display: 'block',
-                marginTop: 7,
-                fontSize: 21,
-                lineHeight: 1.45,
-              }}
-            >
+              <ul>
+                <li>가족이 함께한 평범한 일상</li>
+                <li>오래된 앨범 속 어린 시절</li>
+                <li>여행·명절·기념일의 한 장면</li>
+                <li>반려동물과 함께한 시간</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section className="timeline-reference-ready">
+          <div>
+            <p>현재 준비 상태</p>
+
+            <strong>
               {photoReady
                 ? `사진 ${photos.length}장이 모였습니다.`
                 : `사진을 ${remainingPhotoCount}장 더 모아보세요.`}
             </strong>
 
-            <p
-              style={{
-                margin: '6px 0 0',
-                color:
-                  'rgba(255, 248, 236, 0.75)',
-                fontSize: 14,
-                lineHeight: 1.7,
-              }}
-            >
+            <span>
               {photoReady
-                ? '책 원고를 시작할 기본 사진 수가 준비되었습니다. 이제 사진 속 이야기를 남겨보세요.'
-                : '사진 3장부터 책 원고 만들기의 기본 재료로 사용할 수 있습니다.'}
-            </p>
-          </div>
-
-          <div
-            className="photo-hero-actions"
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 10,
-              marginTop: 22,
-            }}
-          >
-            <a
-              href="#photo-upload"
-              style={heroPrimaryButtonStyle()}
-            >
-              사진 올리기
-            </a>
-
-            <Link
-              href="/dashboard/interview"
-              style={heroSecondaryButtonStyle()}
-            >
-              이야기 남기기
-            </Link>
-
-            <Link
-              href="/dashboard"
-              style={heroSecondaryButtonStyle()}
-            >
-              작업실로 돌아가기
-            </Link>
-          </div>
-        </section>
-
-        <section
-          style={{
-            display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fit, minmax(165px, 1fr))',
-            gap: 14,
-            marginTop: 24,
-          }}
-        >
-          <SummaryCard
-            label="모은 사진"
-            value={photos.length}
-            unit="장"
-            description="현재 책의 재료로 모아 둔 사진"
-            color="#7b4f2a"
-          />
-
-          <SummaryCard
-            label="설명 작성"
-            value={describedPhotoCount}
-            unit="장"
-            description="사진 속 기억을 설명한 사진"
-            color="#9b6d2f"
-          />
-
-          <SummaryCard
-            label="날짜 입력"
-            value={datedPhotoCount}
-            unit="장"
-            description="촬영 시기를 입력한 사진"
-            color="#2e3f52"
-          />
-
-          <SummaryCard
-            label="준비 완료"
-            value={completePhotoCount}
-            unit="장"
-            description="제목·설명·날짜가 모두 준비된 사진"
-            color="#3e5f3a"
-          />
-
-          <SummaryCard
-            label="남긴 이야기"
-            value={storyCount}
-            unit="개"
-            description="책의 문장이 되는 이야기 기록"
-            color="#62438a"
-          />
-         </section>
-
-        <section
-          style={{
-            marginTop: 24,
-            padding: '20px 22px',
-            borderRadius: 22,
-            border: photoReady
-              ? '1px solid #9dcca4'
-              : '1px solid #e3bd7a',
-            background: photoReady
-              ? '#edf8ee'
-              : '#fff4df',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent:
-                'space-between',
-              flexWrap: 'wrap',
-              gap: 14,
-            }}
-          >
-            <div>
-              <p
-                style={{
-                  margin: 0,
-                  color: photoReady
-                    ? '#2f6b38'
-                    : '#83540d',
-                  fontSize: 12,
-                  fontWeight: 900,
-                }}
-              >
-                다음 단계 안내
-              </p>
-
-              <strong
-                style={{
-                  display: 'block',
-                  marginTop: 6,
-                  color: '#33271d',
-                  fontSize: 19,
-                  lineHeight: 1.5,
-                }}
-              >
-                {photoReady
-                  ? '사진이 준비되었습니다. 사진 속 이야기를 남겨주세요.'
-                  : '먼저 사진 3장 이상을 모아주세요.'}
-              </strong>
-            </div>
-
-            {photoReady ? (
-              <Link
-                href="/dashboard/interview"
-                style={nextStepButtonStyle()}
-              >
-                이야기 남기기로 이동
-              </Link>
-            ) : (
-              <a
-                href="#photo-upload"
-                style={nextStepButtonStyle()}
-              >
-                사진 더 올리기
-              </a>
-            )}
-          </div>
-        </section>
-
-        <section
-          id="photo-upload"
-          className="photo-upload-grid"
-          style={{
-            marginTop: 24,
-          }}
-        >
-          <article
-            className="photo-upload-section"
-            style={{
-              padding: 28,
-              borderRadius: 30,
-              background: '#fffaf1',
-              border:
-                '1px solid rgba(91, 66, 43, 0.12)',
-              boxShadow:
-                '0 12px 30px rgba(91, 66, 43, 0.08)',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: '#9b6d2f',
-                fontSize: 12,
-                fontWeight: 900,
-                letterSpacing: '0.08em',
-              }}
-            >
-              새 사진 올리기
-            </p>
-
-            <h2
-              style={{
-                margin: '9px 0 0',
-                fontFamily:
-                  'Noto Serif KR, serif',
-                fontSize: 31,
-                lineHeight: 1.4,
-                letterSpacing: '-0.04em',
-                color: '#33271d',
-              }}
-            >
-              한 번에 한 장씩
-              <br />
-              천천히 기록해보세요.
-            </h2>
-
-            <p
-              style={{
-                margin: '14px 0 0',
-                color: '#6b5845',
-                fontSize: 15,
-                lineHeight: 1.75,
-              }}
-            >
-              사진을 올릴 때 제목, 설명과
-              촬영 날짜를 함께 입력하면 나중에
-              책의 시간 순서를 정리하기
-              쉬워집니다.
-            </p>
-
-            <div
-              style={{
-                marginTop: 22,
-              }}
-            >
-              <UploadForm />
-            </div>
-          </article>
-
-          <aside
-            className="photo-tip-section"
-            style={{
-              padding: 28,
-              borderRadius: 30,
-              background: '#f4ead8',
-              border:
-                '1px solid rgba(91, 66, 43, 0.12)',
-              boxShadow:
-                '0 12px 30px rgba(91, 66, 43, 0.08)',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: '#9b6d2f',
-                fontSize: 12,
-                fontWeight: 900,
-                letterSpacing: '0.08em',
-              }}
-            >
-              어떤 사진이 좋을까요?
-            </p>
-
-            <h2
-              style={{
-                margin: '9px 0 0',
-                fontFamily:
-                  'Noto Serif KR, serif',
-                fontSize: 28,
-                lineHeight: 1.4,
-                letterSpacing: '-0.04em',
-                color: '#33271d',
-              }}
-            >
-              잘 찍은 사진보다
-              이야기가 있는 사진이 좋습니다.
-            </h2>
-
-            <div
-              style={{
-                display: 'grid',
-                gap: 10,
-                marginTop: 20,
-              }}
-            >
-              {[
-                '부모님의 어린 시절이나 학창 시절 사진',
-                '가족이 함께 찍은 명절과 여행 사진',
-                '직장, 가게 또는 일터에서 찍은 사진',
-                '결혼, 출산, 이사와 관련된 사진',
-                '언제 찍었는지 궁금한 오래된 사진',
-              ].map((item, index) => (
-                <div
-                  key={item}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns:
-                      '30px minmax(0, 1fr)',
-                    gap: 10,
-                    alignItems: 'start',
-                    padding: 14,
-                    borderRadius: 16,
-                    background: '#fffaf1',
-                    color: '#4c3a2a',
-                    fontSize: 14,
-                    lineHeight: 1.65,
-                    fontWeight: 800,
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 30,
-                      height: 30,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent:
-                        'center',
-                      borderRadius: 999,
-                      background: '#33271d',
-                      color: '#fff8ec',
-                      fontSize: 11,
-                      fontWeight: 900,
-                    }}
-                  >
-                    {index + 1}
-                  </span>
-
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-          </aside>
-        </section>
-
-        <section
-          className="photo-list-section"
-          style={{
-            marginTop: 24,
-            padding: 28,
-            borderRadius: 30,
-            background: '#fffaf1',
-            border:
-              '1px solid rgba(91, 66, 43, 0.12)',
-            boxShadow:
-              '0 12px 30px rgba(91, 66, 43, 0.08)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent:
-                'space-between',
-              flexWrap: 'wrap',
-              gap: 12,
-            }}
-          >
-            <div>
-              <p
-                style={{
-                  margin: 0,
-                  color: '#9b6d2f',
-                  fontSize: 12,
-                  fontWeight: 900,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                모아 둔 사진
-              </p>
-
-              <h2
-                style={{
-                  margin: '9px 0 0',
-                  fontFamily:
-                    'Noto Serif KR, serif',
-                  fontSize: 31,
-                  lineHeight: 1.4,
-                  letterSpacing:
-                    '-0.04em',
-                  color: '#33271d',
-                }}
-              >
-                책의 장면이 될 사진
-              </h2>
-
-              <p
-                style={{
-                  margin: '8px 0 0',
-                  color: '#6b5845',
-                  fontSize: 14,
-                  lineHeight: 1.7,
-                }}
-              >
-                사진마다 제목·설명·날짜가
-                준비됐는지 확인할 수 있습니다.
-              </p>
-            </div>
-
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                minHeight: 35,
-                padding: '0 13px',
-                borderRadius: 999,
-                background: '#f4ead8',
-                color: '#6b5845',
-                fontSize: 12,
-                fontWeight: 900,
-              }}
-            >
-              전체 {photos.length}장
+                ? "책 원고에 사용할 기본 사진이 준비되었습니다."
+                : "사진 3장부터 책 원고 만들기의 기본 재료로 사용할 수 있습니다."}
             </span>
           </div>
 
-          {years.length > 0 ? (
-            <div
-              style={{
-                display: 'grid',
-                gap: 30,
-                marginTop: 26,
-              }}
-            >
-              {years.map((year) => (
-                <section key={year}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      marginBottom: 14,
-                    }}
-                  >
-                    <h3
-                      style={{
-                        margin: 0,
-                        fontFamily:
-                          'Noto Serif KR, serif',
-                        fontSize: 25,
-                        color: '#33271d',
-                      }}
-                    >
-                      {year}년
-                    </h3>
+          {photoReady ? (
+            <Link href="/dashboard/interview">
+              이야기 쓰기로 이동
+              <span aria-hidden="true">→</span>
+            </Link>
+          ) : (
+            <a href="#photo-upload">
+              사진 더 올리기
+              <span aria-hidden="true">↓</span>
+            </a>
+          )}
+        </section>
 
-                    <span
-                      style={{
-                        color: '#8b7a67',
-                        fontSize: 12,
-                      }}
-                    >
-                      {groupedPhotos[year].length}
-                      장
+        <section className="timeline-reference-gallery">
+          <div className="timeline-reference-section-head">
+            <div>
+              <p>저장된 기억</p>
+              <h2>모아 둔 사진</h2>
+              <span>
+                제목과 날짜, 사진 속 이야기를 확인하고
+                수정할 수 있습니다.
+              </span>
+            </div>
+
+            <strong>전체 {photos.length}장</strong>
+          </div>
+
+          {years.length > 0 ? (
+            <div className="timeline-reference-year-list">
+              {years.map((year) => (
+                <section
+                  key={year}
+                  className="timeline-reference-year"
+                >
+                  <div className="timeline-reference-year-title">
+                    <h3>{year}년</h3>
+                    <span>
+                      {groupedPhotos[year].length}장
                     </span>
                   </div>
 
-                  <div className="photo-list-grid">
-                    {groupedPhotos[year].map(
-                      (photo) => {
-                        const displayDate =
-                          photo.occurredAt ??
-                          photo.createdAt;
+                  <div className="timeline-reference-photo-grid">
+                    {groupedPhotos[year].map((photo) => {
+                      const displayDate =
+                        photo.occurredAt ?? photo.createdAt;
 
-                        const hasTitle =
-                          Boolean(
-                            photo.title?.trim(),
-                          );
+                      const hasTitle = Boolean(
+                        photo.title?.trim(),
+                      );
 
-                        const hasDescription =
-                          Boolean(
-                            photo.description?.trim(),
-                          );
+                      const hasDescription = Boolean(
+                        photo.description?.trim(),
+                      );
 
-                        const hasOccurredAt =
-                          Boolean(
-                            photo.occurredAt,
-                          );
+                      const hasOccurredAt = Boolean(
+                        photo.occurredAt,
+                      );
 
-                        const complete =
-                          hasTitle &&
-                          hasDescription &&
-                          hasOccurredAt;
+                      const complete =
+                        hasTitle &&
+                        hasDescription &&
+                        hasOccurredAt;
 
-                        return (
-                          <article
-                            key={photo.id}
-                            style={{
-                              overflow: 'hidden',
-                              borderRadius: 22,
-                              background: '#ffffff',
-                              border: complete
-                                ? '1px solid #9dcca4'
-                                : '1px solid rgba(91, 66, 43, 0.12)',
-                              boxShadow:
-                                '0 10px 26px rgba(91, 66, 43, 0.06)',
-                            }}
-                          >
-                            <div
-                              className="photo-card-image"
-                              style={{
-                                position:
-                                  'relative',
-                                height: 205,
-                                overflow:
-                                  'hidden',
-                                background:
-                                  'linear-gradient(135deg, rgba(91,66,43,0.14), rgba(240,195,106,0.28))',
-                              }}
-                            >
-                              {photo.fileUrl ? (
-                                <Image
-                                  unoptimized
-                                  src={`/api/blob/${photo.id}`}
-                                  alt={
-                                    photo.title ||
-                                    '가족 사진'
-                                  }
-                                  fill
-                                  sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
-                                  style={{
-                                    objectFit:
-                                      'contain',
-                                    transform:
-                                      'scale(1.08)',
-                                  }}
-                                />
-                              ) : (
-                                <div
-                                  style={{
-                                    height: '100%',
-                                    display:
-                                      'flex',
-                                    alignItems:
-                                      'center',
-                                    justifyContent:
-                                      'center',
-                                    color:
-                                      '#8a6b4d',
-                                    fontSize: 13,
-                                    fontWeight: 900,
-                                  }}
-                                >
-                                  사진 파일 없음
-                                </div>
-                              )}
-
-                              <span
-                                style={{
-                                  position:
-                                    'absolute',
-                                  top: 12,
-                                  right: 12,
-                                  display:
-                                    'inline-flex',
-                                  padding:
-                                    '5px 9px',
-                                  borderRadius: 999,
-                                  background:
-                                    complete
-                                      ? '#3e5f3a'
-                                      : 'rgba(51,39,29,0.82)',
-                                  color:
-                                    '#fff8ec',
-                                  fontSize: 10,
-                                  fontWeight: 900,
-                                }}
-                              >
-                                {complete
-                                  ? '준비 완료'
-                                  : '정보 보완 필요'}
-                              </span>
-                            </div>
-
-                            <div
-                              style={{
-                                padding: 18,
-                              }}
-                            >
-                              <p
-                                style={{
-                                  margin: 0,
-                                  color:
-                                    '#9b6d2f',
-                                  fontSize: 11,
-                                  fontWeight: 900,
-                                }}
-                              >
-                                {photo.occurredAt
-                                  ? `촬영일 ${formatDate(displayDate)}`
-                                  : `등록일 ${formatDate(displayDate)}`}
-                              </p>
-
-                              <h4
-                                style={{
-                                  margin:
-                                    '8px 0 0',
-                                  color:
-                                    '#33271d',
-                                  fontSize: 18,
-                                  lineHeight: 1.45,
-                                  letterSpacing:
-                                    '-0.03em',
-                                  wordBreak:
-                                    'break-word',
-                                }}
-                              >
-                                {photo.title ||
-                                  '제목 없는 사진'}
-                              </h4>
-
-                              <p
-                                style={{
-                                  margin:
-                                    '8px 0 0',
-                                  minHeight: 44,
-                                  color:
-                                    '#6b5845',
-                                  fontSize: 13,
-                                  lineHeight: 1.65,
-                                  wordBreak:
-                                    'break-word',
-                                }}
-                              >
-                                {photo.description ||
-                                  '아직 이 사진에 대한 설명이 없습니다.'}
-                              </p>
-
-                              <div
-                                className="photo-card-status"
-                                style={{
-                                  marginTop: 14,
-                                }}
-                              >
-                                <ReadinessBadge
-                                  label="제목"
-                                  ready={hasTitle}
-                                />
-
-                                <ReadinessBadge
-                                  label="설명"
-                                  ready={
-                                    hasDescription
-                                  }
-                                />
-
-                                <ReadinessBadge
-                                  label="날짜"
-                                  ready={
-                                    hasOccurredAt
-                                  }
-                                />
+                      return (
+                        <article
+                          key={photo.id}
+                          className="timeline-reference-photo-card"
+                          data-complete={
+                            complete ? "true" : "false"
+                          }
+                        >
+                          <div className="timeline-reference-photo-image">
+                            {photo.fileUrl ? (
+                              <Image
+                                unoptimized
+                                src={`/api/blob/${photo.id}`}
+                                alt={
+                                  photo.title ||
+                                  "저장된 사진"
+                                }
+                                fill
+                                sizes="(max-width: 680px) 100vw, (max-width: 1050px) 50vw, 25vw"
+                              />
+                            ) : (
+                              <div className="timeline-reference-no-image">
+                                사진 파일 없음
                               </div>
+                            )}
 
-                              <p
-                                style={{
-                                  margin:
-                                    '12px 0 0',
-                                  paddingTop: 11,
-                                  borderTop:
-                                    '1px solid rgba(91, 66, 43, 0.09)',
-                                  color:
-                                    '#8b7a67',
-                                  fontSize: 10,
-                                }}
-                              >
-                                최근 수정{' '}
-                                {formatDate(
-                                  photo.updatedAt,
-                                )}
-                              </p>
+                            <span
+                              className="timeline-reference-photo-state"
+                              data-complete={
+                                complete ? "true" : "false"
+                              }
+                            >
+                              {complete
+                                ? "준비 완료"
+                                : "정보 보완 필요"}
+                            </span>
+                          </div>
+
+                          <div className="timeline-reference-photo-content">
+                            <time>
+                              {photo.occurredAt
+                                ? `촬영일 ${formatDate(displayDate)}`
+                                : `등록일 ${formatDate(displayDate)}`}
+                            </time>
+
+                            <h4>
+                              {photo.title ||
+                                "제목 없는 사진"}
+                            </h4>
+
+                            <p>
+                              {photo.description ||
+                                "아직 이 사진에 대한 이야기가 없습니다."}
+                            </p>
+
+                            <div className="timeline-reference-badges">
+                              <ReadinessBadge
+                                label="제목"
+                                ready={hasTitle}
+                              />
+
+                              <ReadinessBadge
+                                label="이야기"
+                                ready={hasDescription}
+                              />
+
+                              <ReadinessBadge
+                                label="날짜"
+                                ready={hasOccurredAt}
+                              />
                             </div>
-                          </article>
-                        );
-                      },
-                    )}
+
+                            <div className="timeline-reference-photo-actions">
+                              <EditMemoryButton
+                                memoryId={photo.id}
+                                initialTitle={
+                                  photo.title || ""
+                                }
+                                initialDescription={
+                                  photo.description || ""
+                                }
+                                initialOccurredAt={
+                                  photo.occurredAt
+                                    ? photo.occurredAt.toISOString()
+                                    : null
+                                }
+                                label="수정"
+                              />
+
+                              <DeleteMemoryButton
+                                memoryId={photo.id}
+                                label="삭제"
+                              />
+                            </div>
+
+                            <small>
+                              최근 수정{" "}
+                              {formatDate(photo.updatedAt)}
+                            </small>
+                          </div>
+                        </article>
+                      );
+                    })}
                   </div>
                 </section>
               ))}
             </div>
           ) : (
-            <div
-              style={{
-                marginTop: 22,
-                padding: 32,
-                borderRadius: 22,
-                background: '#ffffff',
-                border:
-                  '1px dashed rgba(91, 66, 43, 0.28)',
-                color: '#6b5845',
-                fontSize: 15,
-                lineHeight: 1.75,
-                textAlign: 'center',
-              }}
-            >
-              아직 모아 둔 사진이 없습니다.
-              <br />
-              첫 번째 사진을 올리면 이곳에
-              시간 순서대로 표시됩니다.
+            <div className="timeline-reference-empty">
+              <p>
+                아직 올린 사진이 없어 예시 사진을
+                보여드리고 있어요.
+              </p>
 
-              <div
-                style={{
-                  marginTop: 16,
-                }}
-              >
-                <a
-                  href="#photo-upload"
-                  style={nextStepButtonStyle()}
-                >
-                  첫 사진 올리기
-                </a>
+              <div className="timeline-reference-sample-grid">
+                {samplePhotos.map((sample) => (
+                  <article key={sample.src}>
+                    <div>
+                      <Image
+                        src={sample.src}
+                        alt={sample.title}
+                        fill
+                        sizes="(max-width: 680px) 46vw, 190px"
+                      />
+                    </div>
+
+                    <strong>{sample.title}</strong>
+                    <time>{sample.date}</time>
+                  </article>
+                ))}
               </div>
+
+              <a href="#photo-upload">
+                첫 사진 선택하기
+                <span aria-hidden="true">↑</span>
+              </a>
             </div>
           )}
         </section>
 
-        {photoReady ? (
-          <section
-            style={{
-              marginTop: 24,
-              padding: '22px 24px',
-              borderRadius: 24,
-              border: '1px solid #9dcca4',
-              background: '#edf8ee',
-            }}
+        <footer className="timeline-reference-footer">
+          <Link href="/dashboard">
+            나중에 하기
+          </Link>
+
+          <Link
+            href={
+              photoReady
+                ? "/dashboard/interview"
+                : "/dashboard/timeline#photo-upload"
+            }
+            className="timeline-reference-next"
           >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent:
-                  'space-between',
-                flexWrap: 'wrap',
-                gap: 14,
-              }}
-            >
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    color: '#2f6b38',
-                    fontSize: 12,
-                    fontWeight: 900,
-                  }}
-                >
-                  사진 모으기 완료
-                </p>
-
-                <strong
-                  style={{
-                    display: 'block',
-                    marginTop: 6,
-                    color: '#33271d',
-                    fontSize: 19,
-                  }}
-                >
-                  다음은 사진 속 이야기를
-                  남길 차례입니다.
-                </strong>
-              </div>
-
-              <Link
-                href="/dashboard/interview"
-                style={nextStepButtonStyle()}
-              >
-                이야기 남기기
-              </Link>
-            </div>
-          </section>
-        ) : null}
+            {photoReady
+              ? "사진 저장하고 다음으로"
+              : "사진을 더 올려주세요"}
+            <span aria-hidden="true">→</span>
+          </Link>
+        </footer>
       </div>
     </main>
   );
 }
 
-function SummaryCard({
+function StatusItem({
   label,
   value,
   unit,
-  description,
-  color,
 }: {
   label: string;
   value: number;
   unit: string;
-  description: string;
-  color: string;
 }) {
   return (
-    <article
-      style={{
-        padding: 21,
-        borderRadius: 23,
-        background: '#fffaf1',
-        border:
-          '1px solid rgba(91, 66, 43, 0.12)',
-        boxShadow:
-          '0 10px 25px rgba(91, 66, 43, 0.07)',
-      }}
-    >
-      <p
-        style={{
-          margin: 0,
-          color: '#9b6d2f',
-          fontSize: 12,
-          fontWeight: 900,
-        }}
-      >
-        {label}
-      </p>
-
-      <strong
-        style={{
-          display: 'block',
-          marginTop: 8,
-          color,
-          fontSize: 33,
-          lineHeight: 1.1,
-        }}
-      >
+    <article>
+      <span>{label}</span>
+      <strong>
         {value.toLocaleString()}
-
-        <span
-          style={{
-            marginLeft: 4,
-            color: '#6b5845',
-            fontSize: 13,
-          }}
-        >
-          {unit}
-        </span>
+        <small>{unit}</small>
       </strong>
-
-      <p
-        style={{
-          margin: '11px 0 0',
-          color: '#6b5845',
-          fontSize: 12,
-          lineHeight: 1.55,
-        }}
-      >
-        {description}
-      </p>
     </article>
   );
 }
@@ -1305,102 +488,1083 @@ function ReadinessBadge({
   ready: boolean;
 }) {
   return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        minHeight: 25,
-        padding: '0 9px',
-        borderRadius: 999,
-        background: ready
-          ? '#e3f4e5'
-          : '#fff1c7',
-        color: ready
-          ? '#2f6b38'
-          : '#83540d',
-        fontSize: 10,
-        fontWeight: 900,
-      }}
-    >
-      {label} {ready ? '완료' : '필요'}
+    <span data-ready={ready ? "true" : "false"}>
+      {label} {ready ? "완료" : "필요"}
     </span>
   );
 }
 
-function heroPrimaryButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 46,
-    padding: '0 21px',
-    borderRadius: 999,
-    background: '#f0c36a',
-    color: '#2b2118',
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: 'none',
-    textAlign: 'center',
-  };
+function PhotoStackIcon() {
+  return (
+    <svg viewBox="0 0 72 72" fill="none">
+      <rect
+        x="14"
+        y="17"
+        width="42"
+        height="38"
+        rx="7"
+        stroke="currentColor"
+        strokeWidth="3"
+      />
+      <circle
+        cx="29"
+        cy="30"
+        r="5"
+        fill="currentColor"
+        opacity=".75"
+      />
+      <path
+        d="m19 48 12-12 8 8 6-6 10 10"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M23 11h33a8 8 0 0 1 8 8v29"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity=".45"
+      />
+    </svg>
+  );
 }
 
-function heroSecondaryButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 46,
-    padding: '0 21px',
-    borderRadius: 999,
-    border:
-      '1px solid rgba(255,255,255,0.42)',
-    background: 'transparent',
-    color: '#fff8ec',
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: 'none',
-    textAlign: 'center',
-  };
-}
-
-function nextStepButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-    padding: '0 15px',
-    borderRadius: 999,
-    border: '1px solid #33271d',
-    background: '#33271d',
-    color: '#fff8ec',
-    fontSize: 12,
-    fontWeight: 900,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-  };
-}
-
-function formatDate(
-  value: Date | string,
-) {
+function formatDate(value: Date | string) {
   const date =
-    value instanceof Date
-      ? value
-      : new Date(value);
+    value instanceof Date ?
+      value :
+      new Date(value);
 
-  if (
-    Number.isNaN(date.getTime())
-  ) {
-    return '-';
+  if (Number.isNaN(date.getTime())) {
+    return "-";
   }
 
-  return new Intl.DateTimeFormat(
-    'ko-KR',
-    {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    },
-  ).format(date);
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
 }
+
+const timelineReferenceStyles = `
+  .timeline-reference-page,
+  .timeline-reference-page * {
+    box-sizing: border-box;
+  }
+
+  .timeline-reference-page {
+    min-height: 100vh;
+    padding:
+      32px
+      24px
+      52px;
+    color: #4a342b;
+    background:
+      radial-gradient(
+        circle at 8% 8%,
+        rgba(255, 231, 216, 0.62),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 95% 15%,
+        rgba(231, 244, 231, 0.56),
+        transparent 25rem
+      ),
+      linear-gradient(
+        180deg,
+        #fffdf8,
+        #fff9f3
+      );
+    font-family:
+      var(--font-daldongne-sans),
+      "Noto Sans KR",
+      sans-serif;
+  }
+
+  .timeline-reference-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .timeline-reference-page a,
+  .timeline-reference-page button {
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .timeline-reference-page a:hover,
+  .timeline-reference-page button:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  .timeline-reference-page a:focus-visible,
+  .timeline-reference-page button:focus-visible,
+  .timeline-reference-page input:focus-visible,
+  .timeline-reference-page textarea:focus-visible {
+    outline:
+      4px solid
+      rgba(240, 105, 83, 0.2);
+    outline-offset: 3px;
+  }
+
+  .timeline-reference-shell {
+    width:
+      min(1380px, 100%);
+    margin: 0 auto;
+  }
+
+  .timeline-reference-heading {
+    text-align: center;
+  }
+
+  .timeline-reference-heading > p {
+    margin: 0;
+    color: #ef6c55;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .timeline-reference-heading h1 {
+    margin: 11px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size:
+      clamp(40px, 5vw, 62px);
+    line-height: 1.18;
+    letter-spacing: -0.06em;
+  }
+
+  .timeline-reference-heading > span {
+    display: block;
+    margin-top: 12px;
+    color: #7b665d;
+    font-size:
+      clamp(14px, 1.5vw, 19px);
+    line-height: 1.7;
+  }
+
+  .timeline-reference-status {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .timeline-reference-status article {
+    min-width: 0;
+    padding: 14px 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border:
+      1px solid
+      rgba(135, 94, 74, 0.11);
+    border-radius: 15px;
+    background:
+      rgba(255, 255, 255, 0.82);
+    box-shadow:
+      0 8px 20px
+      rgba(95, 62, 46, 0.035);
+  }
+
+  .timeline-reference-status article > span {
+    color: #806c63;
+    font-size: 11px;
+    font-weight: 850;
+  }
+
+  .timeline-reference-status article > strong {
+    color: #e46750;
+    font-size: 22px;
+  }
+
+  .timeline-reference-status article small {
+    margin-left: 3px;
+    color: #8f7c72;
+    font-size: 10px;
+  }
+
+  .timeline-reference-upload {
+    margin-top: 18px;
+    padding: 24px;
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1.5fr)
+      minmax(280px, 0.5fr);
+    gap: 18px;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.12);
+    border-radius: 28px;
+    background:
+      rgba(255, 255, 255, 0.92);
+    box-shadow:
+      0 20px 48px
+      rgba(92, 61, 47, 0.07);
+  }
+
+  .timeline-upload-form {
+    min-width: 0;
+  }
+
+  .timeline-upload-dropzone {
+    position: relative;
+    min-height: 245px;
+    padding: 24px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border:
+      2px dashed
+      #f08a74;
+    border-radius: 23px;
+    background:
+      linear-gradient(
+        145deg,
+        #fffaf6,
+        #fff4ed
+      );
+    cursor: pointer;
+  }
+
+  .timeline-upload-dropzone[data-has-file="true"] {
+    border-style: solid;
+    background: #fffdfb;
+  }
+
+  .timeline-upload-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .timeline-upload-empty {
+    text-align: center;
+  }
+
+  .timeline-upload-empty > span {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto;
+    display: grid;
+    place-items: center;
+    border-radius: 26px;
+    color: #ef6d56;
+    background: #ffffff;
+    box-shadow:
+      0 13px 28px
+      rgba(205, 91, 66, 0.12);
+  }
+
+  .timeline-upload-empty svg {
+    width: 53px;
+    height: 53px;
+  }
+
+  .timeline-upload-empty strong {
+    display: block;
+    margin-top: 13px;
+    color: #ef6d56;
+    font-size: 24px;
+    letter-spacing: -0.035em;
+  }
+
+  .timeline-upload-empty p {
+    margin: 7px 0 0;
+    color: #715e55;
+    font-size: 13px;
+  }
+
+  .timeline-upload-preview {
+    position: relative;
+    width: 100%;
+    min-height: 200px;
+    display: grid;
+    grid-template-columns:
+      minmax(180px, 0.72fr)
+      minmax(0, 1.28fr);
+    align-items: center;
+    gap: 22px;
+  }
+
+  .timeline-upload-preview-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.2 / 1;
+    overflow: hidden;
+    border-radius: 17px;
+    background: #f2ece8;
+  }
+
+  .timeline-upload-preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .timeline-upload-preview-file {
+    display: grid;
+    gap: 9px;
+    text-align: left;
+  }
+
+  .timeline-upload-preview-file strong {
+    overflow: hidden;
+    font-size: 18px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .timeline-upload-preview-file span {
+    color: #907b70;
+    font-size: 12px;
+  }
+
+  .timeline-upload-preview-file button {
+    width: max-content;
+    min-height: 38px;
+    padding: 0 13px;
+    border:
+      1px solid
+      #e4b7a8;
+    border-radius: 11px;
+    color: #ba5946;
+    background: #ffffff;
+    font-size: 11px;
+    font-weight: 850;
+    cursor: pointer;
+  }
+
+  .timeline-upload-fields {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1.2fr)
+      minmax(180px, 0.8fr);
+    gap: 11px;
+  }
+
+  .timeline-upload-field {
+    min-width: 0;
+    display: grid;
+    gap: 7px;
+  }
+
+  .timeline-upload-field[data-full="true"] {
+    grid-column: 1 / -1;
+  }
+
+  .timeline-upload-field label {
+    color: #5d493f;
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .timeline-upload-field input,
+  .timeline-upload-field textarea {
+    width: 100%;
+    border:
+      1px solid
+      rgba(142, 99, 78, 0.2);
+    border-radius: 13px;
+    color: #47352d;
+    background: #fffdfb;
+    font: inherit;
+  }
+
+  .timeline-upload-field input {
+    height: 47px;
+    padding: 0 13px;
+  }
+
+  .timeline-upload-field textarea {
+    min-height: 104px;
+    padding: 12px 13px;
+    resize: vertical;
+    line-height: 1.65;
+  }
+
+  .timeline-upload-footer {
+    margin-top: 13px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+  }
+
+  .timeline-upload-submit {
+    min-width: 190px;
+    min-height: 50px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 14px;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ed5e4f
+      );
+    box-shadow:
+      0 13px 28px
+      rgba(218, 83, 64, 0.2);
+    font-size: 14px;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .timeline-upload-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .timeline-upload-message {
+    color: #b85642;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .timeline-reference-upload-help {
+    min-width: 0;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 22px;
+    background:
+      linear-gradient(
+        155deg,
+        #fff5de,
+        #fffaf2
+      );
+  }
+
+  .timeline-reference-help-icon {
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    border-radius: 19px;
+    color: #e26a53;
+    background: #ffffff;
+    box-shadow:
+      0 11px 24px
+      rgba(113, 73, 53, 0.08);
+  }
+
+  .timeline-reference-help-icon svg {
+    width: 50px;
+    height: 50px;
+  }
+
+  .timeline-reference-upload-help p {
+    margin: 17px 0 0;
+    color: #df6c54;
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .timeline-reference-upload-help h2 {
+    margin: 8px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 20px;
+    line-height: 1.55;
+    letter-spacing: -0.04em;
+    word-break: keep-all;
+  }
+
+  .timeline-reference-upload-help ul {
+    margin: 16px 0 0;
+    padding-left: 20px;
+    color: #6e5b52;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .timeline-reference-ready {
+    margin-top: 16px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    border:
+      1px solid
+      #c9d9ad;
+    border-radius: 19px;
+    background:
+      linear-gradient(
+        135deg,
+        #f3f8e9,
+        #fffdf7
+      );
+  }
+
+  .timeline-reference-ready p {
+    margin: 0;
+    color: #4f7a3e;
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .timeline-reference-ready strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  .timeline-reference-ready div > span {
+    display: block;
+    margin-top: 3px;
+    color: #75816d;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .timeline-reference-ready > a {
+    min-height: 43px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    flex: 0 0 auto;
+    border-radius: 12px;
+    color: #ffffff;
+    background: #769451;
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .timeline-reference-gallery {
+    margin-top: 18px;
+    padding: 26px;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.12);
+    border-radius: 27px;
+    background:
+      rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 17px 38px
+      rgba(91, 59, 44, 0.055);
+  }
+
+  .timeline-reference-section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .timeline-reference-section-head p {
+    margin: 0;
+    color: #ea6b54;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+  }
+
+  .timeline-reference-section-head h2 {
+    margin: 7px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 28px;
+    letter-spacing: -0.045em;
+  }
+
+  .timeline-reference-section-head div > span {
+    display: block;
+    margin-top: 6px;
+    color: #7b685f;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .timeline-reference-section-head > strong {
+    min-height: 36px;
+    padding: 0 13px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    color: #765c4f;
+    background: #fff1e9;
+    font-size: 11px;
+  }
+
+  .timeline-reference-year-list {
+    margin-top: 24px;
+    display: grid;
+    gap: 30px;
+  }
+
+  .timeline-reference-year-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 13px;
+  }
+
+  .timeline-reference-year-title h3 {
+    margin: 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 24px;
+  }
+
+  .timeline-reference-year-title span {
+    color: #9a857a;
+    font-size: 11px;
+  }
+
+  .timeline-reference-photo-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .timeline-reference-photo-card {
+    min-width: 0;
+    overflow: hidden;
+    border:
+      1px solid
+      rgba(131, 92, 72, 0.13);
+    border-radius: 19px;
+    background: #ffffff;
+    box-shadow:
+      0 10px 25px
+      rgba(80, 52, 40, 0.055);
+  }
+
+  .timeline-reference-photo-card[data-complete="true"] {
+    border-color: #a8ca9c;
+  }
+
+  .timeline-reference-photo-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.12 / 1;
+    overflow: hidden;
+    background: #f1ebe7;
+  }
+
+  .timeline-reference-photo-image img {
+    object-fit: contain;
+    transform: scale(1.05);
+  }
+
+  .timeline-reference-no-image {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: #90796d;
+    font-size: 11px;
+    font-weight: 850;
+  }
+
+  .timeline-reference-photo-state {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    min-height: 26px;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    color: #ffffff;
+    background:
+      rgba(89, 65, 54, 0.85);
+    font-size: 8px;
+    font-weight: 900;
+  }
+
+  .timeline-reference-photo-state[data-complete="true"] {
+    background: #66885b;
+  }
+
+  .timeline-reference-photo-content {
+    padding: 14px;
+  }
+
+  .timeline-reference-photo-content > time {
+    color: #d0624c;
+    font-size: 9px;
+    font-weight: 850;
+  }
+
+  .timeline-reference-photo-content h4 {
+    margin: 6px 0 0;
+    overflow: hidden;
+    font-size: 15px;
+    line-height: 1.45;
+    letter-spacing: -0.025em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .timeline-reference-photo-content > p {
+    min-height: 39px;
+    margin: 6px 0 0;
+    display: -webkit-box;
+    overflow: hidden;
+    color: #756158;
+    font-size: 10px;
+    line-height: 1.6;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .timeline-reference-badges {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .timeline-reference-badges > span {
+    min-height: 23px;
+    padding: 0 7px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    color: #8e620a;
+    background: #fff1c9;
+    font-size: 8px;
+    font-weight: 900;
+  }
+
+  .timeline-reference-badges > span[data-ready="true"] {
+    color: #347046;
+    background: #e8f5e9;
+  }
+
+  .timeline-reference-photo-actions {
+    margin-top: 11px;
+    padding-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    border-top:
+      1px solid
+      rgba(119, 84, 67, 0.09);
+  }
+
+  .timeline-reference-photo-actions button {
+    min-height: 31px !important;
+    padding: 0 10px !important;
+    border-radius: 9px !important;
+    font-size: 10px !important;
+  }
+
+  .timeline-reference-photo-content > small {
+    display: block;
+    margin-top: 8px;
+    color: #a08c82;
+    font-size: 8px;
+  }
+
+  .timeline-reference-empty {
+    margin-top: 21px;
+    padding: 21px;
+    border:
+      1px dashed
+      #e5ad9b;
+    border-radius: 20px;
+    background: #fffaf7;
+    text-align: center;
+  }
+
+  .timeline-reference-empty > p {
+    margin: 0;
+    color: #806c62;
+    font-size: 12px;
+  }
+
+  .timeline-reference-sample-grid {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns:
+      repeat(6, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .timeline-reference-sample-grid article {
+    min-width: 0;
+    padding: 5px 5px 8px;
+    border:
+      1px solid
+      rgba(134, 94, 74, 0.12);
+    border-radius: 13px;
+    background: #ffffff;
+    text-align: left;
+  }
+
+  .timeline-reference-sample-grid article > div {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.08 / 1;
+    overflow: hidden;
+    border-radius: 9px;
+  }
+
+  .timeline-reference-sample-grid img {
+    object-fit: cover;
+  }
+
+  .timeline-reference-sample-grid strong {
+    display: block;
+    margin-top: 6px;
+    overflow: hidden;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .timeline-reference-sample-grid time {
+    display: block;
+    margin-top: 2px;
+    color: #a28e84;
+    font-size: 7px;
+  }
+
+  .timeline-reference-empty > a {
+    min-height: 42px;
+    margin-top: 17px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 12px;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ec604f
+      );
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .timeline-reference-footer {
+    margin-top: 18px;
+    padding: 17px 22px;
+    display: grid;
+    grid-template-columns:
+      minmax(180px, 0.55fr)
+      minmax(300px, 1.45fr);
+    gap: 14px;
+    border:
+      1px solid
+      rgba(135, 94, 74, 0.12);
+    border-radius: 21px;
+    background:
+      rgba(255, 255, 255, 0.9);
+  }
+
+  .timeline-reference-footer > a {
+    min-height: 53px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    border:
+      1px solid
+      #d3ae9e;
+    border-radius: 14px;
+    color: #705448;
+    background: #ffffff;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .timeline-reference-footer
+  .timeline-reference-next {
+    border-color: transparent;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7765,
+        #ed604f
+      );
+    box-shadow:
+      0 13px 27px
+      rgba(220, 83, 63, 0.18);
+  }
+
+  @media (max-width: 1100px) {
+    .timeline-reference-upload {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline-reference-upload-help {
+      display: grid;
+      grid-template-columns:
+        68px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .timeline-reference-upload-help p {
+      margin-top: 0;
+    }
+
+    .timeline-reference-photo-grid {
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    }
+
+    .timeline-reference-sample-grid {
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 780px) {
+    .timeline-reference-page {
+      padding:
+        22px
+        13px
+        38px;
+    }
+
+    .timeline-reference-status {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+
+    .timeline-reference-upload {
+      padding: 15px;
+      border-radius: 21px;
+    }
+
+    .timeline-upload-preview {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline-upload-fields {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline-upload-field[data-full="true"] {
+      grid-column: auto;
+    }
+
+    .timeline-reference-ready {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .timeline-reference-ready > a {
+      justify-content: center;
+    }
+
+    .timeline-reference-gallery {
+      padding: 18px;
+      border-radius: 21px;
+    }
+
+    .timeline-reference-photo-grid {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 520px) {
+    .timeline-reference-heading h1 {
+      font-size: 37px;
+    }
+
+    .timeline-reference-heading > span {
+      font-size: 13px;
+    }
+
+    .timeline-reference-status article {
+      padding: 11px;
+    }
+
+    .timeline-reference-status article > span {
+      font-size: 9px;
+    }
+
+    .timeline-reference-status article > strong {
+      font-size: 18px;
+    }
+
+    .timeline-upload-dropzone {
+      min-height: 210px;
+      padding: 17px;
+      border-radius: 18px;
+    }
+
+    .timeline-upload-empty > span {
+      width: 69px;
+      height: 69px;
+      border-radius: 21px;
+    }
+
+    .timeline-upload-empty strong {
+      font-size: 20px;
+    }
+
+    .timeline-upload-footer {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .timeline-upload-submit {
+      width: 100%;
+    }
+
+    .timeline-reference-upload-help {
+      padding: 18px;
+      grid-template-columns: 1fr;
+    }
+
+    .timeline-reference-section-head {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .timeline-reference-photo-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline-reference-sample-grid {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+
+    .timeline-reference-footer {
+      padding: 12px;
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .timeline-reference-page a,
+    .timeline-reference-page button {
+      transition: none;
+    }
+  }
+`;

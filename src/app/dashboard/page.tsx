@@ -1,12 +1,105 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 const REQUIRED_PHOTO_COUNT = 3;
 const REQUIRED_STORY_COUNT = 3;
 
-type ActionIconName = "photo" | "story" | "book" | "order";
+const heroPhotos = [
+  {
+    src: "/dashboard/reference-home-v1/hero-family.webp",
+    alt: "함께 웃고 있는 어르신 부부",
+    className: "dashboard-home-collage-family",
+  },
+  {
+    src: "/dashboard/reference-home-v1/hero-child.webp",
+    alt: "환하게 웃는 아이",
+    className: "dashboard-home-collage-child",
+  },
+  {
+    src: "/dashboard/reference-home-v1/hero-man.webp",
+    alt: "따뜻한 차를 들고 있는 청년",
+    className: "dashboard-home-collage-man",
+  },
+  {
+    src: "/dashboard/reference-home-v1/hero-dog.webp",
+    alt: "웃고 있는 강아지",
+    className: "dashboard-home-collage-dog",
+  },
+  {
+    src: "/dashboard/reference-home-v1/hero-friends.webp",
+    alt: "함께 웃는 친구들",
+    className: "dashboard-home-collage-friends",
+  },
+  {
+    src: "/dashboard/reference-home-v1/hero-cat.webp",
+    alt: "편안히 쉬는 고양이",
+    className: "dashboard-home-collage-cat",
+  },
+];
+
+const sampleMemories = [
+  {
+    title: "할아버지와 나들이",
+    date: "2024.05.04",
+    src: "/dashboard/reference-home-v1/sample-1.webp",
+  },
+  {
+    title: "온 가족 저녁 시간",
+    date: "2024.05.03",
+    src: "/dashboard/reference-home-v1/sample-2.webp",
+  },
+  {
+    title: "우리 강아지랑 산책",
+    date: "2024.05.02",
+    src: "/dashboard/reference-home-v1/sample-3.webp",
+  },
+  {
+    title: "햇살 좋은 낮잠 시간",
+    date: "2024.05.01",
+    src: "/dashboard/reference-home-v1/sample-4.webp",
+  },
+  {
+    title: "친구와 수다 데이",
+    date: "2024.05.30",
+    src: "/dashboard/reference-home-v1/sample-5.webp",
+  },
+  {
+    title: "조용한 하루",
+    date: "2024.04.29",
+    src: "/dashboard/reference-home-v1/sample-6.webp",
+  },
+];
+
+const categories = [
+  {
+    label: "나",
+    icon: "person",
+    tone: "mint",
+  },
+  {
+    label: "가족",
+    icon: "family",
+    tone: "sky",
+  },
+  {
+    label: "친구",
+    icon: "friends",
+    tone: "yellow",
+  },
+  {
+    label: "강아지",
+    icon: "dog",
+    tone: "rose",
+  },
+  {
+    label: "고양이",
+    icon: "cat",
+    tone: "blue",
+  },
+] as const;
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -100,11 +193,12 @@ export default async function DashboardPage() {
       orderBy: {
         createdAt: "desc",
       },
-      take: 3,
+      take: 6,
       select: {
         id: true,
         title: true,
         type: true,
+        fileUrl: true,
         createdAt: true,
         occurredAt: true,
       },
@@ -113,7 +207,6 @@ export default async function DashboardPage() {
 
   const usableMaterialMemories = materialMemories.filter((memory) => {
     const title = memory.title?.trim() || "";
-
     const description = memory.description?.trim() || "";
 
     if (memory.type === "PHOTO") {
@@ -145,10 +238,6 @@ export default async function DashboardPage() {
     activeProductionRequests.map((request) => request.bookId),
   ).size;
 
-  const photoReady = photoCount >= REQUIRED_PHOTO_COUNT;
-
-  const storyReady = storyCount >= REQUIRED_STORY_COUNT;
-
   const nextAction = getNextAction({
     photoCount,
     storyCount,
@@ -156,290 +245,297 @@ export default async function DashboardPage() {
     activeProductionBookCount,
   });
 
-  const displayName = user?.name || session.user.name || "달동네 회원";
-
-  const actionCards: {
-    number: string;
-    icon: ActionIconName;
-    title: string;
-    description: string;
-    count: string;
-    status: string;
-    href: string;
-    buttonLabel: string;
-    tone: string;
-    ready: boolean;
-  }[] = [
-    {
-      number: "01",
-      icon: "photo",
-      title: "사진 올리기",
-      description: "기억하고 싶은 사진을 내 공간에 모아보세요.",
-      count: `${photoCount}장`,
-      status: photoReady
-        ? "책 만들기 기본 준비 완료"
-        : `${Math.max(REQUIRED_PHOTO_COUNT - photoCount, 0)}장 더 필요`,
-      href: "/dashboard/timeline",
-      buttonLabel: "사진 관리",
-      tone: "coral",
-      ready: photoReady,
-    },
-    {
-      number: "02",
-      icon: "story",
-      title: "이야기 쓰기",
-      description: "사진을 보며 떠오르는 기억을 짧게 남겨보세요.",
-      count: `${storyCount}개`,
-      status: storyReady
-        ? "풍부한 원고 준비 완료"
-        : `${Math.max(REQUIRED_STORY_COUNT - storyCount, 0)}개 더 권장`,
-      href: "/dashboard/interview",
-      buttonLabel: "이야기 관리",
-      tone: "apricot",
-      ready: storyReady,
-    },
-    {
-      number: "03",
-      icon: "book",
-      title: "책 만들기",
-      description: "모아 둔 사진과 이야기를 책 원고로 정리하세요.",
-      count: `${bookCount}권`,
-      status: photoReady ? "지금 원고 만들기 가능" : "사진 3장부터 준비",
-      href: "/dashboard/book",
-      buttonLabel: "책 원고 만들기",
-      tone: "sage",
-      ready: bookCount > 0,
-    },
-    {
-      number: "04",
-      icon: "order",
-      title: "검토·주문",
-      description: "원고를 확인하고 관리자 검토와 제작 상담을 신청하세요.",
-      count:
-        activeProductionBookCount > 0
-          ? `${activeProductionBookCount}권 진행`
-          : "진행 없음",
-      status: bookCount > 0 ? "내 책장에서 신청 가능" : "책 원고를 먼저 만들기",
-      href: "/dashboard/library",
-      buttonLabel: "내 책장 보기",
-      tone: "sky",
-      ready: activeProductionBookCount > 0,
-    },
-  ];
+  const displayName =
+    user?.name ||
+    session.user.name ||
+    "달동네 회원";
 
   return (
-    <main className="simple-dashboard">
-      <style>{dashboardStyles}</style>
+    <main className="dashboard-home">
+      <style>{dashboardHomeStyles}</style>
 
-      <div className="simple-dashboard-shell">
-        <section className="simple-dashboard-hero">
-          <div className="simple-dashboard-welcome">
-            <p className="simple-dashboard-kicker">나의 기록 작업실</p>
-
-            <h1>
-              {displayName}님,
-              <br />
-              오늘은 무엇을 남길까요?
-            </h1>
-
-            <p className="simple-dashboard-intro">
-              사진 한 장부터 시작해도 충분합니다. 모인 사진과 이야기는 한 권의
-              책 원고로 이어집니다.
+      <div className="dashboard-home-shell">
+        <section className="dashboard-home-hero">
+          <div className="dashboard-home-hero-copy">
+            <p className="dashboard-home-kicker">
+              {displayName}님의 기록 공간
             </p>
+
+            <h1>달동네 스토리북</h1>
+
+            <p className="dashboard-home-subtitle">
+              누구와 함께한 시간이든
+              <br />
+              소중한 기록이 됩니다
+            </p>
+
+            <div className="dashboard-home-line-art" aria-hidden="true">
+              <HouseLineArt />
+            </div>
           </div>
 
-          <div className="simple-dashboard-next">
-            <span className="simple-dashboard-next-label">
-              지금 하면 좋은 일
+          <div
+            className="dashboard-home-collage"
+            aria-label="가족, 아이, 친구, 반려동물의 사진 모음"
+          >
+            {heroPhotos.map((photo) => (
+              <div
+                key={photo.src}
+                className={`dashboard-home-collage-item ${photo.className}`}
+              >
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  priority
+                  sizes="(max-width: 760px) 38vw, 240px"
+                />
+              </div>
+            ))}
+
+            <span
+              className="dashboard-home-collage-heart"
+              aria-hidden="true"
+            >
+              ♡
             </span>
 
-            <strong>{nextAction.title}</strong>
-
-            <p>{nextAction.description}</p>
-
-            <Link
-              href={nextAction.href}
-              className="simple-dashboard-next-button"
+            <span
+              className="dashboard-home-collage-spark"
+              aria-hidden="true"
             >
-              {nextAction.buttonLabel}
-              <span aria-hidden="true">→</span>
+              ✦
+            </span>
+          </div>
+        </section>
+
+        <nav
+          className="dashboard-home-categories"
+          aria-label="기록 주제"
+        >
+          {categories.map((category) => (
+            <Link
+              key={category.label}
+              href="/dashboard/timeline"
+              className="dashboard-home-category"
+              data-tone={category.tone}
+            >
+              <span aria-hidden="true">
+                <CategoryIcon name={category.icon} />
+              </span>
+              <strong>{category.label}</strong>
             </Link>
-          </div>
-        </section>
+          ))}
+        </nav>
 
-        <section className="simple-dashboard-section">
-          <div className="simple-dashboard-section-head">
-            <div>
-              <p>빠른 시작</p>
-              <h2>네 가지만 기억하세요</h2>
-            </div>
-
-            <span>사진 → 이야기 → 책 → 주문</span>
-          </div>
-
-          <div className="simple-dashboard-actions">
-            {actionCards.map((card) => (
-              <article
-                key={card.number}
-                className="simple-dashboard-action"
-                data-tone={card.tone}
-              >
-                <div className="simple-dashboard-action-top">
-                  <span className="simple-dashboard-icon">
-                    <ActionIcon name={card.icon} />
-                  </span>
-
-                  <span className="simple-dashboard-number">{card.number}</span>
-                </div>
-
-                <h3>{card.title}</h3>
-                <p>{card.description}</p>
-
-                <div className="simple-dashboard-count">
-                  <strong>{card.count}</strong>
-                  <span>
-                    {card.ready ? "✓ " : ""}
-                    {card.status}
-                  </span>
-                </div>
-
-                <Link href={card.href} className="simple-dashboard-action-link">
-                  {card.buttonLabel}
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="simple-dashboard-summary">
-          <SummaryItem
-            label="전체 기록"
-            value={memoryCount}
-            unit="개"
+        <section
+          className="dashboard-home-primary-actions"
+          aria-label="주요 기능"
+        >
+          <PrimaryAction
             href="/dashboard/timeline"
+            title="사진 올리기"
+            icon="photo"
+            primary
           />
 
-          <SummaryItem
+          <PrimaryAction
+            href="/dashboard/interview"
+            title="이야기 남기기"
+            icon="story"
+          />
+
+          <PrimaryAction
+            href="/dashboard/library"
+            title="내 기억 보기"
+            icon="book"
+          />
+        </section>
+
+        <section className="dashboard-home-summary">
+          <SummaryCard
             label="모은 사진"
             value={photoCount}
             unit="장"
             href="/dashboard/timeline"
           />
 
-          <SummaryItem
+          <SummaryCard
             label="남긴 이야기"
             value={storyCount}
             unit="개"
             href="/dashboard/interview"
           />
 
-          <SummaryItem
+          <SummaryCard
             label="만든 책"
             value={bookCount}
             unit="권"
             href="/dashboard/library"
           />
+
+          <SummaryCard
+            label="제작 진행"
+            value={activeProductionBookCount}
+            unit="권"
+            href="/dashboard/library"
+          />
         </section>
 
-        <section className="simple-dashboard-lower">
-          <article className="simple-dashboard-panel">
-            <div className="simple-dashboard-panel-head">
+        <section className="dashboard-home-workspace">
+          <article className="dashboard-home-recent-panel">
+            <div className="dashboard-home-section-head">
               <div>
-                <p>최근 기록</p>
-                <h2>최근에 남긴 사진과 이야기</h2>
+                <p>나의 기억</p>
+                <h2>최근 기억</h2>
               </div>
 
-              <Link href="/dashboard/timeline">전체 보기</Link>
+              <Link href="/dashboard/timeline">
+                더 보기
+                <span aria-hidden="true">›</span>
+              </Link>
             </div>
 
             {recentMemories.length > 0 ? (
-              <div className="simple-dashboard-recent">
-                {recentMemories.map((memory) => (
-                  <Link
-                    key={memory.id}
-                    href="/dashboard/timeline"
-                    className="simple-dashboard-recent-item"
-                  >
-                    <span
-                      className="simple-dashboard-memory-icon"
-                      data-type={String(memory.type)}
-                    >
-                      {String(memory.type) === "PHOTO"
-                        ? "사진"
-                        : getMemoryTypeLabel(String(memory.type))}
-                    </span>
+              <div className="dashboard-home-memory-grid">
+                {recentMemories.map((memory, index) => {
+                  const isPhoto =
+                    String(memory.type) === "PHOTO" &&
+                    Boolean(memory.fileUrl);
 
-                    <span className="simple-dashboard-memory-copy">
-                      <strong>{memory.title || "제목 없는 기록"}</strong>
-                      <small>
-                        {formatDate(memory.occurredAt || memory.createdAt)}
-                      </small>
-                    </span>
-
-                    <span
-                      className="simple-dashboard-recent-arrow"
-                      aria-hidden="true"
+                  return (
+                    <Link
+                      key={memory.id}
+                      href="/dashboard/timeline"
+                      className="dashboard-home-memory-card"
                     >
-                      →
-                    </span>
-                  </Link>
-                ))}
+                      <span className="dashboard-home-memory-image">
+                        {isPhoto ? (
+                          <img
+                            src={`/api/blob/${memory.id}`}
+                            alt={memory.title || "저장된 사진"}
+                          />
+                        ) : (
+                          <Image
+                            src={
+                              sampleMemories[
+                                index % sampleMemories.length
+                              ].src
+                            }
+                            alt=""
+                            fill
+                            sizes="(max-width: 760px) 42vw, 180px"
+                          />
+                        )}
+
+                        {!isPhoto ? (
+                          <small className="dashboard-home-memory-type">
+                            {getMemoryTypeLabel(String(memory.type))}
+                          </small>
+                        ) : null}
+                      </span>
+
+                      <strong>
+                        {memory.title ||
+                          (isPhoto
+                            ? "제목 없는 사진"
+                            : "제목 없는 이야기")}
+                      </strong>
+
+                      <time>
+                        {formatDate(
+                          memory.occurredAt ||
+                            memory.createdAt,
+                        )}
+                      </time>
+                    </Link>
+                  );
+                })}
               </div>
             ) : (
-              <div className="simple-dashboard-empty">
-                <span>
-                  <ActionIcon name="photo" />
-                </span>
-                <strong>아직 남긴 기록이 없습니다</strong>
-                <p>첫 번째 사진을 올리면 이곳에서 바로 확인할 수 있습니다.</p>
-                <Link href="/dashboard/timeline">첫 사진 올리기</Link>
-              </div>
+              <>
+                <p className="dashboard-home-sample-note">
+                  아직 기록이 없어 예시 화면을 보여드리고 있어요.
+                </p>
+
+                <div className="dashboard-home-memory-grid">
+                  {sampleMemories.map((memory) => (
+                    <Link
+                      key={memory.title}
+                      href="/dashboard/timeline"
+                      className="dashboard-home-memory-card"
+                    >
+                      <span className="dashboard-home-memory-image">
+                        <Image
+                          src={memory.src}
+                          alt={memory.title}
+                          fill
+                          sizes="(max-width: 760px) 42vw, 180px"
+                        />
+
+                        <small className="dashboard-home-memory-type">
+                          예시
+                        </small>
+                      </span>
+
+                      <strong>{memory.title}</strong>
+                      <time>{memory.date}</time>
+                    </Link>
+                  ))}
+                </div>
+              </>
             )}
           </article>
 
-          <aside className="simple-dashboard-panel simple-dashboard-side">
-            <div className="simple-dashboard-panel-head">
-              <div>
-                <p>내 공간</p>
-                <h2>필요할 때 바로 이동하세요</h2>
-              </div>
-            </div>
+          <aside className="dashboard-home-guide-panel">
+            <p className="dashboard-home-guide-kicker">
+              지금 하면 좋은 일
+            </p>
 
-            <div className="simple-dashboard-side-links">
-              <SideLink
-                href="/dashboard/library"
-                title="내 책장"
-                description={`${bookCount}권의 원고와 책 확인`}
-              />
+            <h2>{nextAction.title}</h2>
 
-              <SideLink
-                href="/dashboard/family"
-                title="함께 쓰는 공간"
-                description={`${familyCount}곳의 공유 공간 확인`}
-              />
+            <p>{nextAction.description}</p>
 
-              <SideLink
-                href="/dashboard/account"
-                title="내 정보"
-                description={
-                  user?.email || session.user.email || "계정 정보 확인"
-                }
-              />
+            <Link
+              href={nextAction.href}
+              className="dashboard-home-guide-button"
+            >
+              {nextAction.buttonLabel}
+              <span aria-hidden="true">→</span>
+            </Link>
+
+            <div className="dashboard-home-guide-links">
+              <Link href="/dashboard/book">
+                <span aria-hidden="true">
+                  <BookSmallIcon />
+                </span>
+                책 원고 만들기
+              </Link>
+
+              <Link href="/dashboard/family">
+                <span aria-hidden="true">
+                  <FamilySmallIcon />
+                </span>
+                함께 쓰는 공간
+                <small>{familyCount}곳</small>
+              </Link>
 
               {user?.role === "ADMIN" ? (
-                <SideLink
-                  href="/admin"
-                  title="관리자 화면"
-                  description="회원·책·제작 상담 관리"
-                  admin
-                />
+                <Link href="/admin">
+                  <span aria-hidden="true">⚙</span>
+                  관리자 화면
+                </Link>
               ) : null}
             </div>
 
-            <p className="simple-dashboard-help">
-              완벽한 글보다 지금 기억나는 한 문장이 더 중요합니다.
-            </p>
+            <div className="dashboard-home-progress-note">
+              <span aria-hidden="true">♡</span>
+              <p>
+                완벽한 글보다 지금 기억나는
+                <br />
+                한 문장이 더 중요합니다.
+              </p>
+            </div>
           </aside>
         </section>
       </div>
@@ -447,7 +543,32 @@ export default async function DashboardPage() {
   );
 }
 
-function SummaryItem({
+function PrimaryAction({
+  href,
+  title,
+  icon,
+  primary = false,
+}: {
+  href: string;
+  title: string;
+  icon: "photo" | "story" | "book";
+  primary?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className="dashboard-home-primary-action"
+      data-primary={primary ? "true" : "false"}
+    >
+      <span aria-hidden="true">
+        <PrimaryActionIcon name={icon} />
+      </span>
+      <strong>{title}</strong>
+    </Link>
+  );
+}
+
+function SummaryCard({
   label,
   value,
   unit,
@@ -459,38 +580,15 @@ function SummaryItem({
   href: string;
 }) {
   return (
-    <Link href={href} className="simple-dashboard-summary-item">
+    <Link
+      href={href}
+      className="dashboard-home-summary-card"
+    >
       <span>{label}</span>
       <strong>
         {value.toLocaleString()}
         <small>{unit}</small>
       </strong>
-    </Link>
-  );
-}
-
-function SideLink({
-  href,
-  title,
-  description,
-  admin = false,
-}: {
-  href: string;
-  title: string;
-  description: string;
-  admin?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className="simple-dashboard-side-link"
-      data-admin={admin ? "true" : "false"}
-    >
-      <span>
-        <strong>{title}</strong>
-        <small>{description}</small>
-      </span>
-      <b aria-hidden="true">→</b>
     </Link>
   );
 }
@@ -509,7 +607,8 @@ function getNextAction({
   if (photoCount < REQUIRED_PHOTO_COUNT) {
     return {
       title: `사진을 ${REQUIRED_PHOTO_COUNT - photoCount}장 더 올려보세요.`,
-      description: "사진이 모이면 책의 장면과 시간의 흐름을 만들기 쉬워집니다.",
+      description:
+        "사진이 모이면 책의 장면과 시간의 흐름을 만들기 쉬워집니다.",
       href: "/dashboard/timeline",
       buttonLabel: "사진 올리기",
     };
@@ -556,7 +655,10 @@ function getNextAction({
 }
 
 function isLegacyAiInterviewTitle(title: string) {
-  return title.startsWith("AI 인터뷰") || title.includes("AI 인터뷰 -");
+  return (
+    title.startsWith("AI 인터뷰") ||
+    title.includes("AI 인터뷰 -")
+  );
 }
 
 function getMemoryTypeLabel(type: string) {
@@ -580,7 +682,10 @@ function getMemoryTypeLabel(type: string) {
 }
 
 function formatDate(value: Date | string) {
-  const date = value instanceof Date ? value : new Date(value);
+  const date =
+    value instanceof Date ?
+      value :
+      new Date(value);
 
   if (Number.isNaN(date.getTime())) {
     return "-";
@@ -593,27 +698,135 @@ function formatDate(value: Date | string) {
   }).format(date);
 }
 
-function ActionIcon({ name }: { name: ActionIconName }) {
-  if (name === "photo") {
+function CategoryIcon({
+  name,
+}: {
+  name:
+    | "person"
+    | "family"
+    | "friends"
+    | "dog"
+    | "cat";
+}) {
+  if (name === "person") {
     return (
-      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
-        <path
-          d="M6 9.5h4.2l1.8-2.7h8l1.8 2.7H26a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-11a3 3 0 0 1 3-3Z"
+      <svg viewBox="0 0 42 42" fill="none">
+        <circle
+          cx="21"
+          cy="13"
+          r="7"
           stroke="currentColor"
           strokeWidth="2.2"
+        />
+        <path
+          d="M8 36c0-8 5.2-12 13-12s13 4 13 12"
+          stroke="currentColor"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (name === "family" || name === "friends") {
+    return (
+      <svg viewBox="0 0 42 42" fill="none">
+        <circle
+          cx="14"
+          cy="14"
+          r="5"
+          stroke="currentColor"
+          strokeWidth="2.1"
+        />
+        <circle
+          cx="29"
+          cy="14"
+          r="5"
+          stroke="currentColor"
+          strokeWidth="2.1"
+        />
+        <path
+          d="M4 34c0-6 3.8-10 10-10s10 4 10 10M19 34c0-6 3.8-10 10-10s9 4 9 10"
+          stroke="currentColor"
+          strokeWidth="2.1"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (name === "dog") {
+    return (
+      <svg viewBox="0 0 42 42" fill="none">
+        <path
+          d="M12 15 6 10v10c0 4 2 6 5 7M30 15l6-5v10c0 4-2 6-5 7"
+          stroke="currentColor"
+          strokeWidth="2.1"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M11 21c0-7 4-11 10-11s10 4 10 11v5c0 7-4 11-10 11s-10-4-10-11v-5Z"
+          stroke="currentColor"
+          strokeWidth="2.1"
+        />
+        <path
+          d="M17 22h.01M25 22h.01M18 29c2 2 4 2 6 0"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 42 42" fill="none">
+      <path
+        d="m12 15-1-8 7 5M30 15l1-8-7 5"
+        stroke="currentColor"
+        strokeWidth="2.1"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M11 22c0-8 4-12 10-12s10 4 10 12v4c0 7-4 11-10 11s-10-4-10-11v-4Z"
+        stroke="currentColor"
+        strokeWidth="2.1"
+      />
+      <path
+        d="M17 22h.01M25 22h.01M18 29c2 2 4 2 6 0M8 26H3M34 26h5M8 31H4M34 31h4"
+        stroke="currentColor"
+        strokeWidth="2.1"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function PrimaryActionIcon({
+  name,
+}: {
+  name: "photo" | "story" | "book";
+}) {
+  if (name === "photo") {
+    return (
+      <svg viewBox="0 0 42 42" fill="none">
+        <path
+          d="M7 11h8l2.5-3h8l2.5 3h7a4 4 0 0 1 4 4v18a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V15a4 4 0 0 1 4-4Z"
+          stroke="currentColor"
+          strokeWidth="2.4"
           strokeLinejoin="round"
         />
         <circle
-          cx="16"
-          cy="17.5"
-          r="5"
+          cx="21"
+          cy="24"
+          r="7"
           stroke="currentColor"
-          strokeWidth="2.2"
+          strokeWidth="2.4"
         />
         <path
-          d="M25 13h.01"
+          d="M34 16h.01"
           stroke="currentColor"
-          strokeWidth="2.8"
+          strokeWidth="3"
           strokeLinecap="round"
         />
       </svg>
@@ -622,855 +835,1092 @@ function ActionIcon({ name }: { name: ActionIconName }) {
 
   if (name === "story") {
     return (
-      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+      <svg viewBox="0 0 42 42" fill="none">
         <path
-          d="M7 5h14a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4Z"
+          d="m10 31 2-8 17-17 7 7-17 17-9 1Z"
           stroke="currentColor"
-          strokeWidth="2.2"
-        />
-        <path
-          d="m12 21 1.1-4.1L21 9l2 2-7.9 7.9L12 21Z"
-          stroke="currentColor"
-          strokeWidth="2.2"
+          strokeWidth="2.4"
           strokeLinejoin="round"
         />
         <path
-          d="M7.5 24.5h10"
+          d="m25 10 7 7M8 35h25"
           stroke="currentColor"
-          strokeWidth="2.2"
+          strokeWidth="2.4"
           strokeLinecap="round"
         />
       </svg>
     );
   }
 
-  if (name === "book") {
-    return (
-      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
-        <path
-          d="M4 7.5c4.8-1 8.8.1 12 3.2v16C12.8 23.6 8.8 22.5 4 23.5v-16Z"
-          stroke="currentColor"
-          strokeWidth="2.2"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M28 7.5c-4.8-1-8.8.1-12 3.2v16c3.2-3.1 7.2-4.2 12-3.2v-16Z"
-          stroke="currentColor"
-          strokeWidth="2.2"
-          strokeLinejoin="round"
-        />
-        <path d="M16 10.7v16" stroke="currentColor" strokeWidth="2.2" />
-      </svg>
-    );
-  }
-
   return (
-    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 42 42" fill="none">
       <path
-        d="M6 8h20v16H6V8Z"
+        d="M4 9c7-1.5 12.8.2 17 5v23c-4.2-4.8-10-6.5-17-5V9Z"
         stroke="currentColor"
-        strokeWidth="2.2"
+        strokeWidth="2.4"
         strokeLinejoin="round"
       />
       <path
-        d="M10 5v6M22 5v6M6 13h20"
+        d="M38 9c-7-1.5-12.8.2-17 5v23c4.2-4.8 10-6.5 17-5V9Z"
         stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
-      <path
-        d="m11.5 19 3 3 6-6"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
+        strokeWidth="2.4"
         strokeLinejoin="round"
       />
     </svg>
   );
 }
 
-const dashboardStyles = `
-  .simple-dashboard {
+function HouseLineArt() {
+  return (
+    <svg viewBox="0 0 460 120" fill="none">
+      <path
+        d="M0 103c39-6 75-4 108 6 38-11 75-10 111 3 41-13 83-13 126 0 37-10 75-11 115-2"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M48 97V60l29-21 29 21v37M59 97V67h36v30M73 67v30"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M126 99V71l22-17 23 17v28M137 99V77h24v22M193 100V60l25-20 25 20v40M204 100V69h28v31"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M286 101V76l19-15 20 15v25M296 101V82h19v19M357 104V69M344 83c0-15 7-25 13-25s13 10 13 25c0 12-6 21-13 21s-13-9-13-21Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M392 103V78M381 87c0-12 6-20 11-20s11 8 11 20c0 9-5 16-11 16s-11-7-11-16Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M108 56h17M171 70h18M243 63h13M326 82h14"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function BookSmallIcon() {
+  return (
+    <svg viewBox="0 0 30 30" fill="none">
+      <path
+        d="M3 6c5-1 9 .3 12 4v16c-3-3.7-7-5-12-4V6ZM27 6c-5-1-9 .3-12 4v16c3-3.7 7-5 12-4V6Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function FamilySmallIcon() {
+  return (
+    <svg viewBox="0 0 30 30" fill="none">
+      <circle cx="10" cy="10" r="4" stroke="currentColor" strokeWidth="2" />
+      <circle cx="21" cy="10" r="4" stroke="currentColor" strokeWidth="2" />
+      <path
+        d="M2 26c0-6 3-9 8-9s8 3 8 9M13 26c0-6 3-9 8-9s7 3 7 9"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+const dashboardHomeStyles = `
+  .dashboard-home,
+  .dashboard-home * {
+    box-sizing: border-box;
+  }
+
+  .dashboard-home {
     min-height: 100vh;
-    padding: 28px;
-    color: #3f3029;
+    padding: 28px 24px 54px;
+    color: #342b28;
     background:
       radial-gradient(
-        circle at 5% 2%,
-        rgba(255, 220, 203, 0.48),
-        transparent 24rem
+        circle at 5% 15%,
+        rgba(205, 238, 228, 0.55),
+        transparent 28rem
       ),
       radial-gradient(
-        circle at 95% 32%,
-        rgba(218, 241, 229, 0.48),
+        circle at 87% 5%,
+        rgba(255, 238, 204, 0.55),
         transparent 25rem
       ),
       linear-gradient(
         180deg,
-        #fffdfb,
-        #fff9f5
+        #fffdf8,
+        #fffaf4
       );
     font-family:
       var(--font-daldongne-sans),
-      Arial,
+      "Noto Sans KR",
       sans-serif;
   }
 
-  .simple-dashboard *,
-  .simple-dashboard *::before,
-  .simple-dashboard *::after {
-    box-sizing: border-box;
+  .dashboard-home a {
+    color: inherit;
+    text-decoration: none;
   }
 
-  .simple-dashboard a {
+  .dashboard-home a,
+  .dashboard-home button {
     transition:
-      transform 180ms ease,
-      box-shadow 180ms ease,
-      border-color 180ms ease;
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease;
   }
 
-  .simple-dashboard a:hover {
+  .dashboard-home a:hover {
     transform: translateY(-2px);
   }
 
-  .simple-dashboard a:focus-visible {
+  .dashboard-home a:focus-visible {
     outline:
       4px solid
-      rgba(244, 111, 93, 0.24);
+      rgba(239, 105, 83, 0.22);
     outline-offset: 3px;
   }
 
-  .simple-dashboard-shell {
-    width: 100%;
-    max-width: 1380px;
+  .dashboard-home-shell {
+    width:
+      min(1320px, 100%);
     margin: 0 auto;
   }
 
-  .simple-dashboard-hero {
-    padding: 36px;
+  .dashboard-home-hero {
+    position: relative;
+    min-height: 430px;
+    padding:
+      54px
+      58px
+      42px;
     display: grid;
     grid-template-columns:
-      minmax(0, 1fr)
-      minmax(330px, 0.72fr);
+      minmax(340px, 0.82fr)
+      minmax(520px, 1.18fr);
     align-items: center;
-    gap: 34px;
+    gap: 30px;
     overflow: hidden;
     border:
       1px solid
-      rgba(220, 145, 110, 0.2);
-    border-radius: 32px;
+      rgba(108, 81, 67, 0.12);
+    border-radius: 34px;
     background:
-      radial-gradient(
-        circle at 92% 8%,
-        rgba(255, 220, 151, 0.4),
-        transparent 20rem
-      ),
       linear-gradient(
-        135deg,
-        #fff7f1,
-        #ffffff 55%,
-        #fff2e9
+        128deg,
+        rgba(255, 253, 247, 0.98),
+        rgba(255, 255, 255, 0.96)
       );
     box-shadow:
-      0 19px 48px
-      rgba(142, 87, 58, 0.08);
+      0 24px 62px
+      rgba(101, 69, 52, 0.08);
   }
 
-  .simple-dashboard-kicker {
-    margin: 0 0 12px;
-    color: #d3614d;
+  .dashboard-home-hero::after {
+    position: absolute;
+    left: -10%;
+    bottom: -66%;
+    width: 63%;
+    height: 95%;
+    border-radius: 50%;
+    background:
+      rgba(191, 235, 223, 0.68);
+    content: "";
+  }
+
+  .dashboard-home-hero-copy {
+    position: relative;
+    z-index: 2;
+    align-self: stretch;
+    padding-top: 22px;
+  }
+
+  .dashboard-home-kicker {
+    margin: 0 0 13px;
+    color: #e56b55;
     font-size: 13px;
     font-weight: 900;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.055em;
   }
 
-  .simple-dashboard-welcome h1 {
+  .dashboard-home-hero h1 {
     margin: 0;
     font-family:
       var(--font-daldongne-serif),
-      Batang,
+      "Noto Serif KR",
       serif;
-    font-size: clamp(36px, 4.3vw, 56px);
-    font-weight: 600;
-    line-height: 1.22;
-    letter-spacing: -0.05em;
+    font-size:
+      clamp(44px, 5vw, 70px);
+    font-weight: 750;
+    line-height: 1.16;
+    letter-spacing: -0.065em;
     word-break: keep-all;
   }
 
-  .simple-dashboard-intro {
-    max-width: 650px;
-    margin: 16px 0 0;
-    color: #756158;
-    font-size: 16px;
-    line-height: 1.78;
+  .dashboard-home-subtitle {
+    margin: 22px 0 0;
+    color: #5f5551;
+    font-size:
+      clamp(18px, 1.75vw, 25px);
+    font-weight: 650;
+    line-height: 1.58;
+    letter-spacing: -0.035em;
     word-break: keep-all;
   }
 
-  .simple-dashboard-next {
-    padding: 23px;
+  .dashboard-home-line-art {
+    position: absolute;
+    left: -18px;
+    bottom: -18px;
+    z-index: 1;
+    width: 480px;
+    color: #75c6b2;
+    opacity: 0.72;
+  }
+
+  .dashboard-home-line-art svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .dashboard-home-collage {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 345px;
+  }
+
+  .dashboard-home-collage-item {
+    position: absolute;
+    overflow: hidden;
+    border:
+      6px solid
+      rgba(255, 255, 255, 0.98);
+    border-radius: 23px;
+    background: #ffffff;
+    box-shadow:
+      0 15px 32px
+      rgba(71, 51, 42, 0.15);
+  }
+
+  .dashboard-home-collage-item img {
+    object-fit: cover;
+  }
+
+  .dashboard-home-collage-family {
+    left: 4%;
+    top: 0;
+    width: 42%;
+    height: 58%;
+    transform: rotate(-4deg);
+  }
+
+  .dashboard-home-collage-child {
+    left: 40%;
+    top: 19%;
+    z-index: 3;
+    width: 29%;
+    height: 48%;
+    transform: rotate(3deg);
+  }
+
+  .dashboard-home-collage-man {
+    right: 1%;
+    top: 1%;
+    width: 38%;
+    height: 58%;
+    transform: rotate(4deg);
+  }
+
+  .dashboard-home-collage-dog {
+    left: 0;
+    bottom: 0;
+    width: 31%;
+    height: 49%;
+    transform: rotate(4deg);
+  }
+
+  .dashboard-home-collage-friends {
+    left: 27%;
+    bottom: -1%;
+    z-index: 2;
+    width: 43%;
+    height: 44%;
+    transform: rotate(-1deg);
+  }
+
+  .dashboard-home-collage-cat {
+    right: 3%;
+    bottom: -2%;
+    width: 31%;
+    height: 46%;
+    transform: rotate(-5deg);
+  }
+
+  .dashboard-home-collage-heart,
+  .dashboard-home-collage-spark {
+    position: absolute;
+    z-index: 5;
+    color: #ef9a22;
+    font-family: Arial, sans-serif;
+    font-size: 46px;
+    line-height: 1;
+  }
+
+  .dashboard-home-collage-heart {
+    left: 5%;
+    top: -18px;
+    transform: rotate(-12deg);
+  }
+
+  .dashboard-home-collage-spark {
+    right: 0;
+    top: 0;
+    color: #79cdb7;
+    font-size: 30px;
+  }
+
+  .dashboard-home-categories {
+    position: relative;
+    z-index: 4;
+    margin:
+      -28px
+      32px
+      0;
+    padding: 18px;
+    display: grid;
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+    gap: 14px;
     border:
       1px solid
-      rgba(218, 135, 96, 0.19);
-    border-radius: 24px;
+      rgba(95, 72, 61, 0.1);
+    border-radius: 25px;
     background:
-      rgba(255, 255, 255, 0.8);
+      rgba(255, 255, 255, 0.96);
     box-shadow:
-      0 13px 30px
-      rgba(129, 79, 53, 0.07);
+      0 17px 37px
+      rgba(91, 61, 47, 0.09);
   }
 
-  .simple-dashboard-next-label {
-    display: block;
-    color: #d76550;
+  .dashboard-home-category {
+    min-width: 0;
+    min-height: 72px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    border-radius: 16px;
+  }
+
+  .dashboard-home-category > span {
+    width: 43px;
+    height: 43px;
+    flex: 0 0 auto;
+  }
+
+  .dashboard-home-category svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .dashboard-home-category strong {
+    font-size: 16px;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  .dashboard-home-category[data-tone="mint"] {
+    color: #174d3d;
+    background: #e7f5ef;
+  }
+
+  .dashboard-home-category[data-tone="sky"] {
+    color: #224d74;
+    background: #eaf4fc;
+  }
+
+  .dashboard-home-category[data-tone="yellow"] {
+    color: #785519;
+    background: #fff6d8;
+  }
+
+  .dashboard-home-category[data-tone="rose"] {
+    color: #8a382d;
+    background: #fff0ee;
+  }
+
+  .dashboard-home-category[data-tone="blue"] {
+    color: #243f78;
+    background: #edf4ff;
+  }
+
+  .dashboard-home-primary-actions {
+    margin-top: 24px;
+    padding: 0 70px;
+    display: grid;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .dashboard-home-primary-action {
+    min-height: 80px;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border:
+      1px solid
+      rgba(123, 89, 70, 0.17);
+    border-radius: 18px;
+    background:
+      rgba(255, 255, 255, 0.88);
+    color: #3c302b;
+    box-shadow:
+      0 10px 26px
+      rgba(81, 58, 47, 0.04);
+  }
+
+  .dashboard-home-primary-action > span {
+    width: 42px;
+    height: 42px;
+    color: #ef6954;
+  }
+
+  .dashboard-home-primary-action svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .dashboard-home-primary-action strong {
+    font-size: 19px;
+    letter-spacing: -0.025em;
+  }
+
+  .dashboard-home-primary-action[data-primary="true"] {
+    border-color: transparent;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7464,
+        #ee5d4f
+      );
+    box-shadow:
+      0 15px 30px
+      rgba(222, 83, 65, 0.2);
+  }
+
+  .dashboard-home-primary-action[data-primary="true"] > span {
+    color: #ffffff;
+  }
+
+  .dashboard-home-summary {
+    margin-top: 18px;
+    padding: 0 70px;
+    display: grid;
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .dashboard-home-summary-card {
+    min-width: 0;
+    padding: 15px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border:
+      1px solid
+      rgba(112, 82, 66, 0.1);
+    border-radius: 16px;
+    background:
+      rgba(255, 255, 255, 0.78);
+    box-shadow:
+      0 9px 21px
+      rgba(80, 55, 44, 0.035);
+  }
+
+  .dashboard-home-summary-card > span {
+    color: #76655d;
     font-size: 12px;
-    font-weight: 900;
-    letter-spacing: 0.04em;
+    font-weight: 800;
   }
 
-  .simple-dashboard-next strong {
+  .dashboard-home-summary-card strong {
+    color: #3f322d;
+    font-size: 22px;
+  }
+
+  .dashboard-home-summary-card small {
+    margin-left: 3px;
+    color: #8f7a70;
+    font-size: 11px;
+  }
+
+  .dashboard-home-workspace {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr)
+      310px;
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .dashboard-home-recent-panel,
+  .dashboard-home-guide-panel {
+    min-width: 0;
+    padding: 26px;
+    border:
+      1px solid
+      rgba(113, 82, 66, 0.11);
+    border-radius: 27px;
+    background:
+      rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 16px 35px
+      rgba(83, 57, 45, 0.05);
+  }
+
+  .dashboard-home-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .dashboard-home-section-head p {
+    margin: 0;
+    color: #ef6b55;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+  }
+
+  .dashboard-home-section-head h2 {
+    margin: 6px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 26px;
+    line-height: 1.3;
+    letter-spacing: -0.045em;
+  }
+
+  .dashboard-home-section-head > a {
+    min-height: 36px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    color: #6f5a50;
+    font-size: 11px;
+    font-weight: 850;
+  }
+
+  .dashboard-home-sample-note {
+    margin: 14px 0 0;
+    color: #9a8277;
+    font-size: 11px;
+  }
+
+  .dashboard-home-memory-grid {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+    gap: 13px;
+  }
+
+  .dashboard-home-memory-card {
+    min-width: 0;
+    padding: 7px 7px 10px;
+    overflow: hidden;
+    border:
+      1px solid
+      rgba(111, 81, 65, 0.12);
+    border-radius: 17px;
+    background: #ffffff;
+    box-shadow:
+      0 9px 21px
+      rgba(77, 53, 43, 0.055);
+  }
+
+  .dashboard-home-memory-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.08 / 1;
     display: block;
-    margin-top: 8px;
-    font-size: 21px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #f3eee9;
+  }
+
+  .dashboard-home-memory-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .dashboard-home-memory-type {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    z-index: 3;
+    padding: 5px 7px;
+    border-radius: 999px;
+    background:
+      rgba(255, 255, 255, 0.9);
+    color: #d65f4b;
+    font-size: 9px;
+    font-weight: 900;
+  }
+
+  .dashboard-home-memory-card > strong {
+    display: block;
+    margin-top: 9px;
+    overflow: hidden;
+    color: #3e332f;
+    font-size: 12px;
     line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-home-memory-card > time {
+    display: block;
+    margin-top: 2px;
+    color: #a18e84;
+    font-size: 9px;
+  }
+
+  .dashboard-home-guide-panel {
+    display: flex;
+    flex-direction: column;
+    background:
+      linear-gradient(
+        155deg,
+        #fff8e4,
+        #fffdf8 45%,
+        #f1faf4
+      );
+  }
+
+  .dashboard-home-guide-kicker {
+    margin: 0;
+    color: #e76d55;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+  }
+
+  .dashboard-home-guide-panel h2 {
+    margin: 10px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 23px;
+    line-height: 1.45;
+    letter-spacing: -0.04em;
     word-break: keep-all;
   }
 
-  .simple-dashboard-next p {
-    margin: 7px 0 0;
-    color: #78665d;
-    font-size: 13px;
+  .dashboard-home-guide-panel > p:not(.dashboard-home-guide-kicker) {
+    margin: 10px 0 0;
+    color: #74635b;
+    font-size: 12px;
     line-height: 1.7;
     word-break: keep-all;
   }
 
-  .simple-dashboard-next-button {
-    min-height: 48px;
-    margin-top: 17px;
+  .dashboard-home-guide-button {
+    min-height: 52px;
+    margin-top: 18px;
     padding: 0 17px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-radius: 15px;
+    color: #ffffff !important;
     background:
       linear-gradient(
         135deg,
-        #fa826e,
-        #ed6552
+        #ff7766,
+        #eb604f
       );
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 900;
-    text-decoration: none;
-    box-shadow:
-      0 12px 23px
-      rgba(220, 91, 68, 0.19);
-  }
-
-  .simple-dashboard-section {
-    margin-top: 22px;
-    padding: 28px;
-    border:
-      1px solid
-      rgba(138, 93, 72, 0.11);
-    border-radius: 30px;
-    background:
-      rgba(255, 255, 255, 0.75);
-    box-shadow:
-      0 15px 38px
-      rgba(101, 68, 51, 0.045);
-  }
-
-  .simple-dashboard-section-head,
-  .simple-dashboard-panel-head {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 18px;
-  }
-
-  .simple-dashboard-section-head p,
-  .simple-dashboard-panel-head p {
-    margin: 0;
-    color: #cf654f;
-    font-size: 12px;
-    font-weight: 900;
-    letter-spacing: 0.07em;
-  }
-
-  .simple-dashboard-section-head h2,
-  .simple-dashboard-panel-head h2 {
-    margin: 7px 0 0;
-    font-family:
-      var(--font-daldongne-serif),
-      Batang,
-      serif;
-    font-size: 28px;
-    font-weight: 600;
-    line-height: 1.4;
-    letter-spacing: -0.04em;
-  }
-
-  .simple-dashboard-section-head > span {
-    padding: 9px 13px;
-    border-radius: 999px;
-    background: #fff2e9;
-    color: #a55d48;
-    font-size: 12px;
-    font-weight: 850;
-    white-space: nowrap;
-  }
-
-  .simple-dashboard-actions {
-    margin-top: 22px;
-    display: grid;
-    grid-template-columns:
-      repeat(4, minmax(0, 1fr));
-    gap: 13px;
-  }
-
-  .simple-dashboard-action {
-    position: relative;
-    min-width: 0;
-    min-height: 305px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border:
-      1px solid
-      rgba(135, 91, 70, 0.11);
-    border-radius: 23px;
-    background: #ffffff;
-    box-shadow:
-      0 12px 26px
-      rgba(91, 62, 48, 0.045);
-  }
-
-  .simple-dashboard-action::after {
-    position: absolute;
-    right: -38px;
-    bottom: -48px;
-    width: 135px;
-    height: 135px;
-    border-radius: 50%;
-    content: '';
-    opacity: 0.5;
-  }
-
-  .simple-dashboard-action[data-tone='coral']::after {
-    background: #ffe0d6;
-  }
-
-  .simple-dashboard-action[data-tone='apricot']::after {
-    background: #ffedc5;
-  }
-
-  .simple-dashboard-action[data-tone='sage']::after {
-    background: #dff2e7;
-  }
-
-  .simple-dashboard-action[data-tone='sky']::after {
-    background: #deedf8;
-  }
-
-  .simple-dashboard-action-top {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .simple-dashboard-icon {
-    width: 59px;
-    height: 59px;
-    display: grid;
-    place-items: center;
-    border-radius: 18px;
-  }
-
-  .simple-dashboard-icon svg {
-    width: 30px;
-    height: 30px;
-  }
-
-  .simple-dashboard-action[data-tone='coral']
-  .simple-dashboard-icon {
-    background: #fff0ea;
-    color: #d25d49;
-  }
-
-  .simple-dashboard-action[data-tone='apricot']
-  .simple-dashboard-icon {
-    background: #fff7e5;
-    color: #b87b20;
-  }
-
-  .simple-dashboard-action[data-tone='sage']
-  .simple-dashboard-icon {
-    background: #edf8f1;
-    color: #478168;
-  }
-
-  .simple-dashboard-action[data-tone='sky']
-  .simple-dashboard-icon {
-    background: #eef7fc;
-    color: #4d7891;
-  }
-
-  .simple-dashboard-number {
-    color: rgba(93, 65, 53, 0.3);
-    font-size: 12px;
-    font-weight: 900;
-    letter-spacing: 0.08em;
-  }
-
-  .simple-dashboard-action h3 {
-    position: relative;
-    z-index: 1;
-    margin: 17px 0 0;
-    font-size: 20px;
-    line-height: 1.4;
-  }
-
-  .simple-dashboard-action > p {
-    position: relative;
-    z-index: 1;
-    margin: 7px 0 13px;
-    color: #77665d;
     font-size: 13px;
-    line-height: 1.65;
-    word-break: keep-all;
-  }
-
-  .simple-dashboard-count {
-    position: relative;
-    z-index: 1;
-    margin-top: auto;
-    padding: 11px 12px;
-    border-radius: 14px;
-    background:
-      rgba(248, 245, 242, 0.9);
-  }
-
-  .simple-dashboard-count strong {
-    display: block;
-    font-size: 19px;
-    line-height: 1.3;
-  }
-
-  .simple-dashboard-count span {
-    display: block;
-    margin-top: 2px;
-    color: #7d6c63;
-    font-size: 10px;
-    font-weight: 750;
-    line-height: 1.5;
-  }
-
-  .simple-dashboard-action-link {
-    position: relative;
-    z-index: 1;
-    min-height: 44px;
-    margin-top: 10px;
-    padding: 0 13px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border:
-      1px solid
-      rgba(149, 99, 76, 0.14);
-    border-radius: 14px;
-    background: #fffdfb;
-    color: #60483d;
-    font-size: 12px;
     font-weight: 900;
-    text-decoration: none;
-  }
-
-  .simple-dashboard-action-link > span {
-    color: #d45d49;
-    font-size: 17px;
-  }
-
-  .simple-dashboard-summary {
-    margin-top: 16px;
-    display: grid;
-    grid-template-columns:
-      repeat(4, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  .simple-dashboard-summary-item {
-    min-width: 0;
-    padding: 17px 19px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    border:
-      1px solid
-      rgba(133, 90, 69, 0.1);
-    border-radius: 18px;
-    background:
-      rgba(255, 255, 255, 0.8);
-    color: #665047;
-    text-decoration: none;
     box-shadow:
-      0 9px 22px
-      rgba(94, 64, 49, 0.035);
+      0 14px 27px
+      rgba(220, 85, 65, 0.18);
   }
 
-  .simple-dashboard-summary-item > span {
-    font-size: 12px;
-    font-weight: 800;
-  }
-
-  .simple-dashboard-summary-item strong {
-    color: #44332c;
-    font-size: 23px;
-  }
-
-  .simple-dashboard-summary-item small {
-    margin-left: 3px;
-    color: #856f64;
-    font-size: 11px;
-  }
-
-  .simple-dashboard-lower {
-    margin-top: 16px;
-    display: grid;
-    grid-template-columns:
-      minmax(0, 1.25fr)
-      minmax(310px, 0.75fr);
-    gap: 16px;
-    align-items: start;
-  }
-
-  .simple-dashboard-panel {
-    padding: 26px;
-    border:
-      1px solid
-      rgba(133, 90, 69, 0.11);
-    border-radius: 27px;
-    background:
-      rgba(255, 255, 255, 0.86);
-    box-shadow:
-      0 14px 35px
-      rgba(94, 63, 48, 0.05);
-  }
-
-  .simple-dashboard-panel-head {
-    align-items: flex-start;
-  }
-
-  .simple-dashboard-panel-head h2 {
-    font-size: 25px;
-  }
-
-  .simple-dashboard-panel-head > a {
-    min-height: 36px;
-    padding: 0 12px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border:
-      1px solid
-      rgba(145, 97, 74, 0.16);
-    border-radius: 999px;
-    color: #a45845;
-    font-size: 11px;
-    font-weight: 900;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
-  .simple-dashboard-recent {
-    margin-top: 18px;
+  .dashboard-home-guide-links {
+    margin-top: 17px;
     display: grid;
     gap: 8px;
   }
 
-  .simple-dashboard-recent-item {
-    min-width: 0;
-    min-height: 66px;
-    padding: 11px 13px;
+  .dashboard-home-guide-links > a {
+    min-height: 49px;
+    padding: 9px 12px;
     display: grid;
     grid-template-columns:
-      auto minmax(0, 1fr) auto;
+      31px minmax(0, 1fr) auto;
     align-items: center;
-    gap: 12px;
+    gap: 9px;
     border:
       1px solid
-      rgba(130, 89, 68, 0.09);
-    border-radius: 17px;
-    background: #fffdfb;
-    color: inherit;
-    text-decoration: none;
+      rgba(109, 80, 65, 0.11);
+    border-radius: 13px;
+    background:
+      rgba(255, 255, 255, 0.8);
+    color: #55453e;
+    font-size: 11px;
+    font-weight: 850;
   }
 
-  .simple-dashboard-memory-icon {
-    min-width: 48px;
-    min-height: 32px;
-    padding: 0 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 11px;
-    background: #eef6fb;
-    color: #4e7590;
-    font-size: 10px;
-    font-weight: 900;
-  }
-
-  .simple-dashboard-memory-icon[data-type='PHOTO'] {
-    background: #fff1e9;
-    color: #bd5c47;
-  }
-
-  .simple-dashboard-memory-copy {
-    min-width: 0;
-  }
-
-  .simple-dashboard-memory-copy strong {
-    display: block;
-    overflow: hidden;
-    color: #49372f;
-    font-size: 13px;
-    line-height: 1.5;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .simple-dashboard-memory-copy small {
-    display: block;
-    margin-top: 2px;
-    color: #948077;
-    font-size: 10px;
-  }
-
-  .simple-dashboard-recent-arrow {
-    color: #ce6550;
-    font-size: 16px;
-  }
-
-  .simple-dashboard-empty {
-    margin-top: 18px;
-    padding: 27px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border:
-      1px dashed
-      rgba(160, 105, 80, 0.22);
-    border-radius: 20px;
-    background: #fffaf6;
-    text-align: center;
-  }
-
-  .simple-dashboard-empty > span {
-    width: 52px;
-    height: 52px;
-    display: grid;
-    place-items: center;
-    border-radius: 17px;
-    background: #ffe9df;
-    color: #cb5b47;
-  }
-
-  .simple-dashboard-empty svg {
+  .dashboard-home-guide-links > a > span {
     width: 27px;
     height: 27px;
+    color: #e06853;
   }
 
-  .simple-dashboard-empty strong {
-    margin-top: 12px;
-    font-size: 15px;
+  .dashboard-home-guide-links svg {
+    width: 100%;
+    height: 100%;
   }
 
-  .simple-dashboard-empty p {
-    margin: 6px 0 0;
-    color: #7b685e;
-    font-size: 12px;
+  .dashboard-home-guide-links small {
+    color: #a18b80;
+    font-size: 9px;
+  }
+
+  .dashboard-home-progress-note {
+    margin-top: auto;
+    padding-top: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    color: #8b735f;
+  }
+
+  .dashboard-home-progress-note > span {
+    color: #ef745c;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .dashboard-home-progress-note p {
+    margin: 0;
+    font-size: 11px;
     line-height: 1.65;
   }
 
-  .simple-dashboard-empty a {
-    min-height: 40px;
-    margin-top: 13px;
-    padding: 0 15px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 13px;
-    background: #f0735e;
-    color: #ffffff;
-    font-size: 12px;
-    font-weight: 900;
-    text-decoration: none;
+  @media (max-width: 1080px) {
+    .dashboard-home-hero {
+      min-height: 390px;
+      padding: 42px;
+      grid-template-columns:
+        minmax(280px, 0.8fr)
+        minmax(430px, 1.2fr);
+    }
+
+    .dashboard-home-primary-actions,
+    .dashboard-home-summary {
+      padding:
+        0
+        24px;
+    }
+
+    .dashboard-home-workspace {
+      grid-template-columns: 1fr;
+    }
+
+    .dashboard-home-guide-panel {
+      min-height: 320px;
+    }
+
+    .dashboard-home-progress-note {
+      margin-top: 22px;
+    }
   }
 
-  .simple-dashboard-side-links {
-    margin-top: 18px;
-    display: grid;
-    gap: 8px;
-  }
+  @media (max-width: 820px) {
+    .dashboard-home {
+      padding:
+        18px
+        14px
+        40px;
+    }
 
-  .simple-dashboard-side-link {
-    min-width: 0;
-    min-height: 62px;
-    padding: 12px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    border:
-      1px solid
-      rgba(134, 91, 70, 0.1);
-    border-radius: 16px;
-    background: #fffdfb;
-    color: #4c3931;
-    text-decoration: none;
-  }
+    .dashboard-home-hero {
+      min-height: 700px;
+      padding:
+        34px
+        28px
+        30px;
+      display: block;
+      border-radius: 25px;
+    }
 
-  .simple-dashboard-side-link span {
-    min-width: 0;
-  }
+    .dashboard-home-hero-copy {
+      min-height: 245px;
+      padding-top: 0;
+    }
 
-  .simple-dashboard-side-link strong,
-  .simple-dashboard-side-link small {
-    display: block;
-  }
+    .dashboard-home-hero h1 {
+      font-size: 46px;
+    }
 
-  .simple-dashboard-side-link strong {
-    font-size: 13px;
-    line-height: 1.5;
-  }
+    .dashboard-home-subtitle {
+      margin-top: 14px;
+      font-size: 18px;
+    }
 
-  .simple-dashboard-side-link small {
-    margin-top: 2px;
-    overflow: hidden;
-    color: #8a756b;
-    font-size: 10px;
-    line-height: 1.45;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+    .dashboard-home-line-art {
+      left: -35px;
+      bottom: -5px;
+      width: 390px;
+    }
 
-  .simple-dashboard-side-link b {
-    color: #cd634e;
-    font-size: 16px;
-  }
+    .dashboard-home-collage {
+      height: 340px;
+      margin-top: 16px;
+    }
 
-  .simple-dashboard-side-link[data-admin='true'] {
-    border-color:
-      rgba(98, 74, 62, 0.14);
-    background:
-      linear-gradient(
-        135deg,
-        #6e5549,
-        #8c6a5a
-      );
-    color: #ffffff;
-  }
+    .dashboard-home-categories {
+      margin:
+        -20px
+        12px
+        0;
+      padding: 12px;
+      gap: 8px;
+      overflow-x: auto;
+    }
 
-  .simple-dashboard-side-link[data-admin='true']
-  small,
-  .simple-dashboard-side-link[data-admin='true']
-  b {
-    color:
-      rgba(255, 255, 255, 0.8);
-  }
+    .dashboard-home-category {
+      min-width: 125px;
+      min-height: 58px;
+      gap: 8px;
+    }
 
-  .simple-dashboard-help {
-    margin: 17px 0 0;
-    padding-top: 15px;
-    border-top:
-      1px solid
-      rgba(132, 90, 69, 0.11);
-    color: #715b50;
-    font-family:
-      var(--font-daldongne-serif),
-      Batang,
-      serif;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.7;
-    word-break: keep-all;
-  }
+    .dashboard-home-category > span {
+      width: 34px;
+      height: 34px;
+    }
 
-  @media (max-width: 1100px) {
-    .simple-dashboard-actions,
-    .simple-dashboard-summary {
+    .dashboard-home-category strong {
+      font-size: 13px;
+    }
+
+    .dashboard-home-primary-actions {
+      padding: 0;
+      grid-template-columns: 1fr;
+      gap: 9px;
+    }
+
+    .dashboard-home-primary-action {
+      min-height: 62px;
+      justify-content: flex-start;
+      padding: 10px 20px;
+    }
+
+    .dashboard-home-primary-action > span {
+      width: 34px;
+      height: 34px;
+    }
+
+    .dashboard-home-primary-action strong {
+      font-size: 16px;
+    }
+
+    .dashboard-home-summary {
+      padding: 0;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-home-memory-grid {
       grid-template-columns:
         repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 920px) {
-    .simple-dashboard-hero,
-    .simple-dashboard-lower {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 700px) {
-    .simple-dashboard {
-      padding: 14px;
+  @media (max-width: 560px) {
+    .dashboard-home {
+      padding:
+        12px
+        10px
+        32px;
     }
 
-    .simple-dashboard-hero {
-      padding: 23px 18px;
-      gap: 23px;
-      border-radius: 24px;
+    .dashboard-home-hero {
+      min-height: 590px;
+      padding:
+        26px
+        20px
+        22px;
+      border-radius: 20px;
     }
 
-    .simple-dashboard-welcome h1 {
-      font-size: 34px;
+    .dashboard-home-hero-copy {
+      min-height: 205px;
     }
 
-    .simple-dashboard-section,
-    .simple-dashboard-panel {
-      padding: 19px 16px;
-      border-radius: 22px;
+    .dashboard-home-kicker {
+      font-size: 10px;
     }
 
-    .simple-dashboard-section-head {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: 9px;
+    .dashboard-home-hero h1 {
+      font-size: 36px;
     }
 
-    .simple-dashboard-section-head h2,
-    .simple-dashboard-panel-head h2 {
-      font-size: 24px;
+    .dashboard-home-subtitle {
+      font-size: 15px;
+      line-height: 1.55;
     }
 
-    .simple-dashboard-actions,
-    .simple-dashboard-summary {
-      grid-template-columns: 1fr;
+    .dashboard-home-line-art {
+      width: 310px;
     }
 
-    .simple-dashboard-action {
-      min-height: 0;
+    .dashboard-home-collage {
+      height: 285px;
     }
 
-    .simple-dashboard-summary-item {
-      min-height: 62px;
+    .dashboard-home-collage-item {
+      border-width: 4px;
+      border-radius: 15px;
     }
 
-    .simple-dashboard-panel-head {
-      align-items: flex-start;
+    .dashboard-home-collage-heart {
+      font-size: 31px;
+    }
+
+    .dashboard-home-collage-spark {
+      font-size: 22px;
+    }
+
+    .dashboard-home-categories {
+      margin:
+        -15px
+        7px
+        0;
+      padding: 9px;
+      border-radius: 17px;
+    }
+
+    .dashboard-home-category {
+      min-width: 104px;
+      min-height: 47px;
+      padding: 7px 10px;
+      border-radius: 11px;
+    }
+
+    .dashboard-home-category > span {
+      width: 28px;
+      height: 28px;
+    }
+
+    .dashboard-home-category strong {
+      font-size: 11px;
+    }
+
+    .dashboard-home-primary-actions {
+      margin-top: 15px;
+    }
+
+    .dashboard-home-summary {
+      gap: 7px;
+    }
+
+    .dashboard-home-summary-card {
+      padding: 12px;
+      border-radius: 13px;
+    }
+
+    .dashboard-home-summary-card > span {
+      font-size: 10px;
+    }
+
+    .dashboard-home-summary-card strong {
+      font-size: 18px;
+    }
+
+    .dashboard-home-workspace {
+      margin-top: 12px;
+      gap: 12px;
+    }
+
+    .dashboard-home-recent-panel,
+    .dashboard-home-guide-panel {
+      padding: 18px;
+      border-radius: 20px;
+    }
+
+    .dashboard-home-section-head h2 {
+      font-size: 22px;
+    }
+
+    .dashboard-home-memory-grid {
+      margin-top: 13px;
+      gap: 8px;
+    }
+
+    .dashboard-home-memory-card {
+      padding: 5px 5px 8px;
+      border-radius: 13px;
+    }
+
+    .dashboard-home-memory-image {
+      border-radius: 9px;
+    }
+
+    .dashboard-home-memory-card > strong {
+      margin-top: 7px;
+      font-size: 10px;
+    }
+
+    .dashboard-home-memory-card > time {
+      font-size: 8px;
+    }
+
+    .dashboard-home-guide-panel h2 {
+      font-size: 21px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .simple-dashboard *,
-    .simple-dashboard *::before,
-    .simple-dashboard *::after {
-      transition: none !important;
-      animation: none !important;
+    .dashboard-home a,
+    .dashboard-home button {
+      transition: none;
     }
   }
 `;

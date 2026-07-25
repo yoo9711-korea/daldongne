@@ -4,10 +4,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
-const secondaryMenuItems = [
+const utilityMenuItems = [
+  {
+    href: "/dashboard/library",
+    label: "내 책장",
+  },
   {
     href: "/dashboard/applications",
-    label: "상품 신청 내역",
+    label: "신청 내역",
   },
   {
     href: "/dashboard/family",
@@ -31,44 +35,41 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="easy-dashboard-shell">
-      <aside className="easy-dashboard-sidebar">
-        <Link href="/dashboard" className="easy-dashboard-brand">
-          <span className="easy-dashboard-brand-mark" aria-hidden="true">
-            <BrandIcon />
-          </span>
+    <div className="storybook-dashboard-shell">
+      <header className="storybook-dashboard-header">
+        <div className="storybook-dashboard-header-inner">
+          <Link href="/dashboard" className="storybook-dashboard-brand">
+            <span className="storybook-dashboard-brand-mark" aria-hidden="true">
+              <BrandIcon />
+            </span>
 
-          <span>
-            <strong>달동네</strong>
-            <small>사진에서 책까지</small>
-          </span>
-        </Link>
+            <span className="storybook-dashboard-brand-copy">
+              <strong>달동네 스토리북</strong>
+              <small>사진과 이야기로 만드는 나의 책</small>
+            </span>
+          </Link>
 
-        <div className="easy-dashboard-guide">
-          <strong>어디서 시작할까요?</strong>
-          <span>1번부터 차례대로 누르면 됩니다.</span>
+          <div className="storybook-dashboard-utility">
+            {utilityMenuItems.map((item) => (
+              <Link key={item.href} href={item.href}>
+                {item.label}
+              </Link>
+            ))}
+
+            <Link href="/" className="storybook-dashboard-home-link">
+              홈페이지
+            </Link>
+          </div>
         </div>
 
-        <DashboardPrimaryNavigation />
+        <div className="storybook-dashboard-progress-wrap">
+          <div className="storybook-dashboard-progress-inner">
+            <DashboardPrimaryNavigation />
+          </div>
+        </div>
+      </header>
 
-        <div className="easy-dashboard-divider" />
-
-        <nav className="easy-dashboard-secondary-menu" aria-label="기타 메뉴">
-          {secondaryMenuItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              {item.label}
-              <span aria-hidden="true">→</span>
-            </Link>
-          ))}
-
-          <Link href="/">
-            홈페이지
-            <span aria-hidden="true">→</span>
-          </Link>
-        </nav>
-      </aside>
-
-      <div className="easy-dashboard-content">{children}</div>
+      <div className="storybook-dashboard-content">{children}</div>
 
       <style
         dangerouslySetInnerHTML={{
@@ -81,143 +82,167 @@ export default async function DashboardLayout({
 
 function BrandIcon() {
   return (
-    <svg viewBox="0 0 40 40" fill="none">
+    <svg viewBox="0 0 44 44" fill="none">
       <path
-        d="M8 17.5 20 7l12 10.5V33H8V17.5Z"
+        d="M7.5 18.5 22 6l14.5 12.5V37H7.5V18.5Z"
         fill="currentColor"
-        opacity=".16"
+        opacity=".14"
       />
       <path
-        d="M8 17.5 20 7l12 10.5M11 15v18h18V15"
+        d="M7.5 18.5 22 6l14.5 12.5M11 16.5V37h22V16.5"
         stroke="currentColor"
-        strokeWidth="2.2"
+        strokeWidth="2.4"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M16 33V23h8v10M15 19h.01M25 19h.01"
+        d="M17 37V25h10v12M16 22h.01M28 22h.01"
         stroke="currentColor"
-        strokeWidth="2.2"
+        strokeWidth="2.4"
         strokeLinecap="round"
         strokeLinejoin="round"
+      />
+      <path
+        d="M5 38.5c5.8-2.5 11.5-2.5 17 0 5.5-2.5 11.2-2.5 17 0"
+        stroke="currentColor"
+        strokeWidth="2.1"
+        strokeLinecap="round"
       />
     </svg>
   );
 }
 
 const dashboardLayoutStyles = `
-  .easy-dashboard-shell,
-  .easy-dashboard-shell * {
+  .storybook-dashboard-shell,
+  .storybook-dashboard-shell * {
     box-sizing: border-box;
   }
 
-  .easy-dashboard-shell {
+  .storybook-dashboard-shell {
     min-height: 100vh;
-    display: grid;
-    grid-template-columns: 224px minmax(0, 1fr);
-    color: #47362e;
+    color: #4a342b;
     background:
-      radial-gradient(circle at 90% 5%, rgba(255, 224, 209, 0.36), transparent 25rem),
-      linear-gradient(180deg, #fffdfb 0%, #fff9f4 100%);
-    font-family: var(--font-body, "NanumSquareNeo"), "Noto Sans KR", sans-serif;
+      radial-gradient(
+        circle at 5% 5%,
+        rgba(255, 224, 209, 0.44),
+        transparent 24rem
+      ),
+      radial-gradient(
+        circle at 94% 8%,
+        rgba(225, 242, 234, 0.5),
+        transparent 25rem
+      ),
+      linear-gradient(
+        180deg,
+        #fffdfa 0%,
+        #fff9f4 100%
+      );
+    font-family:
+      var(--font-body, "NanumSquareNeo"),
+      "Noto Sans KR",
+      sans-serif;
   }
 
-  .easy-dashboard-sidebar {
-    min-height: 100vh;
-    padding: 22px 16px 20px;
+  .storybook-dashboard-header {
     position: sticky;
     top: 0;
-    align-self: start;
-    overflow-y: auto;
-    border-right: 1px solid #f0ddd3;
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow: 8px 0 30px rgba(116, 75, 54, 0.045);
+    z-index: 30;
+    border-bottom:
+      1px solid
+      rgba(141, 96, 73, 0.13);
+    background:
+      rgba(255, 253, 249, 0.94);
+    box-shadow:
+      0 10px 30px
+      rgba(112, 75, 56, 0.055);
+    backdrop-filter: blur(18px);
   }
 
-  .easy-dashboard-brand {
+  .storybook-dashboard-header-inner {
+    width:
+      min(1480px, calc(100% - 48px));
+    min-height: 76px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
-    gap: 11px;
-    padding: 4px 5px 18px;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .storybook-dashboard-brand {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     color: #4a342b;
     text-decoration: none;
   }
 
-  .easy-dashboard-brand-mark {
-    width: 42px;
-    height: 42px;
+  .storybook-dashboard-brand-mark {
+    width: 47px;
+    height: 47px;
     display: grid;
-    flex: 0 0 auto;
     place-items: center;
-    border-radius: 14px;
-    color: #dc7258;
-    background: #fff0e9;
+    flex: 0 0 auto;
+    border-radius: 15px;
+    color: #e36e56;
+    background:
+      linear-gradient(
+        145deg,
+        #fff0e8,
+        #ffd9ca
+      );
+    box-shadow:
+      0 9px 20px
+      rgba(190, 87, 61, 0.12);
   }
 
-  .easy-dashboard-brand-mark svg {
-    width: 30px;
-    height: 30px;
+  .storybook-dashboard-brand-mark svg {
+    width: 34px;
+    height: 34px;
   }
 
-  .easy-dashboard-brand strong,
-  .easy-dashboard-brand small {
+  .storybook-dashboard-brand-copy strong,
+  .storybook-dashboard-brand-copy small {
     display: block;
   }
 
-  .easy-dashboard-brand strong {
-    font-family: var(--font-display, "MaruBuri"), "Noto Serif KR", serif;
+  .storybook-dashboard-brand-copy strong {
+    font-family:
+      var(--font-display, "MaruBuri"),
+      "Noto Serif KR",
+      serif;
     font-size: 22px;
-    line-height: 1.15;
+    line-height: 1.2;
     letter-spacing: -0.04em;
   }
 
-  .easy-dashboard-brand small {
+  .storybook-dashboard-brand-copy small {
     margin-top: 4px;
-    color: #9a7a6c;
-    font-size: 11px;
-    font-weight: 700;
-  }
-
-  .easy-dashboard-guide {
-    margin-bottom: 12px;
-    padding: 13px 14px;
-    border-radius: 15px;
-    color: #765a4d;
-    background: #fff8f3;
-  }
-
-  .easy-dashboard-guide strong,
-  .easy-dashboard-guide span {
-    display: block;
-  }
-
-  .easy-dashboard-guide strong {
-    font-size: 12px;
-    font-weight: 900;
-  }
-
-  .easy-dashboard-guide span {
-    margin-top: 4px;
+    color: #a07f70;
     font-size: 10px;
-    line-height: 1.5;
+    font-weight: 750;
   }
 
-  .easy-dashboard-primary-menu {
-    display: grid;
-    gap: 7px;
-  }
-
-  .easy-dashboard-primary-link {
-    min-height: 54px;
-    padding: 7px 10px;
-    display: grid;
-    grid-template-columns: 34px minmax(0, 1fr) 16px;
+  .storybook-dashboard-utility {
+    display: flex;
     align-items: center;
     gap: 9px;
-    border: 1px solid transparent;
-    border-radius: 15px;
-    color: #553f35;
-    background: transparent;
+  }
+
+  .storybook-dashboard-utility a {
+    min-height: 38px;
+    padding: 0 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border:
+      1px solid
+      transparent;
+    border-radius: 12px;
+    color: #725b50;
+    font-size: 12px;
+    font-weight: 800;
     text-decoration: none;
     transition:
       transform 150ms ease,
@@ -225,61 +250,123 @@ const dashboardLayoutStyles = `
       background 150ms ease;
   }
 
+  .storybook-dashboard-utility a:hover,
+  .storybook-dashboard-utility a:focus-visible {
+    transform: translateY(-2px);
+    border-color: #efd4c8;
+    background: #fff6f1;
+    color: #c75b45;
+    outline: none;
+  }
+
+  .storybook-dashboard-home-link {
+    border-color:
+      #e7c6b8 !important;
+    background:
+      #fffaf7 !important;
+  }
+
+  .storybook-dashboard-progress-wrap {
+    border-top:
+      1px solid
+      rgba(141, 96, 73, 0.08);
+    background:
+      rgba(255, 255, 255, 0.68);
+  }
+
+  .storybook-dashboard-progress-inner {
+    width:
+      min(1320px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 10px 0 12px;
+  }
+
+  .easy-dashboard-primary-menu {
+    position: relative;
+    display: grid;
+    grid-template-columns:
+      150px
+      repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .easy-dashboard-primary-link {
+    position: relative;
+    min-width: 0;
+    min-height: 58px;
+    padding: 8px 12px;
+    display: grid;
+    grid-template-columns:
+      38px minmax(0, 1fr);
+    align-items: center;
+    gap: 9px;
+    border:
+      1px solid
+      rgba(149, 101, 78, 0.11);
+    border-radius: 15px;
+    color: #6e594f;
+    background:
+      rgba(255, 255, 255, 0.78);
+    text-decoration: none;
+    box-shadow:
+      0 6px 17px
+      rgba(103, 70, 54, 0.035);
+    transition:
+      transform 150ms ease,
+      border-color 150ms ease,
+      background 150ms ease,
+      box-shadow 150ms ease;
+  }
+
   .easy-dashboard-primary-link:hover,
   .easy-dashboard-primary-link:focus-visible {
-    transform: translateX(3px);
-    border-color: #f0c4b3;
-    background: #fff4ee;
+    transform: translateY(-2px);
+    border-color: #edb39f;
+    background: #fff7f2;
     outline: none;
   }
 
   .easy-dashboard-primary-link[data-active='true'] {
-    border-color: #eaa38b;
+    border-color: #ee9d83;
     color: #3f2a22;
     background:
       linear-gradient(
         135deg,
         #fff0e8,
-        #fff8f3
+        #fff9f5
       );
     box-shadow:
-      0 8px 20px
-      rgba(191, 91, 62, 0.11);
+      0 9px 23px
+      rgba(191, 91, 62, 0.1);
+  }
+
+  .easy-dashboard-menu-icon {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: #d56f56;
+    background: #fff0e9;
   }
 
   .easy-dashboard-primary-link[data-active='true']
   .easy-dashboard-menu-icon {
     color: #ffffff;
-    background: #e27055;
+    background:
+      linear-gradient(
+        145deg,
+        #f1846d,
+        #e4664f
+      );
     box-shadow:
-      0 5px 12px
+      0 7px 15px
       rgba(196, 89, 62, 0.2);
   }
 
-  .easy-dashboard-primary-link[data-active='true']
-  .easy-dashboard-menu-label small {
-    color: #b7543f;
-  }
-
-  .easy-dashboard-primary-link[data-active='true']
-  .easy-dashboard-menu-arrow {
-    color: #d6634b;
-    font-size: 9px;
-  }
-
-  .easy-dashboard-menu-icon {
-    width: 34px;
-    height: 34px;
-    display: grid;
-    place-items: center;
-    border-radius: 11px;
-    color: #d56f56;
-    background: #fff0e9;
-  }
-
   .easy-dashboard-menu-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 23px;
+    height: 23px;
   }
 
   .easy-dashboard-menu-label small,
@@ -295,117 +382,52 @@ const dashboardLayoutStyles = `
   }
 
   .easy-dashboard-menu-label strong {
-    font-size: 13px;
-    line-height: 1.25;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 1.3;
     letter-spacing: -0.025em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .easy-dashboard-primary-link[data-active='true']
+  .easy-dashboard-menu-label small {
+    color: #b7543f;
   }
 
   .easy-dashboard-menu-arrow {
-    color: #c9aa9c;
-    font-size: 13px;
+    display: none;
   }
 
-  .easy-dashboard-divider {
-    height: 1px;
-    margin: 17px 6px 12px;
-    background: #f1e3dc;
-  }
-
-  .easy-dashboard-secondary-menu {
-    display: grid;
-  }
-
-  .easy-dashboard-secondary-menu a {
-    min-height: 38px;
-    padding: 0 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    border-radius: 11px;
-    color: #81695d;
-    font-size: 11px;
-    font-weight: 800;
-    text-decoration: none;
-  }
-
-  .easy-dashboard-secondary-menu a:hover,
-  .easy-dashboard-secondary-menu a:focus-visible {
-    color: #b95f48;
-    background: #fff7f2;
-    outline: none;
-  }
-
-  .easy-dashboard-secondary-menu a span {
-    color: #cdb5a9;
-  }
-
-  .easy-dashboard-content {
+  .storybook-dashboard-content {
     min-width: 0;
-    min-height: 100vh;
+    min-height:
+      calc(100vh - 156px);
   }
 
-  .easy-dashboard-content button,
-  .easy-dashboard-content input,
-  .easy-dashboard-content textarea,
-  .easy-dashboard-content select {
+  .storybook-dashboard-content button,
+  .storybook-dashboard-content input,
+  .storybook-dashboard-content textarea,
+  .storybook-dashboard-content select {
     font-family: inherit;
   }
 
-  @media (max-width: 980px) {
-    .easy-dashboard-shell {
-      grid-template-columns: 202px minmax(0, 1fr);
+  @media (max-width: 1020px) {
+    .storybook-dashboard-header-inner,
+    .storybook-dashboard-progress-inner {
+      width:
+        min(100% - 30px, 960px);
     }
 
-    .easy-dashboard-sidebar {
-      padding-right: 12px;
-      padding-left: 12px;
-    }
-  }
-
-  @media (max-width: 760px) {
-    .easy-dashboard-shell {
-      display: block;
-    }
-
-    .easy-dashboard-sidebar {
-      min-height: auto;
-      padding: 12px 14px;
-      position: relative;
-      overflow: visible;
-      border-right: 0;
-      border-bottom: 1px solid #f0ddd3;
-      box-shadow: 0 8px 22px rgba(116, 75, 54, 0.05);
-    }
-
-    .easy-dashboard-brand {
-      padding: 0 2px 11px;
-    }
-
-    .easy-dashboard-brand-mark {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-    }
-
-    .easy-dashboard-brand-mark svg {
-      width: 25px;
-      height: 25px;
-    }
-
-    .easy-dashboard-brand strong {
-      font-size: 19px;
-    }
-
-    .easy-dashboard-guide,
-    .easy-dashboard-divider,
-    .easy-dashboard-secondary-menu {
-      display: none;
+    .storybook-dashboard-utility a {
+      padding: 0 10px;
+      font-size: 11px;
     }
 
     .easy-dashboard-primary-menu {
-      display: flex;
-      gap: 7px;
+      grid-template-columns:
+        130px
+        repeat(4, minmax(140px, 1fr));
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -415,24 +437,81 @@ const dashboardLayoutStyles = `
     }
 
     .easy-dashboard-primary-link {
+      min-width: 140px;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .storybook-dashboard-header {
+      position: relative;
+    }
+
+    .storybook-dashboard-header-inner {
+      min-height: 68px;
+      gap: 12px;
+    }
+
+    .storybook-dashboard-brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 13px;
+    }
+
+    .storybook-dashboard-brand-mark svg {
+      width: 29px;
+      height: 29px;
+    }
+
+    .storybook-dashboard-brand-copy strong {
+      font-size: 18px;
+    }
+
+    .storybook-dashboard-brand-copy small {
+      display: none;
+    }
+
+    .storybook-dashboard-utility {
+      gap: 4px;
+    }
+
+    .storybook-dashboard-utility a {
+      display: none;
+    }
+
+    .storybook-dashboard-utility
+    .storybook-dashboard-home-link {
+      min-height: 35px;
+      padding: 0 10px;
+      display: inline-flex;
+      font-size: 10px;
+    }
+
+    .storybook-dashboard-progress-inner {
+      width: 100%;
+      padding:
+        8px 12px 10px;
+    }
+
+    .easy-dashboard-primary-menu {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+    }
+
+    .easy-dashboard-primary-link {
       min-width: max-content;
-      min-height: 43px;
-      padding: 5px 11px 5px 7px;
-      grid-template-columns: 29px auto;
+      min-height: 45px;
+      padding: 5px 10px 5px 7px;
+      grid-template-columns: 30px auto;
       gap: 7px;
       flex: 0 0 auto;
-      border-color: #f2ddd3;
+      border-color: #f0ddd3;
       background: #ffffff;
     }
 
-    .easy-dashboard-primary-link:hover,
-    .easy-dashboard-primary-link:focus-visible {
-      transform: translateY(-2px);
-    }
-
     .easy-dashboard-menu-icon {
-      width: 29px;
-      height: 29px;
+      width: 30px;
+      height: 30px;
       border-radius: 9px;
     }
 
@@ -449,13 +528,15 @@ const dashboardLayoutStyles = `
       font-size: 11px;
     }
 
-    .easy-dashboard-menu-arrow {
-      display: none;
+    .storybook-dashboard-content {
+      min-height:
+        calc(100vh - 122px);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .easy-dashboard-primary-link {
+    .easy-dashboard-primary-link,
+    .storybook-dashboard-utility a {
       transition: none;
     }
   }
