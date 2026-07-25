@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import HomeDesktopCreationFlow from '@/components/home/HomeDesktopCreationFlow';
 
 type StepIconName = "photo" | "story" | "book" | "order";
 
