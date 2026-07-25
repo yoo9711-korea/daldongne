@@ -194,6 +194,11 @@ export default async function EbookPage({
       ? book.pageCount
       : finalPageNumber;
 
+  const coverPhoto =
+    photos.length > 0
+      ? photos[0]
+      : null;
+
   return (
     <main
       className="ebook-main"
@@ -205,6 +210,7 @@ export default async function EbookPage({
       }}
     >
       <style>{ebookResponsiveStyles}</style>
+      <style>{ebookUnifiedStyles}</style>
 
       <div
         className="ebook-toolbar"
@@ -295,6 +301,45 @@ export default async function EbookPage({
         </div>
       </div>
 
+      <section className="ebook-reader-guide">
+        <div>
+          <p>전자책 미리보기</p>
+
+          <strong>
+            실제 책처럼 넘기며 원고를
+            확인합니다.
+          </strong>
+
+          <span>
+            사진 배치와 문장 흐름을 살펴본 뒤
+            책 상세 화면에서 원고를 수정할 수
+            있습니다.
+          </span>
+        </div>
+
+        <div className="ebook-reader-guide-stats">
+          <ReaderStat
+            label="책 종류"
+            value={typeLabel}
+          />
+
+          <ReaderStat
+            label="사진"
+            value={`${displayedPhotoCount}장`}
+          />
+
+          <ReaderStat
+            label="이야기"
+            value={`${displayedStoryCount}개`}
+          />
+
+          <ReaderStat
+            label="예상 분량"
+            value={`${estimatedPageCount}쪽`}
+          />
+        </div>
+      </section>
+
       <section
         className="ebook-book"
         style={bookWrapStyle}
@@ -304,6 +349,35 @@ export default async function EbookPage({
             className="ebook-page ebook-cover"
             style={coverPageStyle}
           >
+            {coverPhoto ? (
+              <Image
+                className="ebook-cover-photo"
+                src={`/api/blob/${coverPhoto.id}`}
+                alt={
+                  coverPhoto.title ||
+                  `${book.title} 표지 사진`
+                }
+                fill
+                unoptimized
+                priority
+                sizes="(max-width: 760px) 100vw, 1120px"
+              />
+            ) : (
+              <Image
+                className="ebook-cover-photo"
+                src="/dashboard/reader-reference-v1/sample-reader-cover.webp"
+                alt="달동네 스토리북 표지 예시"
+                fill
+                priority
+                sizes="(max-width: 760px) 100vw, 1120px"
+              />
+            )}
+
+            <div
+              className="ebook-cover-shade"
+              aria-hidden="true"
+            />
+
             <div
               style={{
                 position: 'relative',
@@ -1037,6 +1111,21 @@ function formatDate(
   ).format(date);
 }
 
+function ReaderStat({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <article>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </article>
+  );
+}
+
 function toolbarButtonStyle(
   background: string,
   color: string,
@@ -1297,6 +1386,309 @@ const secondaryButtonStyle: CSSProperties = {
   background: '#fff8ec',
   color: '#2b2118',
 };
+
+const ebookUnifiedStyles = `
+  .ebook-main,
+  .ebook-main * {
+    box-sizing: border-box;
+  }
+
+  .ebook-main {
+    padding: 24px 24px 58px !important;
+    color: #432f26;
+    background:
+      radial-gradient(
+        circle at 7% 8%,
+        rgba(255, 230, 213, 0.58),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 94% 12%,
+        rgba(232, 244, 228, 0.58),
+        transparent 25rem
+      ),
+      linear-gradient(
+        180deg,
+        #fffdf9,
+        #fff8f2
+      ) !important;
+    font-family:
+      var(--font-daldongne-sans),
+      "Noto Sans KR",
+      sans-serif;
+  }
+
+  .ebook-toolbar {
+    max-width: 1210px !important;
+    margin-bottom: 16px !important;
+    padding: 21px 23px !important;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.13);
+    border-radius: 21px;
+    background:
+      rgba(255, 255, 255, 0.93);
+    box-shadow:
+      0 14px 34px
+      rgba(91, 59, 44, 0.055);
+  }
+
+  .ebook-toolbar h1 {
+    color: #432f26 !important;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif !important;
+  }
+
+  .ebook-toolbar > div:first-child > p:first-child {
+    color: #e56852 !important;
+  }
+
+  .ebook-toolbar-actions a {
+    min-height: 43px !important;
+    padding: 0 15px !important;
+    border:
+      1px solid #d6b3a3 !important;
+    border-radius: 12px !important;
+    color: #755247 !important;
+    background: #ffffff !important;
+    font-size: 11px !important;
+  }
+
+  .ebook-toolbar-actions a:last-child {
+    border-color: transparent !important;
+    color: #ffffff !important;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ed5f4f
+      ) !important;
+    box-shadow:
+      0 12px 24px
+      rgba(218, 82, 63, 0.16);
+  }
+
+  .ebook-reader-guide {
+    width: 100%;
+    max-width: 1210px;
+    margin: 0 auto 17px;
+    padding: 19px 21px;
+    display: grid;
+    grid-template-columns:
+      minmax(260px, 0.72fr)
+      minmax(470px, 1.28fr);
+    align-items: center;
+    gap: 18px;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.13);
+    border-radius: 20px;
+    background:
+      linear-gradient(
+        135deg,
+        #fff5eb,
+        #f2f8ee
+      );
+  }
+
+  .ebook-reader-guide > div:first-child > p {
+    margin: 0;
+    color: #e56852;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+  }
+
+  .ebook-reader-guide > div:first-child > strong {
+    display: block;
+    margin-top: 5px;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 20px;
+    line-height: 1.45;
+  }
+
+  .ebook-reader-guide > div:first-child > span {
+    display: block;
+    margin-top: 5px;
+    color: #77645b;
+    font-size: 10px;
+    line-height: 1.65;
+  }
+
+  .ebook-reader-guide-stats {
+    display: grid;
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .ebook-reader-guide-stats article {
+    min-width: 0;
+    padding: 12px;
+    border:
+      1px solid
+      rgba(139, 97, 75, 0.12);
+    border-radius: 13px;
+    background:
+      rgba(255, 255, 255, 0.85);
+  }
+
+  .ebook-reader-guide-stats span,
+  .ebook-reader-guide-stats strong {
+    display: block;
+  }
+
+  .ebook-reader-guide-stats span {
+    color: #8a756a;
+    font-size: 8px;
+    font-weight: 850;
+  }
+
+  .ebook-reader-guide-stats strong {
+    margin-top: 5px;
+    overflow: hidden;
+    color: #4a352c;
+    font-size: 12px;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ebook-book {
+    max-width: 1210px !important;
+    gap: 20px !important;
+  }
+
+  .ebook-page {
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.14) !important;
+    border-radius: 25px !important;
+    background:
+      linear-gradient(
+        180deg,
+        #fffefb,
+        #fffaf6
+      ) !important;
+    box-shadow:
+      0 17px 42px
+      rgba(91, 59, 44, 0.07) !important;
+  }
+
+  .ebook-cover {
+    min-height: 720px !important;
+    padding: 58px !important;
+    isolation: isolate;
+    color: #ffffff !important;
+    background: #d9c5b5 !important;
+  }
+
+  .ebook-cover-photo {
+    z-index: -3;
+    object-fit: cover;
+  }
+
+  .ebook-cover-shade {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(34, 21, 15, 0.8),
+        rgba(34, 21, 15, 0.48) 52%,
+        rgba(34, 21, 15, 0.24)
+      ),
+      linear-gradient(
+        180deg,
+        rgba(34, 21, 15, 0.08),
+        rgba(34, 21, 15, 0.52)
+      );
+  }
+
+  .ebook-cover h2 {
+    max-width: 740px !important;
+    color: #ffffff !important;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif !important;
+    text-shadow:
+      0 3px 16px
+      rgba(0, 0, 0, 0.42);
+  }
+
+  .ebook-cover p {
+    max-width: 720px !important;
+    color:
+      rgba(255, 255, 255, 0.92) !important;
+    text-shadow:
+      0 2px 10px
+      rgba(0, 0, 0, 0.38);
+  }
+
+  .ebook-photo-frame {
+    background: #f2eae4 !important;
+  }
+
+  .ebook-photo-frame img {
+    object-fit: cover !important;
+  }
+
+  @media (max-width: 840px) {
+    .ebook-reader-guide {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .ebook-main {
+      padding:
+        16px 12px 42px !important;
+    }
+
+    .ebook-toolbar {
+      padding: 17px !important;
+      border-radius: 18px;
+    }
+
+    .ebook-reader-guide {
+      padding: 16px;
+      border-radius: 17px;
+    }
+
+    .ebook-reader-guide-stats {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+
+    .ebook-cover {
+      min-height: 580px !important;
+      padding:
+        36px 23px 55px !important;
+    }
+
+    .ebook-cover-shade {
+      background:
+        linear-gradient(
+          180deg,
+          rgba(34, 21, 15, 0.5),
+          rgba(34, 21, 15, 0.68)
+        );
+    }
+  }
+
+  @media (max-width: 430px) {
+    .ebook-reader-guide-stats {
+      grid-template-columns: 1fr;
+    }
+  }
+`;
 
 const ebookResponsiveStyles = `
   @media (max-width: 760px) {

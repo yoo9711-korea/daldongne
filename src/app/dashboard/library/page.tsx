@@ -1,32 +1,47 @@
-import { auth } from '@/auth';
-import PageGuideBox from '@/components/guide/PageGuideBox';
-import BookShelfView from '@/components/library/BookShelfView';
-import LibraryBookList from '@/components/library/LibraryBookList';
-import { prisma } from '@/lib/prisma';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import type { CSSProperties } from 'react';
+import { auth } from "@/auth";
+import LibraryBookList, {
+  type LibraryBookItem,
+} from "@/components/library/LibraryBookList";
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const TYPE_LABEL: Record<string, string> = {
-  LIFE_BOOK: '인생 기록책',
-  FAMILY_BOOK: '가족 이야기책',
-  COUPLE_BOOK: '부부 이야기책',
-  BABY_BOOK: '성장 기록책',
-  TRAVEL_BOOK: '여행 기록책',
-  AI_MOVIE: 'AI 영상',
+  LIFE_BOOK: "인생 기록책",
+  FAMILY_BOOK: "가족 이야기책",
+  COUPLE_BOOK: "부부 이야기책",
+  BABY_BOOK: "성장 기록책",
+  TRAVEL_BOOK: "여행 기록책",
+  AI_MOVIE: "AI 영상",
 };
 
 const STATUS_LABEL: Record<string, string> = {
-  DRAFT: '원고 초안',
-  IN_PRODUCTION: '제작 진행 중',
-  PUBLISHED: '완성',
+  DRAFT: "원고 초안",
+  IN_PRODUCTION: "제작 진행 중",
+  PUBLISHED: "완성",
 };
+
+const ACTIVE_PRODUCTION_STATUSES = new Set([
+  "REQUESTED",
+  "CONTACTED",
+  "IN_PROGRESS",
+]);
+
+const PAYMENT_READY_STATUSES = new Set([
+  "READY",
+  "FAILED",
+]);
+
+const PAID_OR_PRODUCTION_ORDER_STATUSES = new Set([
+  "PAID",
+  "IN_PRODUCTION",
+]);
 
 export default async function LibraryPage() {
   const session = await auth();
 
   if (!session?.user?.id) {
-    redirect('/login');
+    redirect("/login");
   }
 
   const userId = session.user.id;
@@ -36,7 +51,7 @@ export default async function LibraryPage() {
       authorId: userId,
     },
     orderBy: {
-      createdAt: 'desc',
+      createdAt: "desc",
     },
   });
 
@@ -44,21 +59,24 @@ export default async function LibraryPage() {
     (book) => book.id,
   );
 
-   const productionRequests =
+  const [
+    productionRequests,
+    coverLinks,
+  ] = await Promise.all([
     bookIds.length > 0
-      ? await prisma.bookProductionRequest.findMany({
+      ? prisma.bookProductionRequest.findMany({
           where: {
+            authorId: userId,
             bookId: {
               in: bookIds,
             },
-            authorId: userId,
           },
           orderBy: [
             {
-              createdAt: 'desc',
+              updatedAt: "desc",
             },
             {
-              updatedAt: 'desc',
+              createdAt: "desc",
             },
           ],
           select: {
@@ -66,788 +84,494 @@ export default async function LibraryPage() {
             status: true,
             createdAt: true,
             updatedAt: true,
+            bookOrder: {
+              select: {
+                status: true,
+                orderId: true,
+                productName: true,
+                quantity: true,
+                productAmount: true,
+                shippingFee: true,
+                totalAmount: true,
+              },
+            },
           },
         })
-      : [];
+      : Promise.resolve([]),
 
-  const activeProductionStatuses =
-    new Set([
-      'REQUESTED',
-      'CONTACTED',
-      'IN_PROGRESS',
-    ]);
+    bookIds.length > 0
+      ? prisma.bookMemory.findMany({
+          where: {
+            bookId: {
+              in: bookIds,
+            },
+            memory: {
+              authorId: userId,
+              type: "PHOTO",
+              fileUrl: {
+                not: null,
+              },
+            },
+          },
+          orderBy: {
+            order: "asc",
+          },
+          select: {
+            bookId: true,
+            memory: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        })
+      : Promise.resolve([]),
+  ]);
 
-  const activeProductionRequestBookIds =
-    new Set(
-      productionRequests
-        .filter(
-          (request) =>
-            request.status !==
-            'CANCELED',
-        )
-        .map(
-          (request) =>
-            request.bookId,
-        ),
-    );
+  type ProductionRequest =
+    (typeof productionRequests)[number];
 
-  const pendingProductionRequestBookIds =
-    new Set(
-      productionRequests
-        .filter((request) =>
-          activeProductionStatuses.has(
-            String(
-              request.status,
-            ),
-          ),
-        )
-        .map(
-          (request) =>
-            request.bookId,
-        ),
-    );
-
-  const productionRequestsByBookId =
+  const requestsByBookId =
     new Map<
       string,
-      Array<
-        (typeof productionRequests)[number]
-      >
+      ProductionRequest[]
     >();
 
   for (
     const request of productionRequests
   ) {
-    const requests =
-      productionRequestsByBookId.get(
+    const current =
+      requestsByBookId.get(
         request.bookId,
       ) || [];
 
-    requests.push(request);
+    current.push(request);
 
-    productionRequestsByBookId.set(
+    requestsByBookId.set(
       request.bookId,
-      requests,
+      current,
     );
   }
 
-  const representativeProductionRequestStatusByBookId =
-    new Map<string, string>();
+  const representativeRequestByBookId =
+    new Map<
+      string,
+      ProductionRequest
+    >();
 
   for (
     const [
       bookId,
       requests,
-    ] of productionRequestsByBookId
+    ] of requestsByBookId
   ) {
-    const activeRequest = requests
-      .filter((request) =>
-        activeProductionStatuses.has(
-          String(
-            request.status,
-          ),
+    const activeRequest = requests.find(
+      (request) =>
+        ACTIVE_PRODUCTION_STATUSES.has(
+          String(request.status),
         ),
+    );
+
+    representativeRequestByBookId.set(
+      bookId,
+      activeRequest || requests[0],
+    );
+  }
+
+  const coverMemoryByBookId =
+    new Map<string, string>();
+
+  for (const link of coverLinks) {
+    if (
+      !coverMemoryByBookId.has(
+        link.bookId,
       )
-      .sort(
-        (first, second) =>
-          second.updatedAt.getTime() -
-          first.updatedAt.getTime(),
-      )[0];
-
-    const latestRequest = [
-      ...requests,
-    ].sort(
-      (first, second) =>
-        second.createdAt.getTime() -
-        first.createdAt.getTime(),
-    )[0];
-
-    const representativeRequest =
-      activeRequest ||
-      latestRequest;
-
-    if (representativeRequest) {
-      representativeProductionRequestStatusByBookId.set(
-        bookId,
-        String(
-          representativeRequest.status,
-        ),
+    ) {
+      coverMemoryByBookId.set(
+        link.bookId,
+        link.memory.id,
       );
     }
   }
 
-  const draftCount = books.filter(
-    (book) =>
-      book.status === 'DRAFT',
-  ).length;
+  const listBooks: LibraryBookItem[] =
+    books.map((book) => {
+      const request =
+        representativeRequestByBookId.get(
+          book.id,
+        );
 
-  const inProductionCount =
-    books.filter(
+      const order =
+        request?.bookOrder || null;
+
+      return {
+        id: book.id,
+        type: String(book.type),
+        title: book.title,
+        status: String(book.status),
+        summary: book.summary,
+        pageCount: book.pageCount,
+        basedPhotoCount:
+          book.basedPhotoCount,
+        basedStoryCount:
+          book.basedStoryCount,
+        createdAt:
+          book.createdAt.toISOString(),
+        updatedAt:
+          book.updatedAt.toISOString(),
+        coverMemoryId:
+          coverMemoryByBookId.get(
+            book.id,
+          ) || null,
+        hasProductionRequest:
+          Boolean(request),
+        productionRequestStatus:
+          request
+            ? String(request.status)
+            : null,
+        orderStatus: order
+          ? String(order.status)
+          : null,
+        orderId:
+          order?.orderId || null,
+        orderProductName:
+          order?.productName || null,
+        orderQuantity:
+          order?.quantity || null,
+        orderProductAmount:
+          order?.productAmount || null,
+        orderShippingFee:
+          order?.shippingFee || null,
+        orderTotalAmount:
+          order?.totalAmount || null,
+      };
+    });
+
+  const draftCount =
+    listBooks.filter(
+      (book) =>
+        book.status === "DRAFT",
+    ).length;
+
+  const inProgressCount =
+    listBooks.filter(
       (book) =>
         book.status ===
-        'IN_PRODUCTION',
-    ).length;
-
-  const publishedCount =
-    books.filter(
-      (book) =>
-        book.status === 'PUBLISHED',
-    ).length;
-
-  const shelfBooks = books
-    .slice(0, 6)
-    .map((book) => ({
-      id: book.id,
-      title: book.title,
-      subtitle:
-        TYPE_LABEL[
-          String(book.type)
-        ] || '책 원고',
-      status:
-        STATUS_LABEL[
-          String(book.status)
-        ] || '상태 확인 필요',
-      href: `/dashboard/library/${book.id}`,
-    }));
-
-  const listBooks = books.map(
-    (book) => ({
-      id: book.id,
-      type: String(book.type),
-      title: book.title,
-      status: String(book.status),
-      summary: book.summary,
-      pageCount: book.pageCount,
-      basedPhotoCount:
-        book.basedPhotoCount,
-      basedStoryCount:
-        book.basedStoryCount,
-      createdAt:
-        book.createdAt.toISOString(),
-            hasProductionRequest:
-        activeProductionRequestBookIds.has(
-          book.id,
+          "IN_PRODUCTION" ||
+        ACTIVE_PRODUCTION_STATUSES.has(
+          book.productionRequestStatus ||
+            "",
+        ) ||
+        PAID_OR_PRODUCTION_ORDER_STATUSES.has(
+          book.orderStatus || "",
         ),
-      productionRequestStatus:
-        representativeProductionRequestStatusByBookId.get(
-          book.id,
-        ) || null,
-    }),
-  );
+    ).length;
+
+  const completedCount =
+    listBooks.filter(
+      (book) =>
+        book.status === "PUBLISHED" ||
+        book.orderStatus ===
+          "COMPLETED",
+    ).length;
+
+  const paymentReadyCount =
+    listBooks.filter((book) =>
+      PAYMENT_READY_STATUSES.has(
+        book.orderStatus || "",
+      ),
+    ).length;
+
+  const paidOrderCount =
+    listBooks.filter((book) =>
+      PAID_OR_PRODUCTION_ORDER_STATUSES.has(
+        book.orderStatus || "",
+      ),
+    ).length;
+
+  const recentBooks =
+    listBooks.slice(0, 4);
 
   return (
-    <main
-  className="library-page-main"
-  style={gridPaperPageStyle()}
->
-      <style>{`
-                 .library-page-main {
-          min-height: 100vh;
-          color: #4a352b;
-          background-color: #fffdf9 !important;
-          background-image:
-            linear-gradient(
-              rgba(220, 167, 136, 0.032) 1px,
-              transparent 1px
-            ),
-            linear-gradient(
-              90deg,
-              rgba(220, 167, 136, 0.032) 1px,
-              transparent 1px
-            ) !important;
-          background-size: 32px 32px !important;
-          background-position: 0 0 !important;
-        }
+    <main className="library-reference-page">
+      <style>{libraryReferenceStyles}</style>
 
-        .library-page-hero {
-          position: relative;
-          overflow: hidden;
-          background:
-            radial-gradient(
-              circle at 90% 5%,
-              rgba(255, 210, 190, 0.58),
-              transparent 25rem
-            ),
-            radial-gradient(
-              circle at 5% 100%,
-              rgba(255, 241, 202, 0.52),
-              transparent 23rem
-            ),
-            linear-gradient(
-              135deg,
-              #fff8f3 0%,
-              #ffffff 52%,
-              #fff1e8 100%
-            ) !important;
-          color: #49352b !important;
-          border:
-            1px solid rgba(218, 143, 108, 0.22) !important;
-          box-shadow:
-            0 18px 48px
-            rgba(156, 91, 58, 0.08) !important;
-        }
+      <div className="library-reference-shell">
+        <section className="library-reference-hero">
+          <div className="library-reference-hero-copy">
+            <p>내 책장 · 주문</p>
 
-        .library-page-hero h1,
-        .library-page-hero strong {
-          color: #49352b !important;
-        }
+            <h1>
+              나의 이야기가
+              <br />
+              한 권씩 쌓이는 곳
+            </h1>
 
-        .library-page-hero > p:first-of-type {
-          color: #dd765b !important;
-        }
+            <span>
+              만든 원고를 다시 읽고,
+              제작 상담·결제·제작 진행
+              상태를 한 화면에서 확인합니다.
+            </span>
 
-        .library-page-hero > p:not(:first-of-type) {
-          color: #725d52 !important;
-        }
+            <div className="library-reference-hero-actions">
+              <Link href="/dashboard/book">
+                새 책 원고 만들기
+                <span aria-hidden="true">
+                  →
+                </span>
+              </Link>
 
-        .library-page-hero
-        > div:not(.library-hero-actions) {
-          border:
-            1px solid rgba(218, 143, 108, 0.2) !important;
-          background:
-            rgba(255, 255, 255, 0.78) !important;
-          box-shadow:
-            0 10px 26px
-            rgba(147, 87, 55, 0.045);
-        }
-
-        .library-page-hero
-        > div:not(.library-hero-actions)
-        p {
-          color: #80685c !important;
-        }
-
-        .library-page-hero
-        > div:not(.library-hero-actions)
-        p:first-child {
-          color: #d56f55 !important;
-        }
-
-        .library-hero-actions a {
-          border:
-            1px solid rgba(210, 126, 90, 0.3) !important;
-          background: #ffffff !important;
-          color: #a65f48 !important;
-          box-shadow:
-            0 9px 22px
-            rgba(181, 104, 71, 0.08);
-        }
-
-        .library-hero-actions a:first-child {
-          border-color: transparent !important;
-          background:
-            linear-gradient(
-              135deg,
-              #f49378,
-              #e97861
-            ) !important;
-          color: #ffffff !important;
-          box-shadow:
-            0 11px 25px
-            rgba(220, 104, 77, 0.2);
-        }
-
-        .library-page-container
-        > section:nth-of-type(2)
-        > article {
-          background: #ffffff !important;
-          border-color:
-            rgba(191, 137, 106, 0.18) !important;
-          box-shadow:
-            0 11px 27px
-            rgba(127, 76, 47, 0.05) !important;
-        }
-
-        .library-page-section {
-          background:
-            linear-gradient(
-              145deg,
-              #ffffff,
-              #fffaf7
-            ) !important;
-          border:
-            1px solid rgba(196, 139, 108, 0.19) !important;
-          box-shadow:
-            0 14px 34px
-            rgba(132, 79, 48, 0.055) !important;
-        }
-
-        .library-page-section h2,
-        .library-page-section h3 {
-          color: #49352b !important;
-        }
-
-        .library-page-section
-        > div
-        > p:first-child {
-          color: #d67358 !important;
-        }
-
-        .library-page-section input,
-        .library-page-section select {
-          border:
-            1px solid rgba(192, 139, 108, 0.28) !important;
-          background: #fffdfb !important;
-          color: #49352b !important;
-        }
-
-        .library-page-section button {
-          border:
-            1px solid rgba(210, 126, 90, 0.28) !important;
-          background: #fff3ed !important;
-          color: #a65f48 !important;
-          box-shadow:
-            0 8px 19px
-            rgba(181, 104, 71, 0.07) !important;
-        }
-
-        .library-page-section article {
-          border-color:
-            rgba(191, 137, 106, 0.18) !important;
-          box-shadow:
-            0 10px 25px
-            rgba(127, 76, 47, 0.045) !important;
-        }
-
-        .library-page-main h2,
-        .library-page-main h3 {
-          color: #49352b;
-        }
-        .library-page-container {
-          width: 100%;
-          max-width: 1380px;
-          margin: 0 auto;
-          padding: 28px;
-        }
-
-        .library-hero-actions {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-        }
-
-        @media (max-width: 700px) {
-          .library-page-container {
-            padding: 16px;
-          }
-
-          .library-page-hero {
-            padding: 26px 20px !important;
-            border-radius: 24px !important;
-          }
-
-          .library-hero-actions {
-            display: grid;
-            grid-template-columns: 1fr;
-          }
-
-          .library-hero-actions a {
-            width: 100%;
-          }
-
-          .library-page-section {
-            padding: 20px 16px !important;
-            border-radius: 24px !important;
-          }
-        }
-      `}</style>
-
-      <div className="library-page-container">
-        <section
-          className="library-page-hero"
-          style={{
-            padding: 38,
-            borderRadius: 34,
-            background:
-              'linear-gradient(135deg, #33271d 0%, #5b422c 52%, #8a6238 100%)',
-            color: '#fff8ec',
-            boxShadow:
-              '0 22px 60px rgba(51, 39, 29, 0.18)',
-          }}
-        >
-          <p
-            style={{
-              margin: '0 0 13px',
-              color: '#f0c36a',
-              fontSize: 13,
-              fontWeight: 900,
-              letterSpacing: '0.08em',
-            }}
-          >
-            나의 책 보관함
-          </p>
-
-          <h1
-            style={{
-              margin: 0,
-              maxWidth: 900,
-              fontFamily:
-                'Noto Serif KR, serif',
-              fontSize:
-                'clamp(34px, 5vw, 56px)',
-              lineHeight: 1.2,
-              letterSpacing: '-0.05em',
-            }}
-          >
-            사진과 이야기를 모아 만든
-            <br />
-            책 원고를 보관합니다.
-          </h1>
-
-          <p
-            style={{
-              margin: '22px 0 0',
-              maxWidth: 820,
-              color:
-                'rgba(255, 248, 236, 0.86)',
-              fontSize: 18,
-              lineHeight: 1.8,
-            }}
-          >
-            지금까지 만든 책 원고를
-            확인하고, 원고를 다시 정리하거나
-            인쇄용 화면을 볼 수 있습니다.
-            제작을 원하는 책은 상세 화면에서
-            제작 상담을 신청할 수 있습니다.
-          </p>
-
-          <div
-            style={{
-              marginTop: 26,
-              padding: '18px 20px',
-              borderRadius: 20,
-              border:
-                '1px solid rgba(255,255,255,0.2)',
-              background:
-                'rgba(255,255,255,0.08)',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: '#f0c36a',
-                fontSize: 12,
-                fontWeight: 900,
-              }}
-            >
-              현재 내 책장
-            </p>
-
-            <strong
-              style={{
-                display: 'block',
-                marginTop: 7,
-                fontSize: 21,
-                lineHeight: 1.45,
-              }}
-            >
-              {books.length > 0
-                ? `총 ${books.length}권의 책 원고가 저장되어 있습니다.`
-                : '아직 저장된 책 원고가 없습니다.'}
-            </strong>
-
-            <p
-              style={{
-                margin: '6px 0 0',
-                color:
-                  'rgba(255, 248, 236, 0.75)',
-                fontSize: 14,
-                lineHeight: 1.7,
-              }}
-            >
-              {books.length > 0
-                ? `제작 진행 중 ${inProductionCount}권, 완성된 책 ${publishedCount}권입니다.`
-                : '사진을 모으고 이야기를 남긴 뒤 첫 번째 책 원고를 만들어보세요.'}
-            </p>
+              <Link href="/dashboard">
+                작업실로 돌아가기
+              </Link>
+            </div>
           </div>
 
-          <div
-            className="library-hero-actions"
-            style={{
-              marginTop: 22,
-            }}
-          >
-            <Link
-              href="/dashboard/book"
-              style={heroPrimaryButtonStyle()}
-            >
-              새 책 원고 만들기
-            </Link>
+          <div className="library-reference-hero-books">
+            {recentBooks.length > 0 ? (
+              recentBooks.map(
+                (book, index) => (
+                  <Link
+                    key={book.id}
+                    href={`/dashboard/library/${book.id}`}
+                    className="library-reference-hero-book"
+                    style={
+                      {
+                        "--book-index":
+                          index,
+                      } as React.CSSProperties
+                    }
+                  >
+                    <span className="library-reference-hero-cover">
+                      <img
+                        src={
+                          book.coverMemoryId
+                            ? `/api/blob/${book.coverMemoryId}`
+                            : `/dashboard/library-reference-v1/sample-library-${
+                                (index % 6) + 1
+                              }.webp`
+                        }
+                        alt={
+                          book.title ||
+                          "책 표지"
+                        }
+                      />
 
-            <Link
-              href="/dashboard/timeline"
-              style={heroSecondaryButtonStyle()}
-            >
-              사진 모으기
-            </Link>
+                      <span>
+                        {TYPE_LABEL[
+                          book.type
+                        ] || "스토리북"}
+                      </span>
+                    </span>
 
-            <Link
-              href="/dashboard/interview"
-              style={heroSecondaryButtonStyle()}
-            >
-              이야기 남기기
-            </Link>
+                    <strong>
+                      {book.title}
+                    </strong>
+                  </Link>
+                ),
+              )
+            ) : (
+              [1, 2, 3, 4].map(
+                (number, index) => (
+                  <div
+                    key={number}
+                    className="library-reference-hero-book"
+                    style={
+                      {
+                        "--book-index":
+                          index,
+                      } as React.CSSProperties
+                    }
+                  >
+                    <span className="library-reference-hero-cover">
+                      <img
+                        src={`/dashboard/library-reference-v1/sample-library-${number}.webp`}
+                        alt="스토리북 예시 표지"
+                      />
 
-            <Link
-              href="/dashboard"
-              style={heroSecondaryButtonStyle()}
-            >
-              작업실로 돌아가기
-            </Link>
+                      <span>
+                        달동네 스토리북
+                      </span>
+                    </span>
+
+                    <strong>
+                      기억을 담는 책
+                    </strong>
+                  </div>
+                ),
+              )
+            )}
+
+            <div
+              className="library-reference-shelf"
+              aria-hidden="true"
+            />
           </div>
         </section>
 
-        <section
-          style={{
-            display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fit, minmax(170px, 1fr))',
-            gap: 14,
-            marginTop: 24,
-          }}
-        >
+        <section className="library-reference-summary">
           <SummaryCard
             label="전체 책"
-            value={books.length}
+            value={listBooks.length}
             unit="권"
-            description="내 책장에 저장된 모든 책 원고"
-            color="#7b4f2a"
+            tone="coral"
           />
 
           <SummaryCard
             label="원고 초안"
             value={draftCount}
             unit="권"
-            description="내용을 확인하고 다듬을 수 있는 원고"
-            color="#9b6d2f"
+            tone="cream"
           />
 
           <SummaryCard
-            label="제작 진행 중"
-            value={inProductionCount}
+            label="상담·제작 진행"
+            value={inProgressCount}
             unit="권"
-            description="제작 작업이 진행 중인 책"
-            color="#62438a"
+            tone="mint"
           />
 
           <SummaryCard
-            label="완성된 책"
-            value={publishedCount}
-            unit="권"
-            description="제작 과정이 완료된 책"
-            color="#3e5f3a"
+            label="결제할 주문"
+            value={paymentReadyCount}
+            unit="건"
+            tone="yellow"
           />
 
           <SummaryCard
-            label="상담 신청 책"
-            value={
-              activeProductionRequestBookIds.size
-            }
-            unit="권"
-            description="제작 상담을 신청한 책"
-            color="#245d8c"
+            label="결제·제작 중"
+            value={paidOrderCount}
+            unit="건"
+            tone="blue"
           />
 
           <SummaryCard
-            label="상담 처리 중"
-            value={
-              pendingProductionRequestBookIds.size
-            }
+            label="완성"
+            value={completedCount}
             unit="권"
-            description="접수 또는 상담이 진행 중인 책"
-            color="#9a4b24"
+            tone="green"
           />
         </section>
 
-        <div
-          style={{
-            marginTop: 24,
-          }}
-        >
-          <PageGuideBox
-            label="내 책장 이용 안내"
-            title="책을 선택하면 원고와 제작 상태를 확인할 수 있습니다"
-            description="내 책장에는 만든 책 원고가 저장됩니다. 책 상세 화면에서 원고를 읽고 다시 정리하거나 인쇄용 원고와 제작 상담을 확인할 수 있습니다."
-            steps={[
-              '저장된 책의 종류와 현재 상태를 확인합니다.',
-              '책 상세 보기에서 원고와 사용된 사진·이야기를 확인합니다.',
-              '필요하면 원고를 다시 정리해 내용을 보완합니다.',
-              '인쇄용 원고 화면에서 표지, 목차와 본문을 확인합니다.',
-              '실제 책 제작이 필요하면 제작 상담을 신청합니다.',
-              '필요 없는 책은 여러 권을 선택해 한 번에 삭제할 수 있습니다.',
-            ]}
-            note="책을 삭제해도 원본 사진과 이야기 기록은 삭제되지 않습니다."
-          />
-        </div>
+        {paymentReadyCount > 0 ? (
+          <section className="library-reference-payment-notice">
+            <span aria-hidden="true">
+              ₩
+            </span>
 
-        {books.length > 0 ? (
-          <section
-            className="library-page-section"
-            style={{
-              marginTop: 24,
-              padding: 28,
-              borderRadius: 30,
-              overflow: 'hidden',
-              background: '#fffaf1',
-              border:
-                '1px solid rgba(91, 66, 43, 0.12)',
-              boxShadow:
-                '0 12px 30px rgba(91, 66, 43, 0.08)',
-            }}
-          >
             <div>
-              <p
-                style={{
-                  margin: 0,
-                  color: '#9b6d2f',
-                  fontSize: 12,
-                  fontWeight: 900,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                최근 책장
-              </p>
+              <strong>
+                결제를 기다리는 주문이{" "}
+                {paymentReadyCount}건
+                있습니다.
+              </strong>
 
-              <h2
-                style={{
-                  margin: '9px 0 0',
-                  fontFamily:
-                    'Noto Serif KR, serif',
-                  fontSize: 31,
-                  lineHeight: 1.4,
-                  letterSpacing: '-0.04em',
-                  color: '#33271d',
-                }}
-              >
-                최근에 만든 책을
-                먼저 보여드립니다.
-              </h2>
-
-              <p
-                style={{
-                  margin: '9px 0 0',
-                  color: '#6b5845',
-                  fontSize: 14,
-                  lineHeight: 1.7,
-                }}
-              >
-                가장 최근에 만든 책 원고
-                 6권을 책장 형태로 확인합니다.
+              <p>
+                아래 책 목록에서
+                `결제 화면` 버튼을 눌러
+                관리자 견적과 최종 금액을
+                확인하세요.
               </p>
             </div>
 
-            <div
-              style={{
-                marginTop: 22,
-              }}
-            >
-              <BookShelfView
-                books={shelfBooks}
-              />
-            </div>
-
-            {books.length > 6 ? (
-              <p
-                style={{
-                  margin: '16px 0 0',
-                  color: '#6b5845',
-                  fontSize: 12,
-                  lineHeight: 1.7,
-                }}
-              >
-                전체 {books.length}권 중
-                최근 6권만 표시했습니다.
-                모든 책은 아래 전체 목록에서
-                확인할 수 있습니다.
-              </p>
-            ) : null}
+            <a href="#library-book-list">
+              주문 확인
+              <span aria-hidden="true">
+                ↓
+              </span>
+            </a>
           </section>
-        ) : null}
+        ) : (
+          <section className="library-reference-guide">
+            <div>
+              <span aria-hidden="true">
+                1
+              </span>
+              <p>
+                <strong>
+                  원고 확인
+                </strong>
+                만든 책의 제목과 본문을
+                읽습니다.
+              </p>
+            </div>
+
+            <i aria-hidden="true">→</i>
+
+            <div>
+              <span aria-hidden="true">
+                2
+              </span>
+              <p>
+                <strong>
+                  제작 상담
+                </strong>
+                실제 인쇄를 원하는 책을
+                신청합니다.
+              </p>
+            </div>
+
+            <i aria-hidden="true">→</i>
+
+            <div>
+              <span aria-hidden="true">
+                3
+              </span>
+              <p>
+                <strong>
+                  견적·결제
+                </strong>
+                관리자 검토 후 금액을
+                확인합니다.
+              </p>
+            </div>
+
+            <i aria-hidden="true">→</i>
+
+            <div>
+              <span aria-hidden="true">
+                4
+              </span>
+              <p>
+                <strong>
+                  제작 완료
+                </strong>
+                진행 상태를 내 책장에서
+                확인합니다.
+              </p>
+            </div>
+          </section>
+        )}
 
         <section
-          className="library-page-section"
-          style={{
-            marginTop: 24,
-            padding: 28,
-            borderRadius: 30,
-            background: '#fffaf1',
-            border:
-              '1px solid rgba(91, 66, 43, 0.12)',
-            boxShadow:
-              '0 12px 30px rgba(91, 66, 43, 0.08)',
-          }}
+          id="library-book-list"
+          className="library-reference-list-section"
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent:
-                'space-between',
-              flexWrap: 'wrap',
-              gap: 12,
-            }}
-          >
+          <div className="library-reference-section-head">
             <div>
-              <p
-                style={{
-                  margin: 0,
-                  color: '#9b6d2f',
-                  fontSize: 12,
-                  fontWeight: 900,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                전체 책 목록
-              </p>
+              <p>내 책과 주문</p>
 
-              <h2
-                style={{
-                  margin: '9px 0 0',
-                  fontFamily:
-                    'Noto Serif KR, serif',
-                  fontSize: 31,
-                  lineHeight: 1.4,
-                  letterSpacing: '-0.04em',
-                  color: '#33271d',
-                }}
-              >
-                책의 상태와 제작 상담을
-                한눈에 확인합니다.
+              <h2>
+                책 상태와 제작 과정을
+                한눈에 확인하세요
               </h2>
 
-              <p
-                style={{
-                  margin: '9px 0 0',
-                  maxWidth: 760,
-                  color: '#6b5845',
-                  fontSize: 14,
-                  lineHeight: 1.7,
-                }}
-              >
-                책 종류, 원고 상태, 만든 날짜,
-                사용한 사진과 이야기 수,
-                제작 상담 상태를 확인할 수
-                있습니다.
-              </p>
+              <span>
+                제목 검색과 상태 필터를
+                이용해 필요한 책을 빠르게
+                찾을 수 있습니다.
+              </span>
             </div>
 
-            <Link
-              href="/dashboard/book"
-              style={darkButtonStyle()}
-            >
-              새 책 원고 만들기
+            <Link href="/dashboard/book">
+              + 새 책 만들기
             </Link>
           </div>
 
-          <div
-            style={{
-              marginTop: 22,
-            }}
-          >
-            <LibraryBookList
-              books={listBooks}
-            />
-          </div>
+          <LibraryBookList
+            books={listBooks}
+          />
         </section>
       </div>
     </main>
@@ -858,154 +582,698 @@ function SummaryCard({
   label,
   value,
   unit,
-  description,
-  color,
+  tone,
 }: {
   label: string;
   value: number;
   unit: string;
-  description: string;
-  color: string;
+  tone:
+    | "coral"
+    | "cream"
+    | "mint"
+    | "yellow"
+    | "blue"
+    | "green";
 }) {
   return (
-    <article
-      style={{
-        padding: 21,
-        borderRadius: 23,
-        background: '#fffaf1',
-        border:
-          '1px solid rgba(91, 66, 43, 0.12)',
-        boxShadow:
-          '0 10px 25px rgba(91, 66, 43, 0.07)',
-      }}
-    >
-      <p
-        style={{
-          margin: 0,
-          color: '#9b6d2f',
-          fontSize: 12,
-          fontWeight: 900,
-        }}
-      >
-        {label}
-      </p>
+    <article data-tone={tone}>
+      <span>{label}</span>
 
-      <strong
-        style={{
-          display: 'block',
-          marginTop: 8,
-          color,
-          fontSize: 33,
-          lineHeight: 1.1,
-        }}
-      >
+      <strong>
         {value.toLocaleString()}
-
-        <span
-          style={{
-            marginLeft: 4,
-            color: '#6b5845',
-            fontSize: 13,
-          }}
-        >
-          {unit}
-        </span>
+        <small>{unit}</small>
       </strong>
-
-      <p
-        style={{
-          margin: '11px 0 0',
-          color: '#6b5845',
-          fontSize: 12,
-          lineHeight: 1.55,
-        }}
-      >
-        {description}
-      </p>
     </article>
   );
 }
 
-function heroPrimaryButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 46,
-    padding: '0 21px',
-    borderRadius: 999,
-    background: '#f0c36a',
-    color: '#2b2118',
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: 'none',
-    textAlign: 'center',
-  };
-}
+const libraryReferenceStyles = `
+  .library-reference-page,
+  .library-reference-page * {
+    box-sizing: border-box;
+  }
 
-function heroSecondaryButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 46,
-    padding: '0 21px',
-    borderRadius: 999,
+  .library-reference-page {
+    min-height: 100vh;
+    padding: 28px 24px 56px;
+    color: #432f26;
+    background:
+      radial-gradient(
+        circle at 6% 8%,
+        rgba(255, 231, 215, 0.55),
+        transparent 29rem
+      ),
+      radial-gradient(
+        circle at 95% 11%,
+        rgba(230, 244, 231, 0.55),
+        transparent 26rem
+      ),
+      linear-gradient(
+        180deg,
+        #fffdf9,
+        #fff9f3
+      );
+    font-family:
+      var(--font-daldongne-sans),
+      "Noto Sans KR",
+      sans-serif;
+  }
+
+  .library-reference-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .library-reference-page a,
+  .library-reference-page button {
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .library-reference-page a:hover,
+  .library-reference-page button:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  .library-reference-page a:focus-visible,
+  .library-reference-page button:focus-visible,
+  .library-reference-page input:focus-visible {
+    outline:
+      4px solid
+      rgba(239, 105, 83, 0.2);
+    outline-offset: 3px;
+  }
+
+  .library-reference-shell {
+    width:
+      min(1380px, 100%);
+    margin: 0 auto;
+  }
+
+  .library-reference-hero {
+    position: relative;
+    min-height: 390px;
+    padding: 48px 52px;
+    display: grid;
+    grid-template-columns:
+      minmax(340px, 0.82fr)
+      minmax(520px, 1.18fr);
+    align-items: center;
+    gap: 35px;
+    overflow: hidden;
     border:
-      '1px solid rgba(255,255,255,0.42)',
-    background: 'transparent',
-    color: '#fff8ec',
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: 'none',
-    textAlign: 'center',
-  };
-}
+      1px solid
+      rgba(135, 94, 74, 0.13);
+    border-radius: 32px;
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 253, 248, 0.98),
+        rgba(255, 249, 242, 0.95)
+      );
+    box-shadow:
+      0 23px 56px
+      rgba(92, 60, 45, 0.075);
+  }
 
-function darkButtonStyle(): CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-    padding: '0 15px',
-    borderRadius: 999,
-    border: '1px solid #33271d',
-    background: '#33271d',
-    color: '#fff8ec',
-    fontSize: 12,
-    fontWeight: 900,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-  };
-}
+  .library-reference-hero::before {
+    position: absolute;
+    left: -11%;
+    bottom: -66%;
+    width: 61%;
+    height: 95%;
+    border-radius: 50%;
+    background:
+      rgba(199, 235, 222, 0.68);
+    content: "";
+  }
 
-function gridPaperPageStyle(): CSSProperties {
-  return {
-    minHeight: '100vh',
-    backgroundColor: '#f7eddc',
-    backgroundImage: `
+  .library-reference-hero-copy {
+    position: relative;
+    z-index: 2;
+  }
+
+  .library-reference-hero-copy > p {
+    margin: 0;
+    color: #ed6852;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .library-reference-hero h1 {
+    margin: 12px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size:
+      clamp(43px, 5vw, 66px);
+    line-height: 1.18;
+    letter-spacing: -0.065em;
+  }
+
+  .library-reference-hero-copy > span {
+    display: block;
+    max-width: 520px;
+    margin-top: 19px;
+    color: #725f56;
+    font-size: 16px;
+    line-height: 1.8;
+    word-break: keep-all;
+  }
+
+  .library-reference-hero-actions {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .library-reference-hero-actions > a {
+    min-height: 48px;
+    padding: 0 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    border:
+      1px solid #d7b6a5;
+    border-radius: 14px;
+    color: #785348;
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .library-reference-hero-actions > a:first-child {
+    border-color: transparent;
+    color: #ffffff;
+    background:
       linear-gradient(
-        rgba(154, 106, 36, 0.08) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        rgba(154, 106, 36, 0.08) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        rgba(154, 106, 36, 0.14) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        rgba(154, 106, 36, 0.14) 1px,
-        transparent 1px
+        135deg,
+        #ff7664,
+        #ed5f4f
+      );
+    box-shadow:
+      0 14px 28px
+      rgba(219, 82, 64, 0.19);
+  }
+
+  .library-reference-hero-books {
+    position: relative;
+    z-index: 2;
+    min-height: 300px;
+    padding: 26px 20px 36px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .library-reference-hero-book {
+    position: relative;
+    z-index:
+      calc(10 - var(--book-index));
+    width: 128px;
+    flex: 0 0 auto;
+    transform:
+      translateY(
+        calc(var(--book-index) * 4px)
       )
-    `,
-    backgroundSize:
-      '24px 24px, 24px 24px, 120px 120px, 120px 120px',
-    backgroundPosition: '0 0',
-  };
-}
+      rotate(
+        calc(
+          (var(--book-index) - 1.5) *
+          2deg
+        )
+      );
+    text-align: center;
+  }
+
+  .library-reference-hero-book:hover {
+    transform:
+      translateY(-8px)
+      rotate(0deg) !important;
+  }
+
+  .library-reference-hero-cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 0.72 / 1;
+    display: block;
+    overflow: hidden;
+    border:
+      6px solid
+      rgba(255, 255, 255, 0.96);
+    border-radius: 8px;
+    background: #eee4da;
+    box-shadow:
+      0 18px 31px
+      rgba(63, 42, 33, 0.2);
+  }
+
+  .library-reference-hero-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .library-reference-hero-cover > span {
+    position: absolute;
+    inset: 0;
+    padding: 15px 11px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        180deg,
+        transparent 45%,
+        rgba(32, 20, 15, 0.64)
+      );
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1.5;
+    text-shadow:
+      0 2px 7px
+      rgba(0, 0, 0, 0.45);
+  }
+
+  .library-reference-hero-book > strong {
+    display: block;
+    margin-top: 10px;
+    overflow: hidden;
+    color: #59453c;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .library-reference-shelf {
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    bottom: 7px;
+    height: 22px;
+    border-radius: 8px;
+    background:
+      linear-gradient(
+        180deg,
+        #e3ad80,
+        #bc7353
+      );
+    box-shadow:
+      0 9px 19px
+      rgba(93, 53, 36, 0.19);
+  }
+
+  .library-reference-summary {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns:
+      repeat(6, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .library-reference-summary article {
+    min-width: 0;
+    padding: 16px;
+    border:
+      1px solid
+      rgba(135, 94, 74, 0.11);
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow:
+      0 9px 22px
+      rgba(92, 60, 45, 0.04);
+  }
+
+  .library-reference-summary article[data-tone="coral"] {
+    background: #fff0eb;
+  }
+
+  .library-reference-summary article[data-tone="cream"] {
+    background: #fff7e8;
+  }
+
+  .library-reference-summary article[data-tone="mint"] {
+    background: #edf8f1;
+  }
+
+  .library-reference-summary article[data-tone="yellow"] {
+    background: #fff8d9;
+  }
+
+  .library-reference-summary article[data-tone="blue"] {
+    background: #edf5ff;
+  }
+
+  .library-reference-summary article[data-tone="green"] {
+    background: #eef7e9;
+  }
+
+  .library-reference-summary span {
+    color: #7a675e;
+    font-size: 10px;
+    font-weight: 850;
+  }
+
+  .library-reference-summary strong {
+    display: block;
+    margin-top: 7px;
+    color: #e3634e;
+    font-size: 26px;
+  }
+
+  .library-reference-summary small {
+    margin-left: 3px;
+    color: #806d64;
+    font-size: 10px;
+  }
+
+  .library-reference-payment-notice,
+  .library-reference-guide {
+    margin-top: 17px;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.13);
+    border-radius: 20px;
+    background:
+      rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 12px 29px
+      rgba(91, 59, 44, 0.045);
+  }
+
+  .library-reference-payment-notice {
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns:
+      44px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    border-color: #e0b37e;
+    background:
+      linear-gradient(
+        135deg,
+        #fff7e4,
+        #fffdf9
+      );
+  }
+
+  .library-reference-payment-notice > span {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #ffffff;
+    background: #ed735b;
+    font-size: 20px;
+    font-weight: 900;
+  }
+
+  .library-reference-payment-notice strong {
+    display: block;
+    font-size: 15px;
+  }
+
+  .library-reference-payment-notice p {
+    margin: 4px 0 0;
+    color: #79665d;
+    font-size: 10px;
+    line-height: 1.6;
+  }
+
+  .library-reference-payment-notice > a {
+    min-height: 42px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    border-radius: 12px;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ed5f4f
+      );
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .library-reference-guide {
+    padding: 17px 20px;
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr) auto
+      minmax(0, 1fr) auto
+      minmax(0, 1fr) auto
+      minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+  }
+
+  .library-reference-guide > div {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+      33px minmax(0, 1fr);
+    align-items: center;
+    gap: 9px;
+  }
+
+  .library-reference-guide > div > span {
+    width: 33px;
+    height: 33px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #ffffff;
+    background: #ef7059;
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .library-reference-guide p {
+    margin: 0;
+    color: #765f55;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .library-reference-guide p strong {
+    display: block;
+    color: #49362d;
+    font-size: 12px;
+  }
+
+  .library-reference-guide > i {
+    color: #e99a7a;
+    font-style: normal;
+    font-size: 21px;
+  }
+
+  .library-reference-list-section {
+    margin-top: 17px;
+    padding: 25px;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.13);
+    border-radius: 27px;
+    background:
+      rgba(255, 255, 255, 0.92);
+    box-shadow:
+      0 18px 42px
+      rgba(91, 59, 44, 0.06);
+  }
+
+  .library-reference-section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .library-reference-section-head p {
+    margin: 0;
+    color: #e56953;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+  }
+
+  .library-reference-section-head h2 {
+    margin: 7px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 29px;
+    line-height: 1.4;
+    letter-spacing: -0.045em;
+  }
+
+  .library-reference-section-head div > span {
+    display: block;
+    margin-top: 6px;
+    color: #7b685f;
+    font-size: 11px;
+    line-height: 1.65;
+  }
+
+  .library-reference-section-head > a {
+    min-height: 42px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    border-radius: 12px;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ed5f4f
+      );
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  @media (max-width: 1100px) {
+    .library-reference-hero {
+      grid-template-columns:
+        minmax(300px, 0.8fr)
+        minmax(440px, 1.2fr);
+    }
+
+    .library-reference-hero-book {
+      width: 105px;
+    }
+
+    .library-reference-summary {
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 820px) {
+    .library-reference-page {
+      padding: 20px 13px 40px;
+    }
+
+    .library-reference-hero {
+      padding: 34px 27px;
+      display: block;
+      border-radius: 24px;
+    }
+
+    .library-reference-hero-books {
+      min-height: 270px;
+      margin-top: 22px;
+      overflow-x: auto;
+      justify-content: flex-start;
+    }
+
+    .library-reference-guide {
+      overflow-x: auto;
+      grid-template-columns:
+        220px 30px
+        220px 30px
+        220px 30px
+        220px;
+    }
+
+    .library-reference-list-section {
+      padding: 18px;
+      border-radius: 21px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .library-reference-hero {
+      padding: 27px 20px 22px;
+    }
+
+    .library-reference-hero h1 {
+      font-size: 38px;
+    }
+
+    .library-reference-hero-copy > span {
+      font-size: 13px;
+    }
+
+    .library-reference-hero-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .library-reference-hero-actions > a {
+      width: 100%;
+    }
+
+    .library-reference-hero-books {
+      min-height: 235px;
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+
+    .library-reference-hero-book {
+      width: 92px;
+    }
+
+    .library-reference-summary {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .library-reference-summary article {
+      padding: 13px;
+    }
+
+    .library-reference-summary strong {
+      font-size: 21px;
+    }
+
+    .library-reference-payment-notice {
+      grid-template-columns:
+        37px minmax(0, 1fr);
+      padding: 14px;
+    }
+
+    .library-reference-payment-notice > span {
+      width: 37px;
+      height: 37px;
+    }
+
+    .library-reference-payment-notice > a {
+      grid-column: 1 / -1;
+      justify-content: center;
+    }
+
+    .library-reference-section-head {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .library-reference-section-head > a {
+      justify-content: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .library-reference-page a,
+    .library-reference-page button {
+      transition: none;
+    }
+  }
+`;

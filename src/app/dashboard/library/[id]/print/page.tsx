@@ -194,6 +194,11 @@ export default async function BookPrintPage({
     allPhotoStories.length +
       storyMemories.length;
 
+  const coverPhoto =
+    photos.length > 0
+      ? photos[0]
+      : null;
+
   return (
     <main
       className="print-preview-main"
@@ -205,6 +210,7 @@ export default async function BookPrintPage({
       }}
     >
       <style>{printStyles}</style>
+      <style>{printUnifiedStyles}</style>
 
       <div
         className="print-toolbar"
@@ -292,12 +298,76 @@ export default async function BookPrintPage({
         </div>
       </div>
 
+      <section className="print-preview-guide">
+        <span aria-hidden="true">
+          A4
+        </span>
+
+        <div>
+          <strong>
+            인쇄 전에 페이지 흐름과 사진
+            배치를 확인하세요.
+          </strong>
+
+          <p>
+            오른쪽 `인쇄하기` 버튼을 누른 뒤
+            용지는 A4, 배율은 기본값으로
+            확인하는 것을 권장합니다.
+          </p>
+        </div>
+
+        <div className="print-preview-guide-stats">
+          <small>
+            사진 {displayedPhotoCount}장
+          </small>
+
+          <small>
+            이야기 {displayedStoryCount}개
+          </small>
+
+          <small>
+            미리보기 {finalPageNumber}쪽
+          </small>
+        </div>
+      </section>
+
       <article className="print-document">
         <PrintPage
           pageNumber={coverPageNumber}
           className="print-cover-page"
           hidePageNumber
         >
+          {coverPhoto ? (
+            <Image
+              className="print-cover-photo"
+              src={`/api/blob/${coverPhoto.id}`}
+              alt={
+                cleanText(
+                  coverPhoto.title,
+                ) ||
+                `${book.title} 표지 사진`
+              }
+              fill
+              unoptimized
+              priority
+              sizes="210mm"
+            />
+          ) : (
+            <Image
+              className="print-cover-photo"
+              src="/dashboard/reader-reference-v1/sample-reader-cover.webp"
+              alt="달동네 스토리북 표지 예시"
+              fill
+              priority
+              sizes="210mm"
+            />
+          )}
+
+          <div
+            className="print-cover-shade"
+            aria-hidden="true"
+          />
+
           <div
             className="print-cover-content"
             style={{
@@ -1832,6 +1902,260 @@ const bodyParagraphStyle: CSSProperties = {
   lineHeight: 1.95,
   wordBreak: 'keep-all',
 };
+
+const printUnifiedStyles = `
+  .print-preview-main,
+  .print-preview-main * {
+    box-sizing: border-box;
+  }
+
+  .print-preview-main {
+    padding: 24px 24px 62px !important;
+    color: #432f26 !important;
+    background:
+      radial-gradient(
+        circle at 7% 8%,
+        rgba(255, 230, 213, 0.58),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 94% 12%,
+        rgba(232, 244, 228, 0.58),
+        transparent 25rem
+      ),
+      linear-gradient(
+        180deg,
+        #fffdf9,
+        #fff8f2
+      ) !important;
+    font-family:
+      var(--font-daldongne-sans),
+      "Noto Sans KR",
+      sans-serif;
+  }
+
+  .print-toolbar {
+    max-width: 1040px !important;
+    margin-bottom: 16px !important;
+    padding: 20px 22px !important;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.13);
+    border-radius: 20px;
+    background:
+      rgba(255, 255, 255, 0.94);
+    box-shadow:
+      0 14px 34px
+      rgba(91, 59, 44, 0.055);
+  }
+
+  .print-toolbar h1 {
+    color: #432f26 !important;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif !important;
+  }
+
+  .print-toolbar > div:first-child > p:first-child {
+    color: #e56852 !important;
+  }
+
+  .print-toolbar-actions > * {
+    min-height: 43px !important;
+    padding: 0 15px !important;
+    border:
+      1px solid #d6b3a3 !important;
+    border-radius: 12px !important;
+    color: #755247 !important;
+    background: #ffffff !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+  }
+
+  .print-toolbar-actions > *:last-child {
+    border-color: transparent !important;
+    color: #ffffff !important;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ed5f4f
+      ) !important;
+    box-shadow:
+      0 12px 24px
+      rgba(218, 82, 63, 0.16);
+  }
+
+  .print-preview-guide {
+    width: 100%;
+    max-width: 1040px;
+    margin: 0 auto 17px;
+    padding: 16px 19px;
+    display: grid;
+    grid-template-columns:
+      48px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 13px;
+    border:
+      1px solid #dfbd84;
+    border-radius: 17px;
+    background:
+      linear-gradient(
+        135deg,
+        #fff7e7,
+        #fffdf9
+      );
+  }
+
+  .print-preview-guide > span {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #ffffff;
+    background: #ed6d56;
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .print-preview-guide strong {
+    display: block;
+    font-size: 13px;
+  }
+
+  .print-preview-guide p {
+    margin: 4px 0 0;
+    color: #78645a;
+    font-size: 10px;
+    line-height: 1.6;
+  }
+
+  .print-preview-guide-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .print-preview-guide-stats small {
+    min-height: 27px;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    color: #72594e;
+    background: #ffffff;
+    font-size: 8px;
+    font-weight: 900;
+  }
+
+  .print-document {
+    max-width: 210mm !important;
+    gap: 19px !important;
+  }
+
+  .print-page {
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.15) !important;
+    border-radius: 18px;
+    background:
+      linear-gradient(
+        180deg,
+        #fffefb,
+        #fffaf6
+      ) !important;
+    box-shadow:
+      0 16px 40px
+      rgba(91, 59, 44, 0.075) !important;
+  }
+
+  .print-cover-page {
+    isolation: isolate;
+    color: #ffffff !important;
+    background: #d9c5b5 !important;
+  }
+
+  .print-cover-photo {
+    z-index: -3;
+    object-fit: cover;
+  }
+
+  .print-cover-shade {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(34, 21, 15, 0.82),
+        rgba(34, 21, 15, 0.5) 56%,
+        rgba(34, 21, 15, 0.2)
+      ),
+      linear-gradient(
+        180deg,
+        rgba(34, 21, 15, 0.08),
+        rgba(34, 21, 15, 0.54)
+      );
+  }
+
+  .print-cover-content {
+    color: #ffffff !important;
+  }
+
+  .print-photo-frame {
+    background: #f2eae4 !important;
+  }
+
+  .print-photo-frame img {
+    object-fit: cover !important;
+  }
+
+  @media screen and (max-width: 760px) {
+    .print-preview-main {
+      padding:
+        15px 10px 45px !important;
+    }
+
+    .print-toolbar {
+      padding: 17px !important;
+      border-radius: 17px;
+    }
+
+    .print-preview-guide {
+      grid-template-columns:
+        42px minmax(0, 1fr);
+      padding: 14px;
+    }
+
+    .print-preview-guide > span {
+      width: 42px;
+      height: 42px;
+    }
+
+    .print-preview-guide-stats {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+    }
+  }
+
+  @media print {
+    .print-preview-guide {
+      display: none !important;
+    }
+
+    .print-cover-photo,
+    .print-cover-shade {
+      visibility: visible !important;
+    }
+
+    .print-cover-page {
+      background: #d9c5b5 !important;
+    }
+  }
+`;
 
 const printStyles = `
   @page {

@@ -253,536 +253,234 @@ export default async function BookDetailPage({
     book.basedStoryCount ??
     storyMemories.length +
       allPhotoStories.length;
+  const coverMemoryId =
+    photos.length > 0 &&
+    typeof photos[0]?.id === "string"
+      ? photos[0].id
+      : "";
+
+  const order =
+    productionRequest?.bookOrder || null;
+
+  const paymentAvailable =
+    Boolean(order) &&
+    ["READY", "FAILED"].includes(
+      String(order?.status),
+    );
+
+  const paymentCompleted =
+    Boolean(order) &&
+    [
+      "PAID",
+      "IN_PRODUCTION",
+      "COMPLETED",
+    ].includes(
+      String(order?.status),
+    );
+
   return (
-    <main
-    className="book-detail-main"  
-    style={{
-        minHeight: '100vh',
-        ...gridPaperPageStyle(),
-        color: '#24170f',
-      }}
-    >
-      <style>{`
-                .book-detail-main {
-          min-height: 100vh;
-          color: #4a352b;
-          background-color: #fffdf9 !important;
-          background-image:
-            linear-gradient(
-              rgba(220, 167, 136, 0.032) 1px,
-              transparent 1px
-            ),
-            linear-gradient(
-              90deg,
-              rgba(220, 167, 136, 0.032) 1px,
-              transparent 1px
-            ) !important;
-          background-size: 32px 32px !important;
-          background-position: 0 0 !important;
-        }
+    <main className="book-detail-reference-page">
+      <style>{bookDetailReferenceStyles}</style>
 
-        .book-detail-panel {
-          background:
-            linear-gradient(
-              145deg,
-              #ffffff,
-              #fffaf7
-            ) !important;
-          border:
-            1px solid rgba(196, 139, 108, 0.19) !important;
-          box-shadow:
-            0 14px 34px
-            rgba(132, 79, 48, 0.055) !important;
-        }
-
-        .book-detail-hero {
-          position: relative;
-          overflow: hidden;
-          background:
-            radial-gradient(
-              circle at 92% 4%,
-              rgba(255, 210, 190, 0.58),
-              transparent 24rem
-            ),
-            radial-gradient(
-              circle at 4% 100%,
-              rgba(255, 241, 202, 0.52),
-              transparent 22rem
-            ),
-            linear-gradient(
-              135deg,
-              #fff8f3 0%,
-              #ffffff 52%,
-              #fff1e8 100%
-            ) !important;
-          border:
-            1px solid rgba(218, 143, 108, 0.22) !important;
-          box-shadow:
-            0 18px 48px
-            rgba(156, 91, 58, 0.08) !important;
-        }
-
-        .book-detail-hero h1,
-        .book-detail-hero h2,
-        .book-detail-hero strong {
-          color: #49352b !important;
-        }
-
-        .book-detail-hero > p:first-child {
-          color: #d56f55 !important;
-        }
-
-        .book-detail-hero p {
-          color: #725d52 !important;
-        }
-
-        .book-detail-actions > a,
-        .book-detail-actions > button {
-          border:
-            1px solid rgba(210, 126, 90, 0.18) !important;
-          background:
-            linear-gradient(
-              135deg,
-              #f49378,
-              #e97861
-            ) !important;
-          color: #ffffff !important;
-          box-shadow:
-            0 10px 23px
-            rgba(220, 104, 77, 0.17) !important;
-        }
-
-        .book-cover-card {
-          background:
-            radial-gradient(
-              circle at 88% 8%,
-              rgba(255, 205, 184, 0.64),
-              transparent 19rem
-            ),
-            linear-gradient(
-              145deg,
-              #fff7f1 0%,
-              #ffffff 54%,
-              #ffede4 100%
-            ) !important;
-          color: #49352b !important;
-          border:
-            1px solid rgba(218, 143, 108, 0.25) !important;
-          box-shadow:
-            0 18px 42px
-            rgba(166, 91, 56, 0.09) !important;
-        }
-
-        .book-cover-card h1,
-        .book-cover-card h2,
-        .book-cover-card h3,
-        .book-cover-card strong {
-          color: #49352b !important;
-        }
-
-        .book-cover-card p {
-          color: #725d52 !important;
-        }
-
-        .book-cover-card > p:first-child {
-          color: #d56f55 !important;
-        }
-
-        .book-cover-card > p:last-child {
-          border-color:
-            rgba(201, 126, 92, 0.22) !important;
-          color: #b2644c !important;
-        }
-
-        .book-content-paper {
-          background: #ffffff !important;
-          border:
-            1px solid rgba(196, 139, 108, 0.2) !important;
-          box-shadow:
-            0 12px 30px
-            rgba(132, 79, 48, 0.05) !important;
-        }
-
-        .book-content-paper h1,
-        .book-content-paper h2,
-        .book-content-paper h3 {
-          color: #49352b !important;
-        }
-
-        .book-content-paper p {
-          color: #584338;
-        }
-
-        .photo-story-card {
-          background: #ffffff !important;
-          border-color:
-            rgba(191, 137, 106, 0.19) !important;
-          box-shadow:
-            0 10px 26px
-            rgba(127, 76, 47, 0.045) !important;
-        }
-
-        .photo-story-image {
-          background: #fff3ed !important;
-        }
-
-        .book-next-section {
-          background:
-            linear-gradient(
-              135deg,
-              #fff8f3,
-              #ffffff
-            ) !important;
-        }
-
-        .book-detail-panel h1,
-        .book-detail-panel h2,
-        .book-detail-panel h3 {
-          color: #49352b;
-        }
-
-        .book-detail-panel
-        > p:first-child,
-        .book-detail-panel
-        > div
-        > p:first-child {
-          color: #d67358 !important;
-        }
-
-        .book-detail-panel input,
-        .book-detail-panel textarea,
-        .book-detail-panel select {
-          border:
-            1px solid rgba(192, 139, 108, 0.28) !important;
-          background: #fffdfb !important;
-          color: #49352b !important;
-        }
-
-        .book-detail-panel input:focus,
-        .book-detail-panel textarea:focus,
-        .book-detail-panel select:focus {
-          border-color: #e68a6f !important;
-          outline:
-            3px solid rgba(230, 138, 111, 0.12) !important;
-        }
-        .book-detail-container {
-          width: 100%;
-          max-width: 1240px;
-          margin: 0 auto;
-          padding: 28px 28px 80px;
-        }
-
-        .book-detail-header {
-          display: grid;
-          grid-template-columns:
-            minmax(0, 1fr) auto;
-          gap: 24px;
-          align-items: start;
-        }
-
-        .book-detail-actions {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: flex-end;
-          gap: 8px;
-          max-width: 620px;
-        }
-
-        .book-overview-grid {
-          display: grid;
-          grid-template-columns:
-            minmax(280px, 0.9fr)
-            minmax(360px, 1.35fr);
-          gap: 24px;
-        }
-
-        .book-info-grid {
-          display: grid;
-          grid-template-columns:
-            repeat(3, minmax(0, 1fr));
-          gap: 12px;
-        }
-
-        .book-section-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          flex-wrap: wrap;
-          gap: 14px;
-        }
-
-        .book-preview-actions {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .book-photo-grid {
-          display: grid;
-          grid-template-columns:
-            repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
-        }
-
-        .book-story-grid {
-          display: grid;
-          grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-          gap: 24px;
-        }
-
-        .photo-story-card {
-          display: grid;
-          grid-template-columns:
-            140px minmax(0, 1fr);
-        }
-
-        .book-next-section {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .book-next-actions {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        @media (max-width: 1000px) {
-          .book-detail-header {
-            grid-template-columns: 1fr;
-          }
-
-          .book-detail-actions {
-            justify-content: flex-start;
-            max-width: none;
-          }
-
-          .book-overview-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .book-story-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 700px) {
-          .book-detail-container {
-            padding: 16px 16px 60px;
-          }
-
-          .book-detail-panel {
-            padding: 20px 16px !important;
-            border-radius: 24px !important;
-          }
-
-          .book-detail-actions {
-            display: grid;
-            grid-template-columns: 1fr;
-            width: 100%;
-          }
-
-          .book-detail-actions > * {
-            width: 100%;
-          }
-
-          .book-info-grid {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
-          }
-
-          .book-preview-actions {
-            display: grid;
-            grid-template-columns: 1fr;
-            width: 100%;
-          }
-
-          .book-preview-actions a {
-            width: 100%;
-          }
-
-          .book-photo-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .photo-story-card {
-            grid-template-columns: 1fr;
-          }
-
-          .photo-story-image {
-            min-height: 220px !important;
-          }
-
-          .photo-story-content {
-            padding: 18px !important;
-          }
-
-          .book-content-paper {
-            padding: 24px 18px !important;
-          }
-
-          .book-next-section {
-            display: grid;
-            grid-template-columns: 1fr;
-          }
-
-          .book-next-actions {
-            display: grid;
-            grid-template-columns: 1fr;
-          }
-
-          .book-next-actions a {
-            width: 100%;
-          }
-        }
-      `}</style>
-
-      <div className="book-detail-container">
-        <section
-          className="book-detail-panel book-detail-hero"
-           style={{
-            padding: 30,
-            borderRadius: 30,
-            border:
-              '1px solid #e4cda3',
-            background: '#fffaf0',
-            boxShadow:
-              '0 18px 45px rgba(80, 55, 20, 0.10)',
-            marginBottom: 24,
-          }}
+      <div className="book-detail-reference-shell">
+        <nav
+          className="book-detail-reference-breadcrumb"
+          aria-label="책 상세 위치"
         >
-          <p
-            style={{
-              margin: 0,
-              color: '#9a6a24',
-              fontSize: 12,
-              fontWeight: 900,
-              letterSpacing: '0.06em',
-            }}
-          >
-            내 책장 / 책 상세 보기
-          </p>
+          <Link href="/dashboard">
+            작업실
+          </Link>
 
-          <div
-            className="book-detail-header"
-            style={{
-              marginTop: 12,
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 7,
-                  marginBottom: 12,
-                }}
-              >
-                <span
-                  style={bookTypeBadgeStyle()}
-                >
+          <span aria-hidden="true">›</span>
+
+          <Link href="/dashboard/library">
+            내 책장
+          </Link>
+
+          <span aria-hidden="true">›</span>
+
+          <strong>{book.title}</strong>
+        </nav>
+
+        <section className="book-detail-reference-hero">
+          <div className="book-detail-reference-cover-column">
+            <div className="book-detail-reference-cover">
+              {coverMemoryId ? (
+                <Image
+                  src={`/api/blob/${coverMemoryId}`}
+                  alt={`${book.title} 표지 사진`}
+                  fill
+                  unoptimized
+                  priority
+                  sizes="(max-width: 760px) 78vw, 330px"
+                />
+              ) : (
+                <Image
+                  src="/dashboard/book-detail-reference-v1/sample-detail-cover.webp"
+                  alt="달동네 스토리북 예시 표지"
+                  fill
+                  priority
+                  sizes="(max-width: 760px) 78vw, 330px"
+                />
+              )}
+
+              <div className="book-detail-reference-cover-overlay">
+                <span>
                   {getBookTypeLabel(
                     String(book.type),
                   )}
                 </span>
 
-                <span
-                  style={bookStatusBadgeStyle(
-                    String(book.status),
-                  )}
-                >
-                  {getStatusLabel(
-                    String(book.status),
-                  )}
-                </span>
+                <h2>{book.title}</h2>
 
-                <span
-                  style={productionStatusBadgeStyle(
-                    productionRequest
-                      ? String(
-                          productionRequest.status,
-                        )
-                      : null,
-                  )}
-                >
-                  {productionRequest
-                    ? getProductionRequestStatusLabel(
-                        String(
-                          productionRequest.status,
-                        ),
-                      )
-                    : '주문 신청 전'}
-                </span>
-              </div>
-
-              <h1
-                style={{
-                  margin: 0,
-                  color: '#20130d',
-                  fontFamily:
-                    'Noto Serif KR, serif',
-                  fontSize:
-                    'clamp(34px, 5vw, 46px)',
-                  lineHeight: 1.25,
-                  letterSpacing: '-0.05em',
-                  wordBreak: 'break-word',
-                }}
-              >
-                {book.title}
-              </h1>
-
-              {book.subtitle ? (
-                <p
-                  style={{
-                    margin: '13px 0 0',
-                    color: '#6b5a46',
-                    fontSize: 17,
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {book.subtitle}
+                <p>
+                  {book.subtitle ||
+                    "사진과 이야기로 엮은 우리들의 기록"}
                 </p>
-              ) : null}
 
-              <p
-                style={{
-                  margin: '12px 0 0',
-                  color: '#8a806f',
-                  fontSize: 12,
-                }}
-              >
-                생성일{' '}
-                {formatDate(
-                  book.createdAt,
-                )}
-                {' · '}
-                마지막 정리일{' '}
-                {formatDate(
-                  book.updatedAt,
-                )}
-              </p>
+                <small>
+                  달동네 스토리북
+                </small>
+              </div>
             </div>
 
-            <div className="book-detail-actions">
-              {String(book.status) !== 'PUBLISHED' ? (
-            <EditBookDraftButton
-               bookId={book.id}
-               initialTitle={book.title}
-               initialSubtitle={book.subtitle}
-               initialSummary={summary}
-               initialCoverText={coverText}
-               initialContent={content}
-              />
+            <div className="book-detail-reference-cover-links">
+              <Link
+                href={`/dashboard/library/${book.id}/ebook`}
+              >
+                전자책 보기
+              </Link>
+
+              <Link
+                href={`/dashboard/library/${book.id}/print`}
+              >
+                인쇄용 원고
+              </Link>
+            </div>
+          </div>
+
+          <div className="book-detail-reference-main-copy">
+            <div className="book-detail-reference-badges">
+              <span data-tone="coral">
+                {getBookTypeLabel(
+                  String(book.type),
+                )}
+              </span>
+
+              <span data-tone="cream">
+                {getStatusLabel(
+                  String(book.status),
+                )}
+              </span>
+
+              <span data-tone="mint">
+                {productionRequest
+                  ? getProductionRequestStatusLabel(
+                      String(
+                        productionRequest.status,
+                      ),
+                    )
+                  : "제작 미신청"}
+              </span>
+
+              {order ? (
+                <span
+                  data-tone={
+                    paymentAvailable
+                      ? "yellow"
+                      : paymentCompleted
+                        ? "blue"
+                        : "gray"
+                  }
+                >
+                  {getBookOrderStatusLabel(
+                    String(order.status),
+                  )}
+                </span>
               ) : null}
-            
-              {String(book.status) !== 'PUBLISHED' ? (
-              <BookRevisionHistoryButton
-               bookId={book.id}
+            </div>
+
+            <p className="book-detail-reference-kicker">
+              나의 책 상세 보기
+            </p>
+
+            <h1>{book.title}</h1>
+
+            {book.subtitle ? (
+              <p className="book-detail-reference-subtitle">
+                {book.subtitle}
+              </p>
+            ) : null}
+
+            <p className="book-detail-reference-summary">
+              {summary}
+            </p>
+
+            <div className="book-detail-reference-date">
+              <span>
+                만든 날{" "}
+                {formatDate(book.createdAt)}
+              </span>
+
+              <i aria-hidden="true">·</i>
+
+              <span>
+                마지막 정리{" "}
+                {formatDate(book.updatedAt)}
+              </span>
+            </div>
+
+            <div className="book-detail-reference-info-grid">
+              <DetailInfo
+                label="예상 분량"
+                value={getPageCountLabel(
+                  book.pageCount,
+                )}
+              />
+
+              <DetailInfo
+                label="사용 사진"
+                value={`${displayedPhotoCount}장`}
+              />
+
+              <DetailInfo
+                label="사용 이야기"
+                value={`${displayedStoryCount}개`}
+              />
+
+              <DetailInfo
+                label="연결 자료"
+                value={
+                  linkedMemories.length > 0
+                    ? `${linkedMemories.length}개`
+                    : "이전 방식"
+                }
+              />
+            </div>
+
+            <div className="book-detail-reference-actions">
+              {String(book.status) !==
+              "PUBLISHED" ? (
+                <EditBookDraftButton
+                  bookId={book.id}
+                  initialTitle={book.title}
+                  initialSubtitle={
+                    book.subtitle
+                  }
+                  initialSummary={summary}
+                  initialCoverText={
+                    coverText
+                  }
+                  initialContent={content}
                 />
-              ) : null}             
+              ) : null}
+
+              {String(book.status) !==
+              "PUBLISHED" ? (
+                <BookRevisionHistoryButton
+                  bookId={book.id}
+                />
+              ) : null}
 
               <RefreshBookDraftButton
                 bookId={book.id}
@@ -801,7 +499,7 @@ export default async function BookDetailPage({
                 }
                 defaultPhone={
                   productionRequest?.phone ||
-                  ''
+                  ""
                 }
                 defaultEmail={
                   productionRequest?.email ||
@@ -811,7 +509,7 @@ export default async function BookDetailPage({
                 }
                 defaultMessage={
                   productionRequest?.message ||
-                  ''
+                  ""
                 }
                 existingRequestId={
                   productionRequest
@@ -829,16 +527,6 @@ export default async function BookDetailPage({
                 }
               />
 
-              <Link
-                href="/dashboard/library"
-                style={buttonStyle(
-                  '#fffaf0',
-                  '#4a3828',
-                )}
-              >
-                내 책장으로
-              </Link>
-
               <DeleteBookButton
                 bookId={book.id}
                 redirectTo="/dashboard/library"
@@ -847,564 +535,272 @@ export default async function BookDetailPage({
           </div>
         </section>
 
-        <section
-          className="book-overview-grid"
-          style={{
-            marginBottom: 24,
-          }}
-        >
-          <article
-              className="book-detail-panel book-cover-card"
-              style={{
-              minHeight: 350,
-              padding: 34,
-              borderRadius: 30,
-              background:
-                'linear-gradient(135deg, #21150f 0%, #332016 58%, #6e3c22 100%)',
-              color: '#fffaf0',
-              boxShadow:
-                '0 18px 40px rgba(70, 45, 20, 0.18)',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: '#f3d28a',
-                fontSize: 12,
-                fontWeight: 900,
-                letterSpacing: '0.06em',
-              }}
-            >
-              DALDONGNE MEMORY BOOK
-            </p>
+        <section className="book-detail-reference-status-grid">
+          <article className="book-detail-reference-intro-card">
+            <p>표지 문구</p>
 
-            <h2
-              style={{
-                margin: '18px 0 0',
-                fontFamily:
-                  'Noto Serif KR, serif',
-                fontSize: 34,
-                lineHeight: 1.32,
-                letterSpacing: '-0.05em',
-              }}
-            >
-              {book.title}
+            <h2>
+              이 책이 전하고 싶은 마음
             </h2>
 
-            <p
-              style={{
-                margin: '38px 0 0',
-                color: '#fff2d8',
-                fontSize: 18,
-                lineHeight: 1.85,
-                wordBreak: 'keep-all',
-              }}
-            >
+            <blockquote>
               {coverText}
-            </p>
-
-            <p
-              style={{
-                margin: '38px 0 0',
-                paddingTop: 17,
-                borderTop:
-                  '1px solid rgba(255,255,255,0.18)',
-                color: '#f3d28a',
-                fontSize: 13,
-                fontWeight: 800,
-              }}
-            >
-              사진과 이야기로 엮은
-              우리들의 기록
-            </p>
-          </article>
-
-          <article
-            className="book-detail-panel"
-            style={panelStyle()}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: '#9a6a24',
-                fontSize: 12,
-                fontWeight: 900,
-                letterSpacing: '0.06em',
-              }}
-            >
-              책 소개
-            </p>
-
-            <p
-              style={{
-                margin: '12px 0 0',
-                color: '#4a3828',
-                fontSize: 17,
-                lineHeight: 1.85,
-                wordBreak: 'keep-all',
-              }}
-            >
-              {summary}
-            </p>
+            </blockquote>
 
             <div
-              className="book-info-grid"
-              style={{
-                marginTop: 24,
-              }}
+              data-connected={
+                linkedMemories.length > 0
+                  ? "true"
+                  : "false"
+              }
             >
-              <InfoCard
-                title="책 종류"
-                value={getBookTypeLabel(
-                  String(book.type),
-                )}
-              />
+              <span aria-hidden="true">
+                {linkedMemories.length > 0
+                  ? "✓"
+                  : "i"}
+              </span>
 
-              <InfoCard
-                title="책 상태"
-                value={getStatusLabel(
-                  String(book.status),
-                )}
-              />
+              <p>
+                {linkedMemories.length > 0
+                  ? "원고를 만들 때 선택한 사진과 이야기가 이 책에 연결되어 있습니다."
+                  : "이전 방식으로 만든 책입니다. 원고 다시 정리하기를 실행하면 현재 자료가 다시 연결됩니다."}
+              </p>
+            </div>
+          </article>
 
-              <InfoCard
-                title="주문 신청"
-                value={
-                  productionRequest
-                    ? getProductionRequestStatusLabel(
-                        String(
-                          productionRequest.status,
-                        ),
-                      )
-                    : '신청 전'
-                }
-              />
+          <article className="book-detail-reference-production-card">
+            <div className="book-detail-reference-section-title">
+              <p>제작·주문 상태</p>
 
-              <InfoCard
-                title="예상 분량"
-                value={getPageCountLabel(
-                  book.pageCount,
-                )}
-              />
-
-              <InfoCard
-                title="사용 사진"
-                value={`${displayedPhotoCount}장`}
-              />
-
-              <InfoCard
-                title="사용 이야기"
-                value={`${displayedStoryCount}개`}
-              />
+              <h2>
+                {order
+                  ? "제작 견적과 결제 상태"
+                  : productionRequest
+                    ? "제작 상담이 진행 중입니다"
+                    : "아직 제작 신청 전입니다"}
+              </h2>
             </div>
 
             {productionRequest ? (
-              <div
-                style={{
-                  marginTop: 20,
-                  padding: 16,
-                  borderRadius: 18,
-                  border:
-                    '1px solid #b9d5e9',
-                  background: '#eef7ff',
-                }}
-              >
-
-                           {productionRequest?.bookOrder ? (
-              <section
-                style={{
-                  marginTop: 18,
-                  padding: 22,
-                  borderRadius: 22,
-                  border: '1px solid #d8b97c',
-                  background: '#fff8e9',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    flexWrap: 'wrap',
-                    gap: 12,
-                  }}
-                >
-                  <div>
-                    <p
-                      style={{
-                        margin: 0,
-                        color: '#9a6a24',
-                        fontSize: 12,
-                        fontWeight: 900,
-                        letterSpacing: '0.06em',
-                      }}
-                    >
-                      제작 견적
-                    </p>
-
-                    <h2
-                      style={{
-                        margin: '7px 0 0',
-                        color: '#2d1c12',
-                        fontFamily: 'Noto Serif KR, serif',
-                        fontSize: 24,
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      {productionRequest.bookOrder.productName}
-                    </h2>
-                  </div>
-
-                  <span
-                    style={{
-                      padding: '7px 11px',
-                      borderRadius: 999,
-                      background: '#6e421d',
-                      color: '#fffaf0',
-                      fontSize: 12,
-                      fontWeight: 900,
-                    }}
-                  >
-                    {getBookOrderStatusLabel(
-                      productionRequest.bookOrder.status,
-                    )}
-                  </span>
-                </div>
-
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns:
-                      'repeat(auto-fit, minmax(160px, 1fr))',
-                    gap: 10,
-                    marginTop: 18,
-                  }}
-                >
-                  <InfoCard
-                    title="제작 수량"
-                    value={`${productionRequest.bookOrder.quantity.toLocaleString()}권`}
+              <>
+                <div className="book-detail-reference-request-meta">
+                  <DetailInfo
+                    label="신청자"
+                    value={
+                      productionRequest.name ||
+                      "이름 미입력"
+                    }
                   />
 
-                  <InfoCard
-                    title="상품 금액"
-                    value={`${productionRequest.bookOrder.productAmount.toLocaleString()}원`}
+                  <DetailInfo
+                    label="연락처"
+                    value={
+                      productionRequest.phone ||
+                      "연락처 미입력"
+                    }
                   />
 
-                  <InfoCard
-                    title="배송비"
-                    value={`${productionRequest.bookOrder.shippingFee.toLocaleString()}원`}
-                  />
-
-                  <InfoCard
-                    title="최종 결제 금액"
-                    value={`${productionRequest.bookOrder.totalAmount.toLocaleString()}원`}
+                  <DetailInfo
+                    label="이메일"
+                    value={
+                      productionRequest.email ||
+                      "이메일 미입력"
+                    }
                   />
                 </div>
 
-                {productionRequest.bookOrder.specification ? (
-                  <div
-                    style={{
-                      marginTop: 14,
-                      padding: 15,
-                      borderRadius: 16,
-                      background: '#fffdf7',
-                      border: '1px solid #ead7b7',
-                    }}
-                  >
-                    <p
-                      style={{
-                        margin: 0,
-                        color: '#8a806f',
-                        fontSize: 11,
-                        fontWeight: 900,
-                      }}
-                    >
-                      제작 사양
-                    </p>
+                {productionRequest.message ? (
+                  <div className="book-detail-reference-request-message">
+                    <strong>
+                      제작 요청사항
+                    </strong>
 
-                    <p
-                      style={{
-                        margin: '8px 0 0',
-                        color: '#3b2b1d',
-                        fontSize: 14,
-                        lineHeight: 1.75,
-                        whiteSpace: 'pre-line',
-                      }}
-                    >
-                      {productionRequest.bookOrder.specification}
+                    <p>
+                      {productionRequest.message}
                     </p>
                   </div>
                 ) : null}
 
-                <div
-                  style={{
-                    marginTop: 14,
-                    padding: 14,
-                    borderRadius: 16,
-                    background: '#2d2119',
-                    color: '#fffaf0',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: 10,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 12,
-                      color: 'rgba(255, 250, 240, 0.74)',
-                    }}
-                  >
-                    주문번호 {productionRequest.bookOrder.orderId}
-                  </span>
+                {order ? (
+                  <div className="book-detail-reference-order-box">
+                    <div className="book-detail-reference-order-head">
+                      <div>
+                        <span>
+                          {order.productName}
+                        </span>
 
-                  <strong
-                    style={{
-                      fontSize: 21,
-                    }}
-                  >
-                    {productionRequest.bookOrder.totalAmount.toLocaleString()}원
-                  </strong>
-                </div>
+                        <strong>
+                          {getBookOrderStatusLabel(
+                            String(
+                              order.status,
+                            ),
+                          )}
+                        </strong>
+                      </div>
 
-                {[
-                  'READY',
-                  'FAILED',
-                ].includes(
-                  productionRequest.bookOrder.status,
-                ) ? (
-                  <Link
-                    href={`/dashboard/library/${book.id}/checkout`}
-                    style={{
-                      minHeight: 54,
-                      marginTop: 16,
-                      padding: '0 20px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 12,
-                      borderRadius: 14,
-                      color: '#ffffff',
-                      background:
-                        'linear-gradient(135deg, #ff7664, #ed5e4f)',
-                      boxShadow:
-                        '0 14px 28px rgba(218, 82, 63, 0.19)',
-                      fontSize: 14,
-                      fontWeight: 900,
-                      textDecoration: 'none',
-                    }}
-                  >
-                    검토·결제 화면으로 이동
-                    <span aria-hidden="true">
-                      →
-                    </span>
-                  </Link>
-                ) : null}
-              </section>
-            ) : null}
-                <p
-                  style={{
-                    margin: 0,
-                    color: '#245d8c',
-                    fontSize: 12,
-                    fontWeight: 900,
-                  }}
-                >
-                  주문 신청 현황'
-                </p>
+                      <b>
+                        {order.totalAmount.toLocaleString()}
+                        원
+                      </b>
+                    </div>
 
-                <strong
-                  style={{
-                    display: 'block',
-                    marginTop: 6,
-                    color: '#33271d',
-                    fontSize: 15,
-                    lineHeight: 1.55,
-                  }}
-                >
-                  {getProductionRequestStatusLabel(
-                    String(
-                      productionRequest.status,
-                    ),
-                  )}
-                </strong>
+                    <div className="book-detail-reference-order-prices">
+                      <PriceInfo
+                        label="제작 수량"
+                        value={`${order.quantity.toLocaleString()}권`}
+                      />
 
-                <p
-                  style={{
-                    margin: '7px 0 0',
-                    color: '#5f7180',
-                    fontSize: 12,
-                    lineHeight: 1.65,
-                  }}
-                >
-                  신청일{' '}
-                  {formatDate(
-                    productionRequest.createdAt,
-                  )}
-                  {' · '}
-                  최근 변경{' '}
-                  {formatDate(
-                    productionRequest.updatedAt,
-                  )}
-                </p>
-              </div>
+                      <PriceInfo
+                        label="상품 금액"
+                        value={`${order.productAmount.toLocaleString()}원`}
+                      />
+
+                      <PriceInfo
+                        label="배송비"
+                        value={`${order.shippingFee.toLocaleString()}원`}
+                      />
+                    </div>
+
+                    {order.specification ? (
+                      <div className="book-detail-reference-specification">
+                        <strong>
+                          제작 사양
+                        </strong>
+
+                        <p>
+                          {order.specification}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    <div className="book-detail-reference-order-number">
+                      <span>
+                        주문번호
+                      </span>
+
+                      <strong>
+                        {order.orderId}
+                      </strong>
+                    </div>
+
+                    {paymentAvailable ? (
+                      <Link
+                        href={`/dashboard/library/${book.id}/checkout`}
+                        className="book-detail-reference-checkout-link"
+                      >
+                        검토·결제 화면으로 이동
+                        <span aria-hidden="true">
+                          →
+                        </span>
+                      </Link>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="book-detail-reference-waiting-box">
+                    <strong>
+                      관리자 검토와 견적을
+                      기다리고 있습니다.
+                    </strong>
+
+                    <p>
+                      신청일{" "}
+                      {formatDate(
+                        productionRequest.createdAt,
+                      )}
+                      {" · "}
+                      최근 변경{" "}
+                      {formatDate(
+                        productionRequest.updatedAt,
+                      )}
+                    </p>
+                  </div>
+                )}
+              </>
             ) : (
-              <div
-                style={{
-                  marginTop: 20,
-                  padding: 16,
-                  borderRadius: 18,
-                  border:
-                    '1px solid #e3bd7a',
-                  background: '#fff4df',
-                  color: '#83540d',
-                  fontSize: 13,
-                  lineHeight: 1.7,
-                  fontWeight: 800,
-                }}
-              >
-                이 책은 아직 책 제작 주문을
-                신청하지 않았습니다. 상단의
-                책 제작 주문 신청 버튼을 누르면
-                관리자가 1차 검토 후 연락드립니다.
+              <div className="book-detail-reference-no-request">
+                <span aria-hidden="true">
+                  4
+                </span>
+
+                <div>
+                  <strong>
+                    책 원고를 확인한 뒤
+                    제작 상담을 신청하세요.
+                  </strong>
+
+                  <p>
+                    관리자가 원고와 제작 사양을
+                    검토한 후 연락하고 견적을
+                    등록합니다.
+                  </p>
+                </div>
               </div>
             )}
-
-            <p
-              style={{
-                margin: '18px 0 0',
-                padding: '12px 14px',
-                borderRadius: 16,
-                background:
-                  linkedMemories.length > 0
-                    ? '#f3fbf5'
-                    : '#fff9e8',
-                border:
-                  linkedMemories.length > 0
-                    ? '1px solid #9ec9a8'
-                    : '1px solid #e1bd67',
-                color:
-                  linkedMemories.length > 0
-                    ? '#2f6b3f'
-                    : '#7a4b00',
-                fontSize: 12,
-                lineHeight: 1.7,
-                fontWeight: 800,
-              }}
-            >
-              {linkedMemories.length > 0
-                ? '이 책은 원고를 만들 때 선택한 사진과 이야기를 기준으로 표시됩니다.'
-                : '이전 방식으로 만든 책이라 연결된 자료가 없습니다. 원고 다시 정리하기를 실행하면 현재 자료가 책에 다시 연결됩니다.'}
-            </p>
           </article>
         </section>
 
-        <section
-          className="book-detail-panel"
-          style={{
-            ...panelStyle(),
-            marginBottom: 24,
-          }}
-        >
-          <div className="book-section-header">
+        <section className="book-detail-reference-manuscript">
+          <div className="book-detail-reference-section-head">
             <div>
-              <p
-                style={{
-                  margin: 0,
-                  color: '#9a6a24',
-                  fontSize: 12,
-                  fontWeight: 900,
-                  letterSpacing: '0.06em',
-                }}
-              >
-                책 원고 미리보기
-              </p>
+              <p>책 원고 미리보기</p>
 
-              <h2
-                style={{
-                  margin: '8px 0 0',
-                  color: '#20130d',
-                  fontFamily:
-                    'Noto Serif KR, serif',
-                  fontSize: 30,
-                  lineHeight: 1.35,
-                  letterSpacing: '-0.04em',
-                }}
-              >
-                한 권의 책처럼 읽히는 원고
+              <h2>
+                한 권의 책처럼 읽히는
+                원고
               </h2>
 
-              <p
-                style={{
-                  margin: '9px 0 0',
-                  maxWidth: 720,
-                  color: '#6b5a46',
-                  fontSize: 14,
-                  lineHeight: 1.75,
-                }}
-              >
-                전자책 화면에서는 실제 책처럼
-                읽고, 인쇄용 원고에서는 표지와
-                목차를 포함한 출력 형태를
-                확인할 수 있습니다.
-              </p>
+              <span>
+                표지와 본문을 확인하고,
+                필요한 부분은 상단의 원고
+                수정 기능으로 고칠 수 있습니다.
+              </span>
             </div>
 
-            <div className="book-preview-actions">
+            <div>
               <Link
                 href={`/dashboard/library/${book.id}/ebook`}
-                style={buttonStyle(
-                  '#fff4df',
-                  '#5a3510',
-                )}
               >
-                전자책 보기
+                전자책으로 읽기
               </Link>
 
               <Link
                 href={`/dashboard/library/${book.id}/print`}
-                style={buttonStyle(
-                  '#f3d28a',
-                  '#6d4512',
-                )}
               >
-                인쇄용 원고
+                인쇄용 원고 보기
               </Link>
             </div>
           </div>
 
-          <div
-            style={{
-              marginTop: 24,
-            }}
-          >
+          <div className="book-detail-reference-content-wrap">
             <BookContentPreview
               blocks={parsedContent}
             />
           </div>
         </section>
 
-        <section
-          className="book-detail-panel"
-          style={{
-            ...panelStyle(),
-            marginBottom: 24,
-          }}
-        >
-          <SectionTitle
-            label="이 책에 들어간 사진"
-            title="사진에서 시작된 기억"
-            description={`현재 화면에는 최대 8장까지 표시합니다. 전체 연결 사진은 ${photoMemories.length}장입니다.`}
-          />
+        <section className="book-detail-reference-photos">
+          <div className="book-detail-reference-section-head">
+            <div>
+              <p>이 책에 들어간 사진</p>
+
+              <h2>
+                사진에서 시작된 기억
+              </h2>
+
+              <span>
+                현재 화면에는 최대 8장까지
+                표시합니다. 전체 연결 사진은{" "}
+                {photoMemories.length}장입니다.
+              </span>
+            </div>
+
+            <Link href="/dashboard/timeline">
+              사진 더 모으기
+            </Link>
+          </div>
 
           {photos.length > 0 ? (
-            <div
-              className="book-photo-grid"
-              style={{
-                marginTop: 20,
-              }}
-            >
+            <div className="book-detail-reference-photo-grid">
               {photos.map(
                 (photo, index) => (
                   <PhotoCard
@@ -1421,36 +817,31 @@ export default async function BookDetailPage({
           )}
         </section>
 
-        <section
-          className="book-story-grid"
-          style={{
-            marginBottom: 24,
-          }}
-        >
-          <article
-            className="book-detail-panel"
-            style={panelStyle()}
-          >
-            <SectionTitle
-              label="사진에 붙인 이야기"
-              title="사진 한 장에 담긴 기억"
-              description="사진의 제목과 설명으로 남긴 이야기입니다."
-            />
+        <section className="book-detail-reference-story-grid">
+          <article>
+            <div className="book-detail-reference-section-head">
+              <div>
+                <p>사진에 붙인 이야기</p>
+
+                <h2>
+                  사진 한 장에 담긴
+                  기억
+                </h2>
+
+                <span>
+                  사진의 제목과 설명으로
+                  남긴 이야기입니다.
+                </span>
+              </div>
+            </div>
 
             {photoStories.length > 0 ? (
-              <div
-                style={{
-                  display: 'grid',
-                  gap: 14,
-                  marginTop: 20,
-                }}
-              >
+              <div className="book-detail-reference-story-list">
                 {photoStories.map(
                   (story, index) => (
                     <PhotoStoryCard
                       key={String(
-                        story.id ??
-                          index,
+                        story.id ?? index,
                       )}
                       story={story}
                     />
@@ -1462,30 +853,34 @@ export default async function BookDetailPage({
             )}
           </article>
 
-          <article
-            className="book-detail-panel"
-            style={panelStyle()}
-          >
-            <SectionTitle
-              label="직접 남긴 이야기"
-              title="글로 남긴 우리들의 시간"
-              description="이야기 남기기 화면에서 직접 작성한 기록입니다."
-            />
+          <article>
+            <div className="book-detail-reference-section-head">
+              <div>
+                <p>직접 남긴 이야기</p>
+
+                <h2>
+                  글로 남긴 우리들의
+                  시간
+                </h2>
+
+                <span>
+                  이야기 쓰기 화면에서
+                  직접 작성한 기록입니다.
+                </span>
+              </div>
+
+              <Link href="/dashboard/interview">
+                이야기 더 남기기
+              </Link>
+            </div>
 
             {stories.length > 0 ? (
-              <div
-                style={{
-                  display: 'grid',
-                  gap: 14,
-                  marginTop: 20,
-                }}
-              >
+              <div className="book-detail-reference-story-list">
                 {stories.map(
                   (story, index) => (
                     <StoryCard
                       key={String(
-                        story.id ??
-                          index,
+                        story.id ?? index,
                       )}
                       story={story}
                     />
@@ -1498,82 +893,33 @@ export default async function BookDetailPage({
           </article>
         </section>
 
-        <section
-          className="book-detail-panel book-next-section"
-          style={panelStyle()}
-        >
+        <section className="book-detail-reference-next">
           <div>
-            <p
-              style={{
-                margin: 0,
-                color: '#9a6a24',
-                fontSize: 12,
-                fontWeight: 900,
-                letterSpacing: '0.06em',
-              }}
-            >
-              다음 작업
-            </p>
+            <p>다음 작업</p>
 
-            <h2
-              style={{
-                margin: '8px 0 0',
-                color: '#20130d',
-                fontFamily:
-                  'Noto Serif KR, serif',
-                fontSize: 28,
-                lineHeight: 1.4,
-                letterSpacing: '-0.04em',
-              }}
-            >
+            <h2>
               사진과 이야기를 보완하면
               원고를 더 풍부하게 만들 수
               있습니다.
             </h2>
 
-            <p
-              style={{
-                margin: '9px 0 0',
-                maxWidth: 720,
-                color: '#6b5a46',
-                fontSize: 14,
-                lineHeight: 1.75,
-              }}
-            >
-              자료를 추가한 다음 상단의
-              원고 다시 정리하기 버튼을
+            <span>
+              자료를 추가한 뒤 상단의
+              원고 다시 정리하기 기능을
               사용하세요.
-            </p>
+            </span>
           </div>
 
-          <div className="book-next-actions">
-            <Link
-              href="/dashboard/timeline"
-              style={buttonStyle(
-                '#fffaf0',
-                '#4a3828',
-              )}
-            >
+          <div>
+            <Link href="/dashboard/timeline">
               사진 더 모으기
             </Link>
 
-            <Link
-              href="/dashboard/interview"
-              style={buttonStyle(
-                '#fffaf0',
-                '#4a3828',
-              )}
-            >
+            <Link href="/dashboard/interview">
               이야기 더 남기기
             </Link>
 
-            <Link
-              href="/dashboard/library"
-              style={buttonStyle(
-                '#24170f',
-                '#fffaf0',
-              )}
-            >
+            <Link href="/dashboard/library">
               내 책장으로
             </Link>
           </div>
@@ -1582,6 +928,1085 @@ export default async function BookDetailPage({
     </main>
   );
 }
+
+function DetailInfo({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="book-detail-reference-info">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function PriceInfo({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="book-detail-reference-price">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+const bookDetailReferenceStyles = `
+  .book-detail-reference-page,
+  .book-detail-reference-page * {
+    box-sizing: border-box;
+  }
+
+  .book-detail-reference-page {
+    min-height: 100vh;
+    padding: 24px 24px 56px;
+    color: #432f26;
+    background:
+      radial-gradient(
+        circle at 7% 8%,
+        rgba(255, 230, 213, 0.56),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 95% 12%,
+        rgba(231, 244, 229, 0.56),
+        transparent 25rem
+      ),
+      linear-gradient(
+        180deg,
+        #fffdf9,
+        #fff9f3
+      );
+    font-family:
+      var(--font-daldongne-sans),
+      "Noto Sans KR",
+      sans-serif;
+  }
+
+  .book-detail-reference-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .book-detail-reference-page a,
+  .book-detail-reference-page button {
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .book-detail-reference-page a:hover,
+  .book-detail-reference-page button:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  .book-detail-reference-page a:focus-visible,
+  .book-detail-reference-page button:focus-visible,
+  .book-detail-reference-page input:focus-visible,
+  .book-detail-reference-page textarea:focus-visible {
+    outline:
+      4px solid
+      rgba(239, 105, 83, 0.2);
+    outline-offset: 3px;
+  }
+
+  .book-detail-reference-shell {
+    width: min(1380px, 100%);
+    margin: 0 auto;
+  }
+
+  .book-detail-reference-breadcrumb {
+    min-height: 40px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #8d7469;
+    font-size: 11px;
+  }
+
+  .book-detail-reference-breadcrumb strong {
+    max-width: 420px;
+    overflow: hidden;
+    color: #4b382f;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .book-detail-reference-hero {
+    padding: 28px;
+    display: grid;
+    grid-template-columns:
+      minmax(280px, 0.72fr)
+      minmax(0, 1.28fr);
+    gap: 34px;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.13);
+    border-radius: 30px;
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 253, 248, 0.97),
+        rgba(255, 247, 240, 0.97)
+      );
+    box-shadow:
+      0 22px 52px
+      rgba(91, 59, 44, 0.075);
+  }
+
+  .book-detail-reference-cover-column {
+    min-width: 0;
+  }
+
+  .book-detail-reference-cover {
+    position: relative;
+    width: min(350px, 100%);
+    aspect-ratio: 0.73 / 1;
+    margin: 0 auto;
+    overflow: hidden;
+    border:
+      8px solid
+      rgba(255, 255, 255, 0.96);
+    border-radius: 10px;
+    background: #e9dfd4;
+    box-shadow:
+      0 20px 38px
+      rgba(63, 41, 31, 0.2);
+  }
+
+  .book-detail-reference-cover img {
+    object-fit: cover;
+  }
+
+  .book-detail-reference-cover-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    padding: 34px 27px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    color: #49372e;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 251, 243, 0.9),
+        rgba(255, 250, 240, 0.5) 39%,
+        rgba(29, 18, 13, 0.05) 63%,
+        rgba(29, 18, 13, 0.55)
+      );
+    text-align: center;
+  }
+
+  .book-detail-reference-cover-overlay > span {
+    color: #d9634d;
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .book-detail-reference-cover-overlay h2 {
+    margin: 15px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size:
+      clamp(26px, 3vw, 39px);
+    line-height: 1.35;
+    letter-spacing: -0.05em;
+    word-break: keep-all;
+  }
+
+  .book-detail-reference-cover-overlay p {
+    margin: 12px 0 0;
+    color: #735d51;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  .book-detail-reference-cover-overlay small {
+    margin-top: auto;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 900;
+    text-shadow:
+      0 2px 8px
+      rgba(0, 0, 0, 0.5);
+  }
+
+  .book-detail-reference-cover-links {
+    width: min(350px, 100%);
+    margin: 14px auto 0;
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .book-detail-reference-cover-links a {
+    min-height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border:
+      1px solid #d6b3a3;
+    border-radius: 12px;
+    color: #755247;
+    background: #ffffff;
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .book-detail-reference-main-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .book-detail-reference-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .book-detail-reference-badges > span {
+    min-height: 27px;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 900;
+  }
+
+  .book-detail-reference-badges
+  > span[data-tone="coral"] {
+    color: #b44837;
+    background: #ffe7df;
+  }
+
+  .book-detail-reference-badges
+  > span[data-tone="cream"] {
+    color: #845d20;
+    background: #fff1cf;
+  }
+
+  .book-detail-reference-badges
+  > span[data-tone="mint"] {
+    color: #34705b;
+    background: #e7f5ee;
+  }
+
+  .book-detail-reference-badges
+  > span[data-tone="yellow"] {
+    color: #7d5a14;
+    background: #fff4bd;
+  }
+
+  .book-detail-reference-badges
+  > span[data-tone="blue"] {
+    color: #3d658b;
+    background: #e9f3ff;
+  }
+
+  .book-detail-reference-badges
+  > span[data-tone="gray"] {
+    color: #756b66;
+    background: #efebe8;
+  }
+
+  .book-detail-reference-kicker {
+    margin: 25px 0 0;
+    color: #e56852;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+  }
+
+  .book-detail-reference-main-copy h1 {
+    margin: 8px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size:
+      clamp(40px, 5vw, 61px);
+    line-height: 1.18;
+    letter-spacing: -0.06em;
+    word-break: keep-all;
+  }
+
+  .book-detail-reference-subtitle {
+    margin: 12px 0 0;
+    color: #725d53;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .book-detail-reference-summary {
+    max-width: 760px;
+    margin: 18px 0 0;
+    color: #68554c;
+    font-size: 14px;
+    line-height: 1.9;
+    word-break: keep-all;
+  }
+
+  .book-detail-reference-date {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: #9a8378;
+    font-size: 10px;
+  }
+
+  .book-detail-reference-date i {
+    font-style: normal;
+  }
+
+  .book-detail-reference-info-grid {
+    margin-top: 19px;
+    display: grid;
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .book-detail-reference-info {
+    min-width: 0;
+    padding: 13px;
+    border:
+      1px solid
+      rgba(139, 97, 75, 0.12);
+    border-radius: 14px;
+    background: #fffaf6;
+  }
+
+  .book-detail-reference-info span,
+  .book-detail-reference-info strong {
+    display: block;
+  }
+
+  .book-detail-reference-info span {
+    color: #8c776d;
+    font-size: 8px;
+    font-weight: 850;
+  }
+
+  .book-detail-reference-info strong {
+    margin-top: 5px;
+    overflow: hidden;
+    color: #4a352c;
+    font-size: 13px;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .book-detail-reference-actions {
+    margin-top: auto;
+    padding-top: 21px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .book-detail-reference-actions button,
+  .book-detail-reference-actions a {
+    min-height: 42px !important;
+    padding: 0 13px !important;
+    border-radius: 11px !important;
+    font-size: 10px !important;
+    font-weight: 900 !important;
+  }
+
+  .book-detail-reference-actions button:first-child {
+    border-color: transparent !important;
+    color: #ffffff !important;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ed5f4f
+      ) !important;
+  }
+
+  .book-detail-reference-status-grid {
+    margin-top: 17px;
+    display: grid;
+    grid-template-columns:
+      minmax(0, 0.78fr)
+      minmax(430px, 1.22fr);
+    gap: 17px;
+  }
+
+  .book-detail-reference-intro-card,
+  .book-detail-reference-production-card,
+  .book-detail-reference-manuscript,
+  .book-detail-reference-photos,
+  .book-detail-reference-story-grid > article,
+  .book-detail-reference-next {
+    min-width: 0;
+    padding: 25px;
+    border:
+      1px solid
+      rgba(136, 94, 74, 0.13);
+    border-radius: 24px;
+    background:
+      rgba(255, 255, 255, 0.92);
+    box-shadow:
+      0 15px 36px
+      rgba(91, 59, 44, 0.055);
+  }
+
+  .book-detail-reference-intro-card > p,
+  .book-detail-reference-section-title > p,
+  .book-detail-reference-section-head p,
+  .book-detail-reference-next > div:first-child > p {
+    margin: 0;
+    color: #e56852;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+  }
+
+  .book-detail-reference-intro-card h2,
+  .book-detail-reference-section-title h2,
+  .book-detail-reference-section-head h2,
+  .book-detail-reference-next h2 {
+    margin: 7px 0 0;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 25px;
+    line-height: 1.42;
+    letter-spacing: -0.045em;
+  }
+
+  .book-detail-reference-intro-card blockquote {
+    margin: 17px 0 0;
+    padding: 19px;
+    border-left:
+      4px solid #ef725b;
+    border-radius: 0 14px 14px 0;
+    color: #5d493f;
+    background: #fff6ef;
+    font-family:
+      var(--font-daldongne-serif),
+      "Noto Serif KR",
+      serif;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  .book-detail-reference-intro-card
+  > div {
+    margin-top: 17px;
+    padding: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    border-radius: 13px;
+    color: #6f704b;
+    background: #f4f7e9;
+  }
+
+  .book-detail-reference-intro-card
+  > div[data-connected="false"] {
+    color: #80613e;
+    background: #fff5e5;
+  }
+
+  .book-detail-reference-intro-card
+  > div > span {
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border:
+      1px solid currentColor;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .book-detail-reference-intro-card
+  > div > p {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.7;
+  }
+
+  .book-detail-reference-request-meta {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .book-detail-reference-request-message {
+    margin-top: 11px;
+    padding: 13px;
+    border-radius: 13px;
+    background: #fffaf6;
+  }
+
+  .book-detail-reference-request-message strong {
+    font-size: 9px;
+  }
+
+  .book-detail-reference-request-message p {
+    margin: 6px 0 0;
+    color: #715e55;
+    font-size: 10px;
+    line-height: 1.7;
+    white-space: pre-line;
+  }
+
+  .book-detail-reference-order-box {
+    margin-top: 14px;
+    padding: 16px;
+    border:
+      1px solid #dfbd84;
+    border-radius: 16px;
+    background:
+      linear-gradient(
+        135deg,
+        #fff7e7,
+        #fffdf8
+      );
+  }
+
+  .book-detail-reference-order-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 13px;
+  }
+
+  .book-detail-reference-order-head span,
+  .book-detail-reference-order-head strong {
+    display: block;
+  }
+
+  .book-detail-reference-order-head span {
+    color: #725b4f;
+    font-size: 10px;
+  }
+
+  .book-detail-reference-order-head strong {
+    margin-top: 4px;
+    color: #d85f48;
+    font-size: 13px;
+  }
+
+  .book-detail-reference-order-head b {
+    color: #e45f49;
+    font-size: 23px;
+    white-space: nowrap;
+  }
+
+  .book-detail-reference-order-prices {
+    margin-top: 13px;
+    display: grid;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .book-detail-reference-price {
+    padding: 11px;
+    border-radius: 11px;
+    background: #ffffff;
+  }
+
+  .book-detail-reference-price span,
+  .book-detail-reference-price strong {
+    display: block;
+  }
+
+  .book-detail-reference-price span {
+    color: #8b756a;
+    font-size: 8px;
+  }
+
+  .book-detail-reference-price strong {
+    margin-top: 4px;
+    font-size: 12px;
+  }
+
+  .book-detail-reference-specification {
+    margin-top: 11px;
+    padding: 12px;
+    border-radius: 11px;
+    background: #fffdf9;
+  }
+
+  .book-detail-reference-specification strong {
+    font-size: 9px;
+  }
+
+  .book-detail-reference-specification p {
+    margin: 5px 0 0;
+    color: #725e54;
+    font-size: 9px;
+    line-height: 1.65;
+    white-space: pre-line;
+  }
+
+  .book-detail-reference-order-number {
+    margin-top: 11px;
+    padding: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 9px;
+    border-radius: 11px;
+    color: #ffffff;
+    background: #3d2d25;
+  }
+
+  .book-detail-reference-order-number span {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 8px;
+  }
+
+  .book-detail-reference-order-number strong {
+    overflow: hidden;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .book-detail-reference-checkout-link {
+    min-height: 46px;
+    margin-top: 11px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 12px;
+    color: #ffffff !important;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ed5f4f
+      );
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .book-detail-reference-waiting-box,
+  .book-detail-reference-no-request {
+    margin-top: 16px;
+    padding: 16px;
+    border:
+      1px dashed #dcb19e;
+    border-radius: 15px;
+    background: #fff8f3;
+  }
+
+  .book-detail-reference-waiting-box strong {
+    font-size: 13px;
+  }
+
+  .book-detail-reference-waiting-box p {
+    margin: 6px 0 0;
+    color: #7b685f;
+    font-size: 9px;
+  }
+
+  .book-detail-reference-no-request {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+  }
+
+  .book-detail-reference-no-request > span {
+    width: 45px;
+    height: 45px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    color: #ffffff;
+    background: #ed6e57;
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  .book-detail-reference-no-request strong {
+    font-size: 13px;
+  }
+
+  .book-detail-reference-no-request p {
+    margin: 5px 0 0;
+    color: #766158;
+    font-size: 10px;
+    line-height: 1.65;
+  }
+
+  .book-detail-reference-manuscript,
+  .book-detail-reference-photos {
+    margin-top: 17px;
+  }
+
+  .book-detail-reference-section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .book-detail-reference-section-head
+  div:first-child > span {
+    display: block;
+    margin-top: 6px;
+    color: #7a675e;
+    font-size: 10px;
+    line-height: 1.65;
+  }
+
+  .book-detail-reference-section-head
+  > div:last-child {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .book-detail-reference-section-head
+  a {
+    min-height: 40px;
+    padding: 0 13px;
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    border:
+      1px solid #d6b3a3;
+    border-radius: 11px;
+    color: #755247;
+    background: #ffffff;
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .book-detail-reference-content-wrap {
+    margin-top: 18px;
+  }
+
+  .book-detail-reference-content-wrap
+  .book-content-paper {
+    padding: 38px 42px !important;
+    border:
+      1px solid
+      rgba(139, 97, 75, 0.15) !important;
+    border-radius: 20px !important;
+    background:
+      linear-gradient(
+        180deg,
+        #fffdf9,
+        #fffaf6
+      ) !important;
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255, 255, 255, 0.7);
+  }
+
+  .book-detail-reference-photo-grid {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+    gap: 13px;
+  }
+
+  .book-detail-reference-photo-grid
+  > article {
+    border:
+      1px solid
+      rgba(139, 97, 75, 0.14) !important;
+    border-radius: 17px !important;
+    background: #ffffff !important;
+    box-shadow:
+      0 10px 24px
+      rgba(82, 52, 39, 0.05);
+  }
+
+  .book-detail-reference-photo-grid
+  > article > div:first-child {
+    height: 190px !important;
+    background: #f3ece7 !important;
+  }
+
+  .book-detail-reference-photo-grid
+  img {
+    object-fit: contain !important;
+  }
+
+  .book-detail-reference-story-grid {
+    margin-top: 17px;
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 17px;
+  }
+
+  .book-detail-reference-story-list {
+    margin-top: 17px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .book-detail-reference-story-list
+  .photo-story-card {
+    grid-template-columns:
+      125px minmax(0, 1fr) !important;
+    border:
+      1px solid
+      rgba(139, 97, 75, 0.14) !important;
+    border-radius: 16px !important;
+    background: #fffaf6 !important;
+  }
+
+  .book-detail-reference-story-list
+  .photo-story-image {
+    min-height: 132px !important;
+    background: #f0e8e2 !important;
+  }
+
+  .book-detail-reference-story-list
+  .photo-story-content {
+    padding: 15px !important;
+  }
+
+  .book-detail-reference-story-list
+  > article:not(.photo-story-card) {
+    padding: 15px !important;
+    border:
+      1px solid
+      rgba(139, 97, 75, 0.14) !important;
+    border-radius: 15px !important;
+    background: #fffaf6 !important;
+  }
+
+  .book-detail-reference-next {
+    margin-top: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    background:
+      linear-gradient(
+        135deg,
+        #fff5e9,
+        #f1f8ee
+      );
+  }
+
+  .book-detail-reference-next
+  > div:first-child > span {
+    display: block;
+    margin-top: 6px;
+    color: #756158;
+    font-size: 10px;
+    line-height: 1.65;
+  }
+
+  .book-detail-reference-next
+  > div:last-child {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px;
+  }
+
+  .book-detail-reference-next a {
+    min-height: 42px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    border:
+      1px solid #d4b2a2;
+    border-radius: 11px;
+    color: #755247;
+    background: #ffffff;
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .book-detail-reference-next
+  a:last-child {
+    border-color: transparent;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        135deg,
+        #ff7664,
+        #ed5f4f
+      );
+  }
+
+  @media (max-width: 1050px) {
+    .book-detail-reference-hero {
+      grid-template-columns:
+        minmax(250px, 0.68fr)
+        minmax(0, 1.32fr);
+    }
+
+    .book-detail-reference-info-grid {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+
+    .book-detail-reference-status-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .book-detail-reference-photo-grid {
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 780px) {
+    .book-detail-reference-page {
+      padding: 18px 13px 40px;
+    }
+
+    .book-detail-reference-hero {
+      padding: 20px;
+      grid-template-columns: 1fr;
+      border-radius: 23px;
+    }
+
+    .book-detail-reference-cover {
+      width: min(390px, 82vw);
+    }
+
+    .book-detail-reference-main-copy {
+      text-align: left;
+    }
+
+    .book-detail-reference-photo-grid {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+
+    .book-detail-reference-story-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .book-detail-reference-next {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .book-detail-reference-next
+    > div:last-child {
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .book-detail-reference-breadcrumb {
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .book-detail-reference-main-copy h1 {
+      font-size: 37px;
+    }
+
+    .book-detail-reference-cover-links {
+      grid-template-columns: 1fr;
+    }
+
+    .book-detail-reference-info-grid,
+    .book-detail-reference-request-meta,
+    .book-detail-reference-order-prices {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+
+    .book-detail-reference-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .book-detail-reference-actions > * {
+      width: 100%;
+    }
+
+    .book-detail-reference-intro-card,
+    .book-detail-reference-production-card,
+    .book-detail-reference-manuscript,
+    .book-detail-reference-photos,
+    .book-detail-reference-story-grid > article,
+    .book-detail-reference-next {
+      padding: 18px;
+      border-radius: 19px;
+    }
+
+    .book-detail-reference-section-head {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .book-detail-reference-section-head
+    > div:last-child {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .book-detail-reference-content-wrap
+    .book-content-paper {
+      padding: 24px 18px !important;
+    }
+
+    .book-detail-reference-photo-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .book-detail-reference-story-list
+    .photo-story-card {
+      grid-template-columns: 1fr !important;
+    }
+
+    .book-detail-reference-story-list
+    .photo-story-image {
+      min-height: 210px !important;
+    }
+
+    .book-detail-reference-next
+    > div:last-child {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book-detail-reference-page a,
+    .book-detail-reference-page button {
+      transition: none;
+    }
+  }
+`;
 
 function BookContentPreview({
   blocks,
