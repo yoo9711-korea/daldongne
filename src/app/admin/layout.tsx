@@ -147,6 +147,12 @@ export default async function AdminLayout({
               제작 상담
             </Link>
 
+            <Link href="/admin/orders">
+
+              주문·결제
+
+            </Link>
+
             <Link href="/admin/product-applications">
               상품 신청
             </Link>

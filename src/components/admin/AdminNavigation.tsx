@@ -7,6 +7,7 @@ type NavigationIcon =
   | "dashboard"
   | "inquiry"
   | "production"
+  | "order"
   | "application"
   | "review"
   | "book"
@@ -58,6 +59,19 @@ const NAVIGATION_GROUPS: NavigationGroup[] =
           description:
             "책 제작 상담과 견적",
           icon: "production",
+        },
+        {
+
+          href: "/admin/orders",
+
+          label: "주문·결제",
+
+          description:
+
+            "결제, 환불, 제작과 배송",
+
+          icon: "order",
+
         },
         {
           href:
@@ -289,6 +303,66 @@ function NavigationIcon({
         />
       </svg>
     );
+  }
+
+  if (icon === "order") {
+
+    return (
+
+      <svg
+
+        viewBox="0 0 24 24"
+
+        fill="none"
+
+        aria-hidden="true"
+
+      >
+
+        <path
+
+          d="M4 7h16v12H4V7Z"
+
+          stroke="currentColor"
+
+          strokeWidth="1.8"
+
+          strokeLinejoin="round"
+
+        />
+
+
+
+        <path
+
+          d="M4 10h16M8 15h3"
+
+          stroke="currentColor"
+
+          strokeWidth="1.8"
+
+          strokeLinecap="round"
+
+        />
+
+
+
+        <path
+
+          d="M7 4h10v3H7V4Z"
+
+          stroke="currentColor"
+
+          strokeWidth="1.8"
+
+          strokeLinejoin="round"
+
+        />
+
+      </svg>
+
+    );
+
   }
 
   if (icon === "application") {

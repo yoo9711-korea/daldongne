@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import AdminOrderDashboardPanel from "@/components/admin/AdminOrderDashboardPanel";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -508,6 +509,8 @@ export default async function AdminDashboard() {
             description={`전체 ${totalFamilies.toLocaleString()}개 공간 중 점검 필요`}
           />
         </section>
+
+        <AdminOrderDashboardPanel />
 
         <section className="admin-home-overview">
           <div className="admin-home-overview-heading">
