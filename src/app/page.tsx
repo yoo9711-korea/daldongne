@@ -508,8 +508,8 @@ export default function HomePage() {
           <div className="reference-shell">
             <div className="reference-main-image">
               <Image
-                src="/home/reference-home-v1/home-main-reference.webp"
-                alt="달동네 스토리북의 사람, 가족, 친구, 강아지, 고양이 기록 화면과 모바일 화면을 함께 보여주는 메인 이미지"
+                src="/home/reference-home-v1/home-main-reference-v2.webp"
+                alt="달동네 스토리북의 나, 가족, 친구, 연인, 강아지, 고양이 기록 화면과 모바일 화면을 함께 보여주는 메인 이미지"
                 fill
                 priority
                 sizes="(max-width: 700px) calc(100vw - 28px), (max-width: 1100px) calc(100vw - 40px), 1500px"
