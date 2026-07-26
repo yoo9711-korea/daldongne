@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import AdminOrderAuditDashboardPanel from "@/components/admin/AdminOrderAuditDashboardPanel";
 import AdminOrderDashboardPanel from "@/components/admin/AdminOrderDashboardPanel";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -511,6 +512,8 @@ export default async function AdminDashboard() {
         </section>
 
         <AdminOrderDashboardPanel />
+
+        <AdminOrderAuditDashboardPanel />
 
         <section className="admin-home-overview">
           <div className="admin-home-overview-heading">

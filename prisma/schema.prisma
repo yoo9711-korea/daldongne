@@ -20,6 +20,7 @@ model User {
   accounts            Account[]
   books               Book[]
   bookOrders          BookOrder[]
+  orderAuditLogs      BookOrderAuditLog[]
   productApplications ProductApplication[]
   familyMemberships   FamilyMember[]
   memories            Memory[]
@@ -249,6 +250,7 @@ model BookOrder {
   productionRequest BookProductionRequest @relation(fields: [productionRequestId], references: [id], onDelete: Cascade)
   book              Book                  @relation(fields: [bookId], references: [id], onDelete: Cascade)
   author            User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  auditLogs         BookOrderAuditLog[]
 
   @@index([bookId])
   @@index([authorId])
@@ -258,6 +260,32 @@ model BookOrder {
   @@map("book_orders")
 }
 
+model BookOrderAuditLog {
+  id                String   @id @default(cuid())
+  orderId           String   @map("order_id")
+  actorId           String?  @map("actor_id")
+  actorName         String?  @map("actor_name")
+  actorEmail        String?  @map("actor_email")
+  source            String
+  category          String
+  action            String
+  summary           String
+  beforeData        Json     @map("before_data")
+  afterData         Json     @map("after_data")
+  changedFields     Json     @map("changed_fields")
+  isCustomerVisible Boolean  @default(false) @map("is_customer_visible")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  order BookOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actor User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([category, createdAt])
+  @@index([source, createdAt])
+  @@index([isCustomerVisible, createdAt])
+  @@map("book_order_audit_logs")
+}
 model BookRevision {
   id        String   @id @default(cuid())
   bookId    String

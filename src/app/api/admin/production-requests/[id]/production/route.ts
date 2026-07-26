@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import { recordBookOrderAudit } from '@/lib/order-audit';
 import { sendOrderProductionStageEmail } from '@/lib/order-email';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
@@ -299,6 +300,37 @@ export async function PATCH(
       );
     }
 
+    const previousOrderSnapshot =
+      await prisma.bookOrder.findUnique({
+        where: {
+          id: existingRequest.bookOrder.id,
+        },
+        select: {
+          id: true,
+          orderId: true,
+          status: true,
+          productionStage: true,
+          productionStageUpdatedAt: true,
+          manuscriptReceivedAt: true,
+          reviewStartedAt: true,
+          proofFileUrl: true,
+          proofSentAt: true,
+          proofApprovedAt: true,
+          printOrderedAt: true,
+          printingCompletedAt: true,
+          recipientName: true,
+          recipientPhone: true,
+          postalCode: true,
+          shippingAddress1: true,
+          shippingAddress2: true,
+          shippingMemo: true,
+          shippingCarrier: true,
+          trackingNumber: true,
+          shippedAt: true,
+          completedAt: true,
+          productionNote: true,
+        },
+      });
     const updateData: BookOrderUpdateData =
       {};
 
@@ -445,6 +477,62 @@ export async function PATCH(
         },
       });
 
+    const changedKeys =
+      Object.keys(updateData);
+
+    const deliveryKeys =
+      new Set([
+        'recipientName',
+        'recipientPhone',
+        'postalCode',
+        'shippingAddress1',
+        'shippingAddress2',
+        'shippingMemo',
+        'shippingCarrier',
+        'trackingNumber',
+        'shippedAt',
+      ]);
+
+    const hasDeliveryChange =
+      changedKeys.some(
+        (key) =>
+          deliveryKeys.has(key),
+      );
+
+    const customerVisible =
+      changedKeys.some(
+        (key) =>
+          key !==
+          'productionNote',
+      );
+
+    await recordBookOrderAudit({
+      orderId: updatedOrder.id,
+      actorId: userId,
+      source: 'ADMIN',
+      category:
+        hasDeliveryChange
+          ? 'DELIVERY'
+          : 'PRODUCTION',
+      action:
+        stageChanged
+          ? 'PRODUCTION_STAGE_CHANGED'
+          : hasDeliveryChange
+            ? 'DELIVERY_INFORMATION_UPDATED'
+            : 'PRODUCTION_INFORMATION_UPDATED',
+      summary:
+        stageChanged
+          ? `제작 단계를 "${getProductionStageLabel(updatedOrder.productionStage)}"로 변경했습니다.`
+          : hasDeliveryChange
+            ? '배송 정보를 수정했습니다.'
+            : '제작 정보를 수정했습니다.',
+      before:
+        previousOrderSnapshot || {},
+      after: updatedOrder,
+      isCustomerVisible:
+        customerVisible,
+    });
+
     if (stageChanged) {
       const [book, customer] =
         await Promise.all([
@@ -496,6 +584,13 @@ export async function PATCH(
           updatedOrder.trackingNumber,
       });
     }
+    revalidatePath(
+      '/admin/order-audit',
+    );
+
+    revalidatePath(
+      `/admin/orders/${updatedOrder.id}`,
+    );
     revalidatePath(
       '/admin/production-requests',
     );

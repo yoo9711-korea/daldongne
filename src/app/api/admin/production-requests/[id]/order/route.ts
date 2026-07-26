@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import { recordBookOrderAudit } from '@/lib/order-audit';
 import { prisma } from '@/lib/prisma';
 import { randomUUID } from 'node:crypto';
 import {
@@ -303,6 +304,26 @@ export async function POST(
       currentOrder?.orderId ||
       createOrderId();
 
+    const previousOrderSnapshot =
+      currentOrder
+        ? await prisma.bookOrder.findUnique({
+            where: {
+              id: currentOrder.id,
+            },
+            select: {
+              id: true,
+              orderId: true,
+              productType: true,
+              productName: true,
+              specification: true,
+              quantity: true,
+              productAmount: true,
+              shippingFee: true,
+              totalAmount: true,
+              status: true,
+            },
+          })
+        : null;
     const order =
       await prisma.bookOrder.upsert({
         where: {
@@ -357,6 +378,25 @@ export async function POST(
           updatedAt: true,
         },
       });
+
+    await recordBookOrderAudit({
+      orderId: order.id,
+      actorId: userId,
+      source: 'ADMIN',
+      category: 'QUOTE',
+      action:
+        currentOrder
+          ? 'QUOTE_UPDATED'
+          : 'ORDER_CREATED',
+      summary:
+        currentOrder
+          ? `제작 견적을 ${totalAmount.toLocaleString('ko-KR')}원으로 수정했습니다.`
+          : `제작 견적과 결제 주문을 ${totalAmount.toLocaleString('ko-KR')}원으로 만들었습니다.`,
+      before:
+        previousOrderSnapshot || {},
+      after: order,
+      isCustomerVisible: true,
+    });
 
     return NextResponse.json({
       ok: true,

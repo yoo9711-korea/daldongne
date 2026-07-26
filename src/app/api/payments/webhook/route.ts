@@ -1,3 +1,4 @@
+import { recordBookOrderAudit } from '@/lib/order-audit';
 import { sendOrderPaymentCompletedEmail } from '@/lib/order-email';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
@@ -436,6 +437,49 @@ export async function POST(
         },
       });
 
+    await recordBookOrderAudit({
+      orderId: order.id,
+      source: 'WEBHOOK',
+      category:
+        updatedOrder.status ===
+          BookOrderStatus.REFUNDED ||
+        updatedOrder.status ===
+          BookOrderStatus.PARTIALLY_REFUNDED ||
+        updatedOrder.status ===
+          BookOrderStatus.CANCELED
+          ? 'REFUND'
+          : 'PAYMENT',
+      action:
+        'PAYMENT_STATUS_WEBHOOK',
+      summary:
+        order.status ===
+        updatedOrder.status
+          ? `토스 웹훅으로 결제 상태 ${updatedOrder.status}을(를) 확인했습니다.`
+          : `토스 웹훅으로 결제 상태가 ${order.status}에서 ${updatedOrder.status}(으)로 변경되었습니다.`,
+      before: {
+        status: order.status,
+        paymentMethod:
+          order.paymentMethod,
+        paidAt: order.paidAt,
+        canceledAt:
+          order.canceledAt,
+      },
+      after: {
+        status:
+          updatedOrder.status,
+        paymentMethod:
+          updatedOrder.paymentMethod,
+        paidAt:
+          updatedOrder.paidAt,
+        canceledAt:
+          updatedOrder.canceledAt,
+        totalAmount:
+          updatedOrder.totalAmount,
+      },
+      isCustomerVisible:
+        order.status !==
+        updatedOrder.status,
+    });
     if (
       order.status !==
         BookOrderStatus.PAID &&

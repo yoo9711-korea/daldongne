@@ -75,6 +75,13 @@ const NAVIGATION_GROUPS: NavigationGroup[] =
         },
         {
           href:
+            "/admin/order-audit",
+          label: "처리 이력",
+          description:
+            "주문 변경자와 전후 값",
+          icon: "order",
+        },        {
+          href:
             "/admin/product-applications",
           label: "상품 신청",
           description:

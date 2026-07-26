@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import { recordBookOrderAudit } from '@/lib/order-audit';
 import { sendOrderPaymentCompletedEmail } from '@/lib/order-email';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
@@ -263,6 +264,30 @@ export async function POST(
       },
     });
 
+    await recordBookOrderAudit({
+      orderId: order.id,
+      actorId: userId,
+      source: 'CUSTOMER',
+      category: 'PAYMENT',
+      action: 'PAYMENT_STARTED',
+      summary:
+        '고객이 결제를 시작했습니다.',
+      before: {
+        status: order.status,
+        paymentMethod:
+          order.paymentMethod,
+        paidAt: order.paidAt,
+      },
+      after: {
+        status:
+          'PAYMENT_PENDING',
+        paymentMethod:
+          order.paymentMethod,
+        paidAt: order.paidAt,
+      },
+      isCustomerVisible: true,
+    });
+
     const authorization =
       Buffer.from(
         `${secretKey}:`,
@@ -298,7 +323,7 @@ export async function POST(
         error,
       );
 
-      await markOrderFailed(order.id);
+      await markOrderFailed(order.id, userId);
 
       return NextResponse.json(
         {
@@ -321,7 +346,7 @@ export async function POST(
         | null;
 
     if (!tossResponse.ok) {
-      await markOrderFailed(order.id);
+      await markOrderFailed(order.id, userId);
 
       const tossError =
         tossBody as
@@ -403,7 +428,7 @@ export async function POST(
         },
       );
 
-      await markOrderFailed(order.id);
+      await markOrderFailed(order.id, userId);
 
       return NextResponse.json(
         {
@@ -428,7 +453,7 @@ export async function POST(
       !isPaid &&
       !isWaitingForDeposit
     ) {
-      await markOrderFailed(order.id);
+      await markOrderFailed(order.id, userId);
 
       return NextResponse.json(
         {
@@ -476,6 +501,37 @@ export async function POST(
         },
       });
 
+    await recordBookOrderAudit({
+      orderId: order.id,
+      actorId: userId,
+      source: 'CUSTOMER',
+      category: 'PAYMENT',
+      action:
+        isPaid
+          ? 'PAYMENT_COMPLETED'
+          : 'PAYMENT_WAITING_DEPOSIT',
+      summary:
+        isPaid
+          ? '결제가 완료되었습니다.'
+          : '가상계좌가 발급되어 입금을 기다리고 있습니다.',
+      before: {
+        status: order.status,
+        paymentMethod:
+          order.paymentMethod,
+        paidAt: order.paidAt,
+      },
+      after: {
+        status:
+          updatedOrder.status,
+        paymentMethod:
+          updatedOrder.paymentMethod,
+        paidAt:
+          updatedOrder.paidAt,
+        totalAmount:
+          updatedOrder.totalAmount,
+      },
+      isCustomerVisible: true,
+    });
     if (isPaid) {
       await sendOrderPaymentCompletedEmail({
         to:
@@ -627,16 +683,54 @@ function parseApprovedAt(
 
 async function markOrderFailed(
   orderId: string,
+  actorId: string,
 ) {
-  await prisma.bookOrder.updateMany({
-    where: {
-      id: orderId,
-      status: {
-        not: 'PAID',
+  const before =
+    await prisma.bookOrder.findUnique({
+      where: {
+        id: orderId,
       },
-    },
-    data: {
-      status: 'FAILED',
-    },
+      select: {
+        id: true,
+        status: true,
+        paymentMethod: true,
+        paidAt: true,
+      },
+    });
+
+  if (
+    !before ||
+    before.status === 'PAID'
+  ) {
+    return;
+  }
+
+  const after =
+    await prisma.bookOrder.update({
+      where: {
+        id: orderId,
+      },
+      data: {
+        status: 'FAILED',
+      },
+      select: {
+        id: true,
+        status: true,
+        paymentMethod: true,
+        paidAt: true,
+      },
+    });
+
+  await recordBookOrderAudit({
+    orderId,
+    actorId,
+    source: 'CUSTOMER',
+    category: 'PAYMENT',
+    action: 'PAYMENT_FAILED',
+    summary:
+      '결제 승인 처리에 실패했습니다.',
+    before,
+    after,
+    isCustomerVisible: true,
   });
 }

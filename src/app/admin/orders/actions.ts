@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
+import { recordBookOrderAudit } from "@/lib/order-audit";
 import { prisma } from "@/lib/prisma";
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
@@ -38,7 +39,7 @@ export async function syncOrderPayment(
   let successMessage = "";
 
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
 
     const order =
       await prisma.bookOrder.findUnique({
@@ -185,22 +186,53 @@ export async function syncOrderPayment(
         ? order.canceledAt || now
         : null;
 
-    await prisma.bookOrder.update({
-      where: {
-        id: order.id,
-      },
-      data: {
-        status: nextStatus,
-        paymentKey:
-          verifiedPaymentKey ||
-          order.paymentKey,
-        paymentMethod:
-          verifiedMethod ||
-          order.paymentMethod,
-        paidAt: nextPaidAt,
-        canceledAt:
-          nextCanceledAt,
-      },
+    const updatedOrder =
+      await prisma.bookOrder.update({
+        where: {
+          id: order.id,
+        },
+        data: {
+          status: nextStatus,
+          paymentKey:
+            verifiedPaymentKey ||
+            order.paymentKey,
+          paymentMethod:
+            verifiedMethod ||
+            order.paymentMethod,
+          paidAt: nextPaidAt,
+          canceledAt:
+            nextCanceledAt,
+        },
+        select: {
+          id: true,
+          orderId: true,
+          totalAmount: true,
+          status: true,
+          paymentKey: true,
+          paymentMethod: true,
+          paidAt: true,
+          canceledAt: true,
+        },
+      });
+
+    await recordBookOrderAudit({
+      orderId: order.id,
+      actorId: admin.id,
+      actorName: admin.name,
+      actorEmail: admin.email,
+      source: "ADMIN",
+      category: "PAYMENT",
+      action: "PAYMENT_SYNCED",
+      summary:
+        order.status ===
+        updatedOrder.status
+          ? "토스 결제정보를 다시 조회했습니다."
+          : `토스 조회 결과 결제 상태를 ${order.status}에서 ${updatedOrder.status}(으)로 변경했습니다.`,
+      before: order,
+      after: updatedOrder,
+      isCustomerVisible:
+        order.status !==
+        updatedOrder.status,
     });
 
     successMessage =
@@ -256,7 +288,7 @@ export async function cancelOrRefundOrder(
   let successMessage = "";
 
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
 
     const order =
       await prisma.bookOrder.findUnique({
@@ -305,14 +337,38 @@ export async function cancelOrRefundOrder(
     }
 
     if (!order.paymentKey) {
-      await prisma.bookOrder.update({
-        where: {
-          id: order.id,
-        },
-        data: {
-          status: "CANCELED",
-          canceledAt: new Date(),
-        },
+      const updatedOrder =
+        await prisma.bookOrder.update({
+          where: {
+            id: order.id,
+          },
+          data: {
+            status: "CANCELED",
+            canceledAt: new Date(),
+          },
+          select: {
+            id: true,
+            orderId: true,
+            status: true,
+            paymentMethod: true,
+            paidAt: true,
+            canceledAt: true,
+          },
+        });
+
+      await recordBookOrderAudit({
+        orderId: order.id,
+        actorId: admin.id,
+        actorName: admin.name,
+        actorEmail: admin.email,
+        source: "ADMIN",
+        category: "REFUND",
+        action: "ORDER_CANCELED",
+        summary:
+          `미결제 주문을 취소했습니다. 사유: ${cancelReason.slice(0, 200)}`,
+        before: order,
+        after: updatedOrder,
+        isCustomerVisible: true,
       });
 
       successMessage =
@@ -393,18 +449,45 @@ export async function cancelOrRefundOrder(
         );
       }
 
-      await prisma.bookOrder.update({
-        where: {
-          id: order.id,
-        },
-        data: {
-          status: order.paidAt
-            ? "REFUNDED"
-            : "CANCELED",
-          canceledAt:
-            order.canceledAt ||
-            new Date(),
-        },
+      const updatedOrder =
+        await prisma.bookOrder.update({
+          where: {
+            id: order.id,
+          },
+          data: {
+            status: order.paidAt
+              ? "REFUNDED"
+              : "CANCELED",
+            canceledAt:
+              order.canceledAt ||
+              new Date(),
+          },
+          select: {
+            id: true,
+            orderId: true,
+            status: true,
+            paymentMethod: true,
+            paidAt: true,
+            canceledAt: true,
+          },
+        });
+
+      await recordBookOrderAudit({
+        orderId: order.id,
+        actorId: admin.id,
+        actorName: admin.name,
+        actorEmail: admin.email,
+        source: "ADMIN",
+        category: "REFUND",
+        action:
+          order.paidAt
+            ? "PAYMENT_REFUNDED"
+            : "PAYMENT_CANCELED",
+        summary:
+          `${order.paidAt ? "결제를 전액 환불" : "결제를 취소"}했습니다. 사유: ${cancelReason.slice(0, 200)}`,
+        before: order,
+        after: updatedOrder,
+        isCustomerVisible: true,
       });
 
       successMessage = order.paidAt
@@ -454,7 +537,10 @@ async function requireAdmin() {
         id: userId,
       },
       select: {
+        id: true,
         role: true,
+        name: true,
+        email: true,
       },
     });
 
@@ -465,6 +551,12 @@ async function requireAdmin() {
       "관리자만 주문 정보를 변경할 수 있습니다.",
     );
   }
+
+  return {
+    id: adminUser.id,
+    name: adminUser.name,
+    email: adminUser.email,
+  };
 }
 
 function createBasicAuthorization(
@@ -583,10 +675,16 @@ function revalidateOrderPaths(
 ) {
   revalidatePath("/admin");
   revalidatePath("/admin/orders");
+  revalidatePath("/admin/order-audit");
+  revalidatePath("/dashboard/orders");
 
   if (orderRecordId) {
     revalidatePath(
       `/admin/orders/${orderRecordId}`,
+    );
+
+    revalidatePath(
+      `/dashboard/orders/${orderRecordId}`,
     );
   }
 }

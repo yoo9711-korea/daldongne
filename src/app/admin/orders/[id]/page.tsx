@@ -3,6 +3,7 @@ import {
   cancelOrRefundOrder,
   syncOrderPayment,
 } from "@/app/admin/orders/actions";
+import AdminOrderAuditSummary from "@/components/admin/AdminOrderAuditSummary";
 import AdminOrderConfirmButton from "@/components/admin/AdminOrderConfirmButton";
 import CopyTextButton from "@/components/admin/CopyTextButton";
 import { prisma } from "@/lib/prisma";
@@ -213,6 +214,11 @@ export default async function AdminOrderDetailPage({
             )}
           />
         </section>
+
+        <AdminOrderAuditSummary
+          orderRecordId={order.id}
+          orderNumber={order.orderId}
+        />
 
         <section className="admin-order-detail-grid">
           <div className="admin-order-detail-main">

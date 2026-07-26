@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import OrderPublicAuditTimeline from "@/components/orders/OrderPublicAuditTimeline";
 import OrderStatusTimeline from "@/components/orders/OrderStatusTimeline";
 import OrderValueCopyButton from "@/components/orders/OrderValueCopyButton";
 import { prisma } from "@/lib/prisma";
@@ -243,6 +244,11 @@ export default async function DashboardOrderDetailPage({
             }
           />
         </section>
+
+        <OrderPublicAuditTimeline
+          orderRecordId={order.id}
+          authorId={userId}
+        />
 
         {order.proofFileUrl ? (
           <section className="user-order-proof-panel">
