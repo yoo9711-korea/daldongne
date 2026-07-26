@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import CopyTextButton from "@/components/admin/CopyTextButton";
+import ReviewActionSubmitButton from "@/components/admin/ReviewActionSubmitButton";
 import { prisma } from "@/lib/prisma";
 import {
   CustomerReviewStatus,
@@ -1403,13 +1404,15 @@ function ActionForm({
         value={status}
       />
 
-      <button
-        type="submit"
-        className="admin-review-action-button"
-        data-tone={tone}
-      >
-        {label}
-      </button>
+      <ReviewActionSubmitButton
+        label={label}
+        tone={tone}
+        pendingLabel="처리 중..."
+        confirmMessage={getReviewStatusConfirmMessage(
+          status,
+          label,
+        )}
+      />
     </form>
   );
 }
@@ -1437,15 +1440,79 @@ function SimpleActionForm({
         value={reviewId}
       />
 
-      <button
-        type="submit"
-        className="admin-review-action-button"
-        data-tone={tone}
-      >
-        {label}
-      </button>
+      <ReviewActionSubmitButton
+        label={label}
+        tone={tone}
+        pendingLabel="변경 중..."
+        confirmMessage={getReviewToggleConfirmMessage(
+          tone,
+          label,
+        )}
+      />
     </form>
   );
+}
+
+function getReviewStatusConfirmMessage(
+  status:
+    | "APPROVED"
+    | "PENDING"
+    | "REJECTED",
+  label: string,
+) {
+  if (status === "APPROVED") {
+    return [
+      `이 후기를 "${label}" 상태로 변경할까요?`,
+      "",
+      "승인하면 홈페이지 공개 상태도 함께 활성화됩니다.",
+      "후기 내용을 다시 확인한 후 진행해 주세요.",
+    ].join("\n");
+  }
+
+  if (status === "REJECTED") {
+    return [
+      `이 후기를 "${label}" 처리할까요?`,
+      "",
+      "거절된 후기는 홈페이지에서 공개되지 않으며 대표 후기로도 사용할 수 없습니다.",
+    ].join("\n");
+  }
+
+  return [
+    `이 후기를 "${label}" 상태로 되돌릴까요?`,
+    "",
+    "승인 대기로 변경하면 홈페이지 공개와 대표 후기 설정이 해제됩니다.",
+  ].join("\n");
+}
+
+function getReviewToggleConfirmMessage(
+  tone:
+    | "FEATURE"
+    | "VISIBILITY",
+  label: string,
+) {
+  if (tone === "FEATURE") {
+    const isRemoving =
+      label.includes("해제");
+
+    return isRemoving
+      ? "이 후기를 대표 후기에서 해제할까요?"
+      : [
+          "이 후기를 대표 후기로 지정할까요?",
+          "",
+          "대표 후기는 홈페이지에서 고객에게 우선적으로 소개될 수 있습니다.",
+        ].join("\n");
+  }
+
+  const isHiding =
+    label.includes("숨기기");
+
+  return isHiding
+    ? [
+        "이 후기를 홈페이지에서 숨길까요?",
+        "",
+        "후기는 승인 상태로 유지되지만 홈페이지에는 표시되지 않습니다.",
+      ].join("\n")
+    : "이 후기를 홈페이지에 다시 표시할까요?";
 }
 
 function Pagination({

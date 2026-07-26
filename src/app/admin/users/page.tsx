@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import AdminRoleActionButton from "@/components/admin/AdminRoleActionButton";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -1092,17 +1093,36 @@ function RoleControl({
         value={userId}
       />
 
-      <button
-        type="submit"
+      <AdminRoleActionButton
+        label={label}
+        currentRole={role}
         disabled={disabled}
-        title={disabledTitle}
-        className="admin-users-role-button"
-        data-role={role}
-      >
-        {label}
-      </button>
+        disabledReason={disabledTitle}
+        confirmMessage={getRoleConfirmMessage(
+          role,
+        )}
+      />
     </form>
   );
+}
+
+function getRoleConfirmMessage(
+  currentRole: string,
+) {
+  if (currentRole === "ADMIN") {
+    return [
+      "이 회원의 관리자 권한을 해제할까요?",
+      "",
+      "권한을 해제하면 관리자 화면에 접근할 수 없게 됩니다.",
+    ].join("\n");
+  }
+
+  return [
+    "이 회원에게 관리자 권한을 부여할까요?",
+    "",
+    "관리자는 회원 정보, 고객 문의, 상품 신청과 제작 상태를 관리할 수 있습니다.",
+    "신뢰할 수 있는 계정인지 확인한 후 진행해 주세요.",
+  ].join("\n");
 }
 
 function MobileInfo({
