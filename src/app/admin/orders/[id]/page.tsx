@@ -5,6 +5,7 @@ import {
 } from "@/app/admin/orders/actions";
 import AdminOrderAuditSummary from "@/components/admin/AdminOrderAuditSummary";
 import AdminOrderConfirmButton from "@/components/admin/AdminOrderConfirmButton";
+import AdminProofReviewPanel from "@/components/admin/AdminProofReviewPanel";
 import CopyTextButton from "@/components/admin/CopyTextButton";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -215,9 +216,13 @@ export default async function AdminOrderDetailPage({
           />
         </section>
 
-        <AdminOrderAuditSummary
+                <AdminOrderAuditSummary
           orderRecordId={order.id}
           orderNumber={order.orderId}
+        />
+
+        <AdminProofReviewPanel
+          orderRecordId={order.id}
         />
 
         <section className="admin-order-detail-grid">

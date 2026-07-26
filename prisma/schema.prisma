@@ -8,25 +8,26 @@ datasource db {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  name                String?
-  email               String?              @unique
-  emailVerified       DateTime?
-  image               String?
-  passwordHash        String?
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  role                String               @default("USER")
-  accounts            Account[]
-  books               Book[]
-  bookOrders          BookOrder[]
-  orderAuditLogs      BookOrderAuditLog[]
-  productApplications ProductApplication[]
-  familyMemberships   FamilyMember[]
-  memories            Memory[]
-  passwordResetTokens PasswordResetToken[]
-  sessions            Session[]
-  timeCapsules        TimeCapsule[]
+  id                   String                 @id @default(cuid())
+  name                 String?
+  email                String?                @unique
+  emailVerified        DateTime?
+  image                String?
+  passwordHash         String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  role                 String                 @default("USER")
+  accounts             Account[]
+  books                Book[]
+  bookOrders           BookOrder[]
+  orderAuditLogs       BookOrderAuditLog[]
+  familyMemberships    FamilyMember[]
+  memories             Memory[]
+  passwordResetTokens  PasswordResetToken[]
+  sessions             Session[]
+  timeCapsules         TimeCapsule[]
+  ProductApplication   ProductApplication[]
+  BookOrderProofReview BookOrderProofReview[]
 
   @@map("users")
 }
@@ -247,10 +248,11 @@ model BookOrder {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  productionRequest BookProductionRequest @relation(fields: [productionRequestId], references: [id], onDelete: Cascade)
-  book              Book                  @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  author            User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  productionRequest BookProductionRequest  @relation(fields: [productionRequestId], references: [id], onDelete: Cascade)
+  book              Book                   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  author            User                   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   auditLogs         BookOrderAuditLog[]
+  proofReviews      BookOrderProofReview[]
 
   @@index([bookId])
   @@index([authorId])
@@ -258,6 +260,28 @@ model BookOrder {
   @@index([productionStage])
   @@index([trackingNumber])
   @@map("book_orders")
+}
+
+model BookOrderProofReview {
+  id           String    @id @default(cuid())
+  orderId      String    @map("order_id")
+  authorId     String    @map("author_id")
+  proofFileUrl String    @map("proof_file_url")
+  proofSentAt  DateTime  @map("proof_sent_at")
+  responseType String    @map("response_type")
+  message      String?
+  resolvedAt   DateTime? @map("resolved_at")
+  resolvedById String?   @map("resolved_by_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  order  BookOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  author User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, proofSentAt])
+  @@index([orderId, createdAt])
+  @@index([authorId, createdAt])
+  @@index([responseType, resolvedAt])
+  @@map("book_order_proof_reviews")
 }
 
 model BookOrderAuditLog {
@@ -286,6 +310,7 @@ model BookOrderAuditLog {
   @@index([isCustomerVisible, createdAt])
   @@map("book_order_audit_logs")
 }
+
 model BookRevision {
   id        String   @id @default(cuid())
   bookId    String

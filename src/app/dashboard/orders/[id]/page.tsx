@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import OrderProofReviewPanel from "@/components/orders/OrderProofReviewPanel";
 import OrderPublicAuditTimeline from "@/components/orders/OrderPublicAuditTimeline";
 import OrderStatusTimeline from "@/components/orders/OrderStatusTimeline";
 import OrderValueCopyButton from "@/components/orders/OrderValueCopyButton";
@@ -250,44 +251,10 @@ export default async function DashboardOrderDetailPage({
           authorId={userId}
         />
 
-        {order.proofFileUrl ? (
-          <section className="user-order-proof-panel">
-            <div>
-              <p>
-                교정본 확인
-              </p>
-
-              <h2>
-                책 교정본이 준비되었습니다.
-              </h2>
-
-              <span>
-                내용을 확인한 뒤 수정사항이나
-                승인 여부를 담당자에게
-                전달해 주세요.
-              </span>
-            </div>
-
-            <a
-              href={
-                order.proofFileUrl
-              }
-              target={
-                order.proofFileUrl.startsWith(
-                  "http",
-                )
-                  ? "_blank"
-                  : undefined
-              }
-              rel="noreferrer"
-            >
-              교정본 열기
-              <span aria-hidden="true">
-                →
-              </span>
-            </a>
-          </section>
-        ) : null}
+                        <OrderProofReviewPanel
+          orderRecordId={order.id}
+          authorId={userId}
+        />
 
         <section className="user-order-detail-grid">
           <div className="user-order-detail-main">

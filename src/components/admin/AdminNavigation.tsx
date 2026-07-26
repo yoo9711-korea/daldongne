@@ -73,6 +73,15 @@ const NAVIGATION_GROUPS: NavigationGroup[] =
           icon: "order",
 
         },
+
+                {
+          href:
+            "/admin/proof-reviews",
+          label: "고객 교정 응답",
+          description:
+            "교정 승인과 수정 요청",
+          icon: "order",
+        },
         {
           href:
             "/admin/order-audit",
