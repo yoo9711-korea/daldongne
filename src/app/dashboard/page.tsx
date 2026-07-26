@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import UserOrderDashboardPanel from "@/components/orders/UserOrderDashboardPanel";
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
@@ -382,6 +383,7 @@ export default async function DashboardPage() {
           />
         </section>
 
+        <UserOrderDashboardPanel />
         <section className="dashboard-home-workspace">
           <article className="dashboard-home-recent-panel">
             <div className="dashboard-home-section-head">

@@ -1,5 +1,7 @@
 import { auth } from '@/auth';
+import { sendOrderPaymentCompletedEmail } from '@/lib/order-email';
 import { prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 import {
   NextRequest,
   NextResponse,
@@ -121,12 +123,30 @@ export async function POST(
         select: {
           id: true,
           bookId: true,
+          productName: true,
           orderId: true,
           totalAmount: true,
           status: true,
           paymentKey: true,
           paymentMethod: true,
           paidAt: true,
+          book: {
+            select: {
+              title: true,
+            },
+          },
+          productionRequest: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          author: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
         },
       });
 
@@ -456,6 +476,46 @@ export async function POST(
         },
       });
 
+    if (isPaid) {
+      await sendOrderPaymentCompletedEmail({
+        to:
+          order.productionRequest
+            .email ||
+          order.author.email ||
+          null,
+        customerName:
+          order.productionRequest
+            .name ||
+          order.author.name ||
+          null,
+        bookTitle:
+          order.book.title,
+        orderRecordId:
+          order.id,
+        orderId:
+          updatedOrder.orderId,
+        productName:
+          order.productName,
+        totalAmount:
+          updatedOrder.totalAmount,
+        paymentMethod:
+          updatedOrder.paymentMethod,
+        paidAt:
+          updatedOrder.paidAt,
+      });
+    }
+
+    revalidatePath(
+      '/dashboard/orders',
+    );
+
+    revalidatePath(
+      `/dashboard/orders/${order.id}`,
+    );
+
+    revalidatePath(
+      `/dashboard/library/${order.bookId}`,
+    );
     return NextResponse.json({
       ok: true,
       alreadyApproved: false,

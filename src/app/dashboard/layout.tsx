@@ -10,6 +10,9 @@ const utilityMenuItems = [
     label: "내 책장",
   },
   {
+    href: "/dashboard/orders",
+    label: "주문 현황",
+  },  {
     href: "/dashboard/applications",
     label: "신청 내역",
   },
@@ -286,7 +289,7 @@ const dashboardLayoutStyles = `
     display: grid;
     grid-template-columns:
       150px
-      repeat(4, minmax(0, 1fr));
+      repeat(5, minmax(0, 1fr));
     gap: 10px;
   }
 
@@ -427,7 +430,7 @@ const dashboardLayoutStyles = `
     .easy-dashboard-primary-menu {
       grid-template-columns:
         130px
-        repeat(4, minmax(140px, 1fr));
+        repeat(5, minmax(140px, 1fr));
       overflow-x: auto;
       scrollbar-width: none;
     }

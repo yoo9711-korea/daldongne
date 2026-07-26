@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type MenuIconName = "home" | "photo" | "story" | "book" | "library";
+type MenuIconName = "home" | "photo" | "story" | "book" | "library" | "order";
 
 const menuItems: {
   href: string;
@@ -36,11 +36,16 @@ const menuItems: {
   },
   {
     href: "/dashboard/library",
-    label: "내 책장·주문",
+    label: "내 책장",
     step: "4",
     icon: "library",
   },
-];
+  {
+    href: "/dashboard/orders",
+    label: "주문 현황",
+    step: "5",
+    icon: "order",
+  },];
 
 export default function DashboardPrimaryNavigation() {
   const pathname = usePathname() || "/dashboard";
@@ -170,6 +175,35 @@ function MenuIcon({ name }: { name: MenuIconName }) {
     );
   }
 
+  if (name === "order") {
+    return (
+      <svg viewBox="0 0 28 28" fill="none">
+        <rect
+          x="3.5"
+          y="7"
+          width="21"
+          height="16"
+          rx="3"
+          stroke="currentColor"
+          strokeWidth="2"
+        />
+
+        <path
+          d="M3.5 12h21M8 17h5"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+
+        <path
+          d="M8 4h12v3H8V4Z"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
   return (
     <svg viewBox="0 0 28 28" fill="none">
       <path

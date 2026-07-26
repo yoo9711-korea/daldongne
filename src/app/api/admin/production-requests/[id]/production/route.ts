@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import { sendOrderProductionStageEmail } from '@/lib/order-email';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import {
@@ -263,6 +264,9 @@ export async function PATCH(
           select: {
             id: true,
             bookId: true,
+            authorId: true,
+            name: true,
+            email: true,
             bookOrder: {
               select: {
                 id: true,
@@ -441,12 +445,71 @@ export async function PATCH(
         },
       });
 
+    if (stageChanged) {
+      const [book, customer] =
+        await Promise.all([
+          prisma.book.findUnique({
+            where: {
+              id: existingRequest.bookId,
+            },
+            select: {
+              title: true,
+            },
+          }),
+
+          prisma.user.findUnique({
+            where: {
+              id: existingRequest.authorId,
+            },
+            select: {
+              name: true,
+              email: true,
+            },
+          }),
+        ]);
+
+      await sendOrderProductionStageEmail({
+        to:
+          existingRequest.email ||
+          customer?.email ||
+          null,
+        customerName:
+          existingRequest.name ||
+          customer?.name ||
+          null,
+        bookTitle:
+          book?.title ||
+          '나의 스토리북',
+        orderRecordId:
+          updatedOrder.id,
+        orderId:
+          updatedOrder.orderId,
+        stage:
+          String(
+            updatedOrder.productionStage,
+          ),
+        proofFileUrl:
+          updatedOrder.proofFileUrl,
+        shippingCarrier:
+          updatedOrder.shippingCarrier,
+        trackingNumber:
+          updatedOrder.trackingNumber,
+      });
+    }
     revalidatePath(
       '/admin/production-requests',
     );
 
     revalidatePath(
       `/dashboard/library/${existingRequest.bookId}`,
+    );
+
+    revalidatePath(
+      '/dashboard/orders',
+    );
+
+    revalidatePath(
+      `/dashboard/orders/${updatedOrder.id}`,
     );
 
     return NextResponse.json({
