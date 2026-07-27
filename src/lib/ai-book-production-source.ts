@@ -8,6 +8,14 @@ type BuildSourceSnapshotInput = {
 export type AIBookSourceSnapshot = {
   version: 1;
   generatedAt: string;
+
+  revisionContext?: {
+    previousRunId: string;
+    previousAttempt: number;
+    instruction: string;
+    rejectedAt: string;
+  } | null;
+
   book: {
     id: string;
     title: string;

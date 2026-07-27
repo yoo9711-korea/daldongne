@@ -184,6 +184,25 @@ const hasFinalPdf =
       latestRun.finalPdfUrl,
   );
 
+   const isRework =
+    Boolean(
+      latestRun &&
+        String(
+          latestRun.status,
+        ) ===
+          "REJECTED" &&
+        latestRun.adminDecisionNote
+          ?.trim(),
+    );
+
+  const revisionInstruction =
+    isRework
+      ? latestRun
+          ?.adminDecisionNote
+          ?.trim() ||
+        null
+      : null;
+
   const isPaid =
     String(order.status) ===
     "PAID";
@@ -588,7 +607,7 @@ const hasFinalPdf =
           />
         ) : null}
 
-        <AdminAIProductionStartButton
+                <AdminAIProductionStartButton
           orderRecordId={
             order.id
           }
@@ -597,6 +616,12 @@ const hasFinalPdf =
           }
           disabledReason={
             disabledReason
+          }
+          isRework={
+            isRework
+          }
+          revisionInstruction={
+            revisionInstruction
           }
         />
 

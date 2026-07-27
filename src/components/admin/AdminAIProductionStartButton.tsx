@@ -9,6 +9,8 @@ type AdminAIProductionStartButtonProps = {
   orderRecordId: string;
   disabled?: boolean;
   disabledReason?: string | null;
+  isRework?: boolean;
+  revisionInstruction?: string | null;
 };
 
 type StartResponse = {
@@ -26,6 +28,8 @@ export default function AdminAIProductionStartButton({
   orderRecordId,
   disabled = false,
   disabledReason = null,
+  isRework = false,
+  revisionInstruction = null,
 }: AdminAIProductionStartButtonProps) {
   const router =
     useRouter();
@@ -54,14 +58,28 @@ export default function AdminAIProductionStartButton({
         return;
       }
 
+            const cleanRevisionInstruction =
+        revisionInstruction?.trim() || "";
+
       const confirmed =
         window.confirm(
-          [
-            "AI 자동 제작을 시작할까요?",
-            "",
-            "원본 사진과 글은 변경하거나 삭제하지 않습니다.",
-            "AI는 복사된 자료를 사용해 원고 편집과 검수를 진행합니다.",
-          ].join("\n"),
+          isRework
+            ? [
+                "관리자 반려 지시를 반영한 재작업을 시작할까요?",
+                "",
+                cleanRevisionInstruction
+                  ? `반려 지시: ${cleanRevisionInstruction}`
+                  : "이전 회차의 관리자 반려 지시를 새 작업에 반영합니다.",
+                "",
+                "기존 회차와 최종 PDF는 삭제하지 않습니다.",
+                "새 회차의 자료 분석, 목차, 원고, 사진 배치에 반려 지시가 전달됩니다.",
+              ].join("\n")
+            : [
+                "AI 자동 제작을 시작할까요?",
+                "",
+                "원본 사진과 글은 변경하거나 삭제하지 않습니다.",
+                "AI는 복사된 자료를 사용해 원고 편집과 검수를 진행합니다.",
+              ].join("\n"),
         );
 
       if (!confirmed) {
@@ -138,10 +156,24 @@ export default function AdminAIProductionStartButton({
           isStarting
         }
       >
-        {isStarting
-          ? "AI 작업 생성 중..."
-          : "AI 자동 제작 시작"}
+                {isStarting
+          ? isRework
+            ? "재작업 회차 생성 중..."
+            : "AI 작업 생성 중..."
+          : isRework
+            ? "반려 지시 반영 재작업 시작"
+            : "AI 자동 제작 시작"}
       </button>
+
+            {isRework &&
+      !disabled ? (
+        <p data-tone="rework">
+          이전 관리자 반려 메모를
+          반영하여 새 AI 제작 회차를
+          생성합니다. 기존 회차와
+          PDF는 보존됩니다.
+        </p>
+      ) : null}
 
       {disabled &&
       disabledReason ? (
@@ -225,6 +257,12 @@ export default function AdminAIProductionStartButton({
           border-radius: 10px;
           font-size: 9px;
           line-height: 1.65;
+        }
+
+          p[data-tone="rework"] {
+          color: #78551e;
+          border: 1px solid #ead09b;
+          background: #fff7df;
         }
 
         p[data-tone="notice"] {

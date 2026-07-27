@@ -589,6 +589,11 @@ export async function generateAIBookManuscript({
       requestedSourceRefs,
     });
 
+    const revisionInstruction =
+    snapshot.revisionContext
+      ?.instruction
+      ?.trim() || "";
+
   const response =
     await client.responses.create({
       model,
@@ -608,6 +613,10 @@ export async function generateAIBookManuscript({
         "불확실한 사실은 원고에서 자연스럽게 생략하거나 uncertainStatements와 issues에 기록한다.",
 
         "사용자가 직접 쓴 표현과 말투, 감정의 방향을 최대한 보존한다.",
+        "revisionRequest가 제공되면 이전 관리자가 지적한 수정 사항을 이번 원고 전체에 우선 반영한다.",
+        "반려 지시에는 문체, 분량, 장 순서, 사진 배치, 반복 삭제, 표현 수정 요구가 포함될 수 있다.",
+        "관리자 반려 지시를 반영하더라도 원본 자료에 없는 이름, 사건, 관계, 날짜, 장소, 감정을 새로 만들지 않는다.",
+        "반려 지시와 원본 자료가 충돌하거나 지시 내용을 안전하게 반영할 수 없으면 임의로 작성하지 말고 issues에 기록한다.",
 
         "맞춤법, 띄어쓰기, 어색한 문장, 불필요한 반복은 자연스럽게 편집한다.",
 
@@ -638,8 +647,31 @@ export async function generateAIBookManuscript({
 
       input: JSON.stringify(
         {
-          task:
-            "원본 사진과 글, AI 자료 분석 목차를 바탕으로 책의 전체 원고 초안을 작성하세요.",
+                    task:
+            revisionInstruction
+              ? "원본 사진과 글, 새로 분석한 목차를 바탕으로 이전 관리자 반려 지시를 반영한 책의 전체 원고 수정본을 작성하세요."
+              : "원본 사진과 글, AI 자료 분석 목차를 바탕으로 책의 전체 원고 초안을 작성하세요.",
+
+          revisionRequest:
+            revisionInstruction &&
+            snapshot.revisionContext
+              ? {
+                  previousRunId:
+                    snapshot.revisionContext
+                      .previousRunId,
+
+                  previousAttempt:
+                    snapshot.revisionContext
+                      .previousAttempt,
+
+                  rejectedAt:
+                    snapshot.revisionContext
+                      .rejectedAt,
+
+                  instruction:
+                    revisionInstruction,
+                }
+              : null,
 
           bookRequest: {
             originalTitle:

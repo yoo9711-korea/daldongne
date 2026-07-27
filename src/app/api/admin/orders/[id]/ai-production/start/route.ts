@@ -6,6 +6,7 @@ import {
   AIBookProductionStatus,
   AIBookProductionStep,
   BookOrderStatus,
+  BookProductionStage,
   Prisma,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -135,7 +136,7 @@ export async function POST(
         },
       });
 
-    if (activeRun) {
+       if (activeRun) {
       return NextResponse.json(
         {
           ok: false,
@@ -149,13 +150,64 @@ export async function POST(
       );
     }
 
-    const snapshot =
+        const latestExistingRun =
+      await prisma.aIBookProductionRun.findFirst({
+        where: {
+          orderId:
+            order.id,
+          bookId:
+            order.bookId,
+        },
+        orderBy: {
+          attempt:
+            "desc",
+        },
+        select: {
+          id: true,
+          attempt: true,
+          status: true,
+          adminDecisionNote:
+            true,
+          updatedAt: true,
+        },
+      });
+
+    const previousRejectedRun =
+      latestExistingRun?.status ===
+      AIBookProductionStatus.REJECTED
+        ? latestExistingRun
+        : null;
+
+    const baseSnapshot =
       await buildAIBookSourceSnapshot({
         bookId:
           order.bookId,
         authorId:
           order.authorId,
       });
+
+    const revisionInstruction =
+      previousRejectedRun
+        ?.adminDecisionNote
+        ?.trim() || "";
+
+    const snapshot =
+      revisionInstruction &&
+      previousRejectedRun
+        ? {
+            ...baseSnapshot,
+            revisionContext: {
+              previousRunId:
+                previousRejectedRun.id,
+              previousAttempt:
+                previousRejectedRun.attempt,
+              instruction:
+                revisionInstruction,
+              rejectedAt:
+                previousRejectedRun.updatedAt.toISOString(),
+            },
+          }
+        : baseSnapshot;
 
     const usableMaterialCount =
       snapshot.items.filter(
@@ -215,23 +267,9 @@ export async function POST(
       });
     }
 
-    const latestRun =
-      await prisma.aIBookProductionRun.findFirst({
-        where: {
-          bookId:
-            order.bookId,
-        },
-        orderBy: {
-          attempt: "desc",
-        },
-        select: {
-          attempt: true,
-        },
-      });
-
-    const nextAttempt =
-      (latestRun?.attempt ||
-        0) + 1;
+        const nextAttempt =
+      (latestExistingRun
+        ?.attempt || 0) + 1;
 
     const initialStatus =
       needsInput
@@ -300,6 +338,28 @@ export async function POST(
         },
       });
 
+        if (
+      previousRejectedRun &&
+      revisionInstruction
+    ) {
+      await prisma.bookOrder.update({
+        where: {
+          id:
+            order.id,
+        },
+        data: {
+                    productionStage:
+            needsInput
+              ? BookProductionStage.ON_HOLD
+              : BookProductionStage.REVIEWING,
+          productionStageUpdatedAt:
+            now,
+          proofApprovedAt:
+            null,
+        },
+      });
+    }
+
     await recordBookOrderAudit({
       orderId:
         order.id,
@@ -309,14 +369,18 @@ export async function POST(
         "ADMIN",
       category:
         "PRODUCTION",
-      action:
+            action:
         needsInput
           ? "AI_PRODUCTION_NEEDS_INPUT"
-          : "AI_PRODUCTION_STARTED",
-      summary:
+          : revisionInstruction
+            ? "AI_PRODUCTION_REWORK_STARTED"
+            : "AI_PRODUCTION_STARTED",
+            summary:
         needsInput
           ? "AI 자동 제작을 시작했으나 사용할 원본 자료가 없어 입력 대기로 전환했습니다."
-          : `AI 자동 제작 ${nextAttempt}차 작업을 시작했습니다.`,
+          : revisionInstruction
+            ? `관리자 반려 지시를 반영하여 AI 자동 제작 ${nextAttempt}차 재작업을 시작했습니다.`
+            : `AI 자동 제작 ${nextAttempt}차 작업을 시작했습니다.`,
       before: {
         productionStage:
           order.productionStage,
@@ -334,6 +398,18 @@ export async function POST(
           snapshot.counts,
         issueCount:
           run._count.issues,
+                 revisionContext:
+          revisionInstruction &&
+          previousRejectedRun
+            ? {
+                previousRunId:
+                  previousRejectedRun.id,
+                previousAttempt:
+                  previousRejectedRun.attempt,
+                instruction:
+                  revisionInstruction,
+              }
+            : null,
       },
       isCustomerVisible:
         false,
@@ -365,10 +441,12 @@ export async function POST(
 
     return NextResponse.json({
       ok: true,
-      message:
+            message:
         needsInput
           ? "AI 제작 작업은 생성됐지만 사용할 자료가 없어 입력 대기 상태입니다."
-          : "AI 자동 제작 작업이 생성되었습니다.",
+          : revisionInstruction
+            ? "관리자 반려 지시가 포함된 새 AI 재작업 회차가 생성되었습니다."
+            : "AI 자동 제작 작업이 생성되었습니다.",
       run,
       sourceCounts:
         snapshot.counts,

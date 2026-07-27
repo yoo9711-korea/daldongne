@@ -401,6 +401,11 @@ export async function generateAIBookMaterialAnalysis(
       }),
     );
 
+   const revisionInstruction =
+    snapshot.revisionContext
+      ?.instruction
+      ?.trim() || "";
+
   const response =
     await client.responses.create({
       model,
@@ -412,7 +417,9 @@ export async function generateAIBookMaterialAnalysis(
         "당신은 한국어 인생책과 가족 기록책을 편집하는 전문 출판 편집자다.",
         "AI는 책의 주인공이 아니라 사용자의 기록을 정리하는 조력자다.",
 
-        "사용자가 직접 작성한 기억과 표현을 최대한 보존한다.",
+        "revisionRequest가 제공되면 이전 관리자 반려 사유와 수정 지시를 이번 목차와 사진 사용 계획에 우선 반영한다.",
+        "관리자 수정 지시는 원본에 없는 사실을 새로 만드는 근거가 될 수 없다.",
+        "관리자 수정 지시와 원본 자료가 충돌하거나 지시가 불명확하면 임의로 확정하지 말고 issues와 검토 항목에 기록한다.",
         "자료에 없는 사람 관계, 이름, 장소, 날짜, 사건, 대화, 감정은 절대로 창작하지 않는다.",
         "현재 사진에 보이는 장면과 사용자가 과거를 회상한 이야기를 서로 혼동하지 않는다.",
         "날짜나 사실이 불확실하면 확정적으로 쓰지 말고 검토 항목으로 분류한다.",
@@ -435,8 +442,31 @@ export async function generateAIBookMaterialAnalysis(
 
       input: JSON.stringify(
         {
-          task:
-            "책 제작 자료를 분석하고 연대기, 목차, 초기 사진 사용 계획, 검토 항목을 작성하세요.",
+                    task:
+            revisionInstruction
+              ? "이전 관리자 반려 지시를 우선 반영하여 책 제작 자료를 다시 분석하고 연대기, 목차, 초기 사진 사용 계획, 검토 항목을 작성하세요."
+              : "책 제작 자료를 분석하고 연대기, 목차, 초기 사진 사용 계획, 검토 항목을 작성하세요.",
+
+          revisionRequest:
+            revisionInstruction &&
+            snapshot.revisionContext
+              ? {
+                  previousRunId:
+                    snapshot.revisionContext
+                      .previousRunId,
+
+                  previousAttempt:
+                    snapshot.revisionContext
+                      .previousAttempt,
+
+                  rejectedAt:
+                    snapshot.revisionContext
+                      .rejectedAt,
+
+                  instruction:
+                    revisionInstruction,
+                }
+              : null,
 
           book: {
             title:
