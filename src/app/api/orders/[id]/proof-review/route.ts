@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { recordBookOrderAudit } from "@/lib/order-audit";
 import { prisma } from "@/lib/prisma";
 import {
+  AIBookProductionStatus,
   BookOrderStatus,
   BookProductionStage,
   Prisma,
@@ -28,6 +29,14 @@ type RequestBody = {
   action?: unknown;
   message?: unknown;
 };
+
+class ProofReviewConflictError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name =
+      "ProofReviewConflictError";
+  }
+}
 
 export async function POST(
   request: NextRequest,
@@ -215,6 +224,47 @@ export async function POST(
     const result =
       await prisma.$transaction(
         async (transaction) => {
+          const claimedOrder =
+            await transaction.bookOrder.updateMany({
+              where: {
+                id:
+                  order.id,
+                productionStage:
+                  BookProductionStage.PROOF_SENT,
+                proofSentAt,
+              },
+              data:
+                action ===
+                "APPROVE"
+                  ? {
+                      productionStage:
+                        BookProductionStage.PROOF_APPROVED,
+                      productionStageUpdatedAt:
+                        now,
+                      proofApprovedAt:
+                        now,
+                    }
+                  : {
+                      productionStage:
+                        BookProductionStage.PROOFING,
+                      productionStageUpdatedAt:
+                        now,
+                      proofApprovedAt:
+                        null,
+                      proofSentAt:
+                        null,
+                    },
+            });
+
+          if (
+            claimedOrder.count !==
+            1
+          ) {
+            throw new ProofReviewConflictError(
+              "다른 작업에서 교정 상태를 먼저 변경했습니다. 화면을 새로고침해 주세요.",
+            );
+          }
+
           const review =
             await transaction.bookOrderProofReview.create({
               data: {
@@ -241,32 +291,74 @@ export async function POST(
               },
             });
 
+          let aiProductionRunUpdated =
+            false;
+
+          if (
+            action ===
+            "REQUEST_CHANGES"
+          ) {
+            const latestRun =
+              await transaction.aIBookProductionRun.findFirst({
+                where: {
+                  orderId:
+                    order.id,
+                },
+                orderBy: {
+                  attempt:
+                    "desc",
+                },
+                select: {
+                  id: true,
+                  status: true,
+                  humanReviewReason:
+                    true,
+                },
+              });
+
+            if (
+              latestRun?.status ===
+              AIBookProductionStatus.APPROVED
+            ) {
+              const runUpdate =
+                await transaction.aIBookProductionRun.updateMany({
+                  where: {
+                    id:
+                      latestRun.id,
+                    status:
+                      AIBookProductionStatus.APPROVED,
+                  },
+                  data: {
+                    status:
+                      AIBookProductionStatus.REJECTED,
+                    requiresHumanReview:
+                      true,
+                    humanReviewReason:
+                      joinReviewReasons(
+                        latestRun.humanReviewReason,
+                        `고객 수정 요청: ${message}`,
+                      ),
+                    adminDecisionNote:
+                      `고객 수정 요청:\n${message}`,
+                    approvedById:
+                      null,
+                    approvedAt:
+                      null,
+                  },
+                });
+
+              aiProductionRunUpdated =
+                runUpdate.count ===
+                1;
+            }
+          }
+
           const updatedOrder =
-            await transaction.bookOrder.update({
+            await transaction.bookOrder.findUnique({
               where: {
-                id: order.id,
+                id:
+                  order.id,
               },
-              data:
-                action ===
-                "APPROVE"
-                  ? {
-                      productionStage:
-                        BookProductionStage.PROOF_APPROVED,
-                      productionStageUpdatedAt:
-                        now,
-                      proofApprovedAt:
-                        now,
-                    }
-                  : {
-                      productionStage:
-                        BookProductionStage.PROOFING,
-                      productionStageUpdatedAt:
-                        now,
-                      proofApprovedAt:
-                        null,
-                      proofSentAt:
-                        null,
-                    },
               select: {
                 id: true,
                 orderId: true,
@@ -283,9 +375,16 @@ export async function POST(
               },
             });
 
+          if (!updatedOrder) {
+            throw new ProofReviewConflictError(
+              "변경된 주문 정보를 확인할 수 없습니다.",
+            );
+          }
+
           return {
             review,
             updatedOrder,
+            aiProductionRunUpdated,
           };
         },
       );
@@ -377,10 +476,22 @@ export async function POST(
       responseType,
       message:
         action === "APPROVE"
-          ? "교정본 승인이 완료되었습니다."
-          : "수정 요청이 담당자에게 전달되었습니다.",
+          ? "교정본 승인이 완료되어 제작용 최종본으로 확정되었습니다."
+          : result.aiProductionRunUpdated
+            ? "수정 요청이 접수되어 AI 재작업 대기로 전환되었습니다."
+            : "수정 요청이 담당자에게 전달되었습니다.",
     });
   } catch (error) {
+    if (
+      error instanceof
+      ProofReviewConflictError
+    ) {
+      return createErrorResponse(
+        error.message,
+        409,
+      );
+    }
+
     if (
       error instanceof
         Prisma.PrismaClientKnownRequestError &&
@@ -445,6 +556,20 @@ function createChangeRequestSummary(
       : message;
 
   return `고객이 교정본 수정을 요청했습니다. 요청: ${preview}`;
+}
+
+function joinReviewReasons(
+  previous: string | null,
+  next: string,
+) {
+  return Array.from(
+    new Set(
+      [
+        previous?.trim() || "",
+        next.trim(),
+      ].filter(Boolean),
+    ),
+  ).join("\n");
 }
 
 function createErrorResponse(

@@ -95,11 +95,12 @@ export default async function AdminProofReviewPanel({
           </p>
 
           <small>
-            수정된 교정본 파일 주소를
-            등록한 뒤 제작 단계를
-            ‘교정본 전달’로 변경하면
-            이전 수정 요청을 처리 완료로
-            전환할 수 있습니다.
+            AI 재작업을 시작하면 고객
+            요청이 새 제작 회차에
+            반영됩니다. 새 교정본을
+            관리자가 승인하면 이전
+            수정 요청은 자동으로 처리
+            완료됩니다.
           </small>
         </div>
       ) : null}
@@ -183,16 +184,12 @@ export default async function AdminProofReviewPanel({
                   ) : null}
 
                   <a
-                    href={
-                      review.proofFileUrl
-                    }
-                    target={
-                      review.proofFileUrl.startsWith(
-                        "http",
-                      )
-                        ? "_blank"
-                        : undefined
-                    }
+                    href={`/api/orders/${encodeURIComponent(
+                      orderRecordId,
+                    )}/proof?reviewId=${encodeURIComponent(
+                      review.id,
+                    )}`}
+                    target="_blank"
                     rel="noreferrer"
                   >
                     해당 교정본 열기

@@ -138,16 +138,10 @@ export default async function OrderProofReviewPanel({
           </div>
 
           <a
-            href={
-              order.proofFileUrl
-            }
-            target={
-              order.proofFileUrl.startsWith(
-                "http",
-              )
-                ? "_blank"
-                : undefined
-            }
+            href={`/api/orders/${encodeURIComponent(
+              order.id,
+            )}/proof`}
+            target="_blank"
             rel="noreferrer"
           >
             교정본 열기
@@ -256,7 +250,7 @@ function getCurrentStatus({
       label: "교정 승인 완료",
       tone: "approved",
       description:
-        "교정 승인이 완료되어 인쇄 준비 단계로 진행됩니다.",
+        "교정 승인이 완료되어 현재 교정본이 제작용 최종본으로 확정되었습니다.",
     };
   }
 

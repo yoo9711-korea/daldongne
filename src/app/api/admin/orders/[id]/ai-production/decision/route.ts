@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import {
   recordBookOrderAudit,
 } from "@/lib/order-audit";
+import { sendOrderProductionStageEmail } from "@/lib/order-email";
 import { prisma } from "@/lib/prisma";
 import {
   AIBookProductionStatus,
@@ -139,6 +140,10 @@ export async function POST(
           status: true,
           productionStage:
             true,
+          proofFileUrl:
+            true,
+          proofSentAt:
+            true,
           proofApprovedAt:
             true,
           productionStageUpdatedAt:
@@ -146,6 +151,18 @@ export async function POST(
           book: {
             select: {
               title: true,
+            },
+          },
+          author: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          productionRequest: {
+            select: {
+              name: true,
+              email: true,
             },
           },
         },
@@ -223,11 +240,12 @@ export async function POST(
       );
     }
 
-    if (
-      !cleanText(
+    const finalPdfUrl =
+      cleanText(
         run.finalPdfUrl,
-      )
-    ) {
+      );
+
+    if (!finalPdfUrl) {
       throw new RouteError(
         "승인할 최종 PDF가 없습니다.",
         409,
@@ -255,7 +273,7 @@ export async function POST(
     const nextProductionStage =
       isApproval
         ? BookProductionStage
-            .PROOF_APPROVED
+            .PROOF_SENT
         : BookProductionStage
             .ON_HOLD;
 
@@ -314,21 +332,52 @@ export async function POST(
             );
           }
 
+          if (isApproval) {
+            await transaction.bookOrderProofReview.updateMany({
+              where: {
+                orderId:
+                  order.id,
+                responseType:
+                  "CHANGES_REQUESTED",
+                resolvedAt:
+                  null,
+              },
+              data: {
+                resolvedAt:
+                  now,
+                resolvedById:
+                  admin.id,
+              },
+            });
+          }
+
           await transaction.bookOrder.update({
             where: {
               id:
                 order.id,
             },
-            data: {
-              productionStage:
-                nextProductionStage,
-              productionStageUpdatedAt:
-                now,
-              proofApprovedAt:
-                isApproval
-                  ? now
-                  : null,
-            },
+            data:
+              isApproval
+                ? {
+                    productionStage:
+                      BookProductionStage.PROOF_SENT,
+                    productionStageUpdatedAt:
+                      now,
+                    proofFileUrl:
+                      finalPdfUrl,
+                    proofSentAt:
+                      now,
+                    proofApprovedAt:
+                      null,
+                  }
+                : {
+                    productionStage:
+                      BookProductionStage.ON_HOLD,
+                    productionStageUpdatedAt:
+                      now,
+                    proofApprovedAt:
+                      null,
+                  },
           });
 
           const updatedRun =
@@ -395,7 +444,7 @@ export async function POST(
             : "AI_FINAL_PDF_REJECTED",
         summary:
           isApproval
-            ? `AI 자동 제작 ${run.attempt}차 최종 PDF를 승인했습니다.`
+            ? `AI 자동 제작 ${run.attempt}차 최종 PDF를 승인하고 고객 교정본으로 전달했습니다.`
             : `AI 자동 제작 ${run.attempt}차 최종 PDF를 반려했습니다.`,
         before: {
           aiProductionRunId:
@@ -438,10 +487,16 @@ export async function POST(
             result.approvedAt,
           productionStage:
             nextProductionStage,
-          proofApprovedAt:
+          proofFileUrl:
+            isApproval
+              ? finalPdfUrl
+              : order.proofFileUrl,
+          proofSentAt:
             isApproval
               ? now
-              : null,
+              : order.proofSentAt,
+          proofApprovedAt:
+            null,
         },
         isCustomerVisible:
           false,
@@ -453,6 +508,35 @@ export async function POST(
       );
     }
 
+    if (isApproval) {
+      await sendOrderProductionStageEmail({
+        to:
+          order.productionRequest
+            .email ||
+          order.author.email,
+        customerName:
+          order.productionRequest
+            .name ||
+          order.author.name,
+        bookTitle:
+          order.book.title,
+        orderRecordId:
+          order.id,
+        orderId:
+          order.orderId,
+        stage:
+          "PROOF_SENT",
+        proofFileUrl:
+          `/api/orders/${encodeURIComponent(
+            order.id,
+          )}/proof`,
+        shippingCarrier:
+          null,
+        trackingNumber:
+          null,
+      });
+    }
+
     revalidateAIProductionPaths(
       order.id,
       order.bookId,
@@ -462,7 +546,7 @@ export async function POST(
       ok: true,
       message:
         isApproval
-          ? "최종 PDF를 승인했습니다. 인쇄 발주 전 단계로 이동했습니다."
+          ? "최종 PDF를 승인하고 고객 교정본 확인 단계로 전달했습니다."
           : "최종 PDF를 반려했습니다. 주문 제작이 보류 상태로 변경됐습니다.",
       decision,
       run: result,
@@ -473,10 +557,12 @@ export async function POST(
           order.orderId,
         productionStage:
           nextProductionStage,
-        proofApprovedAt:
+        proofSentAt:
           isApproval
             ? now
-            : null,
+            : order.proofSentAt,
+        proofApprovedAt:
+          null,
       },
     });
   } catch (error) {

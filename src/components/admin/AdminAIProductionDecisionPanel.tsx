@@ -94,7 +94,7 @@ export default function AdminAIProductionDecisionPanel({
             ? [
                 "이 최종 PDF를 승인할까요?",
                 "",
-                "승인하면 AI 제작 작업이 완료되고 주문 제작 단계가 교정 승인으로 변경됩니다.",
+                "승인하면 AI 제작 작업이 완료되고 고객에게 교정본 확인 단계가 열립니다.",
                 "승인 전 PDF의 사진, 문장, 페이지 순서를 다시 확인해 주세요.",
               ].join(
                 "\n",
@@ -278,7 +278,7 @@ export default function AdminAIProductionDecisionPanel({
           activeDecision ===
             "APPROVE"
             ? "최종 승인 처리 중..."
-            : "최종 PDF 승인"}
+            : "고객 교정본으로 승인"}
         </button>
 
         <button
