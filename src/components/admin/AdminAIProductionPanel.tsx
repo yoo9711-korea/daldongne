@@ -1,6 +1,7 @@
 import AdminAIProductionStartButton from "@/components/admin/AdminAIProductionStartButton";
 import AdminAIProductionManuscriptButton from "@/components/admin/AdminAIProductionManuscriptButton";
 import AdminAIProductionAnalyzeButton from "@/components/admin/AdminAIProductionAnalyzeButton";
+import AdminAIProductionPdfButton from "@/components/admin/AdminAIProductionPdfButton";
 import { prisma } from "@/lib/prisma";
 
 type AdminAIProductionPanelProps = {
@@ -149,6 +150,24 @@ export default async function AdminAIProductionPanel({
         ) ===
           "MANUSCRIPT_EDITING",
     );
+
+   const canGeneratePdf =
+  Boolean(
+    latestRun &&
+      String(
+        latestRun.status,
+      ) === "RUNNING" &&
+      String(
+        latestRun.currentStep,
+      ) ===
+        "FINAL_PDF" &&
+      !latestRun.finalPdfUrl,
+  );
+
+const hasFinalPdf =
+  Boolean(
+    latestRun?.finalPdfUrl,
+  );
 
   const isPaid =
     String(order.status) ===
@@ -483,20 +502,7 @@ export default async function AdminAIProductionPanel({
             />
           </div>
 
-          {latestRun.finalPdfUrl ? (
-            <a
-              className="admin-ai-production-pdf-link"
-              href={
-                latestRun.finalPdfUrl
-              }
-              target="_blank"
-              rel="noreferrer"
-            >
-              AI 최종 PDF 열기
-            </a>
-          ) : null}
-
-          {latestRun.adminDecisionNote ? (
+             {latestRun.adminDecisionNote ? (
             <div className="admin-ai-production-admin-note">
               <strong>
                 관리자 결정 메모
@@ -524,46 +530,7 @@ export default async function AdminAIProductionPanel({
           </p>
         </div>
       )}
-
-      <div className="admin-ai-production-action">
-                  {canAnalyze ? (
-          <AdminAIProductionAnalyzeButton
-            orderRecordId={
-              order.id
-            }
-          />
-        ) : null}
-
-        {canGenerateManuscript ? (
-          <AdminAIProductionManuscriptButton
-            orderRecordId={
-              order.id
-            }
-          />
-        ) : null}
-
-        <AdminAIProductionStartButton
-          orderRecordId={
-            order.id
-          }
-          disabled={
-            startDisabled
-          }
-          disabledReason={
-            disabledReason
-          }
-        />
-
-        <p>
-          AI가 원본을 영구 삭제하거나
-          직접 변경하지 않습니다. 새
-          회차를 시작할 때마다 별도의
-          스냅샷과 작업 기록이
-          생성됩니다.
-        </p>
-      </div>
-
-      <style>
+        <style>
         {adminAIProductionStyles}
       </style>
     </section>
