@@ -2,6 +2,7 @@ import AdminAIProductionStartButton from "@/components/admin/AdminAIProductionSt
 import AdminAIProductionManuscriptButton from "@/components/admin/AdminAIProductionManuscriptButton";
 import AdminAIProductionAnalyzeButton from "@/components/admin/AdminAIProductionAnalyzeButton";
 import AdminAIProductionPdfButton from "@/components/admin/AdminAIProductionPdfButton";
+import AdminAIProductionDecisionPanel from "@/components/admin/AdminAIProductionDecisionPanel";
 import { prisma } from "@/lib/prisma";
 
 type AdminAIProductionPanelProps = {
@@ -167,6 +168,20 @@ export default async function AdminAIProductionPanel({
 const hasFinalPdf =
   Boolean(
     latestRun?.finalPdfUrl,
+  );
+
+ const canMakeFinalDecision =
+  Boolean(
+    latestRun &&
+      String(
+        latestRun.status,
+      ) ===
+        "READY_FOR_APPROVAL" &&
+      String(
+        latestRun.currentStep,
+      ) ===
+        "ADMIN_APPROVAL" &&
+      latestRun.finalPdfUrl,
   );
 
   const isPaid =
@@ -530,7 +545,71 @@ const hasFinalPdf =
           </p>
         </div>
       )}
-        <style>
+        <div className="admin-ai-production-action">
+        {canAnalyze ? (
+          <AdminAIProductionAnalyzeButton
+            orderRecordId={
+              order.id
+            }
+          />
+        ) : null}
+
+        {canGenerateManuscript ? (
+          <AdminAIProductionManuscriptButton
+            orderRecordId={
+              order.id
+            }
+          />
+        ) : null}
+
+        {latestRun &&
+        (
+          canGeneratePdf ||
+          hasFinalPdf
+        ) ? (
+          <AdminAIProductionPdfButton
+            orderRecordId={
+              order.id
+            }
+            canGenerate={
+              canGeneratePdf
+            }
+            hasPdf={
+              hasFinalPdf
+            }
+          />
+        ) : null}
+
+        {canMakeFinalDecision ? (
+          <AdminAIProductionDecisionPanel
+            orderRecordId={
+              order.id
+            }
+          />
+        ) : null}
+
+        <AdminAIProductionStartButton
+          orderRecordId={
+            order.id
+          }
+          disabled={
+            startDisabled
+          }
+          disabledReason={
+            disabledReason
+          }
+        />
+
+        <p>
+          AI가 원본을 영구 삭제하거나
+          직접 변경하지 않습니다. 새
+          회차를 시작할 때마다 별도의
+          스냅샷과 작업 기록이
+          생성됩니다.
+        </p>
+      </div>
+
+      <style>
         {adminAIProductionStyles}
       </style>
     </section>
