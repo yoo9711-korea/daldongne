@@ -3,6 +3,7 @@ import AdminAIProductionManuscriptButton from "@/components/admin/AdminAIProduct
 import AdminAIProductionAnalyzeButton from "@/components/admin/AdminAIProductionAnalyzeButton";
 import AdminAIProductionPdfButton from "@/components/admin/AdminAIProductionPdfButton";
 import AdminAIProductionDecisionPanel from "@/components/admin/AdminAIProductionDecisionPanel";
+import AdminAIProductionAutoRunButton from "@/components/admin/AdminAIProductionAutoRunButton";
 import { prisma } from "@/lib/prisma";
 
 type AdminAIProductionPanelProps = {
@@ -217,6 +218,14 @@ const hasFinalPdf =
       : hasActiveRun
         ? "현재 진행 중이거나 승인 대기 중인 AI 제작 작업이 있습니다."
         : null;
+
+      const canUseAutoRun =
+    Boolean(
+      !startDisabled ||
+        canAnalyze ||
+        canGenerateManuscript ||
+        canGeneratePdf,
+    );
 
   return (
     <section className="admin-ai-production-panel">
@@ -564,7 +573,36 @@ const hasFinalPdf =
           </p>
         </div>
       )}
-        <div className="admin-ai-production-action">
+              <div className="admin-ai-production-action">
+        {canUseAutoRun ? (
+          <AdminAIProductionAutoRunButton
+            orderRecordId={
+              order.id
+            }
+            canStart={
+              !startDisabled
+            }
+            canAnalyze={
+              canAnalyze
+            }
+            canGenerateManuscript={
+              canGenerateManuscript
+            }
+            canGeneratePdf={
+              canGeneratePdf
+            }
+            isRework={
+              isRework
+            }
+            revisionInstruction={
+              revisionInstruction
+            }
+            disabledReason={
+              disabledReason
+            }
+          />
+        ) : null}
+
         {canAnalyze ? (
           <AdminAIProductionAnalyzeButton
             orderRecordId={
@@ -607,23 +645,27 @@ const hasFinalPdf =
           />
         ) : null}
 
-                <AdminAIProductionStartButton
-          orderRecordId={
-            order.id
-          }
-          disabled={
-            startDisabled
-          }
-          disabledReason={
-            disabledReason
-          }
-          isRework={
-            isRework
-          }
-          revisionInstruction={
-            revisionInstruction
-          }
-        />
+                {!canUseAutoRun &&
+        !canMakeFinalDecision &&
+        !hasFinalPdf ? (
+          <AdminAIProductionStartButton
+            orderRecordId={
+              order.id
+            }
+            disabled={
+              startDisabled
+            }
+            disabledReason={
+              disabledReason
+            }
+            isRework={
+              isRework
+            }
+            revisionInstruction={
+              revisionInstruction
+            }
+          />
+        ) : null}
 
         <p>
           AI가 원본을 영구 삭제하거나
