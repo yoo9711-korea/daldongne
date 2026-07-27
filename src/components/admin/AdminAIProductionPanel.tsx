@@ -5,6 +5,7 @@ import AdminAIProductionPdfButton from "@/components/admin/AdminAIProductionPdfB
 import AdminAIProductionDecisionPanel from "@/components/admin/AdminAIProductionDecisionPanel";
 import AdminAIProductionAutoRunButton from "@/components/admin/AdminAIProductionAutoRunButton";
 import AdminAIProductionRetryButton from "@/components/admin/AdminAIProductionRetryButton";
+import AdminAIProductionStalledRecoveryButton from "@/components/admin/AdminAIProductionStalledRecoveryButton";
 import { prisma } from "@/lib/prisma";
 
 type AdminAIProductionPanelProps = {
@@ -46,6 +47,7 @@ export default async function AdminAIProductionPanel({
             currentStep: true,
             attempt: true,
             sourceSnapshot: true,
+            manuscriptData: true,
             qualityReport: true,
             finalPdfUrl: true,
             requiresHumanReview: true,
@@ -142,7 +144,12 @@ export default async function AdminAIProductionPanel({
           "MATERIAL_ANALYSIS",
     );
 
-    const canGenerateManuscript =
+     const isManuscriptGenerating =
+    isGeneratingMarker(
+      latestRun?.manuscriptData,
+    );
+
+  const canGenerateManuscript =
     Boolean(
       latestRun &&
         String(
@@ -151,7 +158,8 @@ export default async function AdminAIProductionPanel({
         String(
           latestRun.currentStep,
         ) ===
-          "MANUSCRIPT_EDITING",
+          "MANUSCRIPT_EDITING" &&
+        !isManuscriptGenerating,
     );
 
    const canGeneratePdf =
@@ -186,6 +194,55 @@ export default async function AdminAIProductionPanel({
           String(
             latestRun?.currentStep,
           ),
+        ),
+    );
+
+  const stalledMinutes =
+    latestRun
+      ? Math.max(
+          0,
+          Math.floor(
+            (Date.now() -
+              latestRun.updatedAt.getTime()) /
+              60000,
+          ),
+        )
+      : 0;
+
+  const isStalled =
+    Boolean(
+      latestRun &&
+        stalledMinutes >= 30 &&
+        (
+          (
+            String(
+              latestRun.status,
+            ) === "RUNNING" &&
+            String(
+              latestRun.currentStep,
+            ) ===
+              "MATERIAL_ANALYSIS"
+          ) ||
+          (
+            String(
+              latestRun.status,
+            ) === "RUNNING" &&
+            String(
+              latestRun.currentStep,
+            ) ===
+              "MANUSCRIPT_EDITING" &&
+            isManuscriptGenerating
+          ) ||
+          (
+            String(
+              latestRun.status,
+            ) === "QUEUED" &&
+            String(
+              latestRun.currentStep,
+            ) ===
+              "FINAL_PDF" &&
+            !latestRun.finalPdfUrl
+          )
         ),
     );
 
@@ -245,12 +302,15 @@ const hasFinalPdf =
           ? "현재 진행 중이거나 승인 대기 중인 AI 제작 작업이 있습니다."
           : null;
 
-      const canUseAutoRun =
+       const canUseAutoRun =
     Boolean(
-      !startDisabled ||
-        canAnalyze ||
-        canGenerateManuscript ||
-        canGeneratePdf,
+      !isStalled &&
+        (
+          !startDisabled ||
+          canAnalyze ||
+          canGenerateManuscript ||
+          canGeneratePdf
+        ),
     );
 
   return (
@@ -599,7 +659,24 @@ const hasFinalPdf =
           </p>
         </div>
       )}
-                    <div className="admin-ai-production-action">
+                         <div className="admin-ai-production-action">
+        {isStalled &&
+        latestRun ? (
+          <AdminAIProductionStalledRecoveryButton
+            orderRecordId={
+              order.id
+            }
+            stalledStep={
+              String(
+                latestRun.currentStep,
+              )
+            }
+            stalledMinutes={
+              stalledMinutes
+            }
+          />
+        ) : null}
+
         {canRetryFailedRun &&
         latestRun ? (
           <AdminAIProductionRetryButton
@@ -688,10 +765,11 @@ const hasFinalPdf =
           />
         ) : null}
 
-                        {!canUseAutoRun &&
+        {!canUseAutoRun &&
         !canMakeFinalDecision &&
         !hasFinalPdf &&
-        !isFailed ? (
+        !isFailed &&
+        !isStalled ? (
           <AdminAIProductionStartButton
             orderRecordId={
               order.id
@@ -726,6 +804,33 @@ const hasFinalPdf =
     </section>
   );
 }
+
+function isGeneratingMarker(
+  value: unknown,
+) {
+  if (
+    !value ||
+    typeof value !==
+      "object" ||
+    Array.isArray(value)
+  ) {
+    return false;
+  }
+
+  const record =
+    value as Record<
+      string,
+      unknown
+    >;
+
+  return (
+    record.status ===
+      "GENERATING" &&
+    typeof record.claimedAt ===
+      "string"
+  );
+}
+
 
 function SummaryItem({
   label,
