@@ -20,6 +20,7 @@ model User {
   accounts             Account[]
   books                Book[]
   bookOrders           BookOrder[]
+  aiProductionRuns     AIBookProductionRun[]
   orderAuditLogs       BookOrderAuditLog[]
   familyMemberships    FamilyMember[]
   memories             Memory[]
@@ -195,10 +196,11 @@ model Book {
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
-  author        User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  bookMemories  BookMemory[]
-  bookOrders    BookOrder[]
-  bookRevisions BookRevision[]
+  author           User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  bookMemories     BookMemory[]
+  bookOrders       BookOrder[]
+  bookRevisions    BookRevision[]
+  aiProductionRuns AIBookProductionRun[]
 
   @@index([authorId])
   @@map("books")
@@ -253,6 +255,7 @@ model BookOrder {
   author            User                   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   auditLogs         BookOrderAuditLog[]
   proofReviews      BookOrderProofReview[]
+  aiProductionRuns  AIBookProductionRun[]
 
   @@index([bookId])
   @@index([authorId])
@@ -282,6 +285,69 @@ model BookOrderProofReview {
   @@index([authorId, createdAt])
   @@index([responseType, resolvedAt])
   @@map("book_order_proof_reviews")
+}
+
+model AIBookProductionRun {
+  id          String                 @id @default(cuid())
+  bookId      String                 @map("book_id")
+  orderId     String?                @map("order_id")
+  authorId    String                 @map("author_id")
+  mode        AIBookProductionMode   @default(AUTOMATIC)
+  status      AIBookProductionStatus @default(QUEUED)
+  currentStep AIBookProductionStep   @default(MATERIAL_ANALYSIS) @map("current_step")
+  attempt     Int                    @default(1)
+
+  sourceSnapshot     Json  @map("source_snapshot")
+  outlineData        Json? @map("outline_data")
+  manuscriptData     Json? @map("manuscript_data")
+  photoSelectionData Json? @map("photo_selection_data")
+  layoutData         Json? @map("layout_data")
+  qualityReport      Json? @map("quality_report")
+
+  finalPdfUrl         String? @map("final_pdf_url")
+  requiresHumanReview Boolean @default(false) @map("requires_human_review")
+  humanReviewReason   String? @map("human_review_reason")
+  adminDecisionNote   String? @map("admin_decision_note")
+  approvedById        String? @map("approved_by_id")
+
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  approvedAt  DateTime? @map("approved_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  book   Book                    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  order  BookOrder?              @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  author User                    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  issues AIBookProductionIssue[]
+
+  @@unique([bookId, attempt])
+  @@index([orderId])
+  @@index([authorId, createdAt])
+  @@index([status, currentStep, createdAt])
+  @@map("ai_book_production_runs")
+}
+
+model AIBookProductionIssue {
+  id              String                        @id @default(cuid())
+  runId           String                        @map("run_id")
+  category        String
+  code            String
+  severity        AIBookProductionIssueSeverity
+  status          AIBookProductionIssueStatus   @default(OPEN)
+  message         String
+  sourceRef       String?                       @map("source_ref")
+  suggestedAction String?                       @map("suggested_action")
+  confidence      Float?
+  details         Json?
+  resolvedAt      DateTime?                     @map("resolved_at")
+  createdAt       DateTime                      @default(now()) @map("created_at")
+
+  run AIBookProductionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, status, severity])
+  @@index([status, severity, createdAt])
+  @@map("ai_book_production_issues")
 }
 
 model BookOrderAuditLog {
@@ -431,6 +497,44 @@ enum BookProductionStage {
   SHIPPED
   COMPLETED
   ON_HOLD
+}
+
+enum AIBookProductionMode {
+  AUTOMATIC
+  CUSTOMER_REVIEW
+}
+
+enum AIBookProductionStatus {
+  QUEUED
+  RUNNING
+  NEEDS_INPUT
+  READY_FOR_APPROVAL
+  APPROVED
+  REJECTED
+  FAILED
+}
+
+enum AIBookProductionStep {
+  MATERIAL_ANALYSIS
+  OUTLINE_GENERATION
+  MANUSCRIPT_EDITING
+  PHOTO_SELECTION
+  LAYOUT_GENERATION
+  QUALITY_CHECK
+  FINAL_PDF
+  ADMIN_APPROVAL
+}
+
+enum AIBookProductionIssueSeverity {
+  INFO
+  WARNING
+  BLOCKER
+}
+
+enum AIBookProductionIssueStatus {
+  OPEN
+  RESOLVED
+  IGNORED
 }
 
 enum BookOrderStatus {
