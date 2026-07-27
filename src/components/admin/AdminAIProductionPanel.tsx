@@ -4,6 +4,7 @@ import AdminAIProductionAnalyzeButton from "@/components/admin/AdminAIProduction
 import AdminAIProductionPdfButton from "@/components/admin/AdminAIProductionPdfButton";
 import AdminAIProductionDecisionPanel from "@/components/admin/AdminAIProductionDecisionPanel";
 import AdminAIProductionAutoRunButton from "@/components/admin/AdminAIProductionAutoRunButton";
+import AdminAIProductionRetryButton from "@/components/admin/AdminAIProductionRetryButton";
 import { prisma } from "@/lib/prisma";
 
 type AdminAIProductionPanelProps = {
@@ -166,6 +167,28 @@ export default async function AdminAIProductionPanel({
       !latestRun.finalPdfUrl,
   );
 
+  const isFailed =
+    Boolean(
+      latestRun &&
+        String(
+          latestRun.status,
+        ) === "FAILED",
+    );
+
+  const canRetryFailedRun =
+    Boolean(
+      isFailed &&
+        [
+          "MATERIAL_ANALYSIS",
+          "MANUSCRIPT_EDITING",
+          "FINAL_PDF",
+        ].includes(
+          String(
+            latestRun?.currentStep,
+          ),
+        ),
+    );
+
 const hasFinalPdf =
   Boolean(
     latestRun?.finalPdfUrl,
@@ -208,16 +231,19 @@ const hasFinalPdf =
     String(order.status) ===
     "PAID";
 
-  const startDisabled =
+    const startDisabled =
     !isPaid ||
-    hasActiveRun;
+    hasActiveRun ||
+    isFailed;
 
-  const disabledReason =
+    const disabledReason =
     !isPaid
       ? "결제가 완료된 주문에서만 AI 자동 제작을 시작할 수 있습니다."
-      : hasActiveRun
-        ? "현재 진행 중이거나 승인 대기 중인 AI 제작 작업이 있습니다."
-        : null;
+      : isFailed
+        ? "최근 AI 제작 회차가 실패했습니다. 새 회차를 만들지 말고 실패 단계 복구 기능을 사용해 주세요."
+        : hasActiveRun
+          ? "현재 진행 중이거나 승인 대기 중인 AI 제작 작업이 있습니다."
+          : null;
 
       const canUseAutoRun =
     Boolean(
@@ -573,7 +599,24 @@ const hasFinalPdf =
           </p>
         </div>
       )}
-              <div className="admin-ai-production-action">
+                    <div className="admin-ai-production-action">
+        {canRetryFailedRun &&
+        latestRun ? (
+          <AdminAIProductionRetryButton
+            orderRecordId={
+              order.id
+            }
+            failedStep={
+              String(
+                latestRun.currentStep,
+              )
+            }
+            failureReason={
+              latestRun.humanReviewReason
+            }
+          />
+        ) : null}
+
         {canUseAutoRun ? (
           <AdminAIProductionAutoRunButton
             orderRecordId={
@@ -645,9 +688,10 @@ const hasFinalPdf =
           />
         ) : null}
 
-                {!canUseAutoRun &&
+                        {!canUseAutoRun &&
         !canMakeFinalDecision &&
-        !hasFinalPdf ? (
+        !hasFinalPdf &&
+        !isFailed ? (
           <AdminAIProductionStartButton
             orderRecordId={
               order.id
