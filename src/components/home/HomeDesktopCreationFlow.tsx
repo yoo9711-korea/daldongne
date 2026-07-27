@@ -11,7 +11,7 @@ const desktopFlowItems = [
   },
   {
     image: '/home/desktop-flow/02-photo-upload.webp',
-    alt: '달동네 스토리북 사진 올리기 화면',
+    alt: '달동네 스토리 사진 올리기 화면',
     label: '1단계',
     title: '사진 올리기',
     width: 1536,

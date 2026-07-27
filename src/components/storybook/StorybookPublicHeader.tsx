@@ -327,7 +327,7 @@ const styles = `
       font-size: 12px;
     }
   }
-  /* 로그인·스토리북 만들기 버튼 영역 */
+  /* 로그인·스토리 만들기 버튼 영역 */
   .storybook-public-header-actions {
     min-width: max-content;
     display: flex;
@@ -477,7 +477,7 @@ export default function StorybookPublicHeader({
         <Link
           href="/"
           className="storybook-public-brand"
-          aria-label="달동네 스토리북 홈페이지"
+          aria-label="달동네 스토리 홈페이지"
         >
           <svg
             className="storybook-public-brand-mark"
@@ -493,7 +493,7 @@ export default function StorybookPublicHeader({
           </svg>
 
           <span className="storybook-public-brand-name">
-            달동네 스토리북
+            달동네 스토리
           </span>
 
           <span
@@ -506,7 +506,7 @@ export default function StorybookPublicHeader({
 
         <nav
           className="storybook-public-nav"
-          aria-label="달동네 스토리북 주요 메뉴"
+          aria-label="달동네 스토리 주요 메뉴"
         >
           <HeaderNavigation
             activeKey={activeKey}
@@ -532,7 +532,7 @@ export default function StorybookPublicHeader({
 
       <nav
         className="storybook-public-mobile-nav"
-        aria-label="모바일 달동네 스토리북 메뉴"
+        aria-label="모바일 달동네 스토리 메뉴"
       >
         <HeaderNavigation
           activeKey={activeKey}

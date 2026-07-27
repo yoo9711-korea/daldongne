@@ -213,8 +213,8 @@ export default async function RootLayout({
   }}
 >
   <span style={brandNameStyle}>
-    달동네 스토리북
-  </span>
+  달동네 스토리
+</span>
 
   <small
     style={{

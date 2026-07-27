@@ -11,10 +11,10 @@ type ExtendedManifest =
 export default function manifest(): ExtendedManifest {
   return {
     id: '/',
-    name: '달동네 출판사',
+    name: '달동네 스토리',
     short_name: '달동네',
     description:
-      '사진과 글을 모아 가족의 삶을 한 권의 인생책으로 만드는 달동네 출판사 앱',
+      '사진과 글을 모아 가족의 삶을 한 권의 인생책으로 만드는 달동네 스토리 앱',
     start_url: '/',
     scope: '/',
     display: 'standalone',
