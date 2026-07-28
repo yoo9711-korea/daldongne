@@ -193,12 +193,12 @@ export async function POST(
       await resend.emails.send({
         from:
           process.env.EMAIL_FROM ||
-          '달동네 출판사 <onboarding@resend.dev>',
+          '달동네 스토리 <onboarding@resend.dev>',
 
         to: user.email,
 
         subject:
-          '[달동네 출판사] 비밀번호 재설정 안내',
+          '[달동네 스토리] 비밀번호 재설정 안내',
 
         text: [
           `${displayName}님, 안녕하세요.`,
@@ -214,7 +214,7 @@ export async function POST(
         html: `
           <div style="max-width:560px;margin:0 auto;padding:32px;font-family:Arial,'Noto Sans KR',sans-serif;color:#2f2117;line-height:1.7;">
             <h1 style="margin:0 0 18px;font-size:24px;color:#5a3a18;">
-              달동네 출판사
+              달동네 스토리
             </h1>
 
             <p style="margin:0 0 14px;">

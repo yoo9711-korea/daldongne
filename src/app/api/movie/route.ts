@@ -14,7 +14,7 @@ async function generateCaptions(mode: string, photos: string[], customText: stri
         model: 'gpt-4o',
         max_tokens: 200,
         messages: [
-          { role: 'system', content: '달동네 출판사 감성 영상 작가입니다. 사진을 보고 따뜻한 한국어 문장 2개를 30자 이내로, 줄바꿈으로 구분해서만 출력하세요.' },
+          { role: 'system', content: '달동네 스토리 감성 영상 작가입니다. 사진을 보고 따뜻한 한국어 문장 2개를 30자 이내로, 줄바꿈으로 구분해서만 출력하세요.' },
           { role: 'user', content: [
             { type: 'text', text: '이 사진들을 보고 감성 문장 2개를 만들어주세요.' },
             ...photos.map((url: string) => ({ type: 'image_url', image_url: { url, detail: 'low' } })),
@@ -49,7 +49,7 @@ async function generateCaptions(mode: string, photos: string[], customText: stri
           model: 'gpt-4o',
           max_tokens: 200,
           messages: [
-            { role: 'system', content: '달동네 출판사 감성 영상 작가입니다. 인터뷰 내용으로 따뜻한 한국어 문장 2개를 30자 이내로, 줄바꿈으로 구분해서만 출력하세요.' },
+            { role: 'system', content: '달동네 스토리 감성 영상 작가입니다. 인터뷰 내용으로 따뜻한 한국어 문장 2개를 30자 이내로, 줄바꿈으로 구분해서만 출력하세요.' },
             { role: 'user', content: `인터뷰:\n${text}\n\n감성 문장 2개를 만들어주세요.` },
           ],
         }),
@@ -103,7 +103,7 @@ function buildScenes(photos: string[], title: string, caption1: string, caption2
           animations: [{ time: 'start', duration: 1.5, easing: 'quadratic-out', type: 'fade' }] },
         { type: 'text', text: '의 인생영상', width: 1720, height: 80, x: 100, y: 500,
           'font-family': 'Noto Sans KR', 'font-size': 38, 'fill-color': '#D9B872', 'text-align': 'center', duration: 4 },
-        { type: 'text', text: '달동네 출판사', width: 1720, height: 50, x: 100, y: 960,
+        { type: 'text', text: '달동네 스토리', width: 1720, height: 50, x: 100, y: 960,
           'font-family': 'Noto Sans KR', 'font-size': 24, 'fill-color': '#8A7E6E', 'text-align': 'center', duration: 4 },
       ],
     },

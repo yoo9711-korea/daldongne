@@ -109,13 +109,13 @@ export async function POST(request: Request) {
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   await resend.emails.send({
-    from: process.env.EMAIL_FROM || '달동네 출판사 <onboarding@resend.dev>',
+    from: process.env.EMAIL_FROM || '달동네 스토리 <onboarding@resend.dev>',
     to: email,
     subject: `${inviterName}님이 "${familyName}" 가족 공간에 초대했습니다`,
     html: `
       <div style="max-width:560px;margin:40px auto;font-family:sans-serif;">
         <div style="background:#1A1611;padding:32px;text-align:center;">
-          <h1 style="color:#EFE6D3;font-size:22px;margin:0;">달동네 출판사</h1>
+          <h1 style="color:#EFE6D3;font-size:22px;margin:0;">달동네 스토리</h1>
         </div>
 
         <div style="padding:40px 32px;background:#F8F1E2;">

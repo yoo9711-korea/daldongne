@@ -58,7 +58,7 @@ export default function PricingContent({
     <div className={styles.pricingContainer}>
       <section className={styles.pricingHero}>
         <p className={styles.pricingEyebrow}>
-          달동네 출판사 상품 안내
+          달동네 스토리 상품 안내
         </p>
 
         <h1>

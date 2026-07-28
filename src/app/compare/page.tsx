@@ -30,7 +30,7 @@ export default function ComparePage() {
                 </div>
                 <div style={{ textAlign: 'center', color: 'var(--gold)', fontSize: 18, fontFamily: 'var(--font-mono)' }}>→</div>
                 <div>
-                  <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '.12em', color: 'var(--wine)', marginBottom: 6 }}>달동네 출판사</span>
+                  <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '.12em', color: 'var(--wine)', marginBottom: 6 }}>달동네 스토리</span>
                   <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 17, color: 'var(--ink)' }}>{row.newText}</span>
                 </div>
               </div>

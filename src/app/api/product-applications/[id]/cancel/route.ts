@@ -94,7 +94,7 @@ async function sendProductApplicationCancelEmail(
     await resend.emails.send({
       from:
         process.env.EMAIL_FROM ||
-        '달동네 출판사 <onboarding@resend.dev>',
+        '달동네 스토리 <onboarding@resend.dev>',
 
       to: adminEmail,
 

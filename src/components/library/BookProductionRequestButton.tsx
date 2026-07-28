@@ -783,7 +783,7 @@ export default function BookProductionRequestButton({
                 수집·이용하는 것에
                 동의합니다. 상담 정보는 제작
                 상담과 고객 연락 목적으로
-                사용됩니다. 달동네 출판사의{' '}
+                사용됩니다. 달동네 스토리의{' '}
                 <a
                   href="/terms"
                   target="_blank"

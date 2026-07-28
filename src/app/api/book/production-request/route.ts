@@ -427,7 +427,7 @@ async function sendProductionRequestEmail(
     await resend.emails.send({
       from:
         process.env.EMAIL_FROM ||
-        '달동네 출판사 <onboarding@resend.dev>',
+        '달동네 스토리 <onboarding@resend.dev>',
 
       to: adminEmail,
 
@@ -443,7 +443,7 @@ async function sendProductionRequestEmail(
           </h2>
 
           <p style="margin: 0 0 20px;">
-            달동네 출판사 관리자 화면에서 주문 신청 내용을 1차 검토한 뒤 고객에게 연락해 주세요.
+            달동네 스토리 관리자 화면에서 주문 신청 내용을 1차 검토한 뒤 고객에게 연락해 주세요.
           </p>
 
           <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">

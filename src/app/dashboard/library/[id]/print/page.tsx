@@ -495,7 +495,7 @@ export default async function BookPrintPage({
                   fontSize: 11,
                 }}
               >
-                달동네 출판사
+                달동네 스토리
               </p>
             </div>
           </div>
@@ -1037,7 +1037,7 @@ export default async function BookPrintPage({
                 fontWeight: 900,
               }}
             >
-              달동네 출판사
+              달동네 스토리
             </p>
           </div>
         </PrintPage>
