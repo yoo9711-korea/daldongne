@@ -370,6 +370,16 @@ const hasFinalPdf =
             />
 
             <SummaryItem
+              label="마지막 갱신"
+              value={`${stalledMinutes}분 전`}
+              tone={
+                stalledMinutes >= 30
+                  ? "warning"
+                  : "success"
+              }
+            />
+
+            <SummaryItem
               label="등록 자료"
               value={`${sourceCounts.total}개`}
             />

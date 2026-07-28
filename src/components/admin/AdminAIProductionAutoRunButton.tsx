@@ -1,7 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 type WorkflowStep =
   | "START"
@@ -117,6 +121,31 @@ export default function AdminAIProductionAutoRunButton({
   const disabled =
     isRunning ||
     workflowSteps.length === 0;
+
+  useEffect(() => {
+    if (!isRunning) {
+      return;
+    }
+
+    const handleBeforeUnload = (
+      event: BeforeUnloadEvent,
+    ) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener(
+      "beforeunload",
+      handleBeforeUnload,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "beforeunload",
+        handleBeforeUnload,
+      );
+    };
+  }, [isRunning]);
 
   const handleAutoRun =
     async () => {
@@ -297,7 +326,23 @@ export default function AdminAIProductionAutoRunButton({
         순서대로 자동 실행합니다.
         품질 검수에서 차단 항목이
         발견되면 자동으로 멈춥니다.
+        중단된 경우 주문 상세를 다시
+        열면 서버에 저장된 현재
+        단계부터 이어서 실행할 수
+        있습니다.
       </p>
+
+      {isRunning ? (
+        <p
+          className="admin-ai-auto-run-message"
+          data-tone="notice"
+          role="status"
+        >
+          AI 제작이 끝날 때까지 이 창을
+          닫거나 다른 페이지로 이동하지
+          마세요.
+        </p>
+      ) : null}
 
       <ol>
         {workflowSteps.map(
@@ -724,6 +769,10 @@ async function callWorkflowStep({
   const response =
     await fetch(endpoint, {
       method: "POST",
+      credentials:
+        "same-origin",
+      cache:
+        "no-store",
       headers: {
         Accept:
           "application/json",
