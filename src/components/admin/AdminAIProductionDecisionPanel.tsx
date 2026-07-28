@@ -60,6 +60,11 @@ export default function AdminAIProductionDecisionPanel({
     setIsError,
   ] = useState(false);
 
+    const [
+    hasCheckedFinalPdf,
+    setHasCheckedFinalPdf,
+  ] = useState(false);
+
   const handleDecision =
     async (
       decision: Decision,
@@ -70,6 +75,22 @@ export default function AdminAIProductionDecisionPanel({
 
       const trimmedNote =
         note.trim();
+
+             if (
+        decision ===
+          "APPROVE" &&
+        !hasCheckedFinalPdf
+      ) {
+        setIsError(
+          true,
+        );
+
+        setMessage(
+          "최종 PDF를 확인했다는 체크를 완료한 뒤 승인해 주세요.",
+        );
+
+        return;
+      }
 
       if (
         decision ===
@@ -261,12 +282,38 @@ export default function AdminAIProductionDecisionPanel({
         </small>
       </label>
 
+           <label className="admin-ai-final-pdf-check">
+        <input
+          type="checkbox"
+          checked={
+            hasCheckedFinalPdf
+          }
+          onChange={(
+            event,
+          ) =>
+            setHasCheckedFinalPdf(
+              event.target
+                .checked,
+            )
+          }
+          disabled={
+            isSubmitting
+          }
+        />
+
+        <span>
+          최종 PDF의 사진, 문장, 목차,
+          페이지 순서를 확인했습니다.
+        </span>
+      </label>
+
       <div className="admin-ai-decision-actions">
         <button
           type="button"
           data-action="approve"
-          disabled={
-            isSubmitting
+                    disabled={
+            isSubmitting ||
+            !hasCheckedFinalPdf
           }
           onClick={() =>
             handleDecision(
@@ -438,6 +485,32 @@ export default function AdminAIProductionDecisionPanel({
           color: #9b897a;
           font-size: 8px;
           text-align: right;
+        }
+
+               .admin-ai-final-pdf-check {
+          margin-top: 13px;
+          padding: 11px 12px;
+          display: flex;
+          align-items: flex-start;
+          gap: 9px;
+          border: 1px solid #e4d2aa;
+          border-radius: 12px;
+          background: #fff7e5;
+        }
+
+        .admin-ai-final-pdf-check input {
+          width: 15px;
+          height: 15px;
+          margin-top: 2px;
+          flex: 0 0 15px;
+          accent-color: #477855;
+        }
+
+        .admin-ai-final-pdf-check span {
+          color: #755b32;
+          font-size: 9px;
+          font-weight: 900;
+          line-height: 1.7;
         }
 
         .admin-ai-decision-actions {
