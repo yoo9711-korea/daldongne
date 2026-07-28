@@ -3,15 +3,15 @@ import Image from 'next/image';
 const desktopFlowItems = [
   {
     image: '/home/desktop-flow/01-overview.webp',
-    alt: '사진 올리기, 이야기 쓰기, 책 만들기, 결제하기로 이어지는 스토리북 전체 제작 과정',
+    alt: '사진 올리기, 이야기 쓰기, 원고 만들기, 제작 신청과 결제로 이어지는 스토리북 전체 제작 과정',
     label: '전체 과정',
-    title: '사진과 이야기로 나의 책을 만드는 흐름',
+    title: '사진과 이야기가 스토리북이 되는 흐름',
     width: 1672,
     height: 941,
   },
   {
     image: '/home/desktop-flow/02-photo-upload.webp',
-    alt: '달동네 스토리 사진 올리기 화면',
+    alt: '달동네 스토리에서 소중한 사진을 올리는 화면',
     label: '1단계',
     title: '사진 올리기',
     width: 1536,
@@ -19,7 +19,7 @@ const desktopFlowItems = [
   },
   {
     image: '/home/desktop-flow/03-story-writing.webp',
-    alt: '사진을 보며 촬영 시기, 함께한 사람, 기억을 작성하는 이야기 쓰기 화면',
+    alt: '사진을 보며 촬영 시기, 함께한 사람과 기억을 기록하는 이야기 쓰기 화면',
     label: '2단계',
     title: '이야기 쓰기',
     width: 1672,
@@ -27,17 +27,17 @@ const desktopFlowItems = [
   },
   {
     image: '/home/desktop-flow/04-book-making.webp',
-    alt: '모은 사진과 이야기로 책의 챕터와 원고를 만드는 화면',
+    alt: '모은 사진과 이야기로 책의 목차와 원고를 만드는 화면',
     label: '3단계',
-    title: '책 만들기',
+    title: '원고 만들기',
     width: 1536,
     height: 1024,
   },
   {
     image: '/home/desktop-flow/05-payment.webp',
-    alt: '관리자 검토가 완료된 책의 배송 정보와 결제 방법을 확인하는 화면',
+    alt: '검토가 끝난 스토리북의 배송 정보와 결제 방법을 확인하는 화면',
     label: '4단계',
-    title: '결제하기',
+    title: '제작 신청·결제',
     width: 1536,
     height: 1024,
   },
@@ -215,24 +215,24 @@ export default function HomeDesktopCreationFlow() {
       >
         <div className="storybook-desktop-flow-inner">
           <header className="storybook-desktop-flow-heading">
-            <p className="storybook-desktop-flow-eyebrow">
-              스토리북 제작 과정
-            </p>
+  <p className="storybook-desktop-flow-eyebrow">
+    스토리북 제작 과정
+  </p>
 
-            <h2
-              id="storybook-desktop-flow-title"
-              className="storybook-desktop-flow-title"
-            >
-              사진을 올리고 이야기를 남기면
-              <br />
-              한 권의 책으로 이어집니다
-            </h2>
+  <h2
+    id="storybook-desktop-flow-title"
+    className="storybook-desktop-flow-title"
+  >
+    사진을 모으고 이야기를 남기면
+    <br />
+    나만의 스토리북 원고가 만들어집니다
+  </h2>
 
-            <p className="storybook-desktop-flow-description">
-              사진 올리기부터 관리자 검토 후 결제까지,
-              실제 이용 흐름을 한눈에 확인해 보세요.
-            </p>
-          </header>
+  <p className="storybook-desktop-flow-description">
+    사진 올리기부터 이야기 작성, 원고 만들기,
+    제작 신청과 결제까지 한눈에 확인해 보세요.
+  </p>
+</header>
 
           <div className="storybook-desktop-flow-grid">
             {desktopFlowItems.map((item, index) => (

@@ -334,23 +334,23 @@ export default async function DashboardPage() {
           aria-label="주요 기능"
         >
           <PrimaryAction
-            href="/dashboard/timeline"
-            title="사진 올리기"
-            icon="photo"
-            primary
-          />
+  href="/dashboard/timeline"
+  title="사진 올리기"
+  icon="photo"
+  primary
+/>
 
-          <PrimaryAction
-            href="/dashboard/interview"
-            title="이야기 남기기"
-            icon="story"
-          />
+<PrimaryAction
+  href="/dashboard/interview"
+  title="이야기 쓰기"
+  icon="story"
+/>
 
-          <PrimaryAction
-            href="/dashboard/library"
-            title="내 기억 보기"
-            icon="book"
-          />
+<PrimaryAction
+  href="/dashboard/book"
+  title="원고 만들기"
+  icon="book"
+/>
         </section>
 
         <section className="dashboard-home-summary">
@@ -511,7 +511,7 @@ export default async function DashboardPage() {
                 <span aria-hidden="true">
                   <BookSmallIcon />
                 </span>
-                책 원고 만들기
+                원고 만들기
               </Link>
 
               <Link href="/dashboard/family">
@@ -618,22 +618,22 @@ function getNextAction({
 
   if (storyCount < REQUIRED_STORY_COUNT && bookCount === 0) {
     return {
-      title: "기본 책 원고를 만들 수 있습니다.",
+      title: "기본 원고를 만들 수 있습니다.",
       description: `지금도 원고를 만들 수 있습니다. 이야기를 ${
         REQUIRED_STORY_COUNT - storyCount
       }개 더 남기면 내용이 더욱 풍부해집니다.`,
       href: "/dashboard/book",
-      buttonLabel: "책 원고 만들기",
+      buttonLabel: "원고 만들기",
     };
   }
 
   if (bookCount === 0) {
     return {
-      title: "첫 번째 책 원고를 만들어보세요.",
+      title: "첫 번째 원고를 만들어보세요.",
       description:
         "지금까지 모은 사진과 이야기를 읽기 좋은 원고로 정리할 수 있습니다.",
       href: "/dashboard/book",
-      buttonLabel: "첫 책 원고 만들기",
+      buttonLabel: "첫 원고 만들기",
     };
   }
 

@@ -172,19 +172,20 @@ export default async function BookPage() {
 
       <div className="book-reference-shell">
         <section className="book-reference-heading">
-          <p>책 만들기 3단계</p>
+  <p>원고 만들기 3단계</p>
 
-          <h1>
-            모은 사진과 이야기로
-            <br className="book-reference-mobile-break" />
-            책을 만들어요
-          </h1>
+  <h1>
+    모은 사진과 이야기로
+    <br className="book-reference-mobile-break" />
+    원고를 만들어요
+  </h1>
 
-          <span>
-            책에 담을 자료와 문체를 고르면
-            AI가 한 권의 원고로 정리합니다.
-          </span>
-        </section>
+  <span>
+    원고에 담을 자료와 문체를 고르면
+    AI가 읽기 좋은 초안으로 정리합니다.
+    만든 원고는 직접 확인하고 수정할 수 있습니다.
+  </span>
+</section>
 
         <section className="book-reference-status">
           <StatusCard
@@ -211,60 +212,60 @@ export default async function BookPage() {
             unit="개"
           />
 
-          <StatusCard
-            label="만든 책"
-            value={bookCount}
-            unit="권"
-          />
-        </section>
+           <StatusCard
+  label="만든 원고"
+  value={bookCount}
+  unit="개"
+/>
+</section>
 
-        <section
-          className="book-reference-ready"
-          data-ready={
-            recommendedReady
-              ? "complete"
-              : canCreateDraft
-                ? "possible"
-                : "waiting"
-          }
-        >
-          <div>
-            <p>현재 준비 상태</p>
+<section
+  className="book-reference-ready"
+  data-ready={
+    recommendedReady
+      ? "complete"
+      : canCreateDraft
+        ? "possible"
+        : "waiting"
+  }
+>
+  <div>
+    <p>현재 준비 상태</p>
 
-            <strong>
-              {recommendedReady
-                ? "사진과 이야기가 충분히 준비되었습니다."
-                : canCreateDraft
-                  ? "지금도 기본 책 원고를 만들 수 있습니다."
-                  : `사진을 ${missingPhotoCount}장 더 모아주세요.`}
-            </strong>
+    <strong>
+      {recommendedReady
+        ? "사진과 이야기가 충분히 준비되었습니다."
+        : canCreateDraft
+          ? "지금도 기본 원고를 만들 수 있습니다."
+          : `사진을 ${missingPhotoCount}장 더 모아주세요.`}
+    </strong>
 
-            <span>
-              {recommendedReady
-                ? "선택한 자료를 바탕으로 풍부한 원고를 만들 수 있습니다."
-                : canCreateDraft
-                  ? `이야기를 ${missingStoryCount}개 더 남기면 원고가 더욱 풍부해집니다.`
-                  : "사진 3장 이상부터 책 원고 만들기를 시작할 수 있습니다."}
-            </span>
-          </div>
+    <span>
+      {recommendedReady
+        ? "선택한 자료를 바탕으로 더욱 풍부한 원고를 만들 수 있습니다."
+        : canCreateDraft
+          ? `이야기를 ${missingStoryCount}개 더 쓰면 원고가 더욱 풍부해집니다.`
+          : "사진 3장 이상부터 원고 만들기를 시작할 수 있습니다."}
+    </span>
+  </div>
 
-          {!canCreateDraft ? (
-            <Link href="/dashboard/timeline">
-              사진 더 모으기
-              <span aria-hidden="true">→</span>
-            </Link>
-          ) : !recommendedReady ? (
-            <Link href="/dashboard/interview">
-              이야기 더 남기기
-              <span aria-hidden="true">→</span>
-            </Link>
-          ) : (
-            <a href="#book-material-selector">
-              책 구성 시작
-              <span aria-hidden="true">↓</span>
-            </a>
-          )}
-        </section>
+  {!canCreateDraft ? (
+    <Link href="/dashboard/timeline">
+      사진 더 모으기
+      <span aria-hidden="true">→</span>
+    </Link>
+  ) : !recommendedReady ? (
+    <Link href="/dashboard/interview">
+      이야기 더 쓰기
+      <span aria-hidden="true">→</span>
+    </Link>
+  ) : (
+    <a href="#book-material-selector">
+      원고 구성 시작
+      <span aria-hidden="true">↓</span>
+    </a>
+  )}
+</section>
 
         <BookMaterialSelector
           materials={materials}
