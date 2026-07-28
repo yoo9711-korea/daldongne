@@ -46,6 +46,22 @@ type WorkflowResponse = {
   };
 };
 
+type AutoRunStepResult = {
+  step: WorkflowStep;
+  label?: string;
+  ok?: boolean;
+  message?: string;
+  status?: number;
+  run?: WorkflowResponse["run"];
+  result?: WorkflowResponse["result"];
+};
+
+type AutoRunResponse = WorkflowResponse & {
+  stopped?: boolean;
+  stoppedAt?: WorkflowStep;
+  completedSteps?: AutoRunStepResult[];
+};
+
 const STEP_LABELS: Record<
   WorkflowStep,
   string
@@ -147,7 +163,7 @@ export default function AdminAIProductionAutoRunButton({
     };
   }, [isRunning]);
 
-  const handleAutoRun =
+    const handleAutoRun =
     async () => {
       if (disabled) {
         return;
@@ -176,14 +192,14 @@ export default function AdminAIProductionAutoRunButton({
                   ? `관리자 반려 지시:\n${instructionPreview}`
                   : "이전 관리자 반려 지시를 새 회차에 반영합니다.",
                 "",
-                "새 회차 생성부터 최종 PDF까지 순서대로 실행합니다.",
+                "새 회차 생성부터 최종 PDF까지 서버에서 순서대로 실행합니다.",
                 "기존 회차와 기존 PDF는 삭제하지 않습니다.",
                 "최종 관리자 승인은 자동 처리하지 않습니다.",
               ].join("\n")
             : [
                 "AI 전체 자동 제작을 실행할까요?",
                 "",
-                "자료 분석부터 최종 PDF 생성까지 순서대로 실행합니다.",
+                "자료 분석부터 최종 PDF 생성까지 서버에서 순서대로 실행합니다.",
                 "원본 사진과 글은 변경하거나 삭제하지 않습니다.",
                 "품질 차단 항목이 발견되면 해당 단계에서 자동으로 멈춥니다.",
                 "최종 관리자 승인은 자동 처리하지 않습니다.",
@@ -195,75 +211,92 @@ export default function AdminAIProductionAutoRunButton({
       }
 
       setIsRunning(true);
-      setActiveStep(null);
+      setActiveStep(
+        workflowSteps[0] ||
+          null,
+      );
       setCompletedSteps([]);
-      setMessage("");
+      setMessage(
+        "서버에서 AI 전체 자동 제작을 시작했습니다.",
+      );
       setMessageTone(
         "notice",
       );
 
       try {
-        for (
-          const step of
-          workflowSteps
-        ) {
-          setActiveStep(step);
+        const result =
+          await callWorkflowStep({
+            orderRecordId,
+            step:
+              workflowSteps[0] ||
+              "START",
+            steps:
+              workflowSteps,
+          });
 
+        const completed =
+          result.completedSteps
+            ?.filter(
+              (item) =>
+                item.ok === true,
+            )
+            .map(
+              (item) =>
+                item.step,
+            ) || [];
+
+        setCompletedSteps(
+          completed,
+        );
+
+        const latestStepResult =
+          result.completedSteps &&
+          result.completedSteps
+            .length > 0
+            ? result.completedSteps[
+                result.completedSteps
+                  .length - 1
+              ]
+            : null;
+
+        const stopMessage =
+          result.stopped
+            ? result.message ||
+              "AI 자동 제작이 중간 단계에서 멈췄습니다."
+            : latestStepResult
+              ? validateStepResult(
+                  latestStepResult.step,
+                  {
+                    ok: true,
+                    message:
+                      latestStepResult.message,
+                    run:
+                      latestStepResult.run,
+                    result:
+                      latestStepResult.result,
+                  },
+                )
+              : null;
+
+        setActiveStep(null);
+
+        if (stopMessage) {
           setMessage(
-            `${STEP_LABELS[step]} 작업을 진행하고 있습니다.`,
+            stopMessage,
           );
 
           setMessageTone(
             "notice",
           );
 
-          const result =
-            await callWorkflowStep({
-              orderRecordId,
-              step,
-            });
+          router.refresh();
 
-          const stopMessage =
-            validateStepResult(
-              step,
-              result,
-            );
-
-          if (stopMessage) {
-            setMessage(
-              stopMessage,
-            );
-
-            setMessageTone(
-              "notice",
-            );
-
-            setActiveStep(
-              null,
-            );
-
-            router.refresh();
-
-            return;
-          }
-
-          setCompletedSteps(
-            (current) =>
-              current.includes(
-                step,
-              )
-                ? current
-                : [
-                    ...current,
-                    step,
-                  ],
-          );
+          return;
         }
 
-        setActiveStep(null);
-
         setMessage(
-          "AI 전체 자동 제작과 최종 PDF 생성을 완료했습니다. 관리자 최종 승인 단계로 이동했습니다.",
+          result.message ||
+            "AI 전체 자동 제작과 최종 PDF 생성을 완료했습니다. 관리자 최종 승인 단계로 이동했습니다.",
         );
 
         setMessageTone(
@@ -338,9 +371,9 @@ export default function AdminAIProductionAutoRunButton({
           data-tone="notice"
           role="status"
         >
-          AI 제작이 끝날 때까지 이 창을
-          닫거나 다른 페이지로 이동하지
-          마세요.
+          서버에서 AI 제작 요청을
+          처리하고 있습니다. 완료되면
+          결과가 표시됩니다.
         </p>
       ) : null}
 
@@ -756,10 +789,12 @@ function createWorkflowSteps({
 async function callWorkflowStep({
   orderRecordId,
   step,
+  steps,
 }: {
   orderRecordId: string;
   step: WorkflowStep;
-}): Promise<WorkflowResponse> {
+  steps: WorkflowStep[];
+}): Promise<AutoRunResponse> {
   const endpoint =
     getWorkflowEndpoint(
       orderRecordId,
@@ -776,7 +811,12 @@ async function callWorkflowStep({
       headers: {
         Accept:
           "application/json",
+        "Content-Type":
+          "application/json",
       },
+      body: JSON.stringify({
+        steps,
+      }),
     });
 
   const data =
@@ -785,7 +825,7 @@ async function callWorkflowStep({
       .catch(
         () => null,
       )) as
-      | WorkflowResponse
+      | AutoRunResponse
       | null;
 
   if (
@@ -801,36 +841,16 @@ async function callWorkflowStep({
   return data;
 }
 
-function getWorkflowEndpoint(
+  function getWorkflowEndpoint(
   orderRecordId: string,
-  step: WorkflowStep,
+  _step: WorkflowStep,
 ) {
   const encodedOrderId =
     encodeURIComponent(
       orderRecordId,
     );
 
-  const basePath =
-    `/api/admin/orders/${encodedOrderId}/ai-production`;
-
-  if (step === "START") {
-    return `${basePath}/start`;
-  }
-
-  if (
-    step === "ANALYZE"
-  ) {
-    return `${basePath}/analyze`;
-  }
-
-  if (
-    step ===
-    "MANUSCRIPT"
-  ) {
-    return `${basePath}/manuscript`;
-  }
-
-  return `${basePath}/pdf`;
+  return `/api/admin/orders/${encodedOrderId}/ai-production/auto-run`;
 }
 
 function validateStepResult(
