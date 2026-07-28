@@ -56,6 +56,12 @@ export default async function AdminAIProductionPanel({
             startedAt: true,
             completedAt: true,
             approvedAt: true,
+            approvedBy: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
             createdAt: true,
             updatedAt: true,
             issues: {
@@ -407,6 +413,23 @@ const hasFinalPdf =
                   : "success"
               }
             />
+
+                      <SummaryItem
+              label="승인 관리자"
+              value={
+                latestRun.approvedBy?.name ||
+                latestRun.approvedBy?.email ||
+                (latestRun.approvedAt
+                  ? "관리자 정보 없음"
+                  : "미승인")
+              }
+              tone={
+                latestRun.approvedAt
+                  ? "success"
+                  : "default"
+              }
+            />
+
           </div>
 
           <div className="admin-ai-production-progress">

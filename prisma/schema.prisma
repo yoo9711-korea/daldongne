@@ -8,27 +8,29 @@ datasource db {
 }
 
 model User {
-  id                   String                 @id @default(cuid())
-  name                 String?
-  email                String?                @unique
-  emailVerified        DateTime?
-  image                String?
-  passwordHash         String?
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @updatedAt
-  role                 String                 @default("USER")
-  accounts             Account[]
-  books                Book[]
-  bookOrders           BookOrder[]
-  aiProductionRuns     AIBookProductionRun[]
-  orderAuditLogs       BookOrderAuditLog[]
-  familyMemberships    FamilyMember[]
-  memories             Memory[]
-  passwordResetTokens  PasswordResetToken[]
-  sessions             Session[]
-  timeCapsules         TimeCapsule[]
-  ProductApplication   ProductApplication[]
-  BookOrderProofReview BookOrderProofReview[]
+  id                            String                 @id @default(cuid())
+  name                          String?
+  email                         String?                @unique
+  emailVerified                 DateTime?
+  image                         String?
+  passwordHash                  String?
+  createdAt                     DateTime               @default(now())
+  updatedAt                     DateTime               @updatedAt
+  role                          String                 @default("USER")
+  accounts                      Account[]
+  books                         Book[]
+  bookOrders                    BookOrder[]
+  aiProductionRuns              AIBookProductionRun[]  @relation("AIBookProductionAuthor")
+  approvedAIProductionRuns      AIBookProductionRun[]  @relation("AIBookProductionApprover")
+  orderAuditLogs                BookOrderAuditLog[]
+  familyMemberships             FamilyMember[]
+  memories                      Memory[]
+  passwordResetTokens           PasswordResetToken[]
+  sessions                      Session[]
+  timeCapsules                  TimeCapsule[]
+  ProductApplication            ProductApplication[]
+  BookOrderProofReview          BookOrderProofReview[] @relation("BookOrderProofReviewAuthor")
+  resolvedBookOrderProofReviews BookOrderProofReview[] @relation("BookOrderProofReviewResolver")
 
   @@map("users")
 }
@@ -277,14 +279,15 @@ model BookOrderProofReview {
   resolvedById String?   @map("resolved_by_id")
   createdAt    DateTime  @default(now()) @map("created_at")
 
-  order  BookOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  author User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  order      BookOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  author     User      @relation("BookOrderProofReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  resolvedBy User?     @relation("BookOrderProofReviewResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
 
   @@unique([orderId, proofSentAt])
   @@index([orderId, createdAt])
   @@index([authorId, createdAt])
+  @@index([resolvedById])
   @@index([responseType, resolvedAt])
-  @@map("book_order_proof_reviews")
 }
 
 model AIBookProductionRun {
@@ -316,16 +319,17 @@ model AIBookProductionRun {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  book   Book                    @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  order  BookOrder?              @relation(fields: [orderId], references: [id], onDelete: SetNull)
-  author User                    @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  issues AIBookProductionIssue[]
+  book       Book                    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  order      BookOrder?              @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  author     User                    @relation("AIBookProductionAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  approvedBy User?                   @relation("AIBookProductionApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  issues     AIBookProductionIssue[]
 
   @@unique([bookId, attempt])
   @@index([orderId])
   @@index([authorId, createdAt])
+  @@index([approvedById])
   @@index([status, currentStep, createdAt])
-  @@map("ai_book_production_runs")
 }
 
 model AIBookProductionIssue {

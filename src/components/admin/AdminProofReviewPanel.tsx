@@ -23,8 +23,13 @@ export default async function AdminProofReviewPanel({
         proofSentAt: true,
         responseType: true,
         message: true,
-        resolvedAt: true,
-        resolvedById: true,
+                resolvedAt: true,
+        resolvedBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
         createdAt: true,
         author: {
           select: {
@@ -174,13 +179,22 @@ export default async function AdminProofReviewPanel({
                     )}
                   </span>
 
-                  {review.resolvedAt ? (
-                    <span>
-                      처리 완료{" "}
-                      {formatDateTime(
-                        review.resolvedAt,
-                      )}
-                    </span>
+                                    {review.resolvedAt ? (
+                    <>
+                      <span>
+                        처리 완료{" "}
+                        {formatDateTime(
+                          review.resolvedAt,
+                        )}
+                      </span>
+
+                      <span>
+                        처리 관리자{" "}
+                        {review.resolvedBy?.name ||
+                          review.resolvedBy?.email ||
+                          "정보 없음"}
+                      </span>
+                    </>
                   ) : null}
 
                   <a
