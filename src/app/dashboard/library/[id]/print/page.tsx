@@ -356,7 +356,7 @@ export default async function BookPrintPage({
             <Image
               className="print-cover-photo"
               src="/dashboard/reader-reference-v1/sample-reader-cover.webp"
-              alt="달동네 스토리북 표지 예시"
+              alt="스토리북 표지 예시"
               fill
               priority
               sizes="210mm"

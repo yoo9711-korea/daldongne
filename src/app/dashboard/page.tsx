@@ -262,7 +262,7 @@ export default async function DashboardPage() {
               {displayName}님의 기록 공간
             </p>
 
-            <h1>달동네 스토리북</h1>
+            <h1>달동네 스토리</h1>
 
             <p className="dashboard-home-subtitle">
               누구와 함께한 시간이든

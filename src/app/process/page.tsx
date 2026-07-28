@@ -944,7 +944,7 @@ export default async function ProcessPage() {
                 소중한 기억이 따뜻한 책으로
                 완성되기까지,
                 <br />
-                달동네 스토리북의 정성 어린
+                달동네 스토리의 정성 어린
                 제작 과정을 소개합니다.
               </p>
             </div>
@@ -1004,7 +1004,7 @@ export default async function ProcessPage() {
 
             <section className="process-difference">
               <h2 className="process-strip-title">
-                달동네 스토리북은
+                달동네 스토리는
                 <br />
                 다릅니다.
                 <span className="process-heart">

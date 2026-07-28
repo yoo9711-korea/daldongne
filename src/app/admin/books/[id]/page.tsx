@@ -373,7 +373,7 @@ export default async function AdminBookDetailPage({
               <span>
                 {book.coverText ||
                   book.subtitle ||
-                  "달동네 스토리북"}
+                  "스토리북"}
               </span>
             </div>
           </div>

@@ -426,7 +426,7 @@ export default async function ApplyPage({
             <div className="apply-storybook-hero-inner">
               <div className="apply-storybook-hero-copy">
                 <p className="apply-storybook-label">
-                  달동네 스토리북 상품 신청
+                  스토리북 상품 신청
                 </p>
 
                 <h1 className="apply-storybook-title">

@@ -979,7 +979,7 @@ export default async function TrialPage({
            <div className="trial-hero-image">
             <Image
               src="/home/storybook/hero-book.webp"
-              alt="가족의 기억을 담은 달동네 스토리북"
+              alt="가족의 기억을 담은 스토리북"
               fill
               priority
               sizes="(max-width: 860px) 100vw, 60vw"

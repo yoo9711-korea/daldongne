@@ -327,7 +327,7 @@ export default async function BookCheckoutPage({
                 ) : (
                   <Image
                     src="/dashboard/checkout-reference-v1/sample-checkout-cover.webp"
-                    alt="달동네 스토리북 표지 예시"
+                    alt="스토리북 표지 예시"
                     fill
                     sizes="150px"
                   />

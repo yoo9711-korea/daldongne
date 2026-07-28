@@ -391,7 +391,7 @@ export default async function LibraryPage() {
                       />
 
                       <span>
-                        달동네 스토리북
+                        스토리북
                       </span>
                     </span>
 

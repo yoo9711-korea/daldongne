@@ -324,7 +324,7 @@ export default function BookMaterialSelector({
             ) : (
               <img
                 src="/dashboard/book-reference-v1/sample-cover.webp"
-                alt="달동네 스토리북 표지 예시"
+                alt="스토리북 표지 예시"
               />
             )}
 
@@ -340,7 +340,7 @@ export default function BookMaterialSelector({
               </p>
 
               <small>
-                달동네 스토리북
+                스토리북
               </small>
             </div>
           </div>

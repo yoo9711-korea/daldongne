@@ -1220,7 +1220,7 @@ export default async function GuidePage({
               </h1>
 
               <p className="guide-hero-description">
-                달동네 스토리북은 고객님의
+                스토리북은 고객님의
                 소중한 순간을 담아,
                 <br />
                 세상에 하나뿐인 책으로 만들어

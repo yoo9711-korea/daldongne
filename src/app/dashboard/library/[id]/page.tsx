@@ -317,7 +317,7 @@ export default async function BookDetailPage({
               ) : (
                 <Image
                   src="/dashboard/book-detail-reference-v1/sample-detail-cover.webp"
-                  alt="달동네 스토리북 예시 표지"
+                  alt="스토리북 예시 표지"
                   fill
                   priority
                   sizes="(max-width: 760px) 78vw, 330px"
@@ -339,7 +339,7 @@ export default async function BookDetailPage({
                 </p>
 
                 <small>
-                  달동네 스토리북
+                  스토리북
                 </small>
               </div>
             </div>

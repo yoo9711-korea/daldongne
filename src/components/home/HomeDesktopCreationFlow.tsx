@@ -3,7 +3,7 @@ import Image from 'next/image';
 const desktopFlowItems = [
   {
     image: '/home/desktop-flow/01-overview.webp',
-    alt: '사진 올리기, 이야기 쓰기, 책 만들기, 결제하기로 이어지는 달동네 스토리북 전체 제작 과정',
+    alt: '사진 올리기, 이야기 쓰기, 책 만들기, 결제하기로 이어지는 스토리북 전체 제작 과정',
     label: '전체 과정',
     title: '사진과 이야기로 나의 책을 만드는 흐름',
     width: 1672,
@@ -216,7 +216,7 @@ export default function HomeDesktopCreationFlow() {
         <div className="storybook-desktop-flow-inner">
           <header className="storybook-desktop-flow-heading">
             <p className="storybook-desktop-flow-eyebrow">
-              달동네 스토리북 제작 과정
+              스토리북 제작 과정
             </p>
 
             <h2

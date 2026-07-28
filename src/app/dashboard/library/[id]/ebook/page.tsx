@@ -366,7 +366,7 @@ export default async function EbookPage({
               <Image
                 className="ebook-cover-photo"
                 src="/dashboard/reader-reference-v1/sample-reader-cover.webp"
-                alt="달동네 스토리북 표지 예시"
+                alt="스토리북 표지 예시"
                 fill
                 priority
                 sizes="(max-width: 760px) 100vw, 1120px"

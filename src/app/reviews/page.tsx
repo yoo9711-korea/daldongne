@@ -125,7 +125,7 @@ export default function CustomerReviewPage() {
     <main className="review-page">
       <section className="review-hero">
         <p className="review-eyebrow">
-          달동네 스토리북 고객 후기
+          달동네 스토리 고객 후기
         </p>
 
         <h1>
@@ -135,7 +135,7 @@ export default function CustomerReviewPage() {
         </h1>
 
         <p className="review-description">
-          달동네 스토리북을 이용하며
+          달동네 스토리를 이용하며
           느낀 점을 남겨주세요.
           <br />
           소중한 후기는 관리자 확인 후
