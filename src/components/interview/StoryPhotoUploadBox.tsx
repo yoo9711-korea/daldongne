@@ -53,7 +53,7 @@ export default function StoryPhotoUploadBox() {
     const text = story.trim();
 
     if (!text) {
-      alert('AI로 다듬을 사진 이야기를 먼저 입력해 주세요.');
+      alert('다듬을 사진 이야기를 먼저 입력해 주세요.');
       return;
     }
 
@@ -78,13 +78,13 @@ export default function StoryPhotoUploadBox() {
       };
 
       if (!response.ok || !result.ok || !result.editedText) {
-        alert(result.message || 'AI가 사진 이야기를 다듬지 못했습니다.');
+        alert(result.message || '사진 이야기를 다듬지 못했습니다.');
         return;
       }
 
       setStory(result.editedText);
     } catch {
-      alert('AI로 사진 이야기를 다듬는 중 오류가 발생했습니다.');
+      alert('사진 이야기를 다듬는 중 오류가 발생했습니다.');
     } finally {
       setIsEditing(false);
     }
@@ -175,7 +175,7 @@ export default function StoryPhotoUploadBox() {
           color: '#9a6a24',
         }}
       >
-        사진과 이야기 남기기
+        사진 추가
       </p>
 
       <h2
@@ -188,7 +188,7 @@ export default function StoryPhotoUploadBox() {
           color: '#24170f',
         }}
       >
-        사진 한 장에 이야기를 붙여 보관합니다
+        이야기에 필요한 사진을 간단히 추가하세요
       </h2>
 
       <p
@@ -199,8 +199,8 @@ export default function StoryPhotoUploadBox() {
           color: '#6b5a46',
         }}
       >
-        사진을 올리고 그 사진에 담긴 기억을 함께 적어두면, 나중에 책 원고를
-        만들 때 사진과 이야기가 함께 사용됩니다.
+        사진과 짧은 이야기를 함께 저장하면,
+        원고를 만들 때 자료로 사용할 수 있습니다.
       </p>
 
       <form onSubmit={handleSubmit} style={{ marginTop: 22 }}>
@@ -476,9 +476,9 @@ export default function StoryPhotoUploadBox() {
         : 'pointer',
     }}
   >
-    {isEditing
-      ? 'AI가 다듬는 중...'
-      : 'AI로 다듬기'}
+  {isEditing
+  ? '문장을 다듬는 중...'
+  : '문장 다듬기'}
     </button>
    </div>
         

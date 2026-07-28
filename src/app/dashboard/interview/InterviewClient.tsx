@@ -302,7 +302,7 @@ export default function InterviewClient({
 
             <StoryField
               icon="date"
-              label="언제 찍은 사진인가요?"
+              label="언제 찍은 사진인가요? (선택)"
             >
               <input
                 type="text"
@@ -323,7 +323,7 @@ export default function InterviewClient({
 
             <StoryField
               icon="people"
-              label="누구와 함께 있었나요?"
+              label="누구와 함께 있었나요? (선택)"
             >
               <input
                 type="text"
@@ -340,7 +340,7 @@ export default function InterviewClient({
 
             <StoryField
               icon="heart"
-              label="어떤 기억이 떠오르나요?"
+              label="떠오르는 이야기를 직접 적어주세요"
             >
               <textarea
                 name="memoryText"
@@ -350,7 +350,7 @@ export default function InterviewClient({
                     event.target.value,
                   )
                 }
-                placeholder="그날의 분위기, 같이 했던 일, 가장 기억에 남는 순간과 지금의 마음을 적어주세요."
+                placeholder="짧은 한 문장부터 시작해도 괜찮습니다. 그날 있었던 일, 기억에 남는 순간과 지금의 마음을 자유롭게 적어주세요."
                 maxLength={1200}
               />
 
@@ -373,8 +373,8 @@ export default function InterviewClient({
                 }
                 className="interview-mode-button"
               >
-                글 다듬기 방식 ·{" "}
-                {getModeLabel(mode)}
+                문장 표현 선택 ·{" "}
+               {getModeLabel(mode)}
               </button>
 
               <button
@@ -387,8 +387,8 @@ export default function InterviewClient({
                 className="interview-ai-button"
               >
                 {isEditing
-                  ? "AI가 다듬는 중..."
-                  : "AI로 다듬기"}
+              ? "문장을 다듬는 중..."
+              : "문장 다듬기"}
               </button>
             </div>
 
@@ -488,7 +488,7 @@ export default function InterviewClient({
           >
             <button
               type="button"
-              aria-label="글 다듬기 방식 닫기"
+              aria-label="문장 표현 선택 닫기"
               className="interview-mode-close"
               onClick={() =>
                 setIsModeModalOpen(false)
@@ -497,7 +497,7 @@ export default function InterviewClient({
               ×
             </button>
 
-            <p>글 다듬기 방식</p>
+            <p>문장 표현 선택</p>
 
             <h2 id="interview-mode-title">
               어떤 느낌의 문장으로
@@ -527,8 +527,8 @@ export default function InterviewClient({
               />
 
               <ModeSelectButton
-                label="책 원고처럼"
-                description="책에 바로 담기 좋은 자연스러운 문장으로 정리합니다."
+                label="원고처럼"
+                description="스토리북 원고에 담기 좋은 자연스러운 문장으로 정리합니다."
                 active={
                   mode === "book"
                 }
@@ -730,7 +730,7 @@ function ModeSelectButton({
 function getModeLabel(mode: string) {
   switch (mode) {
     case "book":
-      return "책 원고처럼";
+      return "원고처럼";
     case "letter":
       return "편지처럼";
     case "short":

@@ -169,18 +169,18 @@ export default async function InterviewPage() {
 
       <div className="interview-reference-shell">
         <section className="interview-reference-heading">
-          <p>책 만들기 2단계</p>
+          <p>이야기 쓰기 2단계</p>
 
           <h1>
-            사진 속 이야기를
-            <br className="interview-reference-mobile-break" />
-            들려주세요
-          </h1>
+  사진을 보며 떠오르는 이야기를
+  <br className="interview-reference-mobile-break" />
+  직접 써보세요
+</h1>
 
-          <span>
-            완벽한 글보다 지금 기억나는 한 문장이
-            더 소중합니다.
-          </span>
+<span>
+  길고 완벽하게 쓰지 않아도 괜찮습니다.
+  지금 기억나는 한 문장부터 시작해 보세요.
+</span>
         </section>
 
         <section className="interview-reference-status">
@@ -209,11 +209,11 @@ export default async function InterviewPage() {
           />
 
           <StatusCard
-            label="만든 책"
-            value={bookCount}
-            unit="권"
-          />
-        </section>
+  label="만든 원고"
+  value={bookCount}
+  unit="개"
+/>
+</section>
 
         <section className="interview-reference-ready">
           <div>
@@ -222,27 +222,27 @@ export default async function InterviewPage() {
             <strong>
               {storyReady
                 ? `이야기 자료 ${totalStoryCount}개가 준비되었습니다.`
-                : `이야기를 ${remainingStoryCount}개 더 남겨보세요.`}
+                : `이야기를 ${remainingStoryCount}개 더 써보세요.`}
             </strong>
 
             <span>
-              사진 설명과 직접 작성한 이야기를 합쳐
-              3개 이상이면 책 원고 만들기를 시작할 수
-              있습니다.
-            </span>
+  사진 설명과 직접 쓴 이야기를 합쳐
+  3개 이상이면 원고 만들기를 시작할 수
+  있습니다.
+</span>
           </div>
 
           {storyReady ? (
-            <Link href="/dashboard/book">
-              책 원고 만들기
-              <span aria-hidden="true">→</span>
-            </Link>
-          ) : (
-            <a href="#story-composer">
-              이야기 작성하기
-              <span aria-hidden="true">↓</span>
-            </a>
-          )}
+  <Link href="/dashboard/book">
+    원고 만들기
+    <span aria-hidden="true">→</span>
+  </Link>
+) : (
+  <a href="#story-composer">
+    이야기 쓰기
+    <span aria-hidden="true">↓</span>
+  </a>
+)}
         </section>
 
         <section
@@ -397,19 +397,20 @@ export default async function InterviewPage() {
         </section>
 
         <section className="interview-reference-upload-more">
-          <div className="interview-reference-section-head">
-            <div>
-              <p>새 사진과 이야기 추가</p>
-              <h2>이 화면에서도 사진을 추가할 수 있습니다</h2>
-              <span>
-                새로운 사진을 올리면서 이야기를 함께
-                저장할 수 있습니다.
-              </span>
-            </div>
-          </div>
+  <div className="interview-reference-section-head">
+    <div>
+      <p>사진이 더 필요할 때</p>
+      <h2>이야기에 필요한 사진만 추가하세요</h2>
+      <span>
+        사진을 더 모으고 정리하려면 사진 올리기 화면을
+        이용하고, 여기서는 이야기에 필요한 사진을
+        간단히 추가할 수 있습니다.
+      </span>
+    </div>
+  </div>
 
-          <StoryPhotoUploadBox />
-        </section>
+  <StoryPhotoUploadBox />
+</section>
 
         <footer className="interview-reference-footer">
           <Link href="/dashboard/timeline">
@@ -425,8 +426,8 @@ export default async function InterviewPage() {
             className="interview-reference-next"
           >
             {storyReady
-              ? "이야기 저장하고 다음으로"
-              : "이야기를 더 남겨주세요"}
+  ? "원고 만들기로 이동"
+  : "이야기 더 쓰기"}
             <span aria-hidden="true">→</span>
           </Link>
         </footer>
