@@ -156,7 +156,7 @@ export async function POST(
       );
 
     const retryData:
-      Prisma.AIBookProductionRunUpdateManyMutationInput =
+      Prisma.AIBookProductionRunUncheckedUpdateManyInput =
       {
         ...retryPlan.resetData,
 
