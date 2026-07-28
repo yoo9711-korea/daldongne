@@ -231,7 +231,7 @@ export default function ResetPasswordPage() {
       >
         <img
           src="/brand/icon-mark.png"
-          alt="달동네 출판사"
+          alt="달동네 스토리"
           style={{
             width: 56,
             height: 56,

@@ -147,7 +147,7 @@ function PaymentFailLayout({
             letterSpacing: '0.08em',
           }}
         >
-          달동네 출판사 결제
+          달동네 스토리 결제
         </p>
 
         <h1
