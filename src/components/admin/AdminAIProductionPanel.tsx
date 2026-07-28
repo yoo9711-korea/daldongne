@@ -6,6 +6,7 @@ import AdminAIProductionDecisionPanel from "@/components/admin/AdminAIProduction
 import AdminAIProductionAutoRunButton from "@/components/admin/AdminAIProductionAutoRunButton";
 import AdminAIProductionRetryButton from "@/components/admin/AdminAIProductionRetryButton";
 import AdminAIProductionStalledRecoveryButton from "@/components/admin/AdminAIProductionStalledRecoveryButton";
+import AdminAIProductionAutoRefresh from "@/components/admin/AdminAIProductionAutoRefresh";
 import { prisma } from "@/lib/prisma";
 
 type AdminAIProductionPanelProps = {
@@ -294,6 +295,19 @@ const hasFinalPdf =
     String(order.status) ===
     "PAID";
 
+    const shouldAutoRefresh =
+  Boolean(
+    latestRun &&
+      [
+        "QUEUED",
+        "RUNNING",
+      ].includes(
+        String(
+          latestRun.status,
+        ),
+      ),
+  );
+
     const startDisabled =
     !isPaid ||
     hasActiveRun ||
@@ -356,7 +370,11 @@ const hasFinalPdf =
             시작 전
           </strong>
         )}
-      </header>
+      </header>  
+
+     <AdminAIProductionAutoRefresh
+        enabled={shouldAutoRefresh}
+     />
 
       {latestRun ? (
         <>
