@@ -31,7 +31,7 @@ type RetryPlan = {
   summary: string;
   message: string;
   failurePrefix: string;
-  resetData: Prisma.AIBookProductionRunUpdateManyMutationInput;
+  resetData: Prisma.AIBookProductionRunUncheckedUpdateManyInput;
 };
 
 class RouteError extends Error {
