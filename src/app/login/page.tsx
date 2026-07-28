@@ -45,7 +45,7 @@ export default async function LoginPage({
       >
         <img
           src="/brand/icon-mark.png"
-          alt="달동네 출판사"
+          alt="달동네 스토리"
           style={{
             width: 56,
             height: 56,
@@ -60,7 +60,7 @@ export default async function LoginPage({
             textAlign: 'center',
           }}
         >
-          달동네 출판사
+          달동네 스토리
         </h1>
 
         <p
