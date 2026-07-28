@@ -111,6 +111,15 @@ export default async function DashboardOrderDetailPage({
         order.trackingNumber,
     );
 
+  const shouldShowProofGuide =
+    Boolean(
+      order.proofFileUrl &&
+        String(
+          order.productionStage,
+        ) === "PROOF_SENT" &&
+        !order.proofApprovedAt,
+    );
+
   return (
     <main className="user-order-detail-page">
       <style>
@@ -251,7 +260,42 @@ export default async function DashboardOrderDetailPage({
           authorId={userId}
         />
 
-                        <OrderProofReviewPanel
+                {shouldShowProofGuide ? (
+          <section
+            className="user-order-proof-guide"
+            role="status"
+          >
+            <div>
+              <p>
+                PROOF REVIEW
+              </p>
+
+              <h2>
+                교정본 PDF를 확인해 주세요
+              </h2>
+
+              <span>
+                최종 인쇄 전 확인 단계입니다. PDF를 열어
+                사진, 문장, 목차, 페이지 순서를 확인한 뒤
+                아래 교정본 확인 영역에서 승인 또는 수정
+                요청을 남겨 주세요.
+              </span>
+            </div>
+
+            <a
+              href={
+                order.proofFileUrl ||
+                "#"
+              }
+              target="_blank"
+              rel="noreferrer"
+            >
+              교정본 PDF 열기
+            </a>
+          </section>
+        ) : null}     
+
+         <OrderProofReviewPanel
           orderRecordId={order.id}
           authorId={userId}
         />
@@ -941,6 +985,8 @@ const orderDetailStyles = `
   }
 
   .user-order-proof-panel {
+
+  .user-order-proof-panel {
     margin-top: 15px;
     padding: 22px 25px;
     display: flex;
@@ -1127,6 +1173,15 @@ const orderDetailStyles = `
     .user-order-detail-overview {
       grid-template-columns:
         repeat(2, minmax(0, 1fr));
+    }
+
+       .user-order-proof-guide {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+      .user-order-proof-guide > a {
+      align-self: flex-start;
     }
 
     .user-order-proof-panel {
