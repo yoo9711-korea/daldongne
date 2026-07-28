@@ -710,7 +710,33 @@ const hasFinalPdf =
           </p>
         </div>
       )}
-                         <div className="admin-ai-production-action">
+
+      {canMakeFinalDecision ? (
+  <div
+    className="admin-ai-production-approval-guide"
+    role="status"
+  >
+    <div>
+      <strong>
+        최종 승인 대기 상태입니다
+      </strong>
+
+      <p>
+        최종 PDF를 먼저 확인한 뒤 승인 또는
+        반려를 선택해 주세요. 승인하면 고객이
+        최종본을 확인할 수 있고, 반려하면 관리자
+        메모를 기준으로 AI 재작업을 진행할 수
+        있습니다.
+      </p>
+    </div>
+
+    <span>
+      PDF 확인 후 결정 필요
+    </span>
+  </div>
+) : null}
+
+        <div className="admin-ai-production-action">
         {isStalled &&
         latestRun ? (
           <AdminAIProductionStalledRecoveryButton
@@ -1254,6 +1280,56 @@ const adminAIProductionStyles = `
     color: #3a704b;
     background: #e5f4e9;
   }
+
+ .admin-ai-production-approval-guide {
+  margin-top: 17px;
+  padding: 17px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid #e0bf72;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    #fff8e5,
+    #ffffff
+  );
+  box-shadow: 0 12px 28px rgba(138, 98, 27, 0.12);
+}
+
+.admin-ai-production-approval-guide strong {
+  display: block;
+  color: #7a5517;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.admin-ai-production-approval-guide p {
+  margin: 7px 0 0;
+  color: #7f6b43;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+.admin-ai-production-approval-guide > span {
+  min-height: 31px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  color: #815c1c;
+  background: #fff0c5;
+  font-size: 9px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .admin-ai-production-approval-guide {
+    flex-direction: column;
+  }
+}
 
   .admin-ai-production-summary {
     margin-top: 17px;
