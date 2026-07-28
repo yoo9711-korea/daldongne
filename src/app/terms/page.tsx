@@ -53,7 +53,7 @@ export default function TermsPage() {
             letterSpacing: '0.08em',
           }}
         >
-          달동네 출판사
+          달동네 스토리
         </p>
 
         <h1
@@ -70,7 +70,7 @@ export default function TermsPage() {
         </h1>
 
         <p style={{ marginTop: 18, fontSize: 17, lineHeight: 1.8, color: '#6a4a2b' }}>
-          본 이용약관은 달동네 출판사가 제공하는 사진, 이야기, 인터뷰 기록,
+          본 이용약관은 달동네 스토리가 제공하는 사진, 이야기, 인터뷰 기록,
           AI 원고 생성, 전자책 미리보기, 책 제작 상담 서비스의 이용 조건과
           절차를 정합니다.
         </p>
@@ -82,7 +82,7 @@ export default function TermsPage() {
         <section style={sectionStyle}>
           <h2 style={h2Style}>1. 목적</h2>
           <p style={pStyle}>
-            이 약관은 달동네 출판사가 제공하는 서비스의 이용과 관련하여 회사와
+            이 약관은 달동네 스토리가 제공하는 서비스의 이용과 관련하여 회사와
             이용자 사이의 권리, 의무, 책임사항 및 서비스 이용 절차를 정하는 것을
             목적으로 합니다.
           </p>
@@ -90,14 +90,14 @@ export default function TermsPage() {
 
         <section style={sectionStyle}>
           <h2 style={h2Style}>2. 서비스의 내용</h2>
-          <p style={pStyle}>달동네 출판사는 다음과 같은 서비스를 제공합니다.</p>
+          <p style={pStyle}>달동네 스토리는 다음과 같은 서비스를 제공합니다.</p>
           <ul style={listStyle}>
             <li>사진 및 이야기 등록, 보관, 관리 기능</li>
             <li>인터뷰 답변을 통한 가족 기록 정리 기능</li>
             <li>AI를 활용한 제목, 요약, 목차, 원고 생성 기능</li>
             <li>전자책 미리보기 및 인쇄용 원고 확인 기능</li>
             <li>책 제작 상담 신청 및 진행 안내 기능</li>
-            <li>기타 달동네 출판사가 정하는 기억 기록 관련 서비스</li>
+            <li>기타 달동네 스토리가 정하는 기억 기록 관련 서비스</li>
           </ul>
         </section>
 
@@ -125,7 +125,7 @@ export default function TermsPage() {
           <h2 style={h2Style}>5. 사진, 글, 원고에 대한 권리</h2>
           <p style={pStyle}>
             이용자가 등록한 사진, 글, 이야기, 인터뷰 답변의 권리는 원칙적으로
-            이용자에게 있습니다. 달동네 출판사는 서비스 제공, 원고 생성, 전자책
+            이용자에게 있습니다. 달동네 스토리는 서비스 제공, 원고 생성, 전자책
             미리보기, 제작 상담 등 이용자가 요청한 목적 범위 안에서 해당 자료를
             사용할 수 있습니다.
           </p>
@@ -154,7 +154,7 @@ export default function TermsPage() {
         <section style={sectionStyle}>
           <h2 style={h2Style}>8. 유료 서비스 및 환불</h2>
           <p style={pStyle}>
-            달동네 출판사는 향후 유료 상품 또는 제작 상품을 제공할 수 있습니다.
+            달동네 스토리는 향후 유료 상품 또는 제작 상품을 제공할 수 있습니다.
             유료 서비스의 가격, 결제 방식, 환불 기준은 각 상품 또는 상담 과정에서
             별도로 안내합니다. 인쇄 제작이 시작된 이후에는 제작 진행 단계에 따라
             환불이 제한될 수 있습니다.
@@ -164,7 +164,7 @@ export default function TermsPage() {
         <section style={sectionStyle}>
           <h2 style={h2Style}>9. 서비스의 변경 및 중단</h2>
           <p style={pStyle}>
-            달동네 출판사는 서비스 개선, 시스템 점검, 보안 문제, 외부 서비스
+            달동네 스토리는 서비스 개선, 시스템 점검, 보안 문제, 외부 서비스
             장애, 운영상 필요에 따라 서비스의 전부 또는 일부를 변경하거나
             일시적으로 중단할 수 있습니다.
           </p>
@@ -181,7 +181,7 @@ export default function TermsPage() {
         <section style={sectionStyle}>
           <h2 style={h2Style}>11. 책임의 제한</h2>
           <p style={pStyle}>
-            달동네 출판사는 이용자가 입력한 자료의 정확성, 저작권, 초상권,
+            달동네 스토리는 이용자가 입력한 자료의 정확성, 저작권, 초상권,
             가족 간 권리관계에 대해 사전에 모두 확인할 수 없습니다. 이용자는
             본인이 등록한 자료와 최종 제작물의 사용 권한을 직접 확인해야 합니다.
           </p>

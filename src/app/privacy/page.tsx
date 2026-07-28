@@ -57,7 +57,7 @@ export default function PrivacyPage() {
             letterSpacing: '0.08em',
           }}
         >
-          달동네 출판사
+          달동네 스토리
         </p>
 
         <h1
@@ -81,9 +81,9 @@ export default function PrivacyPage() {
             color: '#6a4a2b',
           }}
         >
-          달동네 출판사는 사진, 이야기, 인터뷰 기록을 바탕으로 가족의
+          달동네 스토리는 사진, 이야기, 인터뷰 기록을 바탕으로 가족의
           기억과 인생책 원고를 만들 수 있도록 서비스를 제공합니다. 본
-          개인정보처리방침은 달동네 출판사가 이용자의 개인정보를 어떤
+          개인정보처리방침은 달동네 스토리가 이용자의 개인정보를 어떤
           목적으로 수집·이용하고, 어떻게 보호하는지 안내합니다.
         </p>
 
@@ -100,7 +100,7 @@ export default function PrivacyPage() {
         <section style={sectionStyle}>
           <h2 style={h2Style}>1. 개인정보의 처리 목적</h2>
           <p style={pStyle}>
-            달동네 출판사는 다음 목적을 위해 개인정보를 처리합니다.
+            달동네 스토리는 다음 목적을 위해 개인정보를 처리합니다.
           </p>
           <ul style={listStyle}>
             <li>회원 로그인 및 본인 식별</li>
@@ -176,7 +176,7 @@ export default function PrivacyPage() {
         <section style={sectionStyle}>
           <h2 style={h2Style}>5. 개인정보 처리의 위탁</h2>
           <p style={pStyle}>
-            달동네 출판사는 서비스 제공을 위해 다음 외부 서비스를 사용할 수
+            달동네 스토리는 서비스 제공을 위해 다음 외부 서비스를 사용할 수
             있습니다.
           </p>
           <ul style={listStyle}>
@@ -197,7 +197,7 @@ export default function PrivacyPage() {
         <section style={sectionStyle}>
           <h2 style={h2Style}>6. 개인정보의 제3자 제공</h2>
           <p style={pStyle}>
-            달동네 출판사는 이용자의 개인정보를 원칙적으로 외부에 제공하지
+            달동네 스토리는 이용자의 개인정보를 원칙적으로 외부에 제공하지
             않습니다. 다만, 이용자가 사전에 동의한 경우 또는 법령에 따라
             요구되는 경우에는 필요한 범위에서 제공될 수 있습니다.
           </p>
@@ -206,7 +206,7 @@ export default function PrivacyPage() {
         <section style={sectionStyle}>
           <h2 style={h2Style}>7. AI 처리에 관한 안내</h2>
           <p style={pStyle}>
-            달동네 출판사는 이용자가 입력한 사진 설명, 이야기, 인터뷰 답변을
+            달동네 스토리는 이용자가 입력한 사진 설명, 이야기, 인터뷰 답변을
             바탕으로 AI 원고, 제목, 요약, 목차, 책 구성안을 생성할 수
             있습니다. 이용자는 민감한 개인정보, 타인의 개인정보, 공개를 원하지
             않는 사생활 정보를 입력하지 않도록 주의해야 합니다.
@@ -244,7 +244,7 @@ export default function PrivacyPage() {
         <section style={sectionStyle}>
           <h2 style={h2Style}>9. 쿠키 및 자동 수집 정보</h2>
           <p style={pStyle}>
-            달동네 출판사는 로그인 유지, 서비스 보안, 이용 환경 개선을 위해
+            달동네 스토리는 로그인 유지, 서비스 보안, 이용 환경 개선을 위해
             쿠키와 접속 정보를 사용할 수 있습니다. 이용자는 브라우저 설정을
             통해 쿠키 저장을 거부하거나 삭제할 수 있습니다. 다만 쿠키를
             차단하는 경우 로그인 유지 등 일부 기능이 제한될 수 있습니다.
@@ -269,7 +269,7 @@ export default function PrivacyPage() {
             있습니다.
           </p>
           <ul style={listStyle}>
-            <li>서비스명: 달동네 출판사</li>
+            <li>서비스명: 달동네 스토리</li>
             <li>개인정보 보호책임자: 서비스 운영자</li>
             <li>문의 이메일: {adminEmail}</li>
           </ul>

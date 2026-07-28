@@ -55,7 +55,7 @@ export default function DataDeletionPage() {
             letterSpacing: '0.08em',
           }}
         >
-          달동네 출판사
+          달동네 스토리
         </p>
 
         <h1
@@ -72,7 +72,7 @@ export default function DataDeletionPage() {
         </h1>
 
         <p style={{ marginTop: 18, fontSize: 17, lineHeight: 1.8, color: '#6a4a2b' }}>
-          달동네 출판사는 이용자가 등록한 사진, 이야기, 인터뷰 답변, 책 원고,
+          달동네 스토리는 이용자가 등록한 사진, 이야기, 인터뷰 답변, 책 원고,
           제작 상담 정보를 안전하게 관리하며, 이용자의 요청에 따라 삭제 절차를
           진행합니다.
         </p>
@@ -173,7 +173,7 @@ export default function DataDeletionPage() {
           </p>
 
           <ul style={listStyle}>
-            <li>서비스명: 달동네 출판사</li>
+            <li>서비스명: 달동네 스토리</li>
             <li>문의 이메일: {adminEmail}</li>
           </ul>
         </section>
