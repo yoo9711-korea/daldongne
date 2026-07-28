@@ -12,9 +12,9 @@ export default function manifest(): ExtendedManifest {
   return {
     id: '/',
     name: '달동네 스토리',
-    short_name: '달동네',
+    short_name: '달동네 스토리',
     description:
-      '사진과 글을 모아 가족의 삶을 한 권의 인생책으로 만드는 달동네 스토리 앱',
+      '사진과 이야기를 모아 소중한 삶의 기록을 한 권의 인생책으로 만드는 달동네 스토리 앱',
     start_url: '/',
     scope: '/',
     display: 'standalone',

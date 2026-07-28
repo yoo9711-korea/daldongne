@@ -8,12 +8,12 @@ import './daldongne-fonts.css';
 
 export const metadata: Metadata = {
   title: '달동네 스토리 — 삶의 인생책 제작 서비스',
-  description: '사진과 글을 모아, 가족의 삶을 한 권의 책으로 만들어드립니다.',
-  applicationName: '달동네',
+  description: '사진과 이야기를 모아, 소중한 삶의 기록을 한 권의 책으로 만들어드립니다.',
+  applicationName: '달동네 스토리',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
-    title: '달동네',
+    title: '달동네 스토리',
     statusBarStyle: 'default',
   },
   icons: {

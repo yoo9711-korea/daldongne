@@ -47,7 +47,7 @@ export default async function DashboardLayout({
             </span>
 
             <span className="storybook-dashboard-brand-copy">
-              <strong>달동네 스토리북</strong>
+              <strong>달동네 스토리</strong>
               <small>사진과 이야기로 만드는 나의 책</small>
             </span>
           </Link>
