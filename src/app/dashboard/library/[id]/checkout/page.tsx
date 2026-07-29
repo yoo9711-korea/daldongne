@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+﻿import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
@@ -139,7 +139,7 @@ export default async function BookCheckoutPage({
       <div className="checkout-reference-shell">
         <nav
           className="checkout-reference-progress"
-          aria-label="제작 신청 진행 단계"
+          aria-label="제작·결제 진행 단계"
         >
           <ProgressStep
             number={1}
@@ -173,10 +173,10 @@ export default async function BookCheckoutPage({
         </nav>
 
         <header className="checkout-reference-heading">
-          <p>책 제작 마지막 단계</p>
+          <p>스토리북 제작 결제 단계</p>
 
           <h1>
-            책 제작을 신청하고
+            확정된 견적을 확인하고
             결제해요
           </h1>
 
@@ -209,9 +209,9 @@ export default async function BookCheckoutPage({
             <div>
               <strong>
                 {paymentCompleted
-                  ? "결제가 완료된 주문입니다."
+                  ? "결제가 완료된 제작 주문입니다."
                   : paymentAvailable
-                    ? "관리자 검토와 제작 견적이 준비되었습니다."
+                    ? "관리자 검토가 끝나고 제작 견적이 준비되었습니다."
                     : "관리자 검토가 진행 중입니다."}
               </strong>
 
@@ -219,7 +219,7 @@ export default async function BookCheckoutPage({
                 {paymentCompleted
                   ? "현재 제작 진행 상태는 내 책장에서 확인할 수 있습니다."
                   : paymentAvailable
-                    ? "아래 주문 내용 확인 후 결제를 진행해 주세요."
+                    ? "아래 제작 주문 내용과 최종 금액을 확인한 뒤 결제를 진행해 주세요."
                     : "견적이 확정되면 이 화면에 결제 버튼이 표시됩니다."}
               </p>
             </div>
@@ -238,7 +238,7 @@ export default async function BookCheckoutPage({
               </strong>
 
               <p>
-                책 상세 화면에서 제작 신청을
+                원고 상세 화면에서 제작 신청을
                 먼저 접수해 주세요.
               </p>
             </div>
@@ -249,7 +249,7 @@ export default async function BookCheckoutPage({
           <article className="checkout-reference-contact-card">
             <div className="checkout-reference-card-heading">
               <p>배송·연락 정보</p>
-              <h2>신청자 정보를 확인해 주세요</h2>
+              <h2>제작 신청 정보를 확인해 주세요</h2>
             </div>
 
             <ContactField
@@ -307,8 +307,8 @@ export default async function BookCheckoutPage({
 
           <aside className="checkout-reference-order-card">
             <div className="checkout-reference-card-heading">
-              <p>주문 요약</p>
-              <h2>제작할 책</h2>
+              <p>제작 주문 요약</p>
+              <h2>제작할 스토리북</h2>
             </div>
 
             <div className="checkout-reference-book-summary">
@@ -353,7 +353,7 @@ export default async function BookCheckoutPage({
                 <p>
                   {book.subtitle ||
                     book.summary ||
-                    "사진과 이야기로 만든 나의 책"}
+                    "사진과 이야기로 만든 나의 스토리북"}
                 </p>
 
                 <small>
@@ -475,14 +475,14 @@ export default async function BookCheckoutPage({
             </strong>
 
             <p>
-              주문 상태와 관리자 안내는
-              책 상세 화면에서 확인해 주세요.
+              제작 진행 상태와 관리자 안내는
+              원고 상세 화면에서 확인해 주세요.
             </p>
 
             <Link
               href={`/dashboard/library/${book.id}`}
             >
-              책 상세 화면으로
+              원고 상세 화면으로
             </Link>
           </section>
         )}
@@ -1458,3 +1458,6 @@ const checkoutReferenceStyles = `
     }
   }
 `;
+
+
+

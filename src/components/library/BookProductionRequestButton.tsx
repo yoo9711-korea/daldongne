@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   useEffect,
@@ -21,11 +21,11 @@ type Props = {
 };
 
 const productionSteps = [
-  '주문 신청',
+  '제작 신청',
   '관리자 1차 검토',
   '고객 연락',
   '제작 견적 안내',
-  '책 편집',
+  '원고 확인·편집',
   '인쇄',
   '배송',
 ];
@@ -156,7 +156,7 @@ export default function BookProductionRequestButton({
 
     if (!bookId) {
       alert(
-        '주문 신청할 책을 찾을 수 없습니다.',
+        '제작 신청할 원고를 찾을 수 없습니다.',
       );
       return;
     }
@@ -211,14 +211,14 @@ export default function BookProductionRequestButton({
       ) {
         alert(
           result.message ||
-            '책 제작 주문 신청을 접수하지 못했습니다.',
+            '제작 신청을 접수하지 못했습니다.',
         );
         return;
       }
 
       alert(
         result.message ||
-          '책 제작 주문 신청이 접수되었습니다.',
+          '제작 신청이 접수되었습니다. 원고 검토 후 견적과 결제 방법을 안내해 드립니다.',
       );
 
       setIsOpen(false);
@@ -226,7 +226,7 @@ export default function BookProductionRequestButton({
       router.refresh();
     } catch {
       alert(
-        '책 제작 주문 신청 중 오류가 발생했습니다.',
+        '제작 신청 중 오류가 발생했습니다.',
       );
     } finally {
       setIsSubmitting(false);
@@ -240,14 +240,14 @@ export default function BookProductionRequestButton({
 
     if (!existingRequestId) {
       alert(
-        '취소할 주문 신청을 찾을 수 없습니다.',
+        '취소할 제작 신청을 찾을 수 없습니다.',
       );
       return;
     }
 
     const confirmed =
       window.confirm(
-        '책 제작 주문 신청을 취소할까요?\n\n취소하면 책 상태는 원고 초안으로 돌아갑니다.',
+        '제작 신청을 취소할까요?\n\n취소하면 이 원고는 원고 초안 상태로 돌아갑니다.',
       );
 
     if (!confirmed) {
@@ -276,14 +276,14 @@ export default function BookProductionRequestButton({
       ) {
         alert(
           result.message ||
-            '책 제작 주문 신청을 취소하지 못했습니다.',
+            '제작 신청을 취소하지 못했습니다.',
         );
         return;
       }
 
       alert(
         result.message ||
-          '책 제작 주문 신청이 취소되었습니다.',
+          '제작 신청이 취소되었습니다.',
       );
 
       setIsOpen(false);
@@ -291,7 +291,7 @@ export default function BookProductionRequestButton({
       router.refresh();
     } catch {
       alert(
-        '책 제작 주문 신청을 취소하는 중 오류가 발생했습니다.',
+        '제작 신청을 취소하는 중 오류가 발생했습니다.',
       );
     } finally {
       setIsSubmitting(false);
@@ -404,7 +404,7 @@ export default function BookProductionRequestButton({
           className="production-request-modal"
           role="dialog"
           aria-modal="true"
-          aria-label="책 책 제작 주문 신청"
+          aria-label="스토리북 제작 신청"
           onMouseDown={(event) => {
             if (
               event.target ===
@@ -464,7 +464,7 @@ export default function BookProductionRequestButton({
                     fontWeight: 900,
                   }}
                 >
-                  책 제작 주문
+                  스토리북 제작 신청
                 </p>
 
                 <h2
@@ -489,7 +489,7 @@ export default function BookProductionRequestButton({
 
               <button
                 type="button"
-                aria-label="상담 창 닫기"
+                aria-label="제작 신청 창 닫기"
                 onClick={closeModal}
                 disabled={isSubmitting}
                 style={{
@@ -547,10 +547,10 @@ export default function BookProductionRequestButton({
             >
               연락처 또는 이메일을
               남겨주시면 관리자가 원고와
-              주문 신청 내용을 1차 검토한 뒤
-              고객님께 연락드립니다. 관리자 연락 전까지
-              사진과 이야기를 더 추가하면
-              책의 완성도가 높아집니다.
+              제작 신청 내용을 먼저 확인한 뒤
+              견적과 결제 방법을 안내해 드립니다. 결제 전까지
+              원고와 사진을 직접 수정하면
+              최종 제작 내용이 더 정확해집니다.
             </p>
 
             <section style={infoBoxStyle}>
@@ -599,7 +599,7 @@ export default function BookProductionRequestButton({
               </h3>
 
               <p style={infoTextStyle}>
-                상담 1~3일 → 편집 3~7일
+                신청 검토·견적 안내 1~3일 → 결제 → 편집 3~7일
                 → 인쇄 5~7일 → 배송
                 2~3일 정도가 기본
                 흐름입니다. 실제 기간은
@@ -611,7 +611,7 @@ export default function BookProductionRequestButton({
 
             <section style={infoBoxStyle}>
               <h3 style={infoTitleStyle}>
-                더 좋은 책을 위해 준비하면
+                제작 전에 확인하면
                 좋은 자료
               </h3>
 
@@ -778,11 +778,11 @@ export default function BookProductionRequestButton({
               />
 
               <span>
-                책 제작 주문 신청을 위해 이름,
+                제작 신청을 위해 이름,
                 연락처, 이메일과 요청 내용을
                 수집·이용하는 것에
-                동의합니다. 상담 정보는 제작
-                상담과 고객 연락 목적으로
+                동의합니다. 신청 정보는 제작
+                상담, 견적 안내와 고객 연락 목적으로
                 사용됩니다. 달동네 스토리의{' '}
                 <a
                   href="/terms"
@@ -829,7 +829,7 @@ export default function BookProductionRequestButton({
                     isSubmitting,
                   )}
                 >
-                  주문 신청 취소
+                  제작 신청 취소
                 </button>
               ) : null}
 
@@ -889,10 +889,10 @@ function getDefaultMessage(
   }
 
   if (hasRequest) {
-    return '기존 책 제작 주문 신청 내용을 수정하고 싶습니다.';
+    return '기존 제작 신청 내용을 수정하고 싶습니다.';
   }
 
-  return '이 원고로 책 제작 주문을 신청하고 싶습니다.';
+  return '이 원고로 스토리북 제작을 신청하고 싶습니다.';
 }
 
 function getOpenButtonLabel(
@@ -901,7 +901,7 @@ function getOpenButtonLabel(
   isCompletedRequest: boolean,
 ) {
   if (isCanceledRequest) {
-    return '제작 주문 다시 신청하기';
+    return '제작 다시 신청하기';
   }
 
   if (isCompletedRequest) {
@@ -909,10 +909,10 @@ function getOpenButtonLabel(
   }
 
   if (hasRequest) {
-    return '주문 신청 내용 확인·수정';
+    return '제작 신청 내용 확인·수정';
   }
 
-  return '책 제작 주문 신청하기';
+  return '스토리북 제작 신청하기';
 }
 
 function getModalTitle(
@@ -929,7 +929,7 @@ function getModalTitle(
   }
 
   if (hasRequest) {
-    return '책 제작 주문 신청 내용을 확인하고 수정합니다';
+    return '제작 신청 내용을 확인하고 수정합니다';
   }
 
   return '이 원고를 책으로 만들기 위한 상담을 신청합니다';
@@ -949,10 +949,10 @@ function getSubmitButtonLabel(
   }
 
   if (hasRequest) {
-    return '주문 신청 내용 다시 접수';
+    return '제작 신청 내용 다시 접수';
   }
 
-  return '주문 신청 접수';
+  return '제작 신청 접수';
 }
 
 function openButtonStyle(
@@ -1066,7 +1066,7 @@ function getProductionRequestStatusLabel(
   status: string | null,
 ) {
   if (status === 'REQUESTED') {
-    return '주문 신청 접수';
+    return '제작 신청 접수';
   }
 
   if (status === 'CONTACTED') {
@@ -1078,12 +1078,13 @@ function getProductionRequestStatusLabel(
   }
 
   if (status === 'COMPLETED') {
-    return '상담 완료';
+    return '제작 상담 완료';
   }
 
   if (status === 'CANCELED') {
-    return '상담 취소';
+    return '제작 신청 취소';
   }
 
-  return '주문 신청 상태 확인 필요';
+  return '제작 신청 상태 확인 필요';
 }
+

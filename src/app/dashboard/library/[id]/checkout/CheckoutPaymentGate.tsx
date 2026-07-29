@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import TossPaymentWidget from "@/components/payment/TossPaymentWidget";
 import { useState } from "react";
@@ -43,7 +43,7 @@ export default function CheckoutPaymentGate({
         />
 
         <span>
-          주문 내용과 최종 결제금액{" "}
+          제작 제작 제작 주문 내용과 최종 결제금액{" "}
           <strong>
             {amount.toLocaleString()}원
           </strong>
@@ -59,7 +59,7 @@ export default function CheckoutPaymentGate({
           </strong>
 
           <p>
-            결제 전 주문번호와 금액을
+            결제 전 주문번호와 최종 금액을
             다시 확인해 주세요.
           </p>
         </div>
@@ -152,3 +152,6 @@ const checkoutPaymentGateStyles = `
     }
   }
 `;
+
+
+
