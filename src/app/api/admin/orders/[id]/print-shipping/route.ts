@@ -658,52 +658,190 @@ export async function POST(
           });
 
         if (emailOrder) {
-          await sendOrderProductionStageEmail({
-            to:
-              emailOrder.productionRequest
-                .email ||
-              emailOrder.author.email,
+          const emailResult =
+            await sendOrderProductionStageEmail({
+              to:
+                emailOrder.productionRequest
+                  .email ||
+                emailOrder.author.email,
 
-            customerName:
-              emailOrder.productionRequest
-                .name ||
-              emailOrder.author.name,
+              customerName:
+                emailOrder.productionRequest
+                  .name ||
+                emailOrder.author.name,
 
-            bookTitle:
-              emailOrder.book.title,
+              bookTitle:
+                emailOrder.book.title,
 
-            orderRecordId:
-              emailOrder.id,
+              orderRecordId:
+                emailOrder.id,
 
+              orderId:
+                emailOrder.orderId,
+
+              stage:
+                String(
+                  emailOrder.productionStage,
+                ),
+
+              proofFileUrl:
+                emailOrder.proofFileUrl,
+
+              shippingCarrier:
+                emailOrder.shippingCarrier,
+
+              trackingNumber:
+                emailOrder.trackingNumber,
+            });
+
+          const notificationType =
+            action === "SHIP"
+              ? "SHIPPING"
+              : "COMPLETION";
+
+          const notificationLabel =
+            action === "SHIP"
+              ? "배송 시작 안내"
+              : "제작 완료 안내";
+
+          const resultLabel =
+            emailResult.status === "SENT"
+              ? "발송 성공"
+              : emailResult.status ===
+                  "SKIPPED"
+                ? "발송 건너뜀"
+                : "발송 실패";
+
+          const recipientLabel =
+            emailResult.to
+              ? ` · ${emailResult.to}`
+              : "";
+
+          await recordBookOrderAudit({
             orderId:
-              emailOrder.orderId,
+              orderRecordId,
 
-            stage:
-              String(
-                emailOrder.productionStage,
-              ),
+            actorId:
+              admin.id,
 
-            proofFileUrl:
-              emailOrder.proofFileUrl,
+            actorName:
+              admin.name,
 
-            shippingCarrier:
-              emailOrder.shippingCarrier,
+            actorEmail:
+              admin.email,
 
-            trackingNumber:
-              emailOrder.trackingNumber,
+            source:
+              "SYSTEM",
+
+            category:
+              action === "SHIP"
+                ? "DELIVERY"
+                : "PRODUCTION",
+
+            action:
+              `CUSTOMER_${notificationType}_EMAIL_${emailResult.status}`,
+
+            summary:
+              `${notificationLabel} 이메일 ${resultLabel}${recipientLabel}`,
+
+            before: {
+              notificationStatus:
+                null,
+            },
+
+            after: {
+              notificationType,
+              notificationStatus:
+                emailResult.status,
+              recipientEmail:
+                emailResult.to,
+              reason:
+                emailResult.reason,
+              providerMessageId:
+                emailResult.providerMessageId,
+            },
+
+            isCustomerVisible:
+              false,
           });
         }
-      } catch (shippingEmailError) {
+      } catch (productionStageEmailError) {
         console.error(
           "[BOOK_PRODUCTION_STAGE_EMAIL_ERROR]",
           {
             orderRecordId,
-            orderId: order.orderId,
-            error: shippingEmailError,
+            orderId:
+              order.orderId,
+            action,
+            error:
+              productionStageEmailError,
           },
         );
+
+        await recordBookOrderAudit({
+          orderId:
+            orderRecordId,
+
+          actorId:
+            admin.id,
+
+          actorName:
+            admin.name,
+
+          actorEmail:
+            admin.email,
+
+          source:
+            "SYSTEM",
+
+          category:
+            action === "SHIP"
+              ? "DELIVERY"
+              : "PRODUCTION",
+
+          action:
+            action === "SHIP"
+              ? "CUSTOMER_SHIPPING_EMAIL_FAILED"
+              : "CUSTOMER_COMPLETION_EMAIL_FAILED",
+
+          summary:
+            action === "SHIP"
+              ? "배송 시작 안내 이메일 처리 중 오류가 발생했습니다."
+              : "제작 완료 안내 이메일 처리 중 오류가 발생했습니다.",
+
+          before: {
+            notificationStatus:
+              null,
+          },
+
+          after: {
+            notificationType:
+              action === "SHIP"
+                ? "SHIPPING"
+                : "COMPLETION",
+
+            notificationStatus:
+              "FAILED",
+
+            recipientEmail:
+              null,
+
+            reason:
+              productionStageEmailError
+                instanceof Error
+                ? productionStageEmailError.message
+                : "UNKNOWN_EMAIL_PROCESSING_ERROR",
+
+            providerMessageId:
+              null,
+          },
+
+          isCustomerVisible:
+            false,
+        });
       }
     }
+
     try {
       await recordBookOrderAudit({
         orderId:

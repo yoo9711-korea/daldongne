@@ -31,6 +31,17 @@ type StageEmailInformation = {
   actionLabel: string;
 };
 
+export type OrderEmailDeliveryStatus =
+  | "SENT"
+  | "SKIPPED"
+  | "FAILED";
+
+export type OrderEmailDeliveryResult = {
+  status: OrderEmailDeliveryStatus;
+  to: string | null;
+  reason: string | null;
+  providerMessageId: string | null;
+};
 export async function sendOrderPaymentCompletedEmail(
   payload: PaymentCompletedEmailPayload,
 ) {
@@ -137,7 +148,12 @@ export async function sendOrderProductionStageEmail(
       },
     );
 
-    return;
+    return {
+      status: "SKIPPED",
+      to: null,
+      reason: "CUSTOMER_EMAIL_MISSING",
+      providerMessageId: null,
+    };
   }
 
   const information =
@@ -146,7 +162,12 @@ export async function sendOrderProductionStageEmail(
     );
 
   if (!information) {
-    return;
+    return {
+      status: "SKIPPED",
+      to: payload.to,
+      reason: "STAGE_EMAIL_TEMPLATE_MISSING",
+      providerMessageId: null,
+    };
   }
 
   const orderUrl =
@@ -209,7 +230,7 @@ export async function sendOrderProductionStageEmail(
         </a>
       `
       : "";
-  await sendOrderEmail({
+  return sendOrderEmail({
     to: payload.to,
     subject:
       `[달동네 스토리] ${information.subject} - ${payload.bookTitle}`,
@@ -276,7 +297,7 @@ async function sendOrderEmail({
   to: string;
   subject: string;
   html: string;
-}) {
+}): Promise<OrderEmailDeliveryResult> {
   const resendApiKey =
     process.env.RESEND_API_KEY;
 
@@ -291,21 +312,56 @@ async function sendOrderEmail({
       },
     );
 
-    return;
+    return {
+      status: "SKIPPED",
+      to,
+      reason:
+        "RESEND_API_KEY_MISSING",
+      providerMessageId: null,
+    };
   }
 
   try {
     const resend =
       new Resend(resendApiKey);
 
-    await resend.emails.send({
-      from:
-        process.env.EMAIL_FROM ||
-        "달동네 스토리 <onboarding@resend.dev>",
+    const response =
+      await resend.emails.send({
+        from:
+          process.env.EMAIL_FROM ||
+          "달동네 스토리 <onboarding@resend.dev>",
+        to,
+        subject,
+        html,
+      });
+
+    if (response.error) {
+      console.error(
+        "[ORDER_EMAIL_SEND_ERROR]",
+        {
+          to,
+          subject,
+          error: response.error,
+        },
+      );
+
+      return {
+        status: "FAILED",
+        to,
+        reason:
+          response.error.message ||
+          "RESEND_SEND_ERROR",
+        providerMessageId: null,
+      };
+    }
+
+    return {
+      status: "SENT",
       to,
-      subject,
-      html,
-    });
+      reason: null,
+      providerMessageId:
+        response.data?.id || null,
+    };
   } catch (error) {
     console.error(
       "[ORDER_EMAIL_SEND_ERROR]",
@@ -315,9 +371,18 @@ async function sendOrderEmail({
         error,
       },
     );
+
+    return {
+      status: "FAILED",
+      to,
+      reason:
+        error instanceof Error
+          ? error.message
+          : "UNKNOWN_EMAIL_SEND_ERROR",
+      providerMessageId: null,
+    };
   }
 }
-
 function getStageEmailInformation(
   stage: string,
 ): StageEmailInformation | null {

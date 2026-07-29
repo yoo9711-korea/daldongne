@@ -4,6 +4,7 @@ import {
   syncOrderPayment,
 } from "@/app/admin/orders/actions";
 import AdminOrderAuditSummary from "@/components/admin/AdminOrderAuditSummary";
+import AdminOrderEmailAuditSummary from "@/components/admin/AdminOrderEmailAuditSummary";
 import AdminAIProductionPanel from "@/components/admin/AdminAIProductionPanel";
 import AdminOrderConfirmButton from "@/components/admin/AdminOrderConfirmButton";
 import AdminProofReviewPanel from "@/components/admin/AdminProofReviewPanel";
@@ -220,6 +221,9 @@ export default async function AdminOrderDetailPage({
        <AdminOrderAuditSummary
               orderRecordId={order.id}
               orderNumber={order.orderId}
+        />
+        <AdminOrderEmailAuditSummary
+          orderRecordId={order.id}
         />
 
         <AdminAIProductionPanel
