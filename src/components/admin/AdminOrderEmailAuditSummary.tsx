@@ -1,3 +1,4 @@
+import AdminOrderEmailAuditFilters from "@/components/admin/AdminOrderEmailAuditFilters";
 import AdminOrderEmailRetryButton from "@/components/admin/AdminOrderEmailRetryButton";
 import { prisma } from "@/lib/prisma";
 
@@ -80,7 +81,14 @@ export default async function AdminOrderEmailAuditSummary({
       </div>
 
       {logs.length > 0 ? (
-        <div className="admin-order-email-audit-list">
+        <>
+          <AdminOrderEmailAuditFilters
+            loadedCount={
+              logs.length
+            }
+          />
+
+          <div className="admin-order-email-audit-list">
           {logs.map((log) => {
             const status =
               getEmailStatus(
@@ -133,6 +141,15 @@ export default async function AdminOrderEmailAuditSummary({
               <article
                 key={log.id}
                 data-status={status}
+                data-email-audit-item="true"
+                data-email-status={status}
+                data-email-type={
+                  log.action.includes(
+                    "SHIPPING",
+                  )
+                    ? "SHIPPING"
+                    : "COMPLETION"
+                }
               >
                 <div className="admin-order-email-audit-top">
                   <div>
@@ -281,7 +298,8 @@ export default async function AdminOrderEmailAuditSummary({
               </article>
             );
           })}
-        </div>
+          </div>
+        </>
       ) : (
         <div className="admin-order-email-audit-empty">
           아직 기록된 고객 알림 발송
