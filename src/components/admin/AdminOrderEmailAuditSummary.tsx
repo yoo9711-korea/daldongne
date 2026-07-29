@@ -1,3 +1,4 @@
+import AdminOrderEmailRetryButton from "@/components/admin/AdminOrderEmailRetryButton";
 import { prisma } from "@/lib/prisma";
 
 const EMAIL_AUDIT_ACTIONS = [
@@ -178,6 +179,21 @@ export default async function AdminOrderEmailAuditSummary({
                     </div>
                   ) : null}
                 </dl>
+
+                {status !== "SENT" ? (
+                  <AdminOrderEmailRetryButton
+                    orderRecordId={
+                      orderRecordId
+                    }
+                    notificationType={
+                      log.action.includes(
+                        "SHIPPING",
+                      )
+                        ? "SHIPPING"
+                        : "COMPLETION"
+                    }
+                  />
+                ) : null}
               </article>
             );
           })}
