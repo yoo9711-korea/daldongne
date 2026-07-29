@@ -1,496 +1,550 @@
-import { auth } from "@/auth";
+"use client";
+
 import Link from "next/link";
 
-const categories = [
+type ControlItem = {
+  label: string;
+  href: string;
+  tone: "mint" | "blue" | "yellow" | "pink" | "peach";
+  icon: "person" | "people" | "heart" | "dog" | "cat";
+};
+
+const relationshipItems: ControlItem[] = [
   {
     label: "나",
-    icon: "person",
+    href: "/dashboard/timeline",
     tone: "mint",
+    icon: "person",
   },
   {
     label: "가족",
-    icon: "family",
-    tone: "sky",
+    href: "/dashboard/timeline",
+    tone: "blue",
+    icon: "people",
   },
   {
     label: "친구",
-    icon: "friends",
+    href: "/dashboard/timeline",
     tone: "yellow",
+    icon: "people",
   },
   {
     label: "연인",
-    icon: "couple",
+    href: "/dashboard/timeline",
     tone: "pink",
+    icon: "heart",
   },
   {
     label: "강아지",
+    href: "/dashboard/timeline",
+    tone: "peach",
     icon: "dog",
-    tone: "rose",
   },
   {
     label: "고양이",
-    icon: "cat",
+    href: "/dashboard/timeline",
     tone: "blue",
+    icon: "cat",
   },
-] as const;
+];
 
-const actions = [
+const actionItems = [
   {
     label: "사진 올리기",
+    href: "/dashboard/timeline",
     icon: "photo",
-    path: "/dashboard/timeline",
     primary: true,
   },
   {
     label: "이야기 남기기",
-    icon: "story",
-    path: "/dashboard/interview",
+    href: "/dashboard/interview",
+    icon: "write",
     primary: false,
   },
   {
     label: "내 기억 보기",
+    href: "/dashboard/library",
     icon: "book",
-    path: "/dashboard/library",
     primary: false,
   },
 ] as const;
 
-export default async function HomeHeroInteractiveControls() {
-  const session = await auth();
-
-  const getHref = (path: string) =>
-    session?.user
-      ? path
-      : `/login?callbackUrl=${encodeURIComponent(path)}`;
-
+export default function HomeHeroInteractiveControls(
+  _props: Record<string, unknown>,
+) {
   return (
-    <div
-      className="home-hero-live-controls"
-      aria-label="달동네 스토리 주요 기능"
-    >
+    <div className="storybook-live-hero">
       <style>{styles}</style>
 
       <nav
-        className="home-hero-live-categories"
-        aria-label="기록할 대상 선택"
+        className="storybook-live-relationships"
+        aria-label="기록할 관계 선택"
       >
-        {categories.map((category) => (
+        {relationshipItems.map((item) => (
           <Link
-            key={category.label}
-            href={getHref("/dashboard/timeline")}
-            className="home-hero-live-category"
-            data-tone={category.tone}
-            aria-label={`${category.label}에 관한 사진과 기억 기록하기`}
+            key={item.label}
+            href={item.href}
+            className="storybook-live-relationship"
+            data-tone={item.tone}
           >
-            <span aria-hidden="true">
-              <HeroControlIcon name={category.icon} />
-            </span>
-            <strong>{category.label}</strong>
+            <ControlIcon name={item.icon} />
+            <span>{item.label}</span>
           </Link>
         ))}
       </nav>
 
       <nav
-        className="home-hero-live-actions"
-        aria-label="주요 기록 기능"
+        className="storybook-live-actions"
+        aria-label="달동네 스토리 주요 기능"
       >
-        {actions.map((action) => (
+        {actionItems.map((item) => (
           <Link
-            key={action.label}
-            href={getHref(action.path)}
-            className="home-hero-live-action"
-            data-primary={action.primary ? "true" : "false"}
+            key={item.label}
+            href={item.href}
+            className="storybook-live-action"
+            data-primary={item.primary ? "true" : "false"}
           >
-            <span aria-hidden="true">
-              <HeroControlIcon name={action.icon} />
-            </span>
-            <strong>{action.label}</strong>
+            <ActionIcon name={item.icon} />
+            <span>{item.label}</span>
           </Link>
         ))}
       </nav>
 
-      <nav
-        className="home-hero-live-mobile"
-        aria-label="모바일 주요 기록 기능"
+      <section
+        className="storybook-live-values"
+        aria-label="달동네 스토리 서비스 특징"
       >
-        {actions.map((action) => (
-          <Link
-            key={action.label}
-            href={getHref(action.path)}
-            data-primary={action.primary ? "true" : "false"}
-          >
-            <span aria-hidden="true">
-              <HeroControlIcon name={action.icon} />
-            </span>
-            <strong>{action.label}</strong>
-          </Link>
-        ))}
-      </nav>
+        <ValueItem
+          icon="shield"
+          title="안전하게 보관"
+          description="소중한 사진과 이야기를 차곡차곡 지켜드려요"
+        />
+        <ValueItem
+          icon="book"
+          title="책으로 제작"
+          description="세상에 하나뿐인 스토리북으로 완성해요"
+        />
+        <ValueItem
+          icon="heart"
+          title="마음에 남는 선물"
+          description="사랑하는 사람과 오래 기억할 이야기를 나눠요"
+        />
+      </section>
     </div>
   );
 }
 
-function HeroControlIcon({
+function ValueItem({
+  icon,
+  title,
+  description,
+}: {
+  icon: "shield" | "book" | "heart";
+  title: string;
+  description: string;
+}) {
+  return (
+    <article>
+      <ValueIcon name={icon} />
+      <div>
+        <strong>{title}</strong>
+        <span>{description}</span>
+      </div>
+    </article>
+  );
+}
+
+function ControlIcon({
   name,
 }: {
-  name:
-    | "person"
-    | "family"
-    | "friends"
-    | "couple"
-    | "dog"
-    | "cat"
-    | "photo"
-    | "story"
-    | "book";
+  name: ControlItem["icon"];
 }) {
-  if (name === "person") {
-    return (
-      <svg viewBox="0 0 48 48" role="img">
-        <circle cx="24" cy="14" r="7" />
-        <path d="M12 41v-8c0-7 5-12 12-12s12 5 12 12v8" />
-      </svg>
-    );
-  }
-
-  if (name === "family") {
-    return (
-      <svg viewBox="0 0 56 48" role="img">
-        <circle cx="28" cy="12" r="6" />
-        <circle cx="12" cy="18" r="5" />
-        <circle cx="44" cy="18" r="5" />
-        <path d="M18 42v-8c0-7 4-12 10-12s10 5 10 12v8" />
-        <path d="M3 42v-6c0-6 4-10 9-10 3 0 5 1 7 4" />
-        <path d="M53 42v-6c0-6-4-10-9-10-3 0-5 1-7 4" />
-      </svg>
-    );
-  }
-
-  if (name === "friends") {
-    return (
-      <svg viewBox="0 0 56 48" role="img">
-        <circle cx="18" cy="14" r="6" />
-        <circle cx="38" cy="14" r="6" />
-        <path d="M7 42v-8c0-7 4-12 11-12s11 5 11 12v8" />
-        <path d="M27 42v-8c0-7 4-12 11-12s11 5 11 12v8" />
-      </svg>
-    );
-  }
-
-  if (name === "couple") {
-    return (
-      <svg viewBox="0 0 56 48" role="img">
-        <circle cx="17" cy="15" r="6" />
-        <circle cx="39" cy="15" r="6" />
-        <path d="M7 42v-8c0-7 4-12 10-12s10 5 10 12v8" />
-        <path d="M29 42v-8c0-7 4-12 10-12s10 5 10 12v8" />
-        <path d="M28 10c-4-6-11 0 0 8 11-8 4-14 0-8Z" />
-      </svg>
-    );
-  }
-
   if (name === "dog") {
     return (
-      <svg viewBox="0 0 52 48" role="img">
-        <path d="M13 14 5 10l2 14c0 11 8 18 19 18s19-7 19-18l2-14-8 4" />
-        <path d="M17 16c3-3 15-3 18 0v10c0 7-4 11-9 11s-9-4-9-11Z" />
-        <circle cx="20" cy="23" r="1.5" fill="currentColor" />
-        <circle cx="32" cy="23" r="1.5" fill="currentColor" />
-        <path d="M23 29h6l-3 4Z" />
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M9 12 5 8v10l4 2M23 12l4-4v10l-4 2M9 12c1-3 4-5 7-5s6 2 7 5v8c0 5-3 8-7 8s-7-3-7-8v-8Z" />
+        <circle cx="13" cy="17" r="1" />
+        <circle cx="19" cy="17" r="1" />
+        <path d="M14 22c1.3 1 2.7 1 4 0" />
       </svg>
     );
   }
 
   if (name === "cat") {
     return (
-      <svg viewBox="0 0 52 48" role="img">
-        <path d="m10 16 7-8 5 7h8l5-7 7 8v14c0 8-7 13-16 13S10 38 10 30Z" />
-        <circle cx="20" cy="25" r="1.5" fill="currentColor" />
-        <circle cx="32" cy="25" r="1.5" fill="currentColor" />
-        <path d="M23 31h6M15 29H7m8 4H8m29-4h8m-8 4h7" />
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="m9 11-3-5v14c0 5 4 8 10 8s10-3 10-8V6l-3 5c-2-2-4-3-7-3s-5 1-7 3Z" />
+        <circle cx="12" cy="18" r="1" />
+        <circle cx="20" cy="18" r="1" />
+        <path d="M14 22h4M8 21l-5-1M24 21l5-1" />
       </svg>
     );
   }
 
-  if (name === "photo") {
+  if (name === "heart") {
     return (
-      <svg viewBox="0 0 52 48" role="img">
-        <rect x="6" y="7" width="35" height="31" rx="3" />
-        <circle cx="31" cy="17" r="4" />
-        <path d="m9 34 10-11 8 8 6-6 8 9" />
-        <path d="M43 30h7M46.5 26.5v7" />
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 27S5 20 5 12c0-4 3-7 7-7 2 0 4 1 5 3 1-2 3-3 5-3 4 0 7 3 7 7 0 8-11 15-13 15Z" />
       </svg>
     );
   }
 
-  if (name === "story") {
+  if (name === "people") {
     return (
-      <svg viewBox="0 0 48 48" role="img">
-        <path d="m10 34 4-10L34 4l10 10-20 20-10 4Z" />
-        <path d="m30 8 10 10M14 24l10 10" />
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="11" cy="10" r="4" />
+        <circle cx="21" cy="10" r="4" />
+        <path d="M4 27v-5c0-4 3-7 7-7s7 3 7 7v5M14 27v-5c0-4 3-7 7-7s7 3 7 7v5" />
       </svg>
     );
   }
 
   return (
-    <svg viewBox="0 0 52 48" role="img">
-      <path d="M5 8c8-3 15-1 21 4v30c-6-5-13-7-21-4Z" />
-      <path d="M47 8c-8-3-15-1-21 4v30c6-5 13-7 21-4Z" />
-      <path d="M26 12v30" />
+    <svg viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="9" r="5" />
+      <path d="M7 28v-7c0-5 4-8 9-8s9 3 9 8v7H7Z" />
+    </svg>
+  );
+}
+
+function ActionIcon({
+  name,
+}: {
+  name: "photo" | "write" | "book";
+}) {
+  if (name === "write") {
+    return (
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="m7 25 3-8L22 5l5 5-12 12-8 3Z" />
+        <path d="m18 9 5 5M7 25l5-1-4-4-1 5Z" />
+      </svg>
+    );
+  }
+
+  if (name === "book") {
+    return (
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M4 7c5-2 9-1 12 3v18c-3-4-7-5-12-3V7ZM28 7c-5-2-9-1-12 3v18c3-4 7-5 12-3V7Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true">
+      <rect x="4" y="6" width="24" height="20" rx="3" />
+      <circle cx="21" cy="12" r="2" />
+      <path d="m7 23 6-7 4 4 3-3 5 6M27 3v7M23.5 6.5h7" />
+    </svg>
+  );
+}
+
+function ValueIcon({
+  name,
+}: {
+  name: "shield" | "book" | "heart";
+}) {
+  if (name === "shield") {
+    return (
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M20 4c5 4 10 5 15 5v10c0 9-6 15-15 18C11 34 5 28 5 19V9c5 0 10-1 15-5Z" />
+        <path d="m13 20 5 5 10-11" />
+      </svg>
+    );
+  }
+
+  if (name === "heart") {
+    return (
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M20 34S6 25 6 15c0-5 4-9 9-9 3 0 5 1 7 4 2-3 4-4 7-4 5 0 9 4 9 9 0 10-14 19-18 19Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M5 8c6-2 11-1 15 4v23c-4-5-9-6-15-4V8ZM35 8c-6-2-11-1-15 4v23c4-5 9-6 15-4V8Z" />
     </svg>
   );
 }
 
 const styles = `
-  .home-hero-live-controls,
-  .home-hero-live-controls * {
-    box-sizing: border-box;
-  }
-
-  .home-hero-live-controls {
+  .storybook-live-hero {
     position: absolute;
     inset: 0;
-    z-index: 6;
+    z-index: 5;
     pointer-events: none;
-    container-type: inline-size;
+    color: #4c352a;
   }
 
-  .home-hero-live-categories {
+  .storybook-live-relationships {
     position: absolute;
-    left: 8.8%;
-    top: 51.6%;
-    width: 60.3%;
-    height: 10.8%;
-    padding: 0.72cqw;
+    top: 57%;
+    left: 6%;
+    right: 6%;
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 0.62cqw;
-    border: 1px solid rgba(107, 84, 66, 0.08);
-    border-radius: 1.18cqw;
-    background: rgba(255, 255, 255, 0.985);
-    box-shadow:
-      0 0.3cqw 1.2cqw rgba(82, 58, 45, 0.08);
+    gap: 1.1%;
+    padding: 1.1%;
+    border: 1px solid rgba(229, 215, 202, 0.92);
+    border-radius: 2.2vw;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 18px 45px rgba(93, 62, 43, 0.11);
     pointer-events: auto;
   }
 
-  .home-hero-live-category {
-    min-width: 0;
+  .storybook-live-relationship {
+    min-height: clamp(52px, 5.4vw, 102px);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.62cqw;
+    gap: clamp(5px, 0.7vw, 14px);
     border: 1px solid transparent;
-    border-radius: 0.72cqw;
-    color: #352f2c;
+    border-radius: clamp(11px, 1.15vw, 22px);
+    color: #4c352a;
     text-decoration: none;
+    font-size: clamp(14px, 1.35vw, 27px);
+    font-weight: 850;
     transition:
       transform 160ms ease,
       box-shadow 160ms ease,
       border-color 160ms ease;
   }
 
-  .home-hero-live-category[data-tone="mint"] {
-    color: #1c6b50;
-    background: #e5f7ef;
-  }
-
-  .home-hero-live-category[data-tone="sky"] {
-    color: #275b85;
-    background: #e8f4fd;
-  }
-
-  .home-hero-live-category[data-tone="yellow"] {
-    color: #8a681b;
-    background: #fff5cc;
-  }
-
-  .home-hero-live-category[data-tone="pink"] {
-    color: #a03f61;
-    background: #fde9ef;
-  }
-
-  .home-hero-live-category[data-tone="rose"] {
-    color: #a94d44;
-    background: #fff0ec;
-  }
-
-  .home-hero-live-category[data-tone="blue"] {
-    color: #315c84;
-    background: #edf4ff;
-  }
-
-  .home-hero-live-category > span {
-    width: 2.05cqw;
-    height: 2.05cqw;
-    flex: 0 0 auto;
-  }
-
-  .home-hero-live-category svg,
-  .home-hero-live-action svg,
-  .home-hero-live-mobile svg {
-    width: 100%;
-    height: 100%;
-    display: block;
+  .storybook-live-relationship svg {
+    width: clamp(22px, 2.1vw, 42px);
+    height: clamp(22px, 2.1vw, 42px);
     fill: none;
     stroke: currentColor;
-    stroke-width: 2.4;
+    stroke-width: 1.8;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
 
-  .home-hero-live-category strong {
-    overflow: hidden;
-    color: #302c29;
-    font-size: 1.43cqw;
-    font-weight: 850;
-    line-height: 1;
-    white-space: nowrap;
+  .storybook-live-relationship[data-tone="mint"] {
+    color: #287c65;
+    background: #e7f6ef;
   }
 
-  .home-hero-live-actions {
+  .storybook-live-relationship[data-tone="blue"] {
+    color: #376faa;
+    background: #e8f2ff;
+  }
+
+  .storybook-live-relationship[data-tone="yellow"] {
+    color: #9a701d;
+    background: #fff4c8;
+  }
+
+  .storybook-live-relationship[data-tone="pink"] {
+    color: #b65370;
+    background: #ffe9ef;
+  }
+
+  .storybook-live-relationship[data-tone="peach"] {
+    color: #b85f47;
+    background: #ffebe3;
+  }
+
+  .storybook-live-relationship:hover,
+  .storybook-live-relationship:focus-visible {
+    transform: translateY(-3px);
+    border-color: currentColor;
+    box-shadow: 0 10px 22px rgba(80, 53, 39, 0.12);
+    outline: none;
+  }
+
+  .storybook-live-actions {
     position: absolute;
-    left: 12.85%;
-    top: 64.7%;
-    width: 54.25%;
-    height: 7.75%;
+    top: 70.3%;
+    left: 15.2%;
+    right: 15.2%;
     display: grid;
-    grid-template-columns:
-      minmax(0, 1.05fr)
-      minmax(0, 1fr)
-      minmax(0, 1fr);
-    gap: 0.85cqw;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.7%;
     pointer-events: auto;
   }
 
-  .home-hero-live-action {
-    min-width: 0;
+  .storybook-live-action {
+    min-height: clamp(58px, 5.5vw, 108px);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.82cqw;
-    border: 1px solid rgba(111, 87, 70, 0.18);
-    border-radius: 0.7cqw;
-    color: #3d3834;
-    background: rgba(255, 255, 255, 0.99);
-    box-shadow:
-      0 0.2cqw 0.7cqw rgba(75, 53, 41, 0.06);
+    gap: clamp(8px, 1vw, 19px);
+    border: 1px solid #e3d7cd;
+    border-radius: clamp(12px, 1.15vw, 23px);
+    color: #4b3930;
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 12px 30px rgba(87, 57, 42, 0.09);
     text-decoration: none;
+    font-size: clamp(15px, 1.45vw, 29px);
+    font-weight: 900;
     transition:
       transform 160ms ease,
-      box-shadow 160ms ease,
-      border-color 160ms ease;
+      box-shadow 160ms ease;
   }
 
-  .home-hero-live-action[data-primary="true"] {
+  .storybook-live-action[data-primary="true"] {
     color: #fff;
-    border-color: #fb6558;
-    background:
-      linear-gradient(
-        135deg,
-        #ff6c5e,
-        #ff5e55
-      );
-    box-shadow:
-      0 0.38cqw 1.1cqw rgba(234, 81, 70, 0.2);
+    border-color: #ff6454;
+    background: linear-gradient(135deg, #ff6959, #f05c4e);
   }
 
-  .home-hero-live-action > span {
-    width: 2.05cqw;
-    height: 2.05cqw;
+  .storybook-live-action svg {
+    width: clamp(25px, 2.25vw, 45px);
+    height: clamp(25px, 2.25vw, 45px);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .storybook-live-action:hover,
+  .storybook-live-action:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 34px rgba(87, 57, 42, 0.15);
+    outline: none;
+  }
+
+  .storybook-live-values {
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    bottom: 3.4%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2.2%;
+    padding: 1.6% 2.1%;
+    border-radius: clamp(15px, 1.6vw, 30px);
+    color: #3d5e51;
+    background: linear-gradient(
+      135deg,
+      rgba(222, 240, 230, 0.96),
+      rgba(236, 245, 233, 0.96)
+    );
+    pointer-events: none;
+  }
+
+  .storybook-live-values article {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 1vw, 20px);
+    min-width: 0;
+  }
+
+  .storybook-live-values svg {
     flex: 0 0 auto;
+    width: clamp(28px, 2.5vw, 51px);
+    height: clamp(28px, 2.5vw, 51px);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
-  .home-hero-live-action strong {
+  .storybook-live-values strong,
+  .storybook-live-values span {
+    display: block;
+  }
+
+  .storybook-live-values strong {
+    font-size: clamp(13px, 1.16vw, 23px);
+  }
+
+  .storybook-live-values span {
+    margin-top: 4px;
     overflow: hidden;
-    font-size: 1.23cqw;
-    font-weight: 850;
-    line-height: 1;
+    color: #678074;
+    font-size: clamp(10px, 0.8vw, 16px);
+    line-height: 1.45;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .home-hero-live-category:hover,
-  .home-hero-live-action:hover {
-    transform: translateY(-0.16cqw);
-    border-color: rgba(171, 101, 78, 0.34);
-    box-shadow:
-      0 0.5cqw 1.4cqw rgba(81, 56, 43, 0.13);
-  }
-
-  .home-hero-live-category:focus-visible,
-  .home-hero-live-action:focus-visible,
-  .home-hero-live-mobile a:focus-visible {
-    outline: 0.2cqw solid #df604d;
-    outline-offset: 0.18cqw;
-  }
-
-  .home-hero-live-mobile {
-    display: none;
-  }
-
-  @container (max-width: 720px) {
-    .home-hero-live-categories,
-    .home-hero-live-actions {
-      display: none;
-    }
-
-    .home-hero-live-mobile {
-      position: absolute;
-      left: 4%;
-      right: 4%;
-      bottom: 4%;
-      padding: 8px;
-      display: grid;
+  @media (max-width: 820px) {
+    .storybook-live-relationships {
+      top: 55%;
+      left: 4.5%;
+      right: 4.5%;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 7px;
-      border: 1px solid rgba(111, 87, 70, 0.14);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.96);
-      box-shadow:
-        0 10px 30px rgba(75, 53, 41, 0.14);
-      backdrop-filter: blur(8px);
-      pointer-events: auto;
+      padding: 8px;
+      border-radius: 16px;
     }
 
-    .home-hero-live-mobile a {
-      min-width: 0;
-      min-height: 48px;
-      padding: 7px 5px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      border: 1px solid rgba(111, 87, 70, 0.15);
+    .storybook-live-relationship {
+      min-height: 42px;
+      gap: 5px;
       border-radius: 10px;
-      color: #4a3a33;
-      background: #fff;
-      text-decoration: none;
+      font-size: 12px;
     }
 
-    .home-hero-live-mobile a[data-primary="true"] {
-      color: #fff;
-      border-color: #fb6558;
-      background: #ff6358;
+    .storybook-live-relationship svg {
+      width: 19px;
+      height: 19px;
     }
 
-    .home-hero-live-mobile span {
-      width: 23px;
-      height: 23px;
+    .storybook-live-actions {
+      top: 73.5%;
+      left: 5.5%;
+      right: 5.5%;
+      gap: 7px;
     }
 
-    .home-hero-live-mobile strong {
-      overflow: hidden;
-      max-width: 100%;
+    .storybook-live-action {
+      min-height: 45px;
+      gap: 5px;
+      padding: 5px;
+      border-radius: 11px;
       font-size: 11px;
-      font-weight: 850;
-      white-space: nowrap;
+    }
+
+    .storybook-live-action svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .storybook-live-values {
+      left: 4.5%;
+      right: 4.5%;
+      bottom: 2.4%;
+      gap: 5px;
+      padding: 8px;
+      border-radius: 13px;
+    }
+
+    .storybook-live-values article {
+      justify-content: center;
+      gap: 5px;
+      text-align: center;
+    }
+
+    .storybook-live-values svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .storybook-live-values strong {
+      font-size: 10px;
+    }
+
+    .storybook-live-values span {
+      display: none;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .home-hero-live-category,
-    .home-hero-live-action {
-      transition: none;
+  @media (max-width: 480px) {
+    .storybook-live-relationships {
+      top: 53.5%;
+    }
+
+    .storybook-live-actions {
+      top: 74.5%;
+    }
+
+    .storybook-live-action {
+      font-size: 10px;
     }
   }
 `;
