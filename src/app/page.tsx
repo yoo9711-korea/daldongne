@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import HomeServiceJourney from "@/components/home/HomeServiceJourney";
 
 const steps = [
   {
@@ -563,6 +564,8 @@ export default function HomePage() {
             </p>
           </div>
         </section>
+
+        <HomeServiceJourney />
 
         <section className="reference-memories" aria-label="기록할 수 있는 사람과 반려동물">
           <div className="reference-shell reference-memory-grid">
