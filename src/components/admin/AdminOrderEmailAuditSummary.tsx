@@ -185,6 +185,9 @@ export default async function AdminOrderEmailAuditSummary({
                     orderRecordId={
                       orderRecordId
                     }
+                    recipientEmail={
+                      recipientEmail
+                    }
                     notificationType={
                       log.action.includes(
                         "SHIPPING",

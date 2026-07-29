@@ -81,15 +81,33 @@ export async function POST(
       );
     }
 
+    const bodyRecord =
+      body as Record<
+        string,
+        unknown
+      >;
+
     const notificationType =
       parseNotificationType(
-        (
-          body as Record<
-            string,
-            unknown
-          >
-        ).notificationType,
+        bodyRecord.notificationType,
       );
+
+    const requestedRecipientEmail =
+      cleanText(
+        bodyRecord.recipientEmail,
+      ).toLowerCase();
+
+    if (
+      requestedRecipientEmail &&
+      !isValidEmail(
+        requestedRecipientEmail,
+      )
+    ) {
+      throw new RouteError(
+        "올바른 고객 이메일 주소를 입력해 주세요.",
+        400,
+      );
+    }
 
     const order =
       await prisma.bookOrder.findUnique({
@@ -174,9 +192,25 @@ export async function POST(
       );
     }
 
-    const recipientEmail =
+    const defaultRecipientEmail =
       order.productionRequest.email ||
       order.author.email;
+
+    const recipientEmail =
+      requestedRecipientEmail ||
+      defaultRecipientEmail;
+
+    if (
+      !recipientEmail ||
+      !isValidEmail(
+        recipientEmail,
+      )
+    ) {
+      throw new RouteError(
+        "재발송할 고객 이메일 주소를 입력해 주세요.",
+        400,
+      );
+    }
 
     const customerName =
       order.productionRequest.name ||
@@ -287,6 +321,19 @@ export async function POST(
 
         isRetry:
           true,
+
+        defaultRecipientEmail,
+
+        requestedRecipientEmail:
+          requestedRecipientEmail ||
+          null,
+
+        emailOverridden:
+          Boolean(
+            requestedRecipientEmail,
+          ) &&
+          requestedRecipientEmail !==
+            defaultRecipientEmail,
       },
 
       isCustomerVisible:
@@ -415,6 +462,20 @@ function parseNotificationType(
   throw new RouteError(
     "다시 발송할 알림 종류를 확인해 주세요.",
     400,
+  );
+}
+
+function isValidEmail(
+  value: string,
+) {
+  if (
+    value.length > 320
+  ) {
+    return false;
+  }
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    value,
   );
 }
 

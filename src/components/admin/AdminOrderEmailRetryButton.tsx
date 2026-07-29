@@ -13,13 +13,18 @@ type NotificationType =
 
 type AdminOrderEmailRetryButtonProps = {
   orderRecordId: string;
+
   notificationType:
     NotificationType;
+
+  recipientEmail?:
+    string | null;
 };
 
 export default function AdminOrderEmailRetryButton({
   orderRecordId,
   notificationType,
+  recipientEmail = null,
 }: AdminOrderEmailRetryButtonProps) {
   const router =
     useRouter();
@@ -28,6 +33,13 @@ export default function AdminOrderEmailRetryButton({
     isSubmitting,
     setIsSubmitting,
   ] = useState(false);
+
+  const [
+    emailInput,
+    setEmailInput,
+  ] = useState(
+    recipientEmail?.trim() || "",
+  );
 
   const [
     message,
@@ -55,9 +67,38 @@ export default function AdminOrderEmailRetryButton({
         return;
       }
 
+      const cleanRecipientEmail =
+        emailInput
+          .trim()
+          .toLowerCase();
+
+      if (!cleanRecipientEmail) {
+        setTone("error");
+
+        setMessage(
+          "재발송할 고객 이메일 주소를 입력해 주세요.",
+        );
+
+        return;
+      }
+
+      if (
+        !isValidEmail(
+          cleanRecipientEmail,
+        )
+      ) {
+        setTone("error");
+
+        setMessage(
+          "올바른 고객 이메일 주소를 입력해 주세요.",
+        );
+
+        return;
+      }
+
       const confirmed =
         window.confirm(
-          `${notificationLabel} 이메일을 고객에게 다시 보내시겠습니까?`,
+          `${notificationLabel} 이메일을 ${cleanRecipientEmail} 주소로 다시 보내시겠습니까?`,
         );
 
       if (!confirmed) {
@@ -85,6 +126,9 @@ export default function AdminOrderEmailRetryButton({
               body:
                 JSON.stringify({
                   notificationType,
+
+                  recipientEmail:
+                    cleanRecipientEmail,
                 }),
             },
           );
@@ -109,7 +153,8 @@ export default function AdminOrderEmailRetryButton({
         }
 
         const succeeded =
-          result?.status === "SENT";
+          result?.status ===
+          "SENT";
 
         setTone(
           succeeded
@@ -140,6 +185,30 @@ export default function AdminOrderEmailRetryButton({
 
   return (
     <div className="admin-email-retry">
+      <label>
+        <span>
+          재발송 이메일
+        </span>
+
+        <input
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          value={emailInput}
+          onChange={(event) => {
+            setEmailInput(
+              event.target.value,
+            );
+
+            setMessage(null);
+            setTone(null);
+          }}
+          placeholder="customer@example.com"
+          disabled={isSubmitting}
+          maxLength={320}
+        />
+      </label>
+
       <button
         type="button"
         onClick={handleRetry}
@@ -147,8 +216,14 @@ export default function AdminOrderEmailRetryButton({
       >
         {isSubmitting
           ? "다시 보내는 중..."
-          : "이메일 다시 보내기"}
+          : "이 이메일로 다시 보내기"}
       </button>
+
+      <small>
+        회원 계정 이메일은 변경되지
+        않습니다. 이번 재발송에만
+        입력한 주소가 사용됩니다.
+      </small>
 
       {message ? (
         <p
@@ -163,10 +238,52 @@ export default function AdminOrderEmailRetryButton({
         {`
           .admin-email-retry {
             margin-top: 12px;
+            padding: 12px;
+            border: 1px solid #eaded8;
+            border-radius: 12px;
+            background: #fffaf7;
+          }
+
+          .admin-email-retry label {
+            display: block;
+          }
+
+          .admin-email-retry label span {
+            display: block;
+            margin-bottom: 6px;
+            color: #765449;
+            font-size: 8px;
+            font-weight: 900;
+          }
+
+          .admin-email-retry input {
+            width: 100%;
+            min-height: 39px;
+            padding: 0 11px;
+            border: 1px solid #ddc6bc;
+            border-radius: 9px;
+            color: #4c382f;
+            background: #ffffff;
+            font: inherit;
+            font-size: 9px;
+            outline: none;
+          }
+
+          .admin-email-retry input:focus {
+            border-color: #df6550;
+            box-shadow:
+              0 0 0 3px
+              rgba(223, 101, 80, 0.1);
+          }
+
+          .admin-email-retry input:disabled {
+            cursor: wait;
+            opacity: 0.65;
           }
 
           .admin-email-retry button {
             min-height: 36px;
+            margin-top: 9px;
             padding: 0 13px;
             border: 1px solid #d3a693;
             border-radius: 10px;
@@ -187,6 +304,14 @@ export default function AdminOrderEmailRetryButton({
           .admin-email-retry button:disabled {
             cursor: wait;
             opacity: 0.58;
+          }
+
+          .admin-email-retry small {
+            display: block;
+            margin-top: 8px;
+            color: #927a70;
+            font-size: 7px;
+            line-height: 1.6;
           }
 
           .admin-email-retry p {
@@ -211,5 +336,19 @@ export default function AdminOrderEmailRetryButton({
         `}
       </style>
     </div>
+  );
+}
+
+function isValidEmail(
+  value: string,
+) {
+  if (
+    value.length > 320
+  ) {
+    return false;
+  }
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    value,
   );
 }
