@@ -679,8 +679,7 @@ export default function ProductionManagementForm({
               </Field>
 
               <Field label="발송 택배사">
-                <input
-                  type="text"
+                <select
                   value={values.shippingCarrier}
                   onChange={(event) =>
                     updateValue(
@@ -688,9 +687,65 @@ export default function ProductionManagementForm({
                       event.target.value,
                     )
                   }
-                  maxLength={100}
-                  placeholder="예: CJ대한통운"
-                />
+                >
+                  <option value="">
+                    택배사를 선택하세요
+                  </option>
+
+                  {values.shippingCarrier &&
+                  ![
+                    "CJ대한통운",
+                    "한진택배",
+                    "롯데택배",
+                    "우체국택배",
+                    "로젠택배",
+                  ].includes(
+                    values.shippingCarrier,
+                  ) ? (
+                    <option
+                      value={
+                        values.shippingCarrier
+                      }
+                    >
+                      기존 입력: {
+                        values.shippingCarrier
+                      }
+                    </option>
+                  ) : null}
+
+                  <option value="CJ대한통운">
+                    CJ대한통운
+                  </option>
+
+                  <option value="한진택배">
+                    한진택배
+                  </option>
+
+                  <option value="롯데택배">
+                    롯데택배
+                  </option>
+
+                  <option value="우체국택배">
+                    우체국택배
+                  </option>
+
+                  <option value="로젠택배">
+                    로젠택배
+                  </option>
+                </select>
+
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "7px",
+                    color: "#68766d",
+                    fontSize: "12px",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  선택한 택배사는 고객의 공식
+                  배송조회 버튼과 연결됩니다.
+                </small>
               </Field>
 
               <Field label="배송조회 송장번호">
