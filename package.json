@@ -2,7 +2,7 @@
   "name": "daldongne-platform",
   "version": "0.1.0",
   "private": true,
-   "engines": {
+  "engines": {
     "node": "22.x"
   },
   "scripts": {
@@ -10,7 +10,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "postinstall": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "brand:check": "node scripts/check-brand-name.cjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.7.4",

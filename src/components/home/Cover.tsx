@@ -5,7 +5,7 @@ export default function Cover() {
     <section className="cover" data-folio="표지">
       <div className="cover__inner">
         <p className="cover__eyebrow">
-          DAL-DONG-NE PUBLISHING
+          DALDONGNE STORY
         </p>
 
         <h1 className="cover__title">
