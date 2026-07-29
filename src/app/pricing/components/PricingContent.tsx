@@ -79,30 +79,7 @@ export default function PricingContent({
         </p>
 
         <div className={styles.startGrid}>
-          <Link
-            href="#life-book"
-            className={styles.startCard}
-          >
-            <span
-              className={
-                styles.startCardLabel
-              }
-            >
-              지금 바로 만들기
-            </span>
-
-            <strong>
-              인생책 제작 · 99,000원부터
-            </strong>
-
-            <span>
-              사진 50장 이하와 이야기를
-              바탕으로 50~80페이지 기본 책을
-              제작합니다.
-            </span>
-          </Link>
-
-          <Link
+                    <Link
             href="#monthly-record"
             className={styles.startCard}
           >
@@ -127,90 +104,7 @@ export default function PricingContent({
         </div>
       </section>
 
-      <section
-        id="life-book"
-        className={styles.section}
-      >
-        <div className={styles.sectionPanel}>
-          <p className={styles.sectionLabel}>
-            한 번에 제작
-          </p>
-
-          <h2 className={styles.sectionTitle}>
-            지금 바로 한 권의 인생책으로
-          </h2>
-
-          <p
-            className={
-              styles.sectionDescription
-            }
-          >
-            이미 모아둔 사진과 이야기가
-            있다면 한 번의 제작 과정으로 원고
-            정리부터 기본 인쇄와 배송까지
-            진행합니다.
-          </p>
-
-          <div className={styles.lifePlanGrid}>
-            <div>
-              {lifeBookPlans.map(
-                (product) => (
-                  <ProductCard
-                    key={product.code}
-                    product={product}
-                    href={createProductHref(
-                      product,
-                      isLoggedIn,
-                    )}
-                  />
-                ),
-              )}
-            </div>
-
-            <aside className={styles.lifeSummary}>
-              <h3>
-                기본 제작 기준
-              </h3>
-
-              <ul>
-                <li>사진 50장 이하</li>
-                <li>
-                  50~80페이지 기본 분량
-                </li>
-                <li>
-                  AI 사진 분석과 글 다듬기
-                </li>
-                <li>
-                  목차 추천과 원고 생성
-                </li>
-                <li>
-                  기본 소프트커버 1권
-                </li>
-                <li>
-                  기본 인쇄·출판·택배비 포함
-                </li>
-              </ul>
-
-              <div
-                className={styles.conditionBox}
-              >
-                <p>
-                  사진 50장 또는 80페이지를
-                  초과하면 추가 견적이 발생할
-                  수 있습니다.
-                </p>
-
-                <p>
-                  하드커버, 사람 검수, 추가
-                  인쇄는 선택 옵션입니다.
-                </p>
-              </div>
-            </aside>
-          </div>
-        </div>
-      </section>
-
-      <section
+            <section
         id="monthly-record"
         className={styles.section}
       >

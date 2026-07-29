@@ -22,19 +22,7 @@ type ProductGroup = {
   tone: 'coral' | 'sage' | 'gold';
 };
 
-const PRODUCT_GROUPS: readonly ProductGroup[] = [
-  {
-    category: 'LIFE_BOOK',
-    anchor: 'life-book',
-    eyebrow: '처음부터 함께',
-    title: '인생책 만들기',
-    description:
-      '사진과 짧은 이야기를 모으면 AI가 원고의 흐름을 정리하고 실제 책 제작까지 이어드립니다.',
-    recommendation:
-      '원고가 아직 없고, 사진부터 차근차근 정리하고 싶은 분',
-    tone: 'coral',
-  },
-  {
+const PRODUCT_GROUPS: readonly ProductGroup[] = [  {
     category: 'MONTHLY_RECORD',
     anchor: 'monthly-record',
     eyebrow: '조금씩 꾸준하게',
