@@ -159,6 +159,18 @@ export async function POST(
       );
     }
 
+    /* PHASE_TWO_PROOF_PAYMENT_GUARD */
+    if (
+      order.status !==
+      BookOrderStatus.PAID
+    ) {
+      return createErrorResponse(
+        "결제 완료가 확인된 주문만 교정본을 승인하거나 수정 요청할 수 있습니다.",
+        409,
+      );
+    }
+
+
     if (
       !order.proofFileUrl ||
       !order.proofSentAt

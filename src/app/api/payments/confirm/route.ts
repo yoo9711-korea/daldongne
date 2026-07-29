@@ -255,14 +255,46 @@ export async function POST(
       );
     }
 
-    await prisma.bookOrder.update({
-      where: {
-        id: order.id,
-      },
-      data: {
-        status: 'PAYMENT_PENDING',
-      },
-    });
+    /* PHASE_TWO_PAYMENT_CLAIM */
+    const paymentClaim =
+      await prisma.bookOrder.updateMany({
+        where: {
+          id: order.id,
+          status: order.status,
+        },
+        data: {
+          status:
+            "PAYMENT_PENDING",
+        },
+      });
+
+    if (
+      paymentClaim.count !== 1
+    ) {
+      const latestOrder =
+        await prisma.bookOrder.findUnique({
+          where: {
+            id: order.id,
+          },
+          select: {
+            status: true,
+          },
+        });
+
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            latestOrder?.status ===
+              "PAID"
+              ? "이미 결제가 완료된 주문입니다."
+              : "다른 결제 요청이 처리 중입니다. 주문 화면을 새로고침한 뒤 다시 확인해 주세요.",
+        },
+        {
+          status: 409,
+        },
+      );
+    }
 
     await recordBookOrderAudit({
       orderId: order.id,
@@ -680,7 +712,7 @@ function parseApprovedAt(
 
   return date;
 }
-
+/* PHASE_TWO_PAYMENT_FAILURE_GUARD */
 async function markOrderFailed(
   orderId: string,
   actorId: string,
@@ -698,20 +730,38 @@ async function markOrderFailed(
       },
     });
 
+  if (!before) {
+    return;
+  }
+
+  const failureUpdate =
+    await prisma.bookOrder.updateMany({
+      where: {
+        id: orderId,
+        status: {
+          in: [
+            "READY",
+            "PAYMENT_PENDING",
+            "FAILED",
+          ],
+        },
+      },
+      data: {
+        status:
+          "FAILED",
+      },
+    });
+
   if (
-    !before ||
-    before.status === 'PAID'
+    failureUpdate.count !== 1
   ) {
     return;
   }
 
   const after =
-    await prisma.bookOrder.update({
+    await prisma.bookOrder.findUnique({
       where: {
         id: orderId,
-      },
-      data: {
-        status: 'FAILED',
       },
       select: {
         id: true,
@@ -721,16 +771,24 @@ async function markOrderFailed(
       },
     });
 
+  if (!after) {
+    return;
+  }
+
   await recordBookOrderAudit({
     orderId,
     actorId,
-    source: 'CUSTOMER',
-    category: 'PAYMENT',
-    action: 'PAYMENT_FAILED',
+    source:
+      "CUSTOMER",
+    category:
+      "PAYMENT",
+    action:
+      "PAYMENT_FAILED",
     summary:
-      '결제 승인 처리에 실패했습니다.',
+      "결제 승인 처리에 실패했습니다.",
     before,
     after,
-    isCustomerVisible: true,
+    isCustomerVisible:
+      true,
   });
 }

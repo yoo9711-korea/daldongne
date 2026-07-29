@@ -288,6 +288,7 @@ model BookOrderProofReview {
   @@index([authorId, createdAt])
   @@index([resolvedById])
   @@index([responseType, resolvedAt])
+  @@map("book_order_proof_reviews")
 }
 
 model AIBookProductionRun {

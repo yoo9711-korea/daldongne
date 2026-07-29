@@ -10,6 +10,8 @@ import {
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { notifyOrderOperationalStage } from "@/lib/order-operation-notification";
+
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -884,6 +886,24 @@ export async function POST(
           action ===
             "COMPLETE",
       });
+
+    /* PHASE_TWO_OPERATION_NOTIFICATION */
+    if (
+      updatedOrder.productionStage ===
+        BookProductionStage.PRINTING ||
+      updatedOrder.productionStage ===
+        BookProductionStage.SHIPPED ||
+      updatedOrder.productionStage ===
+        BookProductionStage.COMPLETED
+    ) {
+      await notifyOrderOperationalStage({
+        orderRecordId:
+          updatedOrder.id,
+        stage:
+          updatedOrder.productionStage,
+      });
+    }
+
     } catch (auditError) {
       console.error(
         "[ADMIN_PRINT_SHIPPING_AUDIT_ERROR]",

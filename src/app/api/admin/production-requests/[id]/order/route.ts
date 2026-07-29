@@ -6,6 +6,8 @@ import {
   NextRequest,
   NextResponse,
 } from 'next/server';
+import { isOrderQuoteLocked } from "@/lib/order-workflow-policy";
+
 
 export const runtime = 'nodejs';
 
@@ -279,6 +281,58 @@ export async function POST(
 
     const currentOrder =
       productionRequest.bookOrder;
+
+    /* PHASE_TWO_QUOTE_LOCK */
+    if (currentOrder) {
+      const workflowOrder =
+        await prisma.bookOrder.findUnique({
+          where: {
+            id: currentOrder.id,
+          },
+          select: {
+            status: true,
+            productionStage: true,
+            paymentKey: true,
+            paidAt: true,
+            manuscriptReceivedAt:
+              true,
+            reviewStartedAt:
+              true,
+            proofFileUrl:
+              true,
+            proofSentAt:
+              true,
+            proofApprovedAt:
+              true,
+            printOrderedAt:
+              true,
+            printingCompletedAt:
+              true,
+            shippedAt:
+              true,
+            completedAt:
+              true,
+          },
+        });
+
+      if (
+        isOrderQuoteLocked(
+          workflowOrder,
+        )
+      ) {
+        return NextResponse.json(
+          {
+            ok: false,
+            message:
+              "결제 또는 제작이 시작된 주문은 견적과 결제금액을 다시 저장할 수 없습니다.",
+          },
+          {
+            status: 409,
+          },
+        );
+      }
+    }
+
 
     if (
       currentOrder &&

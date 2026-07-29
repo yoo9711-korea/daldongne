@@ -9,6 +9,8 @@ import {
   NextRequest,
   NextResponse,
 } from 'next/server';
+import { validatePaymentStatusTransition } from "@/lib/order-workflow-policy";
+
 
 export const runtime = 'nodejs';
 
@@ -379,6 +381,36 @@ export async function POST(
           '변경할 필요가 없는 결제 상태입니다.',
       });
     }
+    /* PHASE_TWO_WEBHOOK_REGRESSION_GUARD */
+    const paymentTransition =
+      validatePaymentStatusTransition(
+        order.status,
+        nextStatus,
+      );
+
+    if (!paymentTransition.ok) {
+      console.warn(
+        "[TOSS_WEBHOOK_REGRESSION_IGNORED]",
+        {
+          orderId:
+            order.orderId,
+          currentStatus:
+            order.status,
+          nextStatus,
+          message:
+            paymentTransition.message,
+        },
+      );
+
+      return NextResponse.json({
+        ok: true,
+        ignored: true,
+        message:
+          "이전 결제 상태로 되돌리는 웹훅을 무시했습니다.",
+      });
+    }
+
+
 
     const isPaid =
       nextStatus ===

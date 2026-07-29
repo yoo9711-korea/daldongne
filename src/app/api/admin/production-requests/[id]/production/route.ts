@@ -7,6 +7,8 @@ import {
   NextRequest,
   NextResponse,
 } from 'next/server';
+import { validateOrderProductionTransition } from "@/lib/order-workflow-policy";
+
 
 export const runtime = 'nodejs';
 
@@ -430,6 +432,33 @@ export async function PATCH(
         existingOrder:
           existingRequest.bookOrder,
       });
+
+    /* PHASE_TWO_PRODUCTION_GUARD */
+    if (
+      stageChanged &&
+      previousOrderSnapshot
+    ) {
+      const workflowValidation =
+        validateOrderProductionTransition({
+          currentStage:
+            previousOrderSnapshot.productionStage,
+          nextStage,
+          orderStatus:
+            previousOrderSnapshot.status,
+          snapshot: {
+            ...previousOrderSnapshot,
+            ...updateData,
+          },
+        });
+
+      if (!workflowValidation.ok) {
+        return createErrorResponse(
+          workflowValidation.message,
+          409,
+        );
+      }
+    }
+
     }
 
     if (

@@ -47,6 +47,16 @@ const NAVIGATION_GROUPS: NavigationGroup[] =
             "회원가입부터 배송 완료 점검",
           icon: "dashboard",
         },
+        {
+          href:
+            "/admin/system-test/phase-two",
+          label:
+            "2단계 검증",
+          description:
+            "결제·교정·인쇄·배송 안전성",
+          icon:
+            "order",
+        },
       ],
     },
     {
