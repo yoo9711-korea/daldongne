@@ -259,6 +259,8 @@ model BookOrder {
   proofReviews      BookOrderProofReview[]
   aiProductionRuns  AIBookProductionRun[]
 
+  manualPrintJob BookOrderManualPrintJob?
+
   @@index([bookId])
   @@index([authorId])
   @@index([status])
@@ -289,6 +291,46 @@ model BookOrderProofReview {
   @@index([resolvedById])
   @@index([responseType, resolvedAt])
   @@map("book_order_proof_reviews")
+}
+
+model BookOrderManualPrintJob {
+  id                   String    @id @default(cuid())
+  orderId              String    @unique @map("order_id")
+  status               String    @default("PREPARING")
+  printerName          String?   @map("printer_name")
+  contactName          String?   @map("contact_name")
+  contactPhone         String?   @map("contact_phone")
+  contactEmail         String?   @map("contact_email")
+  orderMethod          String?   @map("order_method")
+  finalPdfUrl          String?   @map("final_pdf_url")
+  coverPdfUrl          String?   @map("cover_pdf_url")
+  interiorPdfUrl       String?   @map("interior_pdf_url")
+  trimSize             String?   @map("trim_size")
+  pageCount            Int?      @map("page_count")
+  coverPaper           String?   @map("cover_paper")
+  innerPaper           String?   @map("inner_paper")
+  bindingType          String?   @map("binding_type")
+  printColor           String?   @map("print_color")
+  quantity             Int?
+  unitCost             Int?      @map("unit_cost")
+  totalCost            Int?      @map("total_cost")
+  orderSentAt          DateTime? @map("order_sent_at")
+  acceptedAt           DateTime? @map("accepted_at")
+  expectedCompletionAt DateTime? @map("expected_completion_at")
+  printingStartedAt    DateTime? @map("printing_started_at")
+  completedAt          DateTime? @map("completed_at")
+  note                 String?
+  createdById          String?   @map("created_by_id")
+  updatedById          String?   @map("updated_by_id")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  order BookOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([status, updatedAt])
+  @@index([printerName, updatedAt])
+  @@index([expectedCompletionAt])
+  @@map("book_order_manual_print_jobs")
 }
 
 model AIBookProductionRun {

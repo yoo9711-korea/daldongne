@@ -90,6 +90,13 @@ const NAVIGATION_GROUPS: NavigationGroup[] =
           icon: "order",
 
         },
+        {
+          href: "/admin/manual-print",
+          label: "수동 인쇄 운영",
+          description:
+            "인쇄소 전달과 접수·완료 기록",
+          icon: "order",
+        },
 
                 {
           href:

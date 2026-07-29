@@ -20,7 +20,10 @@
     "test:phase2:policy": "node scripts/test-phase-two-policy.cjs",
     "test:phase2:static": "node scripts/check-phase-two-static.cjs",
     "test:phase2:data": "node scripts/check-phase-two-data.cjs",
-    "test:phase2:all": "pnpm test:phase2:policy && pnpm test:phase2:static && pnpm test:phase2:data && pnpm test:flow:static"
+    "test:phase2:all": "pnpm test:phase2:policy && pnpm test:phase2:static && pnpm test:phase2:data && pnpm test:flow:static",
+    "test:manual-print:static": "node scripts/check-manual-print-static.cjs",
+    "test:manual-print:data": "node scripts/check-manual-print-data.cjs",
+    "test:manual-print:all": "pnpm test:manual-print:static && pnpm test:manual-print:data"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.7.4",
