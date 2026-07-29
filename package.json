@@ -12,7 +12,11 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "brand:check": "node scripts/check-brand-name.cjs",
-    "public:design-check": "node scripts/check-public-design.cjs"
+    "public:design-check": "node scripts/check-public-design.cjs",
+    "test:flow:static": "node scripts/test-customer-flow-static.cjs",
+    "test:flow:data": "node scripts/test-customer-flow-data.cjs",
+    "test:flow:live": "node scripts/test-customer-flow-live.cjs",
+    "test:flow:all": "pnpm test:flow:static && pnpm test:flow:data && pnpm test:flow:live"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.7.4",

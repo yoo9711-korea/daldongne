@@ -40,6 +40,13 @@ const NAVIGATION_GROUPS: NavigationGroup[] =
           icon: "dashboard",
           exact: true,
         },
+        {
+          href: "/admin/system-test",
+          label: "통합 테스트",
+          description:
+            "회원가입부터 배송 완료 점검",
+          icon: "dashboard",
+        },
       ],
     },
     {
