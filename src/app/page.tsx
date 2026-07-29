@@ -1,3 +1,4 @@
+import HomeHeroInteractiveControls from "@/components/home/HomeHeroInteractiveControls";
 import Image from "next/image";
 import Link from "next/link";
 import HomeServiceJourney from "@/components/home/HomeServiceJourney";
@@ -517,6 +518,7 @@ export default function HomePage() {
           unoptimized
           sizes="(max-width: 700px) calc(100vw - 28px), (max-width: 1100px) calc(100vw - 40px), 1500px"
               />
+<HomeHeroInteractiveControls />
             </div>
 
             <h1 className="reference-title">

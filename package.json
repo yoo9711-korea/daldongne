@@ -26,7 +26,8 @@
     "test:manual-print:all": "pnpm test:manual-print:static && pnpm test:manual-print:data",
     "test:print-readiness:static": "node scripts/check-print-readiness-static.cjs",
     "test:print-readiness:data": "node scripts/check-print-readiness-data.cjs",
-    "test:print-readiness:all": "pnpm test:print-readiness:static && pnpm test:print-readiness:data"
+    "test:print-readiness:all": "pnpm test:print-readiness:static && pnpm test:print-readiness:data",
+    "test:home-hero-buttons": "node scripts/check-home-hero-live-buttons.cjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.7.4",
