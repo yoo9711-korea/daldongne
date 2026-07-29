@@ -23,10 +23,11 @@ export default function EditMemoryButton({
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState(cleanEditableTitle(initialTitle));
   const [description, setDescription] = useState(initialDescription);
-const [occurredAt, setOccurredAt] = useState(
+  const [occurredAt, setOccurredAt] = useState(
   toDateInputValue(initialOccurredAt),
 );
-const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const isPhotoRecord = label.includes('사진');
   const handleSave = async () => {
     if (isSaving) return;
 
@@ -121,27 +122,29 @@ const [isSaving, setIsSaving] = useState(false);
             }}
           >
             <p
-              style={{
-                margin: 0,
-                fontSize: 14,
-                fontWeight: 900,
-                color: '#9a6a24',
+               style={{
+               margin: 0,
+               fontSize: 14,
+               fontWeight: 900,
+               color: '#9a6a24',
               }}
-            >
-              기록 수정
+           >
+            {isPhotoRecord ? '사진 수정' : '이야기 수정'}
             </p>
 
             <h2
-              style={{
-                margin: '8px 0 18px',
-                fontFamily: 'Noto Serif KR, serif',
-                fontSize: 28,
-                lineHeight: 1.35,
-                color: '#24170f',
-              }}
-            >
-              제목과 이야기를 수정합니다
-            </h2>
+             style={{
+               margin: '8px 0 18px',
+               fontFamily: 'Noto Serif KR, serif',
+               fontSize: 28,
+               lineHeight: 1.35,
+               color: '#24170f',
+               }}
+             >
+            {isPhotoRecord
+               ? '사진의 기본 정보를 수정합니다'
+               : '제목과 이야기를 수정합니다'}
+          </h2>
 
             <label
               style={{
@@ -152,13 +155,17 @@ const [isSaving, setIsSaving] = useState(false);
                 color: '#4a3828',
               }}
             >
-              제목
+             {isPhotoRecord ? '사진 제목' : '이야기 제목'}
             </label>
 
             <input
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              placeholder="예: 아버지가 늘 하시던 말"
+              placeholder={
+               isPhotoRecord
+                   ? '예: 가족과 함께한 봄날'
+                     : '예: 아버지가 늘 하시던 말'
+               }
               style={{
                 width: '100%',
                 height: 46,
@@ -182,7 +189,9 @@ const [isSaving, setIsSaving] = useState(false);
     color: '#4a3828',
   }}
 >
-  기억 날짜
+  {isPhotoRecord
+    ? '사진 날짜 (선택)'
+    : '관련 날짜 (선택)'}
 </label>
 
 <input
@@ -210,8 +219,9 @@ const [isSaving, setIsSaving] = useState(false);
     color: '#8a806f',
   }}
 >
-  정확한 날짜를 모르면 비워두어도 됩니다. 날짜를 넣으면 책 원고가 시간
-  순서대로 더 잘 정리됩니다.
+ {isPhotoRecord
+  ? '정확한 날짜를 모르면 비워두어도 됩니다. 날짜를 입력하면 사진을 시간순으로 정리하는 데 도움이 됩니다.'
+  : '정확한 날짜를 모르면 비워두어도 됩니다. 날짜를 입력하면 원고를 시간순으로 정리하는 데 도움이 됩니다.'}
 </p>
 
             <label
@@ -224,12 +234,19 @@ const [isSaving, setIsSaving] = useState(false);
                 color: '#4a3828',
               }}
             >
-              이야기
-            </label>
+           {isPhotoRecord
+            ? '짧은 사진 설명 (선택)'
+            : '이야기'}
+         </label>
 
             <textarea
               value={description}
               onChange={(event) => setDescription(event.target.value)}
+              placeholder={
+              isPhotoRecord
+              ? '예: 1980년 봄, 가족과 함께 동네 공원에서 찍은 사진'
+              : '기억나는 장면과 그때의 마음을 자유롭게 적어주세요.'
+              }
               style={{
                 width: '100%',
                 minHeight: 190,

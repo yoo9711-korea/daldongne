@@ -144,14 +144,14 @@ export default async function TimelinePage() {
 
       <div className="timeline-reference-shell">
         <section className="timeline-reference-heading">
-          <p>책 만들기 1단계</p>
+          <p>사진 올리기 1단계</p>
 
           <h1>사진을 올려주세요</h1>
 
           <span>
-            휴대폰이나 컴퓨터에 있는 소중한 사진을
-            선택하세요.
-          </span>
+             사진을 먼저 올리고 제목과 날짜,
+             짧은 설명을 함께 기록해 보세요.
+             </span>
         </section>
 
         <section className="timeline-reference-status">
@@ -162,10 +162,10 @@ export default async function TimelinePage() {
           />
 
           <StatusItem
-            label="설명 작성"
+            label="짧은 설명"
             value={describedPhotoCount}
             unit="장"
-          />
+           />
 
           <StatusItem
             label="날짜 입력"
@@ -180,7 +180,7 @@ export default async function TimelinePage() {
           />
 
           <StatusItem
-            label="남긴 이야기"
+            label="작성한 이야기"
             value={storyCount}
             unit="개"
           />
@@ -228,8 +228,8 @@ export default async function TimelinePage() {
 
             <span>
               {photoReady
-                ? "책 원고에 사용할 기본 사진이 준비되었습니다."
-                : "사진 3장부터 책 원고 만들기의 기본 재료로 사용할 수 있습니다."}
+                ? "원고에 사용할 기본 사진이 준비되었습니다."
+                : "사진 3장부터 원고 만들기의 기본 자료로 사용할 수 있습니다."}
             </span>
           </div>
 
@@ -252,9 +252,10 @@ export default async function TimelinePage() {
               <p>저장된 기억</p>
               <h2>모아 둔 사진</h2>
               <span>
-                제목과 날짜, 사진 속 이야기를 확인하고
-                수정할 수 있습니다.
-              </span>
+                제목과 날짜, 짧은 사진 설명을 확인하고
+                수정할 수 있습니다. 긴 이야기는 다음
+                단계에서 작성하세요.
+           </span>
             </div>
 
             <strong>전체 {photos.length}장</strong>
@@ -450,8 +451,8 @@ export default async function TimelinePage() {
             className="timeline-reference-next"
           >
             {photoReady
-              ? "사진 저장하고 다음으로"
-              : "사진을 더 올려주세요"}
+              ? "이야기 쓰기로 이동"
+               : "사진 더 올리기"}
             <span aria-hidden="true">→</span>
           </Link>
         </footer>

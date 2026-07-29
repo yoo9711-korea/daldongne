@@ -238,8 +238,8 @@ export default function UploadForm() {
 
         <div className="timeline-upload-field">
           <label htmlFor="timeline-date">
-            기억 날짜
-          </label>
+            사진 날짜 (선택)
+           </label>
 
           <input
             id="timeline-date"
@@ -253,13 +253,13 @@ export default function UploadForm() {
           data-full="true"
         >
           <label htmlFor="timeline-description">
-            사진 속 이야기
-          </label>
+             짧은 사진 설명 (선택)
+           </label>
 
           <textarea
             id="timeline-description"
             name="description"
-            placeholder="이 사진을 찍은 날, 함께 있던 사람과 기억나는 일을 짧게 적어주세요."
+            placeholder="예: 1980년 봄, 가족과 함께 동네 공원에서 찍은 사진"
           />
         </div>
       </div>
