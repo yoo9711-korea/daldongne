@@ -546,12 +546,12 @@ export default function EditBookDraftButton({
     }
 
     if (!title.trim()) {
-      alert('책 제목을 입력해 주세요.');
+      alert('스토리북 제목을 입력해 주세요.');
       return;
     }
 
     if (!content.trim()) {
-      alert('책 본문을 입력해 주세요.');
+      alert('원고 본문을 입력해 주세요.');
       return;
     }
 
@@ -592,7 +592,7 @@ export default function EditBookDraftButton({
       ) {
         alert(
           result.message ||
-            '책 원고를 저장하지 못했습니다.',
+            '원고 초안을 저장하지 못했습니다.',
         );
         return;
       }
@@ -604,14 +604,14 @@ export default function EditBookDraftButton({
 
       alert(
         result.message ||
-          '책 원고를 저장했습니다.',
+          '원고 초안을 저장했습니다.',
       );
 
       setIsOpen(false);
       router.refresh();
     } catch {
       alert(
-        '책 원고를 저장하는 중 오류가 발생했습니다.',
+        '원고 초안을 저장하는 중 오류가 발생했습니다.',
       );
     } finally {
       setIsSaving(false);
@@ -625,7 +625,7 @@ export default function EditBookDraftButton({
         onClick={openEditor}
         className="book-draft-editor-open"
       >
-        원고 직접 수정
+        원고 초안 수정
       </button>
 
       {isOpen ? (
@@ -633,7 +633,7 @@ export default function EditBookDraftButton({
           className="book-draft-editor-overlay"
           role="dialog"
           aria-modal="true"
-          aria-label="책 원고 직접 수정"
+          aria-label="원고 초안 수정"
           onMouseDown={(event) => {
             if (
               event.target ===
@@ -650,8 +650,8 @@ export default function EditBookDraftButton({
           >
             <div className="book-draft-editor-header">
               <div>
-                <p>원고 편집실</p>
-                <h2>원고 직접 수정</h2>
+                <p>원고 초안 편집실</p>
+                제목부터 본문까지 직접 수정할<h2>원고 초안 수정</h2>
               </div>
 
               <button
@@ -666,11 +666,11 @@ export default function EditBookDraftButton({
             </div>
 
             <p className="book-draft-editor-guide">
-              제목부터 본문까지 직접 수정할
-              수 있습니다. 서버에 저장하기 전
-              변경 내용은 이 브라우저에 자동으로
-              임시 저장됩니다. Ctrl+S를 누르면
-              서버에 즉시 저장됩니다.
+              만들어진 원고는 수정 가능한 초안입니다.
+               제목부터 본문까지 직접 고칠 수 있으며,
+               서버에 저장하기 전 변경 내용은
+               이 브라우저에 자동으로 임시 저장됩니다.
+               Ctrl+S를 누르면 서버에 즉시 저장됩니다.
             </p>
 
             <div
@@ -856,7 +856,7 @@ export default function EditBookDraftButton({
 
             <div className="book-draft-editor-fields">
               <label>
-                <span>책 제목</span>
+                <span>스토리북 제목</span>
                 <input
                   value={title}
                   onChange={(event) =>

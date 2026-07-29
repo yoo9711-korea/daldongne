@@ -141,13 +141,13 @@ export default function CreateBookDraftButton({
         throw new Error(
           data?.message ||
             data?.error ||
-            '책 원고를 만드는 중 문제가 발생했습니다.',
+            '원고 초안을 만드는 중 문제가 발생했습니다.'
         );
       }
 
       if (!data?.bookId) {
         throw new Error(
-          '생성된 책 ID를 찾을 수 없습니다.',
+          '생성된 원고 정보를 찾을 수 없습니다.',
         );
       }
 
@@ -202,8 +202,8 @@ export default function CreateBookDraftButton({
         }}
       >
         {isLoading
-          ? 'AI 원고 만드는 중...'
-          : 'AI로 책 원고 만들기'}
+          ? '원고 초안을 정리하는 중...'
+          : '원고 초안 만들기'}
       </button>
 
       {showMaterialModal ? (
@@ -241,7 +241,7 @@ export default function CreateBookDraftButton({
               id="material-modal-title"
               style={modalTitleStyle}
             >
-              책을 만들기 위한 자료가
+              더 구체적이고 풍성한 원고가
               <br />
               조금 더 필요해요.
             </h2>
@@ -330,7 +330,7 @@ export default function CreateBookDraftButton({
                   }}
                   style={primaryButtonStyle}
                 >
-                  지금 원고 만들기
+                 지금 원고 초안 만들기
                 </button>
               ) : null}
             </div>
@@ -376,7 +376,7 @@ export default function CreateBookDraftButton({
             <div style={iconStyle}>♡</div>
 
             <p style={modalLabelStyle}>
-              원고 만들기
+              원고 초안 만들기
             </p>
 
             <h2
@@ -385,7 +385,7 @@ export default function CreateBookDraftButton({
             >
               선택한 자료로
               <br />
-              책 원고를 만들까요?
+              선택한 자료로 원고 초안을 만들까요?
             </h2>
 
             <div style={optionBoxStyle}>
@@ -409,7 +409,7 @@ export default function CreateBookDraftButton({
                 onClick={handleCreate}
                 style={primaryButtonStyle}
               >
-                원고 만들기
+                원고 초안 만들기
               </button>
 
               <button
@@ -452,14 +452,14 @@ export default function CreateBookDraftButton({
             <div style={iconStyle}>!</div>
 
             <p style={modalLabelStyle}>
-              원고 생성 안내
+              원고 만들기 안내
             </p>
 
             <h2
               id="error-modal-title"
               style={modalTitleStyle}
             >
-              원고를 만들지 못했어요.
+              원고 초안을 만들지 못했어요.
             </h2>
 
             <p style={modalDescriptionStyle}>

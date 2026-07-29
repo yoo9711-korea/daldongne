@@ -435,23 +435,22 @@ export default function BookMaterialSelector({
       <section className="book-builder-settings">
         <div className="book-builder-section-head">
           <div>
-            <p>책의 방향 선택</p>
-            <h2>
-              어떤 책으로 만들지
-              정해주세요
-            </h2>
+            <p>원고의 방향 선택</p>
+           <h2>
+             어떤 스토리북 원고로
+              정리할지 선택하세요
+             </h2>
           </div>
 
           <span>
-            선택한 설정은 AI 원고에
-            반영됩니다.
-          </span>
+  선택한 설정은 수정 가능한
+  원고 초안에 반영됩니다.
+</span>
         </div>
 
         <div className="book-builder-setting-grid">
           <label>
-            <span>책 종류</span>
-
+            <span>스토리북 종류</span>
             <select
               value={bookType}
               onChange={(event) =>
@@ -529,11 +528,11 @@ export default function BookMaterialSelector({
       <section className="book-builder-materials">
         <div className="book-builder-section-head">
           <div>
-            <p>책에 넣을 자료</p>
-            <h2>
-              사진과 이야기를
-              선택해주세요
-            </h2>
+            <p>원고에 담을 자료</p>
+        <h2>
+           사진과 이야기를
+            선택하세요
+          </h2>
           </div>
 
           <div className="book-builder-selection-actions">
@@ -572,10 +571,10 @@ export default function BookMaterialSelector({
 
           <span>
             {!canCreate
-              ? `책 원고를 시작하려면 사진이 ${REQUIRED_PHOTO_COUNT - selectedPhotoCount}장 더 필요합니다.`
+              ? `원고 만들기를 시작하려면 사진이 ${REQUIRED_PHOTO_COUNT - selectedPhotoCount}장 더 필요합니다.`
               : !hasEnoughStory
                 ? `지금도 원고를 만들 수 있습니다. 이야기를 ${RECOMMENDED_STORY_COUNT - selectedStoryCount}개 더 선택하면 더 풍부해집니다.`
-                : "사진과 이야기가 충분합니다. 선택한 자료만 원고에 반영됩니다."}
+               : "사진과 이야기가 충분합니다. 선택한 자료를 바탕으로 원고 초안이 만들어집니다."}
           </span>
         </div>
 
@@ -606,8 +605,8 @@ export default function BookMaterialSelector({
 
       <section className="book-builder-actions">
         <a href="#book-material-selector">
-          책 미리보기
-        </a>
+         선택한 자료 확인
+          </a>
 
         <CreateBookDraftButton
           disabled={!canCreate}
@@ -629,9 +628,9 @@ export default function BookMaterialSelector({
         />
 
         <p>
-          원고는 만든 뒤 내 책장에서
-          다시 고칠 수 있습니다.
-        </p>
+  만들어진 원고는 초안이며,
+  내 책장에서 직접 확인하고 수정할 수 있습니다.
+</p>
       </section>
     </section>
   );
