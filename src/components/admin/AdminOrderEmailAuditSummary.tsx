@@ -123,6 +123,12 @@ export default async function AdminOrderEmailAuditSummary({
                 "emailOverridden",
               );
 
+            const recipientOverrideReason =
+              readAuditString(
+                log.afterData,
+                "recipientOverrideReason",
+              );
+
             return (
               <article
                 key={log.id}
@@ -227,6 +233,25 @@ export default async function AdminOrderEmailAuditSummary({
                           {requestedRecipientEmail ||
                             recipientEmail ||
                             "발송 이메일 확인 필요"}
+                        </dd>
+                      </div>
+
+                      <div>
+                        <dt>
+                          이메일 변경 사유
+                        </dt>
+
+                        <dd
+                          style={{
+                            whiteSpace:
+                              "pre-wrap",
+                            overflowWrap:
+                              "anywhere",
+                            lineHeight: 1.7,
+                          }}
+                        >
+                          {recipientOverrideReason ||
+                            "변경 사유 기록 없음"}
                         </dd>
                       </div>
                     </>
