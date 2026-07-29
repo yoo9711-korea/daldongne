@@ -3,6 +3,7 @@ import OrderProofReviewPanel from "@/components/orders/OrderProofReviewPanel";
 import OrderPublicAuditTimeline from "@/components/orders/OrderPublicAuditTimeline";
 import OrderStatusTimeline from "@/components/orders/OrderStatusTimeline";
 import OrderValueCopyButton from "@/components/orders/OrderValueCopyButton";
+import OrderShippingTrackingLink from "@/components/orders/OrderShippingTrackingLink";
 import { prisma } from "@/lib/prisma";
 import {
   BookOrderStatus,
@@ -458,6 +459,11 @@ export default async function DashboardOrderDetailPage({
                     order.trackingNumber
                   }
                   wide
+                />
+
+                <OrderShippingTrackingLink
+                  carrier={order.shippingCarrier}
+                  trackingNumber={order.trackingNumber}
                 />
 
                 <DataBox
@@ -1217,4 +1223,3 @@ const orderDetailStyles = `
     }
   }
 `;
-
