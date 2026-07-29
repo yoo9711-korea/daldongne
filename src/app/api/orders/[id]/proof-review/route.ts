@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+﻿import { auth } from "@/auth";
 import { recordBookOrderAudit } from "@/lib/order-audit";
 import { prisma } from "@/lib/prisma";
 import {
@@ -81,7 +81,7 @@ export async function POST(
 
     if (!action) {
       return createErrorResponse(
-        "교정 승인 또는 수정 요청을 선택해 주세요.",
+        "인쇄용 최종 승인 또는 수정 요청을 선택해 주세요.",
         400,
       );
     }
@@ -176,7 +176,7 @@ export async function POST(
       const message =
         order.productionStage ===
         BookProductionStage.PROOF_APPROVED
-          ? "이미 교정 승인이 완료되었습니다."
+          ? "이미 인쇄용 최종 승인이 완료되었습니다."
           : "현재 교정 응답을 제출할 수 있는 단계가 아닙니다.";
 
       return createErrorResponse(
@@ -400,7 +400,7 @@ export async function POST(
           : "PROOF_CHANGES_REQUESTED",
       summary:
         action === "APPROVE"
-          ? "고객이 교정본을 최종 승인했습니다."
+          ? "고객이 교정본을 인쇄용 최종본으로 승인했습니다."
           : createChangeRequestSummary(
               message,
             ),
@@ -476,9 +476,9 @@ export async function POST(
       responseType,
       message:
         action === "APPROVE"
-          ? "교정본 승인이 완료되어 제작용 최종본으로 확정되었습니다."
+          ? "교정본이 인쇄용 최종본으로 승인되었습니다. 담당자가 인쇄 진행을 준비합니다."
           : result.aiProductionRunUpdated
-            ? "수정 요청이 접수되어 AI 재작업 대기로 전환되었습니다."
+            ? "수정 요청이 접수되어 교정본 수정 대기로 전환되었습니다."
             : "수정 요청이 담당자에게 전달되었습니다.",
     });
   } catch (error) {

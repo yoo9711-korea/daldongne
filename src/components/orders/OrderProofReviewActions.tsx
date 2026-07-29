@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   useState,
@@ -74,9 +74,9 @@ export default function OrderProofReviewActions({
       const confirmMessage =
         action === "APPROVE"
           ? [
-              "현재 교정본을 최종 승인할까요?",
+              "현재 교정본을 인쇄용 최종본으로 승인할까요?",
               "",
-              "승인이 완료되면 현재 교정본이 제작용 최종본으로 확정됩니다.",
+              "승인 후 현재 교정본은 인쇄용 최종본으로 확정되며, 원칙적으로 다시 수정하기 어렵습니다.",
             ].join("\n")
           : [
               "작성한 수정 요청을 담당자에게 전달할까요?",
@@ -183,7 +183,7 @@ export default function OrderProofReviewActions({
         >
           {isSubmitting
             ? "처리 중..."
-            : "교정본 최종 승인"}
+            : "인쇄용 최종본 승인"}
         </button>
 
         <button
@@ -208,7 +208,7 @@ export default function OrderProofReviewActions({
         >
           {isRequestFormOpen
             ? "수정 요청 닫기"
-            : "수정 요청 작성"}
+            : "수정 내용 작성"}
         </button>
       </div>
 
