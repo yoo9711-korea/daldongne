@@ -41,7 +41,7 @@ export default async function AdminOrderEmailAuditSummary({
           createdAt: "desc",
         },
 
-        take: 10,
+        take: 50,
 
         select: {
           id: true,

@@ -6,6 +6,8 @@ import {
   useState,
 } from "react";
 
+const PAGE_SIZE = 10;
+
 type EmailTypeFilter =
   | "ALL"
   | "SHIPPING"
@@ -44,13 +46,54 @@ export default function AdminOrderEmailAuditFilters({
   );
 
   const [
+    visibleLimit,
+    setVisibleLimit,
+  ] = useState(PAGE_SIZE);
+
+  const [
+    matchedCount,
+    setMatchedCount,
+  ] = useState(loadedCount);
+
+  const [
     visibleCount,
     setVisibleCount,
-  ] = useState(loadedCount);
+  ] = useState(
+    Math.min(
+      loadedCount,
+      PAGE_SIZE,
+    ),
+  );
 
   const hasActiveFilter =
     typeFilter !== "ALL" ||
     statusFilter !== "ALL";
+
+  const remainingCount =
+    Math.max(
+      matchedCount -
+        visibleCount,
+      0,
+    );
+
+  const nextLoadCount =
+    Math.min(
+      PAGE_SIZE,
+      remainingCount,
+    );
+
+  const hasMoreRecords =
+    remainingCount > 0;
+
+  useEffect(() => {
+    setVisibleLimit(
+      PAGE_SIZE,
+    );
+  }, [
+    loadedCount,
+    statusFilter,
+    typeFilter,
+  ]);
 
   useEffect(() => {
     const section =
@@ -69,6 +112,7 @@ export default function AdminOrderEmailAuditFilters({
         ),
       );
 
+    let nextMatchedCount = 0;
     let nextVisibleCount = 0;
 
     items.forEach((item) => {
@@ -86,9 +130,18 @@ export default function AdminOrderEmailAuditFilters({
         statusFilter === "ALL" ||
         emailStatus === statusFilter;
 
-      const isVisible =
+      const matchesFilters =
         matchesType &&
         matchesStatus;
+
+      if (matchesFilters) {
+        nextMatchedCount += 1;
+      }
+
+      const isVisible =
+        matchesFilters &&
+        nextMatchedCount <=
+          visibleLimit;
 
       item.hidden = !isVisible;
 
@@ -97,6 +150,10 @@ export default function AdminOrderEmailAuditFilters({
       }
     });
 
+    setMatchedCount(
+      nextMatchedCount,
+    );
+
     setVisibleCount(
       nextVisibleCount,
     );
@@ -104,12 +161,25 @@ export default function AdminOrderEmailAuditFilters({
     loadedCount,
     statusFilter,
     typeFilter,
+    visibleLimit,
   ]);
 
   const resetFilters = () => {
     setTypeFilter("ALL");
     setStatusFilter("ALL");
+    setVisibleLimit(
+      PAGE_SIZE,
+    );
   };
+
+  const showMoreRecords =
+    () => {
+      setVisibleLimit(
+        (currentLimit) =>
+          currentLimit +
+          PAGE_SIZE,
+      );
+    };
 
   return (
     <div
@@ -186,24 +256,56 @@ export default function AdminOrderEmailAuditFilters({
         </button>
       </div>
 
-      <div className="admin-order-email-audit-filter-result">
+      <div
+        className="admin-order-email-audit-filter-result"
+        aria-live="polite"
+      >
         <strong>
-          현재 {visibleCount.toLocaleString()}건
+          현재{" "}
+          {visibleCount.toLocaleString()}
+          건 표시
         </strong>
 
         <span>
+          조건 일치{" "}
+          {matchedCount.toLocaleString()}
+          건
+        </span>
+
+        <span>
           최근 불러온 기록{" "}
-          {loadedCount.toLocaleString()}건 중
+          {loadedCount.toLocaleString()}
+          건 중
         </span>
       </div>
 
-      {visibleCount === 0 ? (
+      {matchedCount === 0 ? (
         <p
           className="admin-order-email-audit-filter-empty"
           role="status"
         >
           선택한 조건에 맞는 이메일
           발송 기록이 없습니다.
+        </p>
+      ) : null}
+
+      {hasMoreRecords ? (
+        <button
+          className="admin-order-email-audit-load-more"
+          type="button"
+          onClick={showMoreRecords}
+        >
+          이전 기록{" "}
+          {nextLoadCount.toLocaleString()}
+          건 더 보기
+        </button>
+      ) : null}
+
+      {matchedCount > 0 &&
+      !hasMoreRecords ? (
+        <p className="admin-order-email-audit-load-complete">
+          불러온 기록을 모두
+          표시했습니다.
         </p>
       ) : null}
 
@@ -289,7 +391,8 @@ export default function AdminOrderEmailAuditFilters({
             margin-top: 11px;
             display: flex;
             align-items: center;
-            gap: 7px;
+            flex-wrap: wrap;
+            gap: 5px 9px;
             color: #927a70;
             font-size: 8px;
           }
@@ -306,6 +409,34 @@ export default function AdminOrderEmailAuditFilters({
             color: #806329;
             background: #fff8e6;
             font-size: 8px;
+            line-height: 1.6;
+            text-align: center;
+          }
+
+          .admin-order-email-audit-load-more {
+            width: 100%;
+            min-height: 42px;
+            margin-top: 12px;
+            border: 1px solid #d3a693;
+            border-radius: 11px;
+            color: #754c3e;
+            background: #ffffff;
+            font: inherit;
+            font-size: 8px;
+            font-weight: 900;
+            cursor: pointer;
+          }
+
+          .admin-order-email-audit-load-more:hover {
+            border-color: #df6550;
+            color: #ffffff;
+            background: #df6550;
+          }
+
+          .admin-order-email-audit-load-complete {
+            margin: 12px 0 0;
+            color: #927a70;
+            font-size: 7px;
             line-height: 1.6;
             text-align: center;
           }
