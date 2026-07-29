@@ -97,6 +97,14 @@ export async function POST(
         bodyRecord.recipientEmail,
       ).toLowerCase();
 
+    const recipientOverrideReason =
+      cleanText(
+        bodyRecord.recipientOverrideReason,
+      ).slice(
+        0,
+        300,
+      );
+
     if (
       requestedRecipientEmail &&
       !isValidEmail(
@@ -196,6 +204,12 @@ export async function POST(
       order.productionRequest.email ||
       order.author.email;
 
+    const normalizedDefaultRecipientEmail =
+      defaultRecipientEmail
+        ?.trim()
+        .toLowerCase() ||
+      null;
+
     const recipientEmail =
       requestedRecipientEmail ||
       defaultRecipientEmail;
@@ -208,6 +222,23 @@ export async function POST(
     ) {
       throw new RouteError(
         "재발송할 고객 이메일 주소를 입력해 주세요.",
+        400,
+      );
+    }
+
+    const emailOverridden =
+      Boolean(
+        requestedRecipientEmail,
+      ) &&
+      requestedRecipientEmail !==
+        normalizedDefaultRecipientEmail;
+
+    if (
+      emailOverridden &&
+      !recipientOverrideReason
+    ) {
+      throw new RouteError(
+        "기본 이메일과 다른 주소로 발송하는 사유를 입력해 주세요.",
         400,
       );
     }
@@ -271,6 +302,11 @@ export async function POST(
         ? ` · ${emailResult.to}`
         : "";
 
+    const overrideReasonLabel =
+      emailOverridden
+        ? ` · 변경 사유: ${recipientOverrideReason}`
+        : "";
+
     await recordBookOrderAudit({
       orderId:
         orderRecordId,
@@ -297,7 +333,7 @@ export async function POST(
         `CUSTOMER_${notificationType}_EMAIL_${emailResult.status}`,
 
       summary:
-        `${notificationLabel} 이메일 재발송 ${resultLabel}${recipientLabel}`,
+        `${notificationLabel} 이메일 재발송 ${resultLabel}${recipientLabel}${overrideReasonLabel}`,
 
       before: {
         notificationStatus:
@@ -328,12 +364,12 @@ export async function POST(
           requestedRecipientEmail ||
           null,
 
-        emailOverridden:
-          Boolean(
-            requestedRecipientEmail,
-          ) &&
-          requestedRecipientEmail !==
-            defaultRecipientEmail,
+        emailOverridden,
+
+        recipientOverrideReason:
+          emailOverridden
+            ? recipientOverrideReason
+            : null,
       },
 
       isCustomerVisible:
