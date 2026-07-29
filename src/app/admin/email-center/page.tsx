@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import AdminEmailCenterBulkToolbar from "@/components/admin/AdminEmailCenterBulkToolbar";
 import AdminOrderEmailRetryButton from "@/components/admin/AdminOrderEmailRetryButton";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
@@ -339,6 +340,8 @@ export default async function AdminEmailCenterPage({
             <strong>{filteredCount.toLocaleString()}건</strong>
           </div>
 
+          <AdminEmailCenterBulkToolbar />
+
           {logs.length > 0 ? (
             <div className="admin-email-center-list">
               {logs.map((log) => {
@@ -383,6 +386,38 @@ export default async function AdminEmailCenterPage({
                   >
                     <div className="admin-email-center-card-top">
                       <div>
+                          {status !== "SENT" ? (
+                            defaultRecipientEmail ? (
+                              <label className="admin-email-center-bulk-choice">
+                                <input
+                                  type="checkbox"
+                                  data-email-bulk-item="true"
+                                  data-order-record-id={
+                                    log.order.id
+                                  }
+                                  data-notification-type={
+                                    log.action.includes(
+                                      "SHIPPING",
+                                    )
+                                      ? "SHIPPING"
+                                      : "COMPLETION"
+                                  }
+                                />
+
+                                <span>
+                                  {"일괄 선택"}
+                                </span>
+                              </label>
+                            ) : (
+                              <span
+                                className="admin-email-center-bulk-unavailable"
+                                title={"기본 이메일 주소가 없어 개별 주소 입력이 필요합니다."}
+                              >
+                                {"개별 주소 입력 필요"}
+                              </span>
+                            )
+                          ) : null}
+
                         <span className="admin-email-center-type">
                           {getEmailTypeLabel(log.action)}
                         </span>
@@ -1100,6 +1135,160 @@ const adminEmailCenterStyles = `
     white-space: nowrap;
   }
 
+  .admin-email-center-bulk-toolbar {
+    margin-top: 16px;
+    padding: 15px;
+    display: grid;
+    grid-template-columns:
+      minmax(180px, .8fr)
+      minmax(380px, 1.6fr);
+    gap: 13px;
+    align-items: center;
+    border: 1px solid #d9c0b4;
+    border-radius: 14px;
+    background: #fff8f4;
+  }
+
+  .admin-email-center-bulk-toolbar > div:first-child p {
+    margin: 0;
+    color: #df6550;
+    font-size: 8px;
+    font-weight: 900;
+  }
+
+  .admin-email-center-bulk-toolbar > div:first-child strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+  }
+
+  .admin-email-center-bulk-toolbar > div:first-child span {
+    display: block;
+    margin-top: 5px;
+    color: #927a70;
+    font-size: 8px;
+    line-height: 1.55;
+  }
+
+  .admin-email-center-bulk-actions {
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .admin-email-center-bulk-actions button {
+    min-height: 38px;
+    padding: 0 11px;
+    border: 1px solid #d3a693;
+    border-radius: 9px;
+    color: #754c3e;
+    background: #ffffff;
+    font: inherit;
+    font-size: 8px;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .admin-email-center-bulk-actions button:hover:not(:disabled),
+  .admin-email-center-bulk-actions button[data-primary="true"] {
+    border-color: #df6550;
+    color: #ffffff;
+    background: #df6550;
+  }
+
+  .admin-email-center-bulk-actions button[data-danger="true"] {
+    border-color: #b24e43;
+    color: #ffffff;
+    background: #b24e43;
+  }
+
+  .admin-email-center-bulk-actions button:disabled {
+    cursor: not-allowed;
+    opacity: .45;
+  }
+
+  .admin-email-center-bulk-progress,
+  .admin-email-center-bulk-message {
+    grid-column: 1 / -1;
+  }
+
+  .admin-email-center-bulk-progress > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 8px;
+  }
+
+  .admin-email-center-bulk-progress progress {
+    width: 100%;
+    height: 10px;
+    margin-top: 7px;
+  }
+
+  .admin-email-center-bulk-message {
+    margin: 0;
+    padding: 10px;
+    border-radius: 9px;
+    font-size: 8px;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  .admin-email-center-bulk-message[data-tone="success"] {
+    color: #316b43;
+    border: 1px solid #b7d9c1;
+    background: #edf8ef;
+  }
+
+  .admin-email-center-bulk-message[data-tone="error"] {
+    color: #984b42;
+    border: 1px solid #efc1bb;
+    background: #fff0ed;
+  }
+
+  .admin-email-center-bulk-message[data-tone="info"] {
+    color: #76551d;
+    border: 1px solid #ead9b4;
+    background: #fff8e6;
+  }
+
+  .admin-email-center-bulk-choice {
+    min-height: 25px;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid #d3a693;
+    border-radius: 999px;
+    color: #754c3e;
+    background: #ffffff;
+    font-size: 7px;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .admin-email-center-bulk-choice input {
+    width: 13px;
+    height: 13px;
+    margin: 0;
+    accent-color: #df6550;
+  }
+
+  .admin-email-center-bulk-unavailable {
+    min-height: 25px;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    color: #806329;
+    background: #fff3cf;
+    font-size: 7px;
+    font-weight: 900;
+  }
+
+
   .admin-email-center-list {
     margin-top: 16px;
     display: grid;
@@ -1284,6 +1473,18 @@ const adminEmailCenterStyles = `
 
     .admin-email-center-search {
       grid-column: 1 / -1;
+    }
+  }
+
+
+  .admin-email-center-bulk-mobile-layout {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+    .admin-email-center-bulk-toolbar,
+    .admin-email-center-bulk-actions {
+      grid-template-columns: 1fr;
     }
   }
 
