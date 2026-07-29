@@ -159,6 +159,13 @@ export async function sendOrderProductionStageEmail(
       payload.proofFileUrl,
     );
 
+  const shippingTrackingUrl =
+    payload.stage === "SHIPPED"
+      ? createShippingTrackingUrl(
+          payload.shippingCarrier,
+          payload.trackingNumber,
+        )
+      : null;
   const shippingInformation =
     payload.stage === "SHIPPED"
       ? `
@@ -188,6 +195,20 @@ export async function sendOrderProductionStageEmail(
       `
       : "";
 
+  const shippingButton =
+    payload.stage === "SHIPPED" &&
+    shippingTrackingUrl
+      ? `
+        <a
+          href="${escapeHtml(
+            shippingTrackingUrl,
+          )}"
+          style="display: inline-block; margin-right: 8px; padding: 13px 20px; border-radius: 999px; background: #24583c; color: #ffffff; text-decoration: none; font-weight: bold;"
+        >
+          공식 배송조회
+        </a>
+      `
+      : "";
   await sendOrderEmail({
     to: payload.to,
     subject:
@@ -230,6 +251,7 @@ export async function sendOrderProductionStageEmail(
         </table>
 
         <p style="margin: 24px 0 10px;">
+          ${shippingButton}
           ${proofButton}
 
           <a
@@ -354,6 +376,79 @@ function getStageEmailInformation(
   return null;
 }
 
+function createShippingTrackingUrl(
+  carrier: string | null,
+  trackingNumber: string | null,
+) {
+  const normalizedCarrier =
+    carrier
+      ?.trim()
+      .replace(/\s+/g, "")
+      .toLowerCase() || "";
+
+  const normalizedTrackingNumber =
+    trackingNumber
+      ?.trim()
+      .replace(/[^0-9a-zA-Z]/g, "") ||
+    "";
+
+  if (
+    !normalizedCarrier ||
+    !normalizedTrackingNumber
+  ) {
+    return null;
+  }
+
+  const encodedTrackingNumber =
+    encodeURIComponent(
+      normalizedTrackingNumber,
+    );
+
+  if (
+    normalizedCarrier.includes("cj") ||
+    normalizedCarrier.includes(
+      "대한통운",
+    )
+  ) {
+    return (
+      "https://www.cjlogistics.com/ko/tool/parcel/tracking" +
+      `?gnbInvcNo=${encodedTrackingNumber}`
+    );
+  }
+
+  if (
+    normalizedCarrier.includes("한진")
+  ) {
+    return (
+      "https://www.hanjin.com/kor/CMS/DeliveryMgr/WaybillResult.do" +
+      "?mCode=MN038&schLang=KR" +
+      `&wblnum=${encodedTrackingNumber}`
+    );
+  }
+
+  if (
+    normalizedCarrier.includes("롯데")
+  ) {
+    return "https://www.lotteglogis.com/home/reservation/tracking/index";
+  }
+
+  if (
+    normalizedCarrier.includes(
+      "우체국",
+    ) ||
+    normalizedCarrier.includes("우편")
+  ) {
+    return "https://trace.epost.go.kr/xtts/servlet/kpl.tts.common.svl.SttSVL";
+  }
+
+  if (
+    normalizedCarrier.includes("로젠")
+  ) {
+    return "https://www.ilogen.co.kr/";
+  }
+
+  return null;
+}
 function createOrderUrl(
   orderRecordId: string,
 ) {

@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { recordBookOrderAudit } from "@/lib/order-audit";
+import { sendOrderProductionStageEmail } from "@/lib/order-email";
 import { prisma } from "@/lib/prisma";
 import {
   AIBookProductionStatus,
@@ -616,6 +617,90 @@ export async function POST(
         },
       );
 
+    if (action === "SHIP") {
+      try {
+        const emailOrder =
+          await prisma.bookOrder.findUnique({
+            where: {
+              id: orderRecordId,
+            },
+            select: {
+              id: true,
+              orderId: true,
+              productionStage: true,
+              proofFileUrl: true,
+              shippingCarrier: true,
+              trackingNumber: true,
+
+              productionRequest: {
+                select: {
+                  name: true,
+                  email: true,
+                },
+              },
+
+              book: {
+                select: {
+                  title: true,
+                },
+              },
+
+              author: {
+                select: {
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          });
+
+        if (emailOrder) {
+          await sendOrderProductionStageEmail({
+            to:
+              emailOrder.productionRequest
+                .email ||
+              emailOrder.author.email,
+
+            customerName:
+              emailOrder.productionRequest
+                .name ||
+              emailOrder.author.name,
+
+            bookTitle:
+              emailOrder.book.title,
+
+            orderRecordId:
+              emailOrder.id,
+
+            orderId:
+              emailOrder.orderId,
+
+            stage:
+              String(
+                emailOrder.productionStage,
+              ),
+
+            proofFileUrl:
+              emailOrder.proofFileUrl,
+
+            shippingCarrier:
+              emailOrder.shippingCarrier,
+
+            trackingNumber:
+              emailOrder.trackingNumber,
+          });
+        }
+      } catch (shippingEmailError) {
+        console.error(
+          "[BOOK_SHIPMENT_EMAIL_ERROR]",
+          {
+            orderRecordId,
+            orderId: order.orderId,
+            error: shippingEmailError,
+          },
+        );
+      }
+    }
     try {
       await recordBookOrderAudit({
         orderId:
