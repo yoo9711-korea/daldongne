@@ -57,15 +57,15 @@ export default async function AdminProofReviewPanel({
       <div className="admin-proof-review-heading">
         <div>
           <p>
-            CUSTOMER PROOF REVIEW
+            CUSTOMER PROOF APPROVAL
           </p>
 
           <h2>
-            고객 교정 응답
+            고객 교정본 승인·수정 요청
           </h2>
 
           <span>
-            고객이 제출한 교정 승인과
+            고객이 제출한 인쇄용 최종 승인과
             수정 요청을 교정본 회차별로
             확인합니다.
           </span>
@@ -84,7 +84,7 @@ export default async function AdminProofReviewPanel({
         <div className="admin-proof-review-pending">
           <div>
             <strong>
-              수정 요청 처리 대기
+              고객 수정 요청 처리 대기
             </strong>
 
             <span>
@@ -100,7 +100,7 @@ export default async function AdminProofReviewPanel({
           </p>
 
           <small>
-            AI 재작업을 시작하면 고객
+            수정 작업을 시작하면 고객
             요청이 새 제작 회차에
             반영됩니다. 새 교정본을
             관리자가 승인하면 이전
@@ -133,7 +133,7 @@ export default async function AdminProofReviewPanel({
                     >
                       {review.responseType ===
                       "APPROVED"
-                        ? "교정 승인"
+                        ? "인쇄용 최종 승인"
                         : "수정 요청"}
                     </strong>
 
@@ -160,7 +160,7 @@ export default async function AdminProofReviewPanel({
                   {review.message ||
                     (review.responseType ===
                     "APPROVED"
-                      ? "고객이 교정본을 최종 승인했습니다."
+                      ? "고객이 교정본을 인쇄용 최종본으로 승인했습니다."
                       : "수정 요청 내용이 없습니다.")}
                 </p>
 
@@ -215,8 +215,8 @@ export default async function AdminProofReviewPanel({
         </div>
       ) : (
         <div className="admin-proof-review-empty">
-          아직 고객이 제출한 교정
-          승인이나 수정 요청이 없습니다.
+          아직 고객이 제출한 최종
+          승인 또는 수정 요청이 없습니다.
         </div>
       )}
     </section>

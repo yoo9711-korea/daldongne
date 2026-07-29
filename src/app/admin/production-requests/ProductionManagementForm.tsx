@@ -254,7 +254,7 @@ export default function ProductionManagementForm({
           </strong>
           <p>
             견적과 결제 주문을 먼저 등록하면
-            원고, 교정, 인쇄, 배송 단계를 한곳에서
+            원고, 교정본 확인, 인쇄, 배송 단계를 한곳에서
             관리할 수 있습니다.
           </p>
         </div>
@@ -531,7 +531,7 @@ export default function ProductionManagementForm({
               />
 
               <DateField
-                label="교정본 전달일"
+                label="고객 교정본 전달일"
                 value={values.proofSentAt}
                 onChange={(value) =>
                   updateValue(
@@ -542,7 +542,7 @@ export default function ProductionManagementForm({
               />
 
               <DateField
-                label="고객 교정 승인일"
+                label="고객 인쇄용 최종 승인일"
                 value={
                   values.proofApprovedAt
                 }
@@ -605,12 +605,12 @@ export default function ProductionManagementForm({
           <section className="admin-production-manager-group">
             <GroupHeading
               number="02"
-              title="교정본 관리"
-              description="고객이 확인할 교정본 파일 주소를 기록합니다."
+              title="고객 교정본 전달 관리"
+              description="고객이 확인할 교정본 주소를 등록하고 전달 여부를 관리합니다."
             />
 
             <Field
-              label="교정본 파일 주소"
+              label="고객 확인용 교정본 주소"
               hint="https:// 또는 /로 시작하는 주소"
             >
               <input

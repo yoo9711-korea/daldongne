@@ -306,7 +306,7 @@ export default async function AdminOrderDetailPage({
 
             <Panel
               eyebrow="제작 정보"
-              title="원고·교정·인쇄 진행"
+              title="교정본·인쇄·배송 진행"
             >
               <div className="admin-order-detail-info-grid">
                 <DataBox
@@ -338,14 +338,14 @@ export default async function AdminOrderDetailPage({
                 />
 
                 <DataBox
-                  label="교정본 전달"
+                  label="고객 교정본 전달"
                   value={formatDateTime(
                     order.proofSentAt,
                   )}
                 />
 
                 <DataBox
-                  label="교정 승인"
+                  label="고객 인쇄용 최종 승인"
                   value={formatDateTime(
                     order.proofApprovedAt,
                   )}
@@ -369,7 +369,7 @@ export default async function AdminOrderDetailPage({
                   label="교정본 주소"
                   value={
                     order.proofFileUrl ||
-                    "교정본 주소 없음"
+                    "등록된 교정본 주소 없음"
                   }
                   copyValue={
                     order.proofFileUrl
@@ -843,7 +843,7 @@ function getProductionStageLabel(
         "원고 접수",
       REVIEWING: "원고 검토",
       PROOFING: "교정 작업",
-      PROOF_SENT: "교정본 전달",
+      PROOF_SENT: "고객 교정본 확인",
       PROOF_APPROVED:
         "교정 승인",
       PRINT_ORDERED: "인쇄 발주",

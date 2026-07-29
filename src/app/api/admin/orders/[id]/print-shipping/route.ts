@@ -222,14 +222,14 @@ export async function POST(
       assertCurrentStage(
         order,
         BookProductionStage.PROOF_APPROVED,
-        "교정 승인",
+        "고객 인쇄용 최종 승인",
       );
 
       if (
         !order.proofApprovedAt
       ) {
         throw new RouteError(
-          "교정 승인일이 등록되지 않아 인쇄를 발주할 수 없습니다.",
+          "고객의 인쇄용 최종 승인일이 등록되지 않아 인쇄를 발주할 수 없습니다.",
           409,
         );
       }
@@ -305,7 +305,7 @@ export async function POST(
         `주문 ${order.orderId}의 인쇄 발주를 등록했습니다. 수량 ${order.quantity}권.`;
 
       responseMessage =
-        "인쇄 발주를 등록했습니다. 실제 인쇄소 발주 여부를 확인한 뒤 인쇄 진행 단계로 이동해 주세요.";
+        "인쇄 발주를 등록했습니다. 실제 인쇄소 접수 여부를 확인한 뒤 인쇄 진행 단계로 이동해 주세요.";
     }
 
     if (
