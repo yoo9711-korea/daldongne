@@ -2,6 +2,7 @@ import AdminOrderEmailAuditClient, {
   type AdminOrderEmailAuditLogItem,
 } from "@/components/admin/AdminOrderEmailAuditClient";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 
 const INITIAL_PAGE_SIZE = 10;
 
@@ -127,8 +128,35 @@ export default async function AdminOrderEmailAuditSummary({
         </strong>
       </div>
 
+      <Link
+        href="/admin/email-center"
+        style={{
+          minHeight: 41,
+          marginTop: 15,
+          padding: "0 13px",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 7,
+          border: "1px solid #d3a693",
+          borderRadius: 10,
+          color: "#754c3e",
+          background: "#ffffff",
+          fontSize: 8,
+          fontWeight: 900,
+          textDecoration: "none",
+        }}
+      >
+        {"모든 주문 이메일 통합 관리"}
+
+        <span aria-hidden="true">
+          {"→"}
+        </span>
+      </Link>
+
       {totalCount > 0 ? (
-        <AdminOrderEmailAuditClient
+
+      <AdminOrderEmailAuditClient
           orderRecordId={
             orderRecordId
           }
