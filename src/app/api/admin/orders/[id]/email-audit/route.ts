@@ -92,6 +92,33 @@ export async function GET(
         ),
       );
 
+    const dateFrom =
+      parseDateFilter(
+        requestUrl.searchParams.get(
+          "dateFrom",
+        ),
+        "조회 시작일",
+      );
+
+    const dateTo =
+      parseDateFilter(
+        requestUrl.searchParams.get(
+          "dateTo",
+        ),
+        "조회 종료일",
+      );
+
+    if (
+      dateFrom &&
+      dateTo &&
+      dateFrom > dateTo
+    ) {
+      throw new RouteError(
+        "조회 시작일은 종료일보다 늦을 수 없습니다.",
+        400,
+      );
+    }
+
     const limit =
       parseLimit(
         requestUrl.searchParams.get(
@@ -123,12 +150,25 @@ export async function GET(
         statusFilter,
       );
 
+    const createdAtRange =
+      buildCreatedAtRange(
+        dateFrom,
+        dateTo,
+      );
+
     const where = {
       orderId: orderRecordId,
 
       action: {
         in: actions,
       },
+
+      ...(createdAtRange
+        ? {
+            createdAt:
+              createdAtRange,
+          }
+        : {}),
     };
 
     const [
@@ -228,6 +268,10 @@ export async function GET(
 
         status:
           statusFilter,
+
+        dateFrom,
+
+        dateTo,
       },
     });
   } catch (error) {
@@ -373,6 +417,106 @@ function parseStatusFilter(
     "이메일 발송 상태를 확인해 주세요.",
     400,
   );
+}
+
+function parseDateFilter(
+  value: string | null,
+  label: string,
+) {
+  const cleaned =
+    cleanText(value);
+
+  if (!cleaned) {
+    return null;
+  }
+
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      cleaned,
+    ) ||
+    !isValidCalendarDate(
+      cleaned,
+    )
+  ) {
+    throw new RouteError(
+      `${label} 형식을 확인해 주세요.`,
+      400,
+    );
+  }
+
+  return cleaned;
+}
+
+function isValidCalendarDate(
+  value: string,
+) {
+  const [
+    year,
+    month,
+    day,
+  ] =
+    value
+      .split("-")
+      .map(Number);
+
+  const date =
+    new Date(
+      Date.UTC(
+        year,
+        month - 1,
+        day,
+      ),
+    );
+
+  return (
+    date.getUTCFullYear() ===
+      year &&
+    date.getUTCMonth() ===
+      month - 1 &&
+    date.getUTCDate() ===
+      day
+  );
+}
+
+function buildCreatedAtRange(
+  dateFrom: string | null,
+  dateTo: string | null,
+) {
+  if (
+    !dateFrom &&
+    !dateTo
+  ) {
+    return null;
+  }
+
+  const range: {
+    gte?: Date;
+    lt?: Date;
+  } = {};
+
+  if (dateFrom) {
+    range.gte =
+      new Date(
+        `${dateFrom}T00:00:00+09:00`,
+      );
+  }
+
+  if (dateTo) {
+    const endExclusive =
+      new Date(
+        `${dateTo}T00:00:00+09:00`,
+      );
+
+    endExclusive.setUTCDate(
+      endExclusive.getUTCDate() +
+        1,
+    );
+
+    range.lt =
+      endExclusive;
+  }
+
+  return range;
 }
 
 function parseLimit(

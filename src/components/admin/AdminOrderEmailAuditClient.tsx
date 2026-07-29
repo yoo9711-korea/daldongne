@@ -31,21 +31,30 @@ export type AdminOrderEmailAuditLogItem = {
 
 type AdminOrderEmailAuditClientProps = {
   orderRecordId: string;
+
   initialLogs:
     AdminOrderEmailAuditLogItem[];
+
   initialTotalCount: number;
   initialHasMore: boolean;
+
   initialNextCursor:
     string | null;
 };
 
 type EmailAuditApiResponse = {
   ok?: boolean;
-  logs?: AdminOrderEmailAuditLogItem[];
+
+  logs?:
+    AdminOrderEmailAuditLogItem[];
+
   totalCount?: number;
   loadedCount?: number;
   hasMore?: boolean;
-  nextCursor?: string | null;
+
+  nextCursor?:
+    string | null;
+
   error?: string;
 };
 
@@ -58,6 +67,9 @@ export default function AdminOrderEmailAuditClient({
 }: AdminOrderEmailAuditClientProps) {
   const isFirstFilterRun =
     useRef(true);
+
+  const isLoadingRef =
+    useRef(false);
 
   const [
     logs,
@@ -104,6 +116,16 @@ export default function AdminOrderEmailAuditClient({
   );
 
   const [
+    dateFrom,
+    setDateFrom,
+  ] = useState("");
+
+  const [
+    dateTo,
+    setDateTo,
+  ] = useState("");
+
+  const [
     isLoading,
     setIsLoading,
   ] = useState(false);
@@ -115,6 +137,13 @@ export default function AdminOrderEmailAuditClient({
     string | null
   >(null);
 
+  const hasInvalidDateRange =
+    Boolean(
+      dateFrom &&
+      dateTo &&
+      dateFrom > dateTo,
+    );
+
   const fetchAuditLogs =
     useCallback(
       async ({
@@ -123,14 +152,38 @@ export default function AdminOrderEmailAuditClient({
       }: {
         cursor:
           string | null;
-        append: boolean;
+
+        append:
+          boolean;
       }) => {
-        if (isLoading) {
+        if (
+          isLoadingRef.current
+        ) {
           return;
         }
 
+        if (
+          hasInvalidDateRange
+        ) {
+          setErrorMessage(
+            "조회 시작일은 종료일보다 늦을 수 없습니다.",
+          );
+
+          return;
+        }
+
+        isLoadingRef.current =
+          true;
+
         setIsLoading(true);
         setErrorMessage(null);
+
+        if (!append) {
+          setLogs([]);
+          setTotalCount(0);
+          setHasMore(false);
+          setNextCursor(null);
+        }
 
         try {
           const searchParams =
@@ -146,6 +199,20 @@ export default function AdminOrderEmailAuditClient({
                   PAGE_SIZE,
                 ),
             });
+
+          if (dateFrom) {
+            searchParams.set(
+              "dateFrom",
+              dateFrom,
+            );
+          }
+
+          if (dateTo) {
+            searchParams.set(
+              "dateTo",
+              dateTo,
+            );
+          }
 
           if (cursor) {
             searchParams.set(
@@ -245,11 +312,16 @@ export default function AdminOrderEmailAuditClient({
               : "이메일 발송 기록을 불러오는 중 오류가 발생했습니다.",
           );
         } finally {
+          isLoadingRef.current =
+            false;
+
           setIsLoading(false);
         }
       },
       [
-        isLoading,
+        dateFrom,
+        dateTo,
+        hasInvalidDateRange,
         orderRecordId,
         statusFilter,
         typeFilter,
@@ -272,21 +344,23 @@ export default function AdminOrderEmailAuditClient({
     });
   }, [
     fetchAuditLogs,
-    statusFilter,
-    typeFilter,
   ]);
 
   const resetFilters =
     () => {
       setTypeFilter("ALL");
       setStatusFilter("ALL");
+      setDateFrom("");
+      setDateTo("");
+      setErrorMessage(null);
     };
 
   const loadMore =
     () => {
       if (
         !nextCursor ||
-        !hasMore
+        !hasMore ||
+        isLoading
       ) {
         return;
       }
@@ -302,7 +376,9 @@ export default function AdminOrderEmailAuditClient({
 
   const hasActiveFilter =
     typeFilter !== "ALL" ||
-    statusFilter !== "ALL";
+    statusFilter !== "ALL" ||
+    Boolean(dateFrom) ||
+    Boolean(dateTo);
 
   const csvDownloadParams =
     new URLSearchParams({
@@ -316,10 +392,28 @@ export default function AdminOrderEmailAuditClient({
         "csv",
     });
 
+  if (dateFrom) {
+    csvDownloadParams.set(
+      "dateFrom",
+      dateFrom,
+    );
+  }
+
+  if (dateTo) {
+    csvDownloadParams.set(
+      "dateTo",
+      dateTo,
+    );
+  }
+
   const csvDownloadUrl =
     `/api/admin/orders/${encodeURIComponent(
       orderRecordId,
     )}/email-audit?${csvDownloadParams.toString()}`;
+
+  const csvDownloadDisabled =
+    isLoading ||
+    hasInvalidDateRange;
 
   return (
     <div className="admin-order-email-audit-client">
@@ -337,9 +431,7 @@ export default function AdminOrderEmailAuditClient({
               disabled={
                 isLoading
               }
-              onChange={(
-                event,
-              ) => {
+              onChange={(event) => {
                 setTypeFilter(
                   event.target
                     .value as EmailTypeFilter,
@@ -372,9 +464,7 @@ export default function AdminOrderEmailAuditClient({
               disabled={
                 isLoading
               }
-              onChange={(
-                event,
-              ) => {
+              onChange={(event) => {
                 setStatusFilter(
                   event.target
                     .value as EmailStatusFilter,
@@ -399,6 +489,60 @@ export default function AdminOrderEmailAuditClient({
             </select>
           </label>
 
+          <label>
+            <span>
+              조회 시작일
+            </span>
+
+            <input
+              type="date"
+              value={
+                dateFrom
+              }
+              max={
+                dateTo ||
+                undefined
+              }
+              disabled={
+                isLoading
+              }
+              onChange={(event) => {
+                setDateFrom(
+                  event.target.value,
+                );
+
+                setErrorMessage(null);
+              }}
+            />
+          </label>
+
+          <label>
+            <span>
+              조회 종료일
+            </span>
+
+            <input
+              type="date"
+              value={
+                dateTo
+              }
+              min={
+                dateFrom ||
+                undefined
+              }
+              disabled={
+                isLoading
+              }
+              onChange={(event) => {
+                setDateTo(
+                  event.target.value,
+                );
+
+                setErrorMessage(null);
+              }}
+            />
+          </label>
+
           <button
             type="button"
             onClick={
@@ -418,10 +562,12 @@ export default function AdminOrderEmailAuditClient({
             }
             download
             aria-disabled={
-              isLoading
+              csvDownloadDisabled
             }
             onClick={(event) => {
-              if (isLoading) {
+              if (
+                csvDownloadDisabled
+              ) {
                 event.preventDefault();
               }
             }}
@@ -445,6 +591,18 @@ export default function AdminOrderEmailAuditClient({
             {totalCount.toLocaleString()}
             건
           </span>
+
+          {dateFrom ||
+          dateTo ? (
+            <span>
+              조회 기간:{" "}
+              {dateFrom ||
+                "처음"}
+              {" ~ "}
+              {dateTo ||
+                "현재"}
+            </span>
+          ) : null}
         </div>
       </div>
 
@@ -466,7 +624,8 @@ export default function AdminOrderEmailAuditClient({
               });
             }}
             disabled={
-              isLoading
+              isLoading ||
+              hasInvalidDateRange
             }
           >
             다시 불러오기
@@ -728,8 +887,10 @@ export default function AdminOrderEmailAuditClient({
           .admin-order-email-audit-filter-fields {
             display: grid;
             grid-template-columns:
-              minmax(150px, 1fr)
-              minmax(150px, 1fr)
+              minmax(145px, 1fr)
+              minmax(145px, 1fr)
+              minmax(140px, 0.9fr)
+              minmax(140px, 0.9fr)
               auto
               auto;
             gap: 10px;
@@ -744,10 +905,11 @@ export default function AdminOrderEmailAuditClient({
             font-weight: 900;
           }
 
-          .admin-order-email-audit-filter-fields select {
+          .admin-order-email-audit-filter-fields select,
+          .admin-order-email-audit-filter-fields input {
             width: 100%;
             min-height: 40px;
-            padding: 0 34px 0 11px;
+            padding: 0 11px;
             border: 1px solid #ddc6bc;
             border-radius: 10px;
             color: #4c382f;
@@ -755,6 +917,10 @@ export default function AdminOrderEmailAuditClient({
             font: inherit;
             font-size: 9px;
             outline: none;
+          }
+
+          .admin-order-email-audit-filter-fields select {
+            padding-right: 34px;
             cursor: pointer;
           }
 
@@ -780,20 +946,22 @@ export default function AdminOrderEmailAuditClient({
             text-decoration: none;
           }
 
-          .admin-order-email-audit-filter-fields a:hover {
+          .admin-order-email-audit-filter-fields button:hover:not(:disabled),
+          .admin-order-email-audit-filter-fields a:hover:not([aria-disabled="true"]) {
             border-color: #df6550;
             color: #ffffff;
             background: #df6550;
           }
 
-          .admin-order-email-audit-filter-fields a[aria-disabled="true"] {
-            pointer-events: none;
+          .admin-order-email-audit-filter-fields select:disabled,
+          .admin-order-email-audit-filter-fields input:disabled,
+          .admin-order-email-audit-filter-fields button:disabled {
             cursor: wait;
             opacity: 0.5;
           }
 
-          .admin-order-email-audit-filter-fields select:disabled,
-          .admin-order-email-audit-filter-fields button:disabled {
+          .admin-order-email-audit-filter-fields a[aria-disabled="true"] {
+            pointer-events: none;
             cursor: wait;
             opacity: 0.5;
           }
@@ -987,13 +1155,23 @@ export default function AdminOrderEmailAuditClient({
             text-align: center;
           }
 
+          @media (max-width: 1100px) {
+            .admin-order-email-audit-filter-fields {
+              grid-template-columns:
+                repeat(
+                  2,
+                  minmax(0, 1fr)
+                );
+            }
+          }
+
           @media (max-width: 720px) {
             .admin-order-email-audit-filter-fields {
               grid-template-columns: 1fr;
             }
 
             .admin-order-email-audit-filter-fields button,
-          .admin-order-email-audit-filter-fields a {
+            .admin-order-email-audit-filter-fields a {
               width: 100%;
             }
 
@@ -1051,9 +1229,12 @@ function getEmailStatusLabel(
   const labels:
     Record<string, string> = {
       SENT: "발송 성공",
+
       SKIPPED:
         "발송 건너뜀",
-      FAILED: "발송 실패",
+
+      FAILED:
+        "발송 실패",
     };
 
   return (
@@ -1153,8 +1334,14 @@ function formatDateTime(
   return new Intl.DateTimeFormat(
     "ko-KR",
     {
-      dateStyle: "medium",
-      timeStyle: "short",
+      dateStyle:
+        "medium",
+
+      timeStyle:
+        "short",
+
+      timeZone:
+        "Asia/Seoul",
     },
   ).format(date);
 }
