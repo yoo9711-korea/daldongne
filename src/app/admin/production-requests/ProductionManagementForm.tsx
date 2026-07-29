@@ -293,7 +293,69 @@ export default function ProductionManagementForm({
       values.productionStage !==
       savedValues.productionStage;
 
+    const normalizedShippingCarrier =
+      values.shippingCarrier.trim();
+
+    const normalizedTrackingNumber =
+      values.trackingNumber.replace(/\D/g, "");
+
+    const hasShippingInformation =
+      Boolean(normalizedShippingCarrier) ||
+      Boolean(normalizedTrackingNumber);
+
+    const supportedShippingCarriers = [
+      "CJ대한통운",
+      "한진택배",
+      "롯데택배",
+      "우체국택배",
+      "로젠택배",
+    ];
+
+    if (hasShippingInformation) {
+      if (!normalizedShippingCarrier) {
+        setIsError(true);
+        setMessage(
+          "발송 택배사를 선택해 주세요.",
+        );
+        return;
+      }
+
+      if (
+        !supportedShippingCarriers.includes(
+          normalizedShippingCarrier,
+        )
+      ) {
+        setIsError(true);
+        setMessage(
+          "지원하는 택배사를 다시 선택해 주세요.",
+        );
+        return;
+      }
+
+      if (
+        !/^\d{8,20}$/.test(
+          normalizedTrackingNumber,
+        )
+      ) {
+        setIsError(true);
+        setMessage(
+          "송장번호는 숫자 8~20자리로 입력해 주세요.",
+        );
+        return;
+      }
+    }
+
     const confirmationLines = [
+      ...(hasShippingInformation
+        ? [
+            "배송정보 최종 확인",
+            `택배사: ${normalizedShippingCarrier}`,
+            `송장번호: ${normalizedTrackingNumber}`,
+            "",
+            "택배사와 송장번호가 정확한지 확인해 주세요.",
+            "",
+          ]
+        : []),
       stageChanged
         ? `제작 단계를 "${getProductionStageLabel(
             savedValues.productionStage,
@@ -750,16 +812,31 @@ export default function ProductionManagementForm({
 
               <Field label="배송조회 송장번호">
                 <input
+                  inputMode="numeric"
+                  autoComplete="off"
+                  maxLength={20}
+                  placeholder="숫자 8~20자리"
                   type="text"
                   value={values.trackingNumber}
                   onChange={(event) =>
                     updateValue(
                       "trackingNumber",
-                      event.target.value,
+                      event.target.value.replace(/\D/g, "").slice(0, 20),
                     )
                   }
-                  maxLength={100}
                 />
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "7px",
+                    color: "#68766d",
+                    fontSize: "12px",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  숫자 8~20자리로 입력해 주세요.
+                  공백과 하이픈은 자동으로 제거됩니다.
+                </small>
               </Field>
             </div>
 
@@ -1156,7 +1233,7 @@ function normalizeProductionValues(
     shippingCarrier:
       values.shippingCarrier.trim(),
     trackingNumber:
-      values.trackingNumber.trim(),
+      values.trackingNumber.replace(/\D/g, ""),
     productionNote:
       values.productionNote.trim(),
   };

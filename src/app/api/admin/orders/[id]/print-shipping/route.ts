@@ -384,6 +384,53 @@ export async function POST(
     if (
       action === "SHIP"
     ) {
+      const supportedShippingCarriers = [
+        "CJ대한통운",
+        "한진택배",
+        "롯데택배",
+        "우체국택배",
+        "로젠택배",
+      ];
+
+      const shippingCarrier =
+        order.shippingCarrier?.trim() ?? "";
+
+      const normalizedTrackingNumber =
+        order.trackingNumber?.replace(/\D/g, "") ?? "";
+
+      if (
+        shippingCarrier &&
+        !supportedShippingCarriers.includes(
+          shippingCarrier,
+        )
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "지원하지 않는 택배사입니다. 택배사를 목록에서 다시 선택해 주세요.",
+          },
+          {
+            status: 400,
+          },
+        );
+      }
+
+      if (
+        normalizedTrackingNumber &&
+        !/^\d{8,20}$/.test(
+          normalizedTrackingNumber,
+        )
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "송장번호는 숫자 8~20자리로 입력해 주세요.",
+          },
+          {
+            status: 400,
+          },
+        );
+      }
       assertCurrentStage(
         order,
         BookProductionStage.SHIPPING_PREPARATION,
@@ -808,7 +855,7 @@ function parseShippingUpdate(
     trackingNumber.provided
   ) {
     updateData.trackingNumber =
-      trackingNumber.value;
+      trackingNumber.value?.replace(/\D/g, "") ?? null;
   }
 
   if (
