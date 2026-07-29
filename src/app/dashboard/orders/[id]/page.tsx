@@ -1,4 +1,4 @@
-﻿import { auth } from "@/auth";
+import { auth } from "@/auth";
 import OrderProofReviewPanel from "@/components/orders/OrderProofReviewPanel";
 import OrderPublicAuditTimeline from "@/components/orders/OrderPublicAuditTimeline";
 import OrderStatusTimeline from "@/components/orders/OrderStatusTimeline";
@@ -386,11 +386,11 @@ export default async function DashboardOrderDetailPage({
             <section className="user-order-detail-panel">
               <PanelHeading
                 eyebrow="DELIVERY INFORMATION"
-                title="배송 정보"
+                title="배송·송장 정보"
                 description={
                   hasShippingInformation
-                    ? "담당자가 확인한 최종 배송 정보입니다."
-                    : "배송이 준비되면 수령인과 송장 정보가 표시됩니다."
+                    ? "발송된 스토리북의 수령인, 택배사와 송장번호를 확인해 주세요."
+                    : "인쇄가 끝나고 발송 준비가 되면 수령인, 택배사와 송장번호가 표시됩니다."
                 }
               />
 
@@ -449,7 +449,7 @@ export default async function DashboardOrderDetailPage({
                 />
 
                 <DataBox
-                  label="송장번호"
+                  label="배송조회 송장번호"
                   value={
                     order.trackingNumber ||
                     "발송 전"

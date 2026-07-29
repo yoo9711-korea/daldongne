@@ -402,7 +402,7 @@ export async function POST(
         !order.printingCompletedAt
       ) {
         throw new RouteError(
-          "인쇄 완료일이 등록되지 않아 발송 처리할 수 없습니다.",
+          "인쇄 완료 처리가 되지 않아 택배 발송을 등록할 수 없습니다.",
           409,
         );
       }
@@ -426,7 +426,7 @@ export async function POST(
         `주문 ${order.orderId}의 택배 발송을 등록했습니다. ${order.shippingCarrier} / ${order.trackingNumber}`;
 
       responseMessage =
-        "택배 발송을 등록했습니다.";
+        "택배 발송을 등록했습니다. 고객 주문 상세에 택배사와 송장번호가 표시됩니다.";
     }
 
     if (
@@ -447,7 +447,7 @@ export async function POST(
         !order.shippedAt
       ) {
         throw new RouteError(
-          "발송일이 등록되지 않아 주문을 완료할 수 없습니다.",
+          "택배 발송일이 등록되지 않아 제작·배송 완료 처리할 수 없습니다.",
           409,
         );
       }
@@ -975,7 +975,7 @@ function assertShippingAddress(
     0
   ) {
     throw new RouteError(
-      `배송 준비 전에 다음 정보를 등록해 주세요: ${missing.join(
+      `배송 준비 전에 수령인과 배송지 정보를 등록해 주세요: ${missing.join(
         ", ",
       )}`,
       409,
@@ -1014,7 +1014,7 @@ function assertTrackingInformation(
     0
   ) {
     throw new RouteError(
-      `발송 전에 다음 정보를 등록해 주세요: ${missing.join(
+      `택배 발송 전에 택배사와 송장번호를 등록해 주세요: ${missing.join(
         ", ",
       )}`,
       409,

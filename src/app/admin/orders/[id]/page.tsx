@@ -389,8 +389,8 @@ export default async function AdminOrderDetailPage({
             </Panel>
 
             <Panel
-              eyebrow="배송 정보"
-              title="수령인·주소·송장"
+              eyebrow="발송·배송 정보"
+              title="수령인·배송지·택배 정보"
             >
               <div className="admin-order-detail-info-grid">
                 <DataBox
@@ -421,7 +421,7 @@ export default async function AdminOrderDetailPage({
                 />
 
                 <DataBox
-                  label="기본 배송지"
+                  label="배송지 주소"
                   value={
                     order.shippingAddress1 ||
                     "미등록"
@@ -430,7 +430,7 @@ export default async function AdminOrderDetailPage({
                 />
 
                 <DataBox
-                  label="상세 배송지"
+                  label="배송지 상세주소"
                   value={
                     order.shippingAddress2 ||
                     "미등록"
@@ -456,7 +456,7 @@ export default async function AdminOrderDetailPage({
                 />
 
                 <DataBox
-                  label="송장번호"
+                  label="배송조회 송장번호"
                   value={
                     order.trackingNumber ||
                     "미등록"

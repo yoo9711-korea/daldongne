@@ -632,7 +632,7 @@ export default function ProductionManagementForm({
             <GroupHeading
               number="03"
               title="배송 정보"
-              description="수령인, 주소, 택배사와 송장번호를 관리합니다."
+              description="인쇄 완료 후 발송에 사용할 수령인, 배송지, 택배사와 송장번호를 확인·등록합니다."
             />
 
             <div className="admin-production-manager-field-grid">
@@ -678,7 +678,7 @@ export default function ProductionManagementForm({
                 />
               </Field>
 
-              <Field label="택배사">
+              <Field label="발송 택배사">
                 <input
                   type="text"
                   value={values.shippingCarrier}
@@ -693,7 +693,7 @@ export default function ProductionManagementForm({
                 />
               </Field>
 
-              <Field label="송장번호">
+              <Field label="배송조회 송장번호">
                 <input
                   type="text"
                   value={values.trackingNumber}
