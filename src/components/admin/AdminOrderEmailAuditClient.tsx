@@ -59,9 +59,6 @@ export default function AdminOrderEmailAuditClient({
   const isFirstFilterRun =
     useRef(true);
 
-  const isLoadingRef =
-    useRef(false);
-
   const [
     logs,
     setLogs,
@@ -128,14 +125,9 @@ export default function AdminOrderEmailAuditClient({
           string | null;
         append: boolean;
       }) => {
-        if (
-          isLoadingRef.current
-        ) {
+        if (isLoading) {
           return;
         }
-
-        isLoadingRef.current =
-          true;
 
         setIsLoading(true);
         setErrorMessage(null);
@@ -253,13 +245,11 @@ export default function AdminOrderEmailAuditClient({
               : "이메일 발송 기록을 불러오는 중 오류가 발생했습니다.",
           );
         } finally {
-          isLoadingRef.current =
-            false;
-
           setIsLoading(false);
         }
       },
       [
+        isLoading,
         orderRecordId,
         statusFilter,
         typeFilter,
@@ -313,6 +303,23 @@ export default function AdminOrderEmailAuditClient({
   const hasActiveFilter =
     typeFilter !== "ALL" ||
     statusFilter !== "ALL";
+
+  const csvDownloadParams =
+    new URLSearchParams({
+      type:
+        typeFilter,
+
+      status:
+        statusFilter,
+
+      format:
+        "csv",
+    });
+
+  const csvDownloadUrl =
+    `/api/admin/orders/${encodeURIComponent(
+      orderRecordId,
+    )}/email-audit?${csvDownloadParams.toString()}`;
 
   return (
     <div className="admin-order-email-audit-client">
@@ -404,6 +411,23 @@ export default function AdminOrderEmailAuditClient({
           >
             필터 초기화
           </button>
+
+          <a
+            href={
+              csvDownloadUrl
+            }
+            download
+            aria-disabled={
+              isLoading
+            }
+            onClick={(event) => {
+              if (isLoading) {
+                event.preventDefault();
+              }
+            }}
+          >
+            CSV 내려받기
+          </a>
         </div>
 
         <div
@@ -706,6 +730,7 @@ export default function AdminOrderEmailAuditClient({
             grid-template-columns:
               minmax(150px, 1fr)
               minmax(150px, 1fr)
+              auto
               auto;
             gap: 10px;
             align-items: end;
@@ -733,7 +758,8 @@ export default function AdminOrderEmailAuditClient({
             cursor: pointer;
           }
 
-          .admin-order-email-audit-filter-fields button {
+          .admin-order-email-audit-filter-fields button,
+          .admin-order-email-audit-filter-fields a {
             min-height: 40px;
             padding: 0 14px;
             border: 1px solid #d3a693;
@@ -745,6 +771,25 @@ export default function AdminOrderEmailAuditClient({
             font-weight: 900;
             white-space: nowrap;
             cursor: pointer;
+          }
+
+          .admin-order-email-audit-filter-fields a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+          }
+
+          .admin-order-email-audit-filter-fields a:hover {
+            border-color: #df6550;
+            color: #ffffff;
+            background: #df6550;
+          }
+
+          .admin-order-email-audit-filter-fields a[aria-disabled="true"] {
+            pointer-events: none;
+            cursor: wait;
+            opacity: 0.5;
           }
 
           .admin-order-email-audit-filter-fields select:disabled,
@@ -947,7 +992,8 @@ export default function AdminOrderEmailAuditClient({
               grid-template-columns: 1fr;
             }
 
-            .admin-order-email-audit-filter-fields button {
+            .admin-order-email-audit-filter-fields button,
+          .admin-order-email-audit-filter-fields a {
               width: 100%;
             }
 
