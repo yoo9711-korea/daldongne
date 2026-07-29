@@ -617,7 +617,10 @@ export async function POST(
         },
       );
 
-    if (action === "SHIP") {
+    if (
+      action === "SHIP" ||
+      action === "COMPLETE"
+    ) {
       try {
         const emailOrder =
           await prisma.bookOrder.findUnique({
@@ -692,7 +695,7 @@ export async function POST(
         }
       } catch (shippingEmailError) {
         console.error(
-          "[BOOK_SHIPMENT_EMAIL_ERROR]",
+          "[BOOK_PRODUCTION_STAGE_EMAIL_ERROR]",
           {
             orderRecordId,
             orderId: order.orderId,
