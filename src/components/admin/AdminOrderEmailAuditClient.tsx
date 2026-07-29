@@ -21,6 +21,12 @@ type EmailStatusFilter =
   | "SKIPPED"
   | "FAILED";
 
+type DatePreset =
+  | "TODAY"
+  | "LAST_7_DAYS"
+  | "LAST_30_DAYS"
+  | "THIS_MONTH";
+
 export type AdminOrderEmailAuditLogItem = {
   id: string;
   action: string;
@@ -355,6 +361,66 @@ export default function AdminOrderEmailAuditClient({
       setErrorMessage(null);
     };
 
+  const applyDatePreset =
+    (
+      preset:
+        DatePreset,
+    ) => {
+      const today =
+        getSeoulDateString();
+
+      if (
+        preset === "TODAY"
+      ) {
+        setDateFrom(today);
+        setDateTo(today);
+      }
+
+      if (
+        preset ===
+        "LAST_7_DAYS"
+      ) {
+        setDateFrom(
+          shiftSeoulDate(
+            today,
+            -6,
+          ),
+        );
+
+        setDateTo(today);
+      }
+
+      if (
+        preset ===
+        "LAST_30_DAYS"
+      ) {
+        setDateFrom(
+          shiftSeoulDate(
+            today,
+            -29,
+          ),
+        );
+
+        setDateTo(today);
+      }
+
+      if (
+        preset ===
+        "THIS_MONTH"
+      ) {
+        setDateFrom(
+          `${today.slice(
+            0,
+            7,
+          )}-01`,
+        );
+
+        setDateTo(today);
+      }
+
+      setErrorMessage(null);
+    };
+
   const loadMore =
     () => {
       if (
@@ -415,9 +481,95 @@ export default function AdminOrderEmailAuditClient({
     isLoading ||
     hasInvalidDateRange;
 
+  const activeDatePreset =
+    getActiveDatePreset(
+      dateFrom,
+      dateTo,
+    );
+
   return (
     <div className="admin-order-email-audit-client">
       <div className="admin-order-email-audit-filters">
+        <div className="admin-order-email-audit-quick">
+          <span>
+            빠른 기간
+          </span>
+
+          <div>
+            <button
+              type="button"
+              data-active={
+                activeDatePreset ===
+                "TODAY"
+              }
+              disabled={
+                isLoading
+              }
+              onClick={() => {
+                applyDatePreset(
+                  "TODAY",
+                );
+              }}
+            >
+              오늘
+            </button>
+
+            <button
+              type="button"
+              data-active={
+                activeDatePreset ===
+                "LAST_7_DAYS"
+              }
+              disabled={
+                isLoading
+              }
+              onClick={() => {
+                applyDatePreset(
+                  "LAST_7_DAYS",
+                );
+              }}
+            >
+              최근 7일
+            </button>
+
+            <button
+              type="button"
+              data-active={
+                activeDatePreset ===
+                "LAST_30_DAYS"
+              }
+              disabled={
+                isLoading
+              }
+              onClick={() => {
+                applyDatePreset(
+                  "LAST_30_DAYS",
+                );
+              }}
+            >
+              최근 30일
+            </button>
+
+            <button
+              type="button"
+              data-active={
+                activeDatePreset ===
+                "THIS_MONTH"
+              }
+              disabled={
+                isLoading
+              }
+              onClick={() => {
+                applyDatePreset(
+                  "THIS_MONTH",
+                );
+              }}
+            >
+              이번 달
+            </button>
+          </div>
+        </div>
+
         <div className="admin-order-email-audit-filter-fields">
           <label>
             <span>
@@ -884,6 +1036,53 @@ export default function AdminOrderEmailAuditClient({
             background: #fffaf7;
           }
 
+          .admin-order-email-audit-quick {
+            margin-bottom: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+          }
+
+          .admin-order-email-audit-quick > span {
+            color: #765449;
+            font-size: 8px;
+            font-weight: 900;
+            white-space: nowrap;
+          }
+
+          .admin-order-email-audit-quick > div {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 6px;
+          }
+
+          .admin-order-email-audit-quick button {
+            min-height: 34px;
+            padding: 0 12px;
+            border: 1px solid #ddc6bc;
+            border-radius: 999px;
+            color: #765449;
+            background: #ffffff;
+            font: inherit;
+            font-size: 8px;
+            font-weight: 900;
+            cursor: pointer;
+          }
+
+          .admin-order-email-audit-quick button:hover:not(:disabled),
+          .admin-order-email-audit-quick button[data-active="true"] {
+            border-color: #df6550;
+            color: #ffffff;
+            background: #df6550;
+          }
+
+          .admin-order-email-audit-quick button:disabled {
+            cursor: wait;
+            opacity: 0.5;
+          }
           .admin-order-email-audit-filter-fields {
             display: grid;
             grid-template-columns:
@@ -1166,6 +1365,24 @@ export default function AdminOrderEmailAuditClient({
           }
 
           @media (max-width: 720px) {
+            .admin-order-email-audit-quick {
+              align-items: flex-start;
+              flex-direction: column;
+            }
+
+            .admin-order-email-audit-quick > div {
+              width: 100%;
+              justify-content: flex-start;
+            }
+
+            .admin-order-email-audit-quick button {
+              flex:
+                1 1
+                calc(
+                  50% - 6px
+                );
+            }
+
             .admin-order-email-audit-filter-fields {
               grid-template-columns: 1fr;
             }
@@ -1187,6 +1404,121 @@ export default function AdminOrderEmailAuditClient({
         `}
       </style>
     </div>
+  );
+}
+
+function getActiveDatePreset(
+  dateFrom: string,
+  dateTo: string,
+): DatePreset | null {
+  const today =
+    getSeoulDateString();
+
+  if (
+    dateFrom === today &&
+    dateTo === today
+  ) {
+    return "TODAY";
+  }
+
+  if (
+    dateFrom ===
+      shiftSeoulDate(
+        today,
+        -6,
+      ) &&
+    dateTo === today
+  ) {
+    return "LAST_7_DAYS";
+  }
+
+  if (
+    dateFrom ===
+      shiftSeoulDate(
+        today,
+        -29,
+      ) &&
+    dateTo === today
+  ) {
+    return "LAST_30_DAYS";
+  }
+
+  if (
+    dateFrom ===
+      `${today.slice(
+        0,
+        7,
+      )}-01` &&
+    dateTo === today
+  ) {
+    return "THIS_MONTH";
+  }
+
+  return null;
+}
+
+function getSeoulDateString(
+  value:
+    Date = new Date(),
+) {
+  const parts =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        timeZone:
+          "Asia/Seoul",
+
+        year:
+          "numeric",
+
+        month:
+          "2-digit",
+
+        day:
+          "2-digit",
+      },
+    ).formatToParts(value);
+
+  const year =
+    parts.find(
+      (part) =>
+        part.type ===
+        "year",
+    )?.value || "";
+
+  const month =
+    parts.find(
+      (part) =>
+        part.type ===
+        "month",
+    )?.value || "";
+
+  const day =
+    parts.find(
+      (part) =>
+        part.type ===
+        "day",
+    )?.value || "";
+
+  return `${year}-${month}-${day}`;
+}
+
+function shiftSeoulDate(
+  value: string,
+  days: number,
+) {
+  const date =
+    new Date(
+      `${value}T12:00:00+09:00`,
+    );
+
+  date.setUTCDate(
+    date.getUTCDate() +
+      days,
+  );
+
+  return getSeoulDateString(
+    date,
   );
 }
 
