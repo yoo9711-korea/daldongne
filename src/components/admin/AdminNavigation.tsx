@@ -97,6 +97,13 @@ const NAVIGATION_GROUPS: NavigationGroup[] =
             "인쇄소 전달과 접수·완료 기록",
           icon: "order",
         },
+        {
+          href: "/admin/print-readiness",
+          label: "인쇄 준비 점검",
+          description:
+            "PDF·사양·견적·샘플 확인",
+          icon: "order",
+        },
 
                 {
           href:

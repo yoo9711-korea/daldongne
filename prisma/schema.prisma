@@ -261,6 +261,9 @@ model BookOrder {
 
   manualPrintJob BookOrderManualPrintJob?
 
+  printReadiness BookOrderPrintReadiness?
+  printQuotes    BookOrderPrintQuote[]
+
   @@index([bookId])
   @@index([authorId])
   @@index([status])
@@ -331,6 +334,87 @@ model BookOrderManualPrintJob {
   @@index([printerName, updatedAt])
   @@index([expectedCompletionAt])
   @@map("book_order_manual_print_jobs")
+}
+
+model BookOrderPrintReadiness {
+  id                     String    @id @default(cuid())
+  orderId                String    @unique @map("order_id")
+  status                 String    @default("DRAFT")
+  version                Int       @default(1)
+  finalPdfUrl            String?   @map("final_pdf_url")
+  coverPdfUrl            String?   @map("cover_pdf_url")
+  interiorPdfUrl         String?   @map("interior_pdf_url")
+  trimSize               String?   @map("trim_size")
+  trimWidthMm            Int?      @map("trim_width_mm")
+  trimHeightMm           Int?      @map("trim_height_mm")
+  bleedMm                Int?      @default(3) @map("bleed_mm")
+  pageCount              Int?      @map("page_count")
+  coverPaper             String?   @map("cover_paper")
+  innerPaper             String?   @map("inner_paper")
+  coverFinish            String?   @map("cover_finish")
+  bindingType            String?   @map("binding_type")
+  printColor             String?   @map("print_color")
+  quantity               Int?
+  orderMethod            String?   @map("order_method")
+  samplePrintRequired    Boolean   @default(false) @map("sample_print_required")
+  samplePrintStatus      String    @default("NOT_REQUIRED") @map("sample_print_status")
+  sampleNote             String?   @map("sample_note")
+  pdfOpenedConfirmed     Boolean   @default(false) @map("pdf_opened_confirmed")
+  fontsEmbeddedConfirmed Boolean   @default(false) @map("fonts_embedded_confirmed")
+  imageQualityConfirmed  Boolean   @default(false) @map("image_quality_confirmed")
+  bleedConfirmed         Boolean   @default(false) @map("bleed_confirmed")
+  safeAreaConfirmed      Boolean   @default(false) @map("safe_area_confirmed")
+  pageOrderConfirmed     Boolean   @default(false) @map("page_order_confirmed")
+  colorConfirmed         Boolean   @default(false) @map("color_confirmed")
+  coverSpineConfirmed    Boolean   @default(false) @map("cover_spine_confirmed")
+  blockerCount           Int       @default(0) @map("blocker_count")
+  warningCount           Int       @default(0) @map("warning_count")
+  report                 Json?
+  specHash               String?   @map("spec_hash")
+  frozenAt               DateTime? @map("frozen_at")
+  frozenById             String?   @map("frozen_by_id")
+  note                   String?
+  createdById            String?   @map("created_by_id")
+  updatedById            String?   @map("updated_by_id")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  order BookOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([status, updatedAt])
+  @@index([blockerCount, warningCount, updatedAt])
+  @@map("book_order_print_readiness")
+}
+
+model BookOrderPrintQuote {
+  id                   String    @id @default(cuid())
+  orderId              String    @map("order_id")
+  printerName          String    @map("printer_name")
+  contactName          String?   @map("contact_name")
+  contactPhone         String?   @map("contact_phone")
+  contactEmail         String?   @map("contact_email")
+  quoteNumber          String?   @map("quote_number")
+  status               String    @default("RECEIVED")
+  quantity             Int
+  minimumQuantity      Int?      @map("minimum_quantity")
+  unitCost             Int?      @map("unit_cost")
+  setupCost            Int       @default(0) @map("setup_cost")
+  shippingCost         Int       @default(0) @map("shipping_cost")
+  totalCost            Int       @map("total_cost")
+  vatIncluded          Boolean   @default(false) @map("vat_included")
+  leadTimeBusinessDays Int?      @map("lead_time_business_days")
+  validUntil           DateTime? @map("valid_until")
+  selectedAt           DateTime? @map("selected_at")
+  note                 String?
+  createdById          String?   @map("created_by_id")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  order BookOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, status, createdAt])
+  @@index([printerName, createdAt])
+  @@map("book_order_print_quotes")
 }
 
 model AIBookProductionRun {

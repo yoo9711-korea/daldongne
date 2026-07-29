@@ -5,6 +5,7 @@ import {
   Prisma,
 } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { checkHandoffReadiness } from "@/lib/print-readiness";
 import { NextRequest, NextResponse } from "next/server";
 
 type RouteContext = {
@@ -127,6 +128,19 @@ export async function POST(
 
     if (action === "MARK_SENT") {
       assertCanSend(order, currentJobStatus, details);
+
+      const handoffCheck =
+        await checkHandoffReadiness(
+          order.id,
+          details,
+        );
+
+      if (!handoffCheck.ok) {
+        throw new RouteError(
+          handoffCheck.message,
+          409,
+        );
+      }
 
       nextJobStatus = "SENT";
       jobUpdate.status = nextJobStatus;
