@@ -5,6 +5,8 @@ import { auth, signOut } from '@/auth';
 import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
 import './globals.css';
 import './daldongne-fonts.css';
+import "@/styles/public-site-finish.css";
+import PublicExperienceFinish from "@/components/public/PublicExperienceFinish";
 
 export const metadata: Metadata = {
   title: '달동네 스토리 — 삶의 인생책 제작 서비스',
@@ -356,7 +358,8 @@ export default async function RootLayout({
             </nav>
           </div>
         </footer>
-      </body>
+              <PublicExperienceFinish />
+</body>
     </html>
   );
 }

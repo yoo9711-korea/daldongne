@@ -11,7 +11,8 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
-    "brand:check": "node scripts/check-brand-name.cjs"
+    "brand:check": "node scripts/check-brand-name.cjs",
+    "public:design-check": "node scripts/check-public-design.cjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.7.4",
