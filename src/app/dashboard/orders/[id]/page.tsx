@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+﻿import { auth } from "@/auth";
 import OrderProofReviewPanel from "@/components/orders/OrderProofReviewPanel";
 import OrderPublicAuditTimeline from "@/components/orders/OrderPublicAuditTimeline";
 import OrderStatusTimeline from "@/components/orders/OrderStatusTimeline";
@@ -217,8 +217,8 @@ export default async function DashboardOrderDetailPage({
         <section className="user-order-detail-panel">
           <PanelHeading
             eyebrow="PRODUCTION TIMELINE"
-            title="책 제작 진행 과정"
-            description="관리자가 진행 단계를 변경하면 이 화면에 바로 반영됩니다."
+            title="스토리북 제작 진행 과정"
+            description="결제 후 원고 확인, 교정본 확인, 인쇄, 배송 진행 상황이 이 화면에 표시됩니다."
           />
 
           <OrderStatusTimeline
@@ -490,7 +490,7 @@ export default async function DashboardOrderDetailPage({
             <section className="user-order-detail-panel">
               <PanelHeading
                 eyebrow="BOOK"
-                title="제작하는 책"
+                title="제작하는 스토리북"
               />
 
               <div className="user-order-book-card">
@@ -511,7 +511,7 @@ export default async function DashboardOrderDetailPage({
                 <Link
                   href={`/dashboard/library/${order.book.id}`}
                 >
-                  책 원고 확인
+                  원고 초안 확인
                 </Link>
               </div>
             </section>
@@ -747,7 +747,7 @@ function getProductTypeLabel(
       BASIC_SOFTCOVER:
         "기본 소프트커버",
       CUSTOM_BOOK:
-        "맞춤 제작 책",
+        "맞춤 제작 스토리북",
     };
 
   return (

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -149,7 +149,7 @@ function PaymentSuccessContent() {
           setState('COMPLETED');
           setMessage(
             data.message ||
-              '결제가 완료되었습니다.',
+              '결제가 완료되었습니다. 스토리북 제작이 접수되었습니다.',
           );
           return;
         }
@@ -161,7 +161,7 @@ function PaymentSuccessContent() {
           setState('WAITING');
           setMessage(
             data.message ||
-              '입금 완료를 기다리고 있습니다.',
+              '입금이 확인되면 스토리북 제작이 접수됩니다.',
           );
           return;
         }
@@ -319,7 +319,7 @@ function PaymentResultLayout({
             letterSpacing: '0.08em',
           }}
         >
-          달동네 스토리 결제
+          스토리북 제작 결제
         </p>
 
         <h1
@@ -428,7 +428,7 @@ function PaymentResultLayout({
               }}
             >
               {bookId
-                ? '책 주문 확인하기'
+                ? '원고 상세 확인하기'
                 : '내 책장으로 이동'}
             </Link>
 
@@ -512,7 +512,7 @@ function getTitle(
   state: PaymentViewState,
 ) {
   if (state === 'COMPLETED') {
-    return '결제가 완료되었습니다';
+    return '스토리북 제작 결제가 완료되었습니다';
   }
 
   if (state === 'WAITING') {

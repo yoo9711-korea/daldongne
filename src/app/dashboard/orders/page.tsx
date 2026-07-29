@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+﻿import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import {
   BookOrderStatus,
@@ -250,12 +250,12 @@ export default async function DashboardOrdersPage({
             </p>
 
             <h1>
-              나의 주문·제작 현황
+              나의 스토리북 주문·제작 현황
             </h1>
 
             <span>
-              결제부터 교정, 인쇄,
-              배송까지 책 제작 과정을
+              결제부터 원고·교정본 확인, 인쇄,
+              배송까지 스토리북 제작 과정을
               확인할 수 있습니다.
             </span>
           </div>
@@ -305,7 +305,7 @@ export default async function DashboardOrdersPage({
                 defaultValue={
                   searchText
                 }
-                placeholder="책 제목, 상품명, 주문번호"
+                placeholder="스토리북 제목, 상품명, 주문번호"
               />
             </label>
 
@@ -508,8 +508,8 @@ export default async function DashboardOrdersPage({
               </strong>
 
               <p>
-                책 상세 화면에서 제작
-                신청을 접수하면 주문 현황이
+                원고 상세 화면에서 제작
+                신청을 접수하면 주문·제작 현황이
                 이곳에 표시됩니다.
               </p>
 
