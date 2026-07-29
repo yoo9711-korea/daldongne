@@ -1,4 +1,5 @@
-﻿import { auth } from "@/auth";
+import { auth } from "@/auth";
+import OrderShippingTrackingLink from "@/components/orders/OrderShippingTrackingLink";
 import { prisma } from "@/lib/prisma";
 import {
   BookOrderStatus,
@@ -485,6 +486,16 @@ export default async function DashboardOrdersPage({
                             결제하기
                           </Link>
                         ) : null}
+
+                        <OrderShippingTrackingLink
+                          carrier={
+                            order.shippingCarrier
+                          }
+                          trackingNumber={
+                            order.trackingNumber
+                          }
+                          compact
+                        />
 
                         <Link
                           href={`/dashboard/orders/${order.id}`}
