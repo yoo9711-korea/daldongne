@@ -105,6 +105,24 @@ export default async function AdminOrderEmailAuditSummary({
                 "providerMessageId",
               );
 
+            const defaultRecipientEmail =
+              readAuditString(
+                log.afterData,
+                "defaultRecipientEmail",
+              );
+
+            const requestedRecipientEmail =
+              readAuditString(
+                log.afterData,
+                "requestedRecipientEmail",
+              );
+
+            const emailOverridden =
+              readAuditBoolean(
+                log.afterData,
+                "emailOverridden",
+              );
+
             return (
               <article
                 key={log.id}
@@ -128,6 +146,14 @@ export default async function AdminOrderEmailAuditSummary({
                         status,
                       )}
                     </span>
+
+                    {emailOverridden ? (
+                      <span
+                        className="admin-order-email-audit-override"
+                      >
+                        기본 이메일과 다른 주소
+                      </span>
+                    ) : null}
                   </div>
 
                   <time>
@@ -177,6 +203,33 @@ export default async function AdminOrderEmailAuditSummary({
                         {providerMessageId}
                       </dd>
                     </div>
+                  ) : null}
+
+                  {emailOverridden ? (
+                    <>
+                      <div>
+                        <dt>
+                          기본 이메일
+                        </dt>
+
+                        <dd>
+                          {defaultRecipientEmail ||
+                            "기본 이메일 없음"}
+                        </dd>
+                      </div>
+
+                      <div>
+                        <dt>
+                          변경 발송 이메일
+                        </dt>
+
+                        <dd>
+                          {requestedRecipientEmail ||
+                            recipientEmail ||
+                            "발송 이메일 확인 필요"}
+                        </dd>
+                      </div>
+                    </>
                   ) : null}
                 </dl>
 
@@ -325,6 +378,27 @@ function readAuditString(
     : null;
 }
 
+function readAuditBoolean(
+  value: unknown,
+  key: string,
+) {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value)
+  ) {
+    return false;
+  }
+
+  const result =
+    (value as Record<
+      string,
+      unknown
+    >)[key];
+
+  return result === true;
+}
+
 function formatDateTime(
   value: Date,
 ) {
@@ -459,6 +533,19 @@ const emailAuditStyles = `
   .admin-order-email-audit-status[data-status="FAILED"] {
     color: #984b42;
     background: #ffe8e4;
+  }
+
+  .admin-order-email-audit-override {
+    min-height: 25px;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #d8b77a;
+    border-radius: 999px;
+    color: #76551d;
+    background: #fff7df;
+    font-size: 7px;
+    font-weight: 900;
   }
 
   .admin-order-email-audit-top time {
