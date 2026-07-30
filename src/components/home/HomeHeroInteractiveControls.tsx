@@ -880,52 +880,188 @@ const styles = `
   }
 
 
-/* Daldongne hero controls cleanup v1 */
+
+
+/* Daldongne relationship controls restore v2 */
 
   /*
-   * 배경 이미지 안에 이미 관계 선택 그림이 있으므로
-   * 중복되는 관계 버튼 글자와 아이콘은 숨깁니다.
+   * 나·가족·친구·연인·강아지·고양이 관계 선택 카드
    */
   .storybook-live-relationships {
+    display: grid !important;
+    top: 37.5% !important;
+    left: 7% !important;
+    right: 7% !important;
+    z-index: 7 !important;
+    grid-template-columns:
+      repeat(6, minmax(0, 1fr)) !important;
+    gap: clamp(8px, 0.9vw, 16px) !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    pointer-events: auto !important;
+  }
+
+  .storybook-live-relationship {
+    position: relative !important;
+    min-height:
+      clamp(76px, 6.7vw, 112px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(6px, 0.6vw, 10px) !important;
+    padding:
+      clamp(9px, 0.8vw, 14px)
+      clamp(6px, 0.7vw, 12px) !important;
+    overflow: hidden !important;
+    border:
+      1px solid
+      rgba(137, 101, 78, 0.18) !important;
+    border-radius:
+      clamp(15px, 1.25vw, 22px) !important;
+    color: #4c352a !important;
+    background:
+      linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.97),
+        rgba(252, 247, 240, 0.96)
+      ) !important;
+    box-shadow:
+      0 12px 28px rgba(76, 50, 36, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(10px);
+    text-align: center !important;
+    text-decoration: none !important;
+    font-size:
+      clamp(13px, 1.15vw, 21px) !important;
+    font-weight: 850 !important;
+    transition:
+      transform 170ms ease,
+      border-color 170ms ease,
+      box-shadow 170ms ease !important;
+  }
+
+  .storybook-live-relationship::before {
     display: none !important;
   }
 
-  /*
-   * 안전 보관·책 제작·선물 안내는
-   * 메인 이미지 위에서 겹치지 않도록 숨깁니다.
-   */
-  .storybook-live-values {
+  .storybook-live-relationship svg {
+    grid-row: auto !important;
+    width:
+      clamp(31px, 2.65vw, 46px) !important;
+    height:
+      clamp(31px, 2.65vw, 46px) !important;
+    padding:
+      clamp(6px, 0.5vw, 9px) !important;
+    border:
+      1px solid
+      rgba(126, 90, 69, 0.11) !important;
+    border-radius: 50% !important;
+    color: var(
+      --relationship-accent,
+      #8c6d58
+    ) !important;
+    background: var(
+      --relationship-soft,
+      #f4eee8
+    ) !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 1.7 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+  }
+
+  .storybook-live-relationship > span {
+    min-width: 0 !important;
+    display: block !important;
+    color: #4a342a !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  .storybook-live-relationship > span::after {
     display: none !important;
   }
 
+  .storybook-live-relationship[data-tone="mint"] {
+    --relationship-accent: #628473;
+    --relationship-soft: #eaf2ed;
+  }
+
+  .storybook-live-relationship[data-tone="blue"] {
+    --relationship-accent: #667f94;
+    --relationship-soft: #edf2f5;
+  }
+
+  .storybook-live-relationship[data-tone="yellow"] {
+    --relationship-accent: #a27a39;
+    --relationship-soft: #f8f0df;
+  }
+
+  .storybook-live-relationship[data-tone="pink"] {
+    --relationship-accent: #a66c76;
+    --relationship-soft: #f8ecee;
+  }
+
+  .storybook-live-relationship[data-tone="peach"] {
+    --relationship-accent: #a76b53;
+    --relationship-soft: #f8ece6;
+  }
+
+  .storybook-live-relationship:hover,
+  .storybook-live-relationship:focus-visible {
+    transform: translateY(-4px) !important;
+    border-color:
+      var(--relationship-accent) !important;
+    box-shadow:
+      0 17px 34px rgba(76, 50, 36, 0.15),
+      inset 0 1px 0 #ffffff !important;
+    outline: none !important;
+  }
+
+  .storybook-live-relationship:active {
+    transform:
+      translateY(-1px)
+      scale(0.99) !important;
+  }
+
   /*
-   * 실제 사용 기능 3개만 이미지 아래쪽에
-   * 한 줄로 단정하게 배치합니다.
+   * 실제 기능 버튼 3개
    */
   .storybook-live-actions {
-    top: auto !important;
-    bottom: 5.5% !important;
-    left: 12% !important;
-    right: 12% !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: clamp(8px, 1.2vw, 20px) !important;
+    top: 61.5% !important;
+    bottom: auto !important;
+    left: 13% !important;
+    right: 13% !important;
+    z-index: 8 !important;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr)) !important;
+    gap:
+      clamp(9px, 1.2vw, 20px) !important;
     pointer-events: auto !important;
   }
 
   .storybook-live-action {
-    min-height: clamp(52px, 4.7vw, 86px) !important;
-    gap: clamp(7px, 0.85vw, 15px) !important;
+    min-height:
+      clamp(55px, 5vw, 88px) !important;
+    gap:
+      clamp(7px, 0.85vw, 15px) !important;
     padding:
-      clamp(8px, 0.7vw, 14px)
+      clamp(8px, 0.75vw, 14px)
       clamp(10px, 1vw, 20px) !important;
     border:
       1px solid
       rgba(126, 90, 69, 0.18) !important;
     border-radius:
-      clamp(14px, 1.25vw, 22px) !important;
+      clamp(14px, 1.2vw, 22px) !important;
     color: #4a352b !important;
     background:
-      rgba(255, 253, 249, 0.96) !important;
+      rgba(255, 253, 249, 0.97) !important;
     box-shadow:
       0 12px 28px
       rgba(78, 51, 37, 0.11) !important;
@@ -954,25 +1090,44 @@ const styles = `
       clamp(24px, 2vw, 38px) !important;
     height:
       clamp(24px, 2vw, 38px) !important;
-    flex: 0 0 auto;
+    flex: 0 0 auto !important;
   }
 
-  .storybook-live-action:hover,
-  .storybook-live-action:focus-visible {
-    transform: translateY(-3px);
-    box-shadow:
-      0 16px 32px
-      rgba(78, 51, 37, 0.15) !important;
-    outline: none;
-  }
-
-  .storybook-live-action:active {
-    transform: translateY(-1px) scale(0.99);
+  /*
+   * 메인 이미지의 하단 설명 카드는 숨김
+   */
+  .storybook-live-values {
+    display: none !important;
   }
 
   @media (max-width: 820px) {
+    .storybook-live-relationships {
+      top: 40% !important;
+      left: 4.5% !important;
+      right: 4.5% !important;
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+      gap: 7px !important;
+    }
+
+    .storybook-live-relationship {
+      min-height: 51px !important;
+      flex-direction: row !important;
+      gap: 5px !important;
+      padding: 5px 7px !important;
+      border-radius: 11px !important;
+      font-size: 12px !important;
+    }
+
+    .storybook-live-relationship svg {
+      width: 25px !important;
+      height: 25px !important;
+      padding: 4px !important;
+    }
+
     .storybook-live-actions {
-      bottom: 4% !important;
+      top: 72.5% !important;
+      bottom: auto !important;
       left: 4.5% !important;
       right: 4.5% !important;
       gap: 7px !important;
@@ -993,8 +1148,29 @@ const styles = `
   }
 
   @media (max-width: 480px) {
+    .storybook-live-relationships {
+      top: 39% !important;
+      left: 3% !important;
+      right: 3% !important;
+      gap: 5px !important;
+    }
+
+    .storybook-live-relationship {
+      min-height: 43px !important;
+      gap: 4px !important;
+      padding: 4px !important;
+      border-radius: 9px !important;
+      font-size: 10px !important;
+    }
+
+    .storybook-live-relationship svg {
+      width: 21px !important;
+      height: 21px !important;
+      padding: 3px !important;
+    }
+
     .storybook-live-actions {
-      bottom: 3.2% !important;
+      top: 73.5% !important;
       left: 3% !important;
       right: 3% !important;
       gap: 5px !important;
@@ -1004,7 +1180,7 @@ const styles = `
       min-height: 40px !important;
       padding: 4px !important;
       font-size: 9px !important;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.04em !important;
     }
 
     .storybook-live-action svg {
