@@ -32,7 +32,7 @@ const NAV_ITEMS: ReadonlyArray<{
   },
   {
     key: 'reviews',
-    href: '/#reviews',
+    href: '/reviews',
     label: '이용후기',
   },
   {
