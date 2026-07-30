@@ -2910,3 +2910,26 @@ body [aria-disabled="true"] {
     display: none !important;
   }
 }
+/* Daldongne dashboard duplicate brand hide v1 */
+
+/*
+ * 위쪽 공통 홈페이지 로고는 그대로 유지하고,
+ * 대시보드 내부에 중복 표시되는 아래쪽 브랜드만 제거합니다.
+ */
+.storybook-dashboard-brand {
+  display: none !important;
+}
+
+/*
+ * 브랜드 제거 후 관리자·내 책장·홈페이지 등의
+ * 대시보드 메뉴를 오른쪽에 정돈합니다.
+ */
+.storybook-dashboard-header-inner {
+  justify-content: flex-end !important;
+}
+
+@media (max-width: 820px) {
+  .storybook-dashboard-header-inner {
+    justify-content: flex-end !important;
+  }
+}
