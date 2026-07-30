@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 type ControlItem = {
@@ -75,20 +76,28 @@ export default function HomeHeroInteractiveControls(
   return (
     <div className="storybook-live-hero">
       <style>{styles}</style>
-
       <nav
-        className="storybook-live-relationships"
+        className="storybook-live-relationships storybook-live-relationships--image"
         aria-label="기록할 관계 선택"
       >
-        {relationshipItems.map((item) => (
+        <Image
+          src="/home/relationship/relationship-watercolor-v1.webp"
+          alt="나, 가족, 친구, 연인, 강아지, 고양이 중 기록할 이야기를 선택하는 수채화 카드"
+          fill
+          priority
+          sizes="(max-width: 820px) 92vw, 89vw"
+          className="storybook-live-relationship-image"
+        />
+
+        {relationshipItems.map((item, index) => (
           <Link
             key={item.label}
             href={item.href}
-            className="storybook-live-relationship"
-            data-tone={item.tone}
+            className="storybook-live-relationship-hotspot"
+            data-index={index + 1}
+            aria-label={`${item.label} 이야기 기록하기`}
           >
-            <ControlIcon name={item.icon} />
-            <span>{item.label}</span>
+            <span className="sr-only">{item.label}</span>
           </Link>
         ))}
       </nav>
@@ -768,6 +777,105 @@ const styles = `
     .storybook-live-relationship svg {
       width: 22px;
       height: 22px;
+    }
+  }
+
+
+  /* Daldongne relationship watercolor image v1 */
+  .storybook-live-relationships--image {
+    top: 55.8%;
+    left: 3.2%;
+    right: 3.2%;
+    height: 24.8%;
+    display: block;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: clamp(16px, 1.8vw, 30px);
+    background: transparent;
+    box-shadow:
+      0 15px 36px rgba(78, 54, 38, 0.11);
+  }
+
+  .storybook-live-relationship-image {
+    object-fit: cover;
+    object-position: center;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .storybook-live-relationship-hotspot {
+    position: absolute;
+    top: 31%;
+    bottom: 4%;
+    z-index: 2;
+    width: 14.2%;
+    border-radius: clamp(10px, 1.3vw, 22px);
+    text-decoration: none;
+    outline: none;
+    transition:
+      transform 150ms ease,
+      box-shadow 150ms ease,
+      background 150ms ease;
+  }
+
+  .storybook-live-relationship-hotspot[data-index="1"] {
+    left: 2.2%;
+  }
+
+  .storybook-live-relationship-hotspot[data-index="2"] {
+    left: 18.4%;
+  }
+
+  .storybook-live-relationship-hotspot[data-index="3"] {
+    left: 34.4%;
+  }
+
+  .storybook-live-relationship-hotspot[data-index="4"] {
+    left: 50.5%;
+  }
+
+  .storybook-live-relationship-hotspot[data-index="5"] {
+    left: 66.5%;
+  }
+
+  .storybook-live-relationship-hotspot[data-index="6"] {
+    left: 82.5%;
+  }
+
+  .storybook-live-relationship-hotspot:hover,
+  .storybook-live-relationship-hotspot:focus-visible {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.7);
+  }
+
+  .storybook-live-relationship-hotspot:focus-visible {
+    outline: 3px solid rgba(169, 112, 37, 0.55);
+    outline-offset: -3px;
+  }
+
+  @media (max-width: 820px) {
+    .storybook-live-relationships--image {
+      top: 53.8%;
+      left: 2.5%;
+      right: 2.5%;
+      height: 27.5%;
+      border-radius: 13px;
+    }
+
+    .storybook-live-relationship-hotspot {
+      top: 31%;
+      bottom: 4%;
+      width: 14.4%;
+      border-radius: 9px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .storybook-live-relationships--image {
+      top: 52.8%;
+      height: 28.5%;
     }
   }
 `;
