@@ -530,7 +530,7 @@ export default function HomePage() {
           <div className="reference-shell">
             <div className="reference-main-image">
               <Image
-                src="/home/storybook/home-hero-main-v4.png"
+                src="/home/reference-home-v1/home-main-reference-v2.webp"
                 alt="달동네 스토리의 나, 가족, 친구, 연인, 강아지, 고양이 기록 화면과 모바일 화면을 함께 보여주는 메인 이미지"
                 fill
                 priority
