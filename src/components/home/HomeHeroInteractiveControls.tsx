@@ -878,4 +878,138 @@ const styles = `
       height: 28.5%;
     }
   }
+
+
+/* Daldongne hero controls cleanup v1 */
+
+  /*
+   * 배경 이미지 안에 이미 관계 선택 그림이 있으므로
+   * 중복되는 관계 버튼 글자와 아이콘은 숨깁니다.
+   */
+  .storybook-live-relationships {
+    display: none !important;
+  }
+
+  /*
+   * 안전 보관·책 제작·선물 안내는
+   * 메인 이미지 위에서 겹치지 않도록 숨깁니다.
+   */
+  .storybook-live-values {
+    display: none !important;
+  }
+
+  /*
+   * 실제 사용 기능 3개만 이미지 아래쪽에
+   * 한 줄로 단정하게 배치합니다.
+   */
+  .storybook-live-actions {
+    top: auto !important;
+    bottom: 5.5% !important;
+    left: 12% !important;
+    right: 12% !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: clamp(8px, 1.2vw, 20px) !important;
+    pointer-events: auto !important;
+  }
+
+  .storybook-live-action {
+    min-height: clamp(52px, 4.7vw, 86px) !important;
+    gap: clamp(7px, 0.85vw, 15px) !important;
+    padding:
+      clamp(8px, 0.7vw, 14px)
+      clamp(10px, 1vw, 20px) !important;
+    border:
+      1px solid
+      rgba(126, 90, 69, 0.18) !important;
+    border-radius:
+      clamp(14px, 1.25vw, 22px) !important;
+    color: #4a352b !important;
+    background:
+      rgba(255, 253, 249, 0.96) !important;
+    box-shadow:
+      0 12px 28px
+      rgba(78, 51, 37, 0.11) !important;
+    backdrop-filter: blur(12px);
+    font-size:
+      clamp(14px, 1.25vw, 23px) !important;
+    font-weight: 850 !important;
+  }
+
+  .storybook-live-action[data-primary="true"] {
+    border-color: #f76555 !important;
+    color: #ffffff !important;
+    background:
+      linear-gradient(
+        135deg,
+        #ff6d5d,
+        #ed5a4d
+      ) !important;
+    box-shadow:
+      0 14px 30px
+      rgba(221, 83, 66, 0.22) !important;
+  }
+
+  .storybook-live-action svg {
+    width:
+      clamp(24px, 2vw, 38px) !important;
+    height:
+      clamp(24px, 2vw, 38px) !important;
+    flex: 0 0 auto;
+  }
+
+  .storybook-live-action:hover,
+  .storybook-live-action:focus-visible {
+    transform: translateY(-3px);
+    box-shadow:
+      0 16px 32px
+      rgba(78, 51, 37, 0.15) !important;
+    outline: none;
+  }
+
+  .storybook-live-action:active {
+    transform: translateY(-1px) scale(0.99);
+  }
+
+  @media (max-width: 820px) {
+    .storybook-live-actions {
+      bottom: 4% !important;
+      left: 4.5% !important;
+      right: 4.5% !important;
+      gap: 7px !important;
+    }
+
+    .storybook-live-action {
+      min-height: 44px !important;
+      gap: 5px !important;
+      padding: 5px 6px !important;
+      border-radius: 11px !important;
+      font-size: 11px !important;
+    }
+
+    .storybook-live-action svg {
+      width: 19px !important;
+      height: 19px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .storybook-live-actions {
+      bottom: 3.2% !important;
+      left: 3% !important;
+      right: 3% !important;
+      gap: 5px !important;
+    }
+
+    .storybook-live-action {
+      min-height: 40px !important;
+      padding: 4px !important;
+      font-size: 9px !important;
+      letter-spacing: -0.04em;
+    }
+
+    .storybook-live-action svg {
+      width: 17px !important;
+      height: 17px !important;
+    }
+  }
 `;
