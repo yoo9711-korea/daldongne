@@ -1311,4 +1311,16 @@ const styles = `
       height: 17px !important;
     }
   }
+
+
+/* Daldongne hero action buttons move down 20 percent v1 */
+
+  /*
+   * 사진 올리기·이야기 남기기·내 기억 보기
+   * 세 버튼 묶음만 자체 높이의 20%만큼 아래로 이동합니다.
+   * 절대 위치와 주변 레이아웃은 변경하지 않습니다.
+   */
+  .storybook-live-actions {
+    transform: translateY(20%) !important;
+  }
 `;
