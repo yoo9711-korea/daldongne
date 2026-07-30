@@ -547,4 +547,227 @@ const styles = `
       font-size: 10px;
     }
   }
+
+
+/* Daldongne relationship card redesign v1 */
+
+  .storybook-live-relationships {
+    top: 56.5%;
+    left: 5.5%;
+    right: 5.5%;
+    gap: 0.9%;
+    padding: 1%;
+    border: 1px solid rgba(126, 90, 69, 0.16);
+    border-radius: clamp(20px, 2vw, 38px);
+    background:
+      radial-gradient(
+        circle at 14% 20%,
+        rgba(255, 255, 255, 0.96),
+        transparent 35%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(255, 253, 248, 0.98),
+        rgba(248, 240, 230, 0.98)
+      );
+    box-shadow:
+      0 18px 42px rgba(91, 62, 44, 0.11),
+      inset 0 1px 0 rgba(255, 255, 255, 0.96);
+  }
+
+  .storybook-live-relationship {
+    --relationship-accent: #8f725f;
+    --relationship-soft: #f4ede6;
+
+    position: relative;
+    min-height: clamp(52px, 5.4vw, 102px);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: center;
+    justify-content: initial;
+    column-gap: clamp(7px, 0.75vw, 15px);
+    padding:
+      clamp(7px, 0.7vw, 14px)
+      clamp(8px, 0.85vw, 17px);
+    overflow: hidden;
+    border: 1px solid rgba(139, 105, 83, 0.18);
+    border-radius: clamp(13px, 1.15vw, 22px);
+    color: var(--relationship-accent);
+    box-shadow:
+      0 8px 20px rgba(83, 56, 40, 0.07),
+      inset 0 1px 0 #ffffff;
+    font-size: clamp(13px, 1.23vw, 24px);
+    font-weight: 850;
+    transition:
+      transform 170ms ease,
+      border-color 170ms ease,
+      box-shadow 170ms ease;
+  }
+
+  .storybook-live-relationship[data-tone] {
+    color: var(--relationship-accent);
+    background:
+      linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.99),
+        rgba(249, 243, 236, 0.98)
+      );
+  }
+
+  .storybook-live-relationship::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 15%;
+    left: 15%;
+    height: 3px;
+    border-radius: 0 0 999px 999px;
+    background: var(--relationship-accent);
+    opacity: 0.58;
+  }
+
+  .storybook-live-relationship svg {
+    grid-row: 1 / 3;
+    width: clamp(28px, 2.45vw, 48px);
+    height: clamp(28px, 2.45vw, 48px);
+    padding: clamp(5px, 0.45vw, 9px);
+    border: 1px solid rgba(126, 90, 69, 0.11);
+    border-radius: 50%;
+    color: var(--relationship-accent);
+    background: var(--relationship-soft);
+    stroke-width: 1.65;
+  }
+
+  .storybook-live-relationship > span {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: #4c352a;
+    line-height: 1.08;
+    white-space: nowrap;
+  }
+
+  .storybook-live-relationship > span::after {
+    content: "";
+    margin-top: clamp(3px, 0.3vw, 6px);
+    overflow: hidden;
+    color: #927d70;
+    font-size: clamp(8px, 0.68vw, 13px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-overflow: ellipsis;
+  }
+
+  .storybook-live-relationship:nth-child(1) > span::after {
+    content: "나의 오늘";
+  }
+
+  .storybook-live-relationship:nth-child(2) > span::after {
+    content: "함께한 시간";
+  }
+
+  .storybook-live-relationship:nth-child(3) > span::after {
+    content: "웃음과 우정";
+  }
+
+  .storybook-live-relationship:nth-child(4) > span::after {
+    content: "우리의 순간";
+  }
+
+  .storybook-live-relationship:nth-child(5) > span::after {
+    content: "산책과 교감";
+  }
+
+  .storybook-live-relationship:nth-child(6) > span::after {
+    content: "포근한 하루";
+  }
+
+  .storybook-live-relationship[data-tone="mint"] {
+    --relationship-accent: #648675;
+    --relationship-soft: #eaf2ed;
+  }
+
+  .storybook-live-relationship[data-tone="blue"] {
+    --relationship-accent: #6c7f90;
+    --relationship-soft: #edf1f3;
+  }
+
+  .storybook-live-relationship[data-tone="yellow"] {
+    --relationship-accent: #a77b35;
+    --relationship-soft: #f8f0df;
+  }
+
+  .storybook-live-relationship[data-tone="pink"] {
+    --relationship-accent: #a66a72;
+    --relationship-soft: #f7ecec;
+  }
+
+  .storybook-live-relationship[data-tone="peach"] {
+    --relationship-accent: #a96850;
+    --relationship-soft: #f8ece6;
+  }
+
+  .storybook-live-relationship:hover,
+  .storybook-live-relationship:focus-visible {
+    transform: translateY(-4px);
+    border-color: var(--relationship-accent);
+    box-shadow:
+      0 14px 28px rgba(80, 53, 39, 0.13),
+      inset 0 1px 0 #ffffff;
+    outline: none;
+  }
+
+  .storybook-live-relationship:active {
+    transform: translateY(-1px) scale(0.99);
+  }
+
+  @media (max-width: 820px) {
+    .storybook-live-relationships {
+      top: 55%;
+      left: 4.5%;
+      right: 4.5%;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      padding: 8px;
+      border-radius: 16px;
+    }
+
+    .storybook-live-relationship {
+      min-height: 42px;
+      grid-template-columns: auto minmax(0, 1fr);
+      column-gap: 5px;
+      padding: 5px 7px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .storybook-live-relationship svg {
+      width: 24px;
+      height: 24px;
+      padding: 4px;
+    }
+
+    .storybook-live-relationship > span::after {
+      display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .storybook-live-relationships {
+      top: 53.5%;
+    }
+
+    .storybook-live-relationship {
+      padding-right: 5px;
+      padding-left: 5px;
+      font-size: 11px;
+    }
+
+    .storybook-live-relationship svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
 `;
