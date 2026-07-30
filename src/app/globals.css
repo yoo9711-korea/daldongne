@@ -2786,3 +2786,127 @@ body textarea:disabled,
 body [aria-disabled="true"] {
   opacity: 0.72;
 }
+
+/* Daldongne header brand logo v3 */
+.daldongne-global-logo-link,
+.storybook-public-brand {
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  overflow: visible !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
+.daldongne-global-logo-link::before,
+.storybook-public-brand::before {
+  content: "";
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  display: block;
+  border-radius: 14px;
+  background:
+    #ffffff
+    url("/brand/daldongne-story-symbol.png")
+    center / 48px 48px
+    no-repeat;
+  box-shadow:
+    0 8px 20px rgba(74, 47, 32, 0.10),
+    inset 0 0 0 1px rgba(126, 90, 69, 0.12);
+}
+
+.daldongne-global-logo-link > *,
+.storybook-public-brand > * {
+  display: initial !important;
+}
+
+.daldongne-global-logo-link > img {
+  display: none !important;
+}
+
+.storybook-public-brand-mark,
+.storybook-public-brand-heart {
+  display: none !important;
+}
+
+.daldongne-global-logo-link > div {
+  display: flex !important;
+}
+
+.storybook-public-brand-name {
+  display: inline-block !important;
+  color: #432c22 !important;
+  font-size: clamp(22px, 2vw, 31px) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.storybook-dashboard-brand-mark {
+  background:
+    #ffffff
+    url("/brand/daldongne-story-symbol.png")
+    center / 42px 42px
+    no-repeat !important;
+}
+
+.storybook-dashboard-brand-mark svg {
+  display: none !important;
+}
+
+.storybook-dashboard-brand-copy {
+  display: inline-flex !important;
+}
+
+.storybook-dashboard-brand-copy strong {
+  color: #432c22 !important;
+}
+
+@media (max-width: 860px) {
+  .daldongne-global-logo-link,
+  .storybook-public-brand {
+    gap: 8px !important;
+  }
+
+  .daldongne-global-logo-link::before,
+  .storybook-public-brand::before {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+    border-radius: 12px;
+    background-size: 39px 39px;
+  }
+
+  .storybook-public-brand-name {
+    font-size: 21px !important;
+  }
+
+  .daldongne-global-logo-link small {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .daldongne-global-logo-link::before,
+  .storybook-public-brand::before {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    background-size: 34px 34px;
+  }
+
+  .storybook-public-brand-name {
+    font-size: 18px !important;
+  }
+
+  .storybook-dashboard-brand-copy small {
+    display: none !important;
+  }
+}
