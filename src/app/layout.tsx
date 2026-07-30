@@ -191,7 +191,7 @@ export default async function RootLayout({
         <ServiceWorkerRegister />
         <div role="banner" style={headerStyle}>
           <div style={innerStyle}>
-            <Link href="/" style={brandStyle}>
+            <Link href="/" style={brandStyle} className="daldongne-global-logo-link" aria-label="달동네 스토리 홈페이지">
               <img
                 src="/brand/icon-mark.png"
                 alt=""
