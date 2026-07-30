@@ -498,6 +498,26 @@ const styles = `
       transition: none !important;
     }
   }
+
+
+/* Daldongne hero height reduction 25 percent v2 */
+
+  @media (min-width: 821px) {
+    .reference-hero {
+      padding-top: 27px !important;
+      padding-bottom: 27px !important;
+    }
+
+    .reference-main-image {
+      aspect-ratio: 2 / 1 !important;
+      margin-bottom: 34px !important;
+    }
+
+    .reference-main-image > img {
+      object-fit: cover !important;
+      object-position: center top !important;
+    }
+  }
 `;
 
 export default function HomePage() {
