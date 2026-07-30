@@ -2645,3 +2645,144 @@ main samp {
     background-size: 46px 46px;
   }
 }
+
+/* Daldongne global bold text v1 */
+
+/* 전체 페이지 기본 글자 */
+html,
+body {
+  color: #35251d;
+  font-weight: 700;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 일반 본문 */
+body p,
+body span,
+body small,
+body label,
+body li,
+body dt,
+body dd,
+body td,
+body th,
+body legend,
+body figcaption,
+body blockquote,
+body address,
+body time {
+  font-weight: 700;
+}
+
+/* 제목과 강조 글자 */
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6,
+body strong,
+body b {
+  font-weight: 900;
+}
+
+/* 메뉴·버튼·링크 */
+body a,
+body button,
+body [role="button"],
+body input[type="button"],
+body input[type="submit"],
+body input[type="reset"],
+body summary {
+  font-weight: 800;
+}
+
+/* 입력창 */
+body input,
+body textarea,
+body select,
+body option {
+  color: #35251d;
+  font-weight: 700;
+}
+
+body input::placeholder,
+body textarea::placeholder {
+  color: #77675e;
+  font-weight: 700;
+  opacity: 1;
+}
+
+/* 설명문과 보조 문구 */
+body [class*="description"],
+body [class*="subtitle"],
+body [class*="summary"],
+body [class*="caption"],
+body [class*="helper"],
+body [class*="hint"],
+body [class*="note"],
+body [class*="desc"] {
+  font-weight: 700;
+}
+
+/* 헤더·메뉴·푸터 */
+header,
+header a,
+header button,
+nav,
+nav a,
+nav button,
+footer,
+footer a,
+aside,
+aside a,
+aside button {
+  font-weight: 800;
+}
+
+/* 표와 관리자 화면 */
+table,
+table td {
+  font-weight: 700;
+}
+
+table th {
+  font-weight: 900;
+}
+
+/* 손글씨형 제목 */
+.storybook-title,
+.storybook-section-title,
+.storybook-recommend-title,
+.storybook-review-title,
+.about-hand-title,
+.about-process-heading,
+.about-section-title,
+.about-cta-title,
+.process-hand-title,
+.process-section-title,
+.process-recommend-heading,
+.process-cta-title,
+.process-strip-title,
+.guide-hand-title,
+.guide-section-title,
+.guide-review-heading,
+.guide-cta-title,
+.apply-storybook-title,
+.trial-strip-title,
+.trial-cta-title {
+  color: #35251d !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 0.35px currentColor;
+}
+
+/* 비활성화 글자 */
+body button:disabled,
+body input:disabled,
+body select:disabled,
+body textarea:disabled,
+body [aria-disabled="true"] {
+  opacity: 0.72;
+}
