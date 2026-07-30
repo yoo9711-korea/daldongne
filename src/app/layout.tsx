@@ -231,16 +231,143 @@ export default async function RootLayout({
 </div>
             </Link>
 
-            <nav aria-label="상단 메뉴" style={navStyle}>
-              <Link href="/" style={linkStyle}>
+            <nav
+              aria-label="상단 메뉴"
+              style={{
+                ...navStyle,
+                gap: 8,
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Link
+                href="/"
+                style={{
+                  ...linkStyle,
+                  minHeight: 38,
+                  padding: '0 12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid #ead8cd',
+                  borderRadius: 999,
+                  background: '#fffaf5',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 홈
               </Link>
 
-              <Link href="/pricing" style={linkStyle}>
+              <Link
+                href="/about"
+                style={{
+                  ...linkStyle,
+                  minHeight: 38,
+                  padding: '0 12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid #ead8cd',
+                  borderRadius: 999,
+                  background: '#fffaf5',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                스토리 소개
+              </Link>
+
+              <Link
+                href="/process"
+                style={{
+                  ...linkStyle,
+                  minHeight: 38,
+                  padding: '0 12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid #ead8cd',
+                  borderRadius: 999,
+                  background: '#fffaf5',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                제작과정
+              </Link>
+
+              <Link
+                href="/guide"
+                style={{
+                  ...linkStyle,
+                  minHeight: 38,
+                  padding: '0 12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid #ead8cd',
+                  borderRadius: 999,
+                  background: '#fffaf5',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                이용안내
+              </Link>
+
+              <Link
+                href="/reviews"
+                style={{
+                  ...linkStyle,
+                  minHeight: 38,
+                  padding: '0 12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid #ead8cd',
+                  borderRadius: 999,
+                  background: '#fffaf5',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                이용후기
+              </Link>
+
+              <Link
+                href="/apply"
+                style={{
+                  ...linkStyle,
+                  minHeight: 38,
+                  padding: '0 12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid #ead8cd',
+                  borderRadius: 999,
+                  background: '#fffaf5',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                문의하기
+              </Link>
+
+              <Link
+                href="/pricing"
+                style={{
+                  ...linkStyle,
+                  minHeight: 38,
+                  padding: '0 12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid #ead8cd',
+                  borderRadius: 999,
+                  background: '#fffaf5',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 상품안내
               </Link>
 
-                {isLoggedIn ? (
+              {isLoggedIn ? (
                 <>
                   {isAdmin ? (
                     <Link href="/admin" style={buttonStyle}>
