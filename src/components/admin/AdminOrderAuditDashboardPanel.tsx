@@ -208,7 +208,7 @@ const auditDashboardStyles = `
   .admin-audit-dashboard-heading p {
     margin: 0;
     color: #df6550;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     letter-spacing: .09em;
   }
@@ -226,7 +226,7 @@ const auditDashboardStyles = `
     border: 1px solid #d6b2a3;
     border-radius: 9px;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -286,14 +286,14 @@ const auditDashboardStyles = `
   }
 
   .admin-audit-dashboard-list strong {
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-audit-dashboard-list span,
   .admin-audit-dashboard-list small {
     margin-top: 4px;
     color: #927a70;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-audit-dashboard-list small {
@@ -307,7 +307,7 @@ const auditDashboardStyles = `
     border-radius: 13px;
     color: #947d72;
     background: #fffaf7;
-    font-size: 9px;
+    font-size: 10.8px;
     text-align: center;
   }
 

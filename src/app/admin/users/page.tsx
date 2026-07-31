@@ -1548,7 +1548,7 @@ const adminUsersStyles = `
   .admin-users-hero p {
     margin: 0;
     color: #e56852;
-    font-size: 11px;
+    font-size: 13.2px;
     font-weight: 900;
     letter-spacing: 0.08em;
   }
@@ -1571,7 +1571,7 @@ const adminUsersStyles = `
     max-width: 720px;
     margin-top: 10px;
     color: #76635a;
-    font-size: 13px;
+    font-size: 15.6px;
     line-height: 1.78;
   }
 
@@ -1593,7 +1593,7 @@ const adminUsersStyles = `
     border-radius: 12px;
     color: #755247;
     background: #ffffff;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
   }
 
@@ -1703,7 +1703,7 @@ const adminUsersStyles = `
 
   .admin-users-insight span {
     color: #846f65;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-users-insight strong {
@@ -1714,13 +1714,13 @@ const adminUsersStyles = `
   .admin-users-insight small {
     margin-left: 3px;
     color: #8a756a;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-users-insight > p {
     margin: 0;
     color: #7a675e;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.65;
   }
 
@@ -1755,7 +1755,7 @@ const adminUsersStyles = `
     display: block;
     margin-bottom: 6px;
     color: #6d584e;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1785,7 +1785,7 @@ const adminUsersStyles = `
     color: #49362d;
     background: #fffdfb;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-users-search-form input {
@@ -1808,7 +1808,7 @@ const adminUsersStyles = `
     border-radius: 11px;
     color: #765247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     white-space: nowrap;
     cursor: pointer;
@@ -1848,7 +1848,7 @@ const adminUsersStyles = `
     border-radius: 10px;
     color: #72594e;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1874,7 +1874,7 @@ const adminUsersStyles = `
     color: inherit;
     background:
       rgba(120, 82, 64, 0.1);
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-users-list-head {
@@ -1888,7 +1888,7 @@ const adminUsersStyles = `
   .admin-users-list-head p {
     margin: 0;
     color: #e56852;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     letter-spacing: 0.07em;
   }
@@ -1908,7 +1908,7 @@ const adminUsersStyles = `
     display: block;
     margin-top: 5px;
     color: #7a675e;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-users-list-head > a {
@@ -1922,7 +1922,7 @@ const adminUsersStyles = `
     border-radius: 11px;
     color: #755247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -1948,7 +1948,7 @@ const adminUsersStyles = `
   .admin-users-table-wrap th {
     padding: 12px 13px;
     color: #7d695f;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     text-align: left;
     white-space: nowrap;
@@ -1987,7 +1987,7 @@ const adminUsersStyles = `
     display: grid;
     place-items: center;
     color: #9a6f60;
-    font-size: 13px;
+    font-size: 15.6px;
     font-weight: 900;
   }
 
@@ -2002,7 +2002,7 @@ const adminUsersStyles = `
 
   .admin-user-identity strong {
     overflow: hidden;
-    font-size: 10px;
+    font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -2010,14 +2010,14 @@ const adminUsersStyles = `
   .admin-user-identity span {
     margin-top: 3px;
     color: #d35e49;
-    font-size: 6px;
+    font-size: 7.2px;
     font-weight: 900;
   }
 
   .admin-users-email-cell {
     max-width: 230px;
     color: #78645a;
-    font-size: 8px;
+    font-size: 9.6px;
     word-break: break-all;
   }
 
@@ -2032,13 +2032,13 @@ const adminUsersStyles = `
   }
 
   .admin-users-activity-value strong {
-    font-size: 11px;
+    font-size: 13.2px;
   }
 
   .admin-users-activity-value span {
     margin-top: 2px;
     color: #90796e;
-    font-size: 6px;
+    font-size: 7.2px;
   }
 
   .admin-users-role-badge {
@@ -2049,7 +2049,7 @@ const adminUsersStyles = `
     border-radius: 999px;
     color: #76665e;
     background: #eee9e5;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2061,7 +2061,7 @@ const adminUsersStyles = `
 
   .admin-users-date-cell {
     color: #8a756a;
-    font-size: 7px;
+    font-size: 8.4px;
     white-space: nowrap;
   }
 
@@ -2075,7 +2075,7 @@ const adminUsersStyles = `
     color: #765247;
     background: #ffffff;
     font: inherit;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     white-space: nowrap;
     cursor: pointer;
@@ -2126,7 +2126,7 @@ const adminUsersStyles = `
     border-radius: 10px;
     color: #755247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -2169,7 +2169,7 @@ const adminUsersStyles = `
   .admin-users-empty p {
     margin: 5px 0 0;
     color: #806b61;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-users-empty a {
@@ -2186,7 +2186,7 @@ const adminUsersStyles = `
         #ff7664,
         #ed5f4f
       );
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -2269,7 +2269,7 @@ const adminUsersStyles = `
     .admin-users-mobile-email {
       margin: 11px 0 0;
       color: #78645a;
-      font-size: 8px;
+      font-size: 9.6px;
       word-break: break-all;
     }
 
@@ -2305,13 +2305,13 @@ const adminUsersStyles = `
 
     .admin-users-mobile-info span {
       color: #8a756a;
-      font-size: 6px;
+      font-size: 7.2px;
     }
 
     .admin-users-mobile-info strong {
       margin-top: 4px;
       overflow: hidden;
-      font-size: 9px;
+      font-size: 10.8px;
       text-overflow: ellipsis;
       white-space: nowrap;
     }

@@ -353,7 +353,7 @@ const styles = `
   .manual-print-address > div:first-child p {
     margin: 0;
     color: #c2644e;
-    font-size: 12px;
+    font-size: 14.4px;
     font-weight: 900;
     letter-spacing: 0.14em;
   }
@@ -379,7 +379,7 @@ const styles = `
     border: 1px solid #dec8bd;
     border-radius: 11px;
     background: #fff;
-    font-size: 13px;
+    font-size: 15.6px;
     font-weight: 800;
     text-decoration: none;
   }

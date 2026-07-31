@@ -492,7 +492,7 @@ const adminNoteStyles = `
   > div > span {
     display: block;
     color: #d3624e;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     letter-spacing: 0.1em;
   }
@@ -500,14 +500,14 @@ const adminNoteStyles = `
   .admin-note-title-area h3 {
     margin: 4px 0 0;
     color: #4f362d;
-    font-size: 13px;
+    font-size: 15.6px;
     letter-spacing: -0.035em;
   }
 
   .admin-note-title-area p {
     margin: 4px 0 0;
     color: #92796d;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
   }
 
@@ -525,7 +525,7 @@ const adminNoteStyles = `
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -541,7 +541,7 @@ const adminNoteStyles = `
 
   .admin-note-meta small {
     color: #a08b80;
-    font-size: 6px;
+    font-size: 7.2px;
   }
 
   .admin-note-field {
@@ -553,7 +553,7 @@ const adminNoteStyles = `
     display: block;
     margin-bottom: 6px;
     color: #6b5146;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -568,7 +568,7 @@ const adminNoteStyles = `
     color: #3f2d26;
     background: #ffffff;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.75;
     resize: vertical;
     outline: none;
@@ -604,12 +604,12 @@ const adminNoteStyles = `
     align-items: center;
     gap: 6px;
     color: #a08b80;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-note-count strong {
     color: #74594e;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-note-actions {
@@ -628,7 +628,7 @@ const adminNoteStyles = `
     gap: 6px;
     border-radius: 10px;
     font: inherit;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     cursor: pointer;
     transition:
@@ -735,7 +735,7 @@ const adminNoteStyles = `
     border-radius: 50%;
     color: #ffffff;
     background: #57936a;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -746,7 +746,7 @@ const adminNoteStyles = `
 
   .admin-note-feedback p {
     margin: 1px 0 0;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 800;
     line-height: 1.7;
   }

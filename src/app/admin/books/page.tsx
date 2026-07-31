@@ -1881,7 +1881,7 @@ const adminBooksStyles = `
   .admin-books-hero p {
     margin: 0;
     color: #e56852;
-    font-size: 11px;
+    font-size: 13.2px;
     font-weight: 900;
     letter-spacing: 0.08em;
   }
@@ -1902,7 +1902,7 @@ const adminBooksStyles = `
     display: block;
     margin-top: 10px;
     color: #76635a;
-    font-size: 13px;
+    font-size: 15.6px;
     line-height: 1.75;
   }
 
@@ -1925,7 +1925,7 @@ const adminBooksStyles = `
     border-radius: 12px;
     color: #755247;
     background: #ffffff;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
   }
 
@@ -2034,7 +2034,7 @@ const adminBooksStyles = `
     display: block;
     margin-bottom: 6px;
     color: #6d584e;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2064,7 +2064,7 @@ const adminBooksStyles = `
     color: #49362d;
     background: #fffdfb;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-books-search input {
@@ -2087,7 +2087,7 @@ const adminBooksStyles = `
     border-radius: 11px;
     color: #765247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     white-space: nowrap;
     cursor: pointer;
@@ -2115,7 +2115,7 @@ const adminBooksStyles = `
   .admin-books-quick-filters > p {
     margin: 0;
     color: #6d584e;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -2138,7 +2138,7 @@ const adminBooksStyles = `
     border-radius: 10px;
     color: #72594e;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -2164,7 +2164,7 @@ const adminBooksStyles = `
     color: inherit;
     background:
       rgba(120, 82, 64, 0.09);
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-books-type-overview {
@@ -2218,7 +2218,7 @@ const adminBooksStyles = `
   .admin-books-list-head p {
     margin: 0;
     color: #e56852;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     letter-spacing: 0.07em;
   }
@@ -2238,7 +2238,7 @@ const adminBooksStyles = `
     display: block;
     margin-top: 5px;
     color: #7a675e;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-books-list-head > a {
@@ -2252,7 +2252,7 @@ const adminBooksStyles = `
     border-radius: 11px;
     color: #755247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -2304,7 +2304,7 @@ const adminBooksStyles = `
 
   .admin-book-number span {
     color: #9a7566;
-    font-size: 6px;
+    font-size: 7.2px;
   }
 
   .admin-book-number strong {
@@ -2341,7 +2341,7 @@ const adminBooksStyles = `
     margin: 3px 0 0;
     overflow: hidden;
     color: #79655c;
-    font-size: 8px;
+    font-size: 9.6px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -2356,7 +2356,7 @@ const adminBooksStyles = `
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -2421,7 +2421,7 @@ const adminBooksStyles = `
     border-radius: 9px;
     color: #755247;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2453,14 +2453,14 @@ const adminBooksStyles = `
 
   .admin-book-owner span {
     color: #8b766c;
-    font-size: 6px;
+    font-size: 7.2px;
   }
 
   .admin-book-owner strong {
     margin-top: 4px;
     overflow: hidden;
     color: #4a352c;
-    font-size: 9px;
+    font-size: 10.8px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -2469,7 +2469,7 @@ const adminBooksStyles = `
     margin-top: 2px;
     overflow: hidden;
     color: #8b766c;
-    font-size: 7px;
+    font-size: 8.4px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -2554,20 +2554,20 @@ const adminBooksStyles = `
   .admin-book-request > div:first-child > p {
     margin: 0;
     color: #e56852;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
   .admin-book-request h4 {
     margin: 3px 0 0;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-book-request > div:first-child > span {
     display: block;
     margin-top: 3px;
     color: #7c685e;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-book-request-contact {
@@ -2575,7 +2575,7 @@ const adminBooksStyles = `
     display: grid;
     gap: 3px;
     color: #765f55;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-book-request-contact span {
@@ -2608,14 +2608,14 @@ const adminBooksStyles = `
   .admin-book-order > div:first-child > span {
     overflow: hidden;
     color: #7a665d;
-    font-size: 7px;
+    font-size: 8.4px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .admin-book-order strong {
     margin-top: 3px;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-book-order > div:last-child {
@@ -2644,7 +2644,7 @@ const adminBooksStyles = `
     margin-top: 3px;
     overflow: hidden;
     color: #9a8175;
-    font-size: 6px;
+    font-size: 7.2px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -2654,7 +2654,7 @@ const adminBooksStyles = `
     border-radius: 9px;
     color: #8a7469;
     background: #ffffff;
-    font-size: 7px;
+    font-size: 8.4px;
     line-height: 1.5;
   }
 
@@ -2672,7 +2672,7 @@ const adminBooksStyles = `
         #ff7664,
         #ed5f4f
       );
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2689,7 +2689,7 @@ const adminBooksStyles = `
     border-radius: 11px;
     color: #806b61;
     background: #fffaf7;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-book-no-consultation a {
@@ -2703,7 +2703,7 @@ const adminBooksStyles = `
     border-radius: 8px;
     color: #755247;
     background: #ffffff;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -2733,7 +2733,7 @@ const adminBooksStyles = `
     border-radius: 10px;
     color: #755247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -2784,7 +2784,7 @@ const adminBooksStyles = `
   .admin-books-empty p {
     margin: 5px 0 0;
     color: #806b61;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-books-empty a {
@@ -2801,7 +2801,7 @@ const adminBooksStyles = `
         #ff7664,
         #ed5f4f
       );
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 

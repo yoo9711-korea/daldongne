@@ -337,7 +337,7 @@ export default function AdminOrderEmailAuditFilters({
             display: block;
             margin-bottom: 6px;
             color: #765449;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
           }
 
@@ -350,7 +350,7 @@ export default function AdminOrderEmailAuditFilters({
             color: #4c382f;
             background: #ffffff;
             font: inherit;
-            font-size: 9px;
+            font-size: 10.8px;
             outline: none;
             cursor: pointer;
           }
@@ -370,7 +370,7 @@ export default function AdminOrderEmailAuditFilters({
             color: #754c3e;
             background: #ffffff;
             font: inherit;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
             white-space: nowrap;
             cursor: pointer;
@@ -394,7 +394,7 @@ export default function AdminOrderEmailAuditFilters({
             flex-wrap: wrap;
             gap: 5px 9px;
             color: #927a70;
-            font-size: 8px;
+            font-size: 9.6px;
           }
 
           .admin-order-email-audit-filter-result strong {
@@ -408,7 +408,7 @@ export default function AdminOrderEmailAuditFilters({
             border-radius: 10px;
             color: #806329;
             background: #fff8e6;
-            font-size: 8px;
+            font-size: 9.6px;
             line-height: 1.6;
             text-align: center;
           }
@@ -422,7 +422,7 @@ export default function AdminOrderEmailAuditFilters({
             color: #754c3e;
             background: #ffffff;
             font: inherit;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
             cursor: pointer;
           }
@@ -436,7 +436,7 @@ export default function AdminOrderEmailAuditFilters({
           .admin-order-email-audit-load-complete {
             margin: 12px 0 0;
             color: #927a70;
-            font-size: 7px;
+            font-size: 8.4px;
             line-height: 1.6;
             text-align: center;
           }

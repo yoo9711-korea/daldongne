@@ -575,7 +575,7 @@ const retryStyles = `
   header p {
     margin: 0;
     color: #a15b52;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     letter-spacing: 0.11em;
   }
@@ -600,14 +600,14 @@ const retryStyles = `
     border-radius: 999px;
     color: #934d45;
     background: #ffe2de;
-    font-size: 8px;
+    font-size: 9.6px;
     white-space: nowrap;
   }
 
   .admin-ai-retry-description {
     margin: 10px 0 0;
     color: #826d69;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.7;
   }
 
@@ -621,7 +621,7 @@ const retryStyles = `
 
   .admin-ai-retry-reason strong {
     color: #874d46;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-ai-retry-reason p {
@@ -629,7 +629,7 @@ const retryStyles = `
     margin: 6px 0 0;
     overflow: auto;
     color: #7e6865;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.7;
     white-space: pre-line;
   }
@@ -657,7 +657,7 @@ const retryStyles = `
         0.18
       );
     font: inherit;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
     cursor: pointer;
   }
@@ -673,7 +673,7 @@ const retryStyles = `
     margin: 10px 0 0;
     padding: 10px 12px;
     border-radius: 10px;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.7;
     white-space: pre-line;
   }

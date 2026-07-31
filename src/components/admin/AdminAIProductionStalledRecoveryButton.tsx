@@ -558,7 +558,7 @@ const styles = `
   header p {
     margin: 0;
     color: #99702e;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     letter-spacing: 0.11em;
   }
@@ -583,7 +583,7 @@ const styles = `
     border-radius: 999px;
     color: #8a611e;
     background: #ffedbd;
-    font-size: 8px;
+    font-size: 9.6px;
     white-space: nowrap;
   }
 
@@ -601,19 +601,19 @@ const styles = `
 
   .admin-ai-stalled-recovery-step span {
     color: #9b8565;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-ai-stalled-recovery-step strong {
     color: #795a2b;
-    font-size: 9px;
+    font-size: 10.8px;
     text-align: right;
   }
 
   .admin-ai-stalled-recovery-description {
     margin: 11px 0 0;
     color: #827560;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.7;
   }
 
@@ -640,7 +640,7 @@ const styles = `
         0.18
       );
     font: inherit;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
     cursor: pointer;
   }
@@ -656,7 +656,7 @@ const styles = `
     margin: 10px 0 0;
     padding: 10px 12px;
     border-radius: 10px;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.7;
     white-space: pre-line;
   }

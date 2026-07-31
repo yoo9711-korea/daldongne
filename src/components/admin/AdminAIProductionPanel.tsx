@@ -1207,7 +1207,7 @@ const adminAIProductionStyles = `
   > header p {
     margin: 0;
     color: #7a5596;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     letter-spacing: 0.1em;
   }
@@ -1229,7 +1229,7 @@ const adminAIProductionStyles = `
     max-width: 590px;
     margin-top: 7px;
     color: #89727f;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.7;
   }
 
@@ -1243,7 +1243,7 @@ const adminAIProductionStyles = `
     border-radius: 999px;
     color: #675173;
     background: #eee5f4;
-    font-size: 9px;
+    font-size: 10.8px;
     white-space: nowrap;
   }
 
@@ -1301,14 +1301,14 @@ const adminAIProductionStyles = `
 .admin-ai-production-approval-guide strong {
   display: block;
   color: #7a5517;
-  font-size: 13px;
+  font-size: 15.6px;
   font-weight: 900;
 }
 
 .admin-ai-production-approval-guide p {
   margin: 7px 0 0;
   color: #7f6b43;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.8;
 }
 
@@ -1320,7 +1320,7 @@ const adminAIProductionStyles = `
   border-radius: 999px;
   color: #815c1c;
   background: #fff0c5;
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 900;
   white-space: nowrap;
 }
@@ -1396,7 +1396,7 @@ const adminAIProductionStyles = `
       space-between;
     gap: 12px;
     color: #7e6875;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-ai-production-progress-track {
@@ -1450,7 +1450,7 @@ const adminAIProductionStyles = `
     border-radius: 50%;
     color: #998993;
     background: #eee9ec;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1459,7 +1459,7 @@ const adminAIProductionStyles = `
     display: block;
     margin-top: 6px;
     color: #9a8892;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-ai-production-progress
@@ -1549,7 +1549,7 @@ const adminAIProductionStyles = `
   strong,
   .admin-ai-production-admin-note
   strong {
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-ai-production-human-review
@@ -1557,7 +1557,7 @@ const adminAIProductionStyles = `
   .admin-ai-production-admin-note
   p {
     margin: 6px 0 0;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.7;
   }
 
@@ -1583,19 +1583,19 @@ const adminAIProductionStyles = `
   .admin-ai-production-section-heading
   span {
     color: #85629a;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
   .admin-ai-production-section-heading
   strong {
     margin-top: 3px;
-    font-size: 13px;
+    font-size: 15.6px;
   }
 
   .admin-ai-production-section-heading
   em {
-    font-size: 9px;
+    font-size: 10.8px;
     font-style: normal;
   }
 
@@ -1635,7 +1635,7 @@ const adminAIProductionStyles = `
   article > div strong,
   .admin-ai-production-issue-list
   article > div span {
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-ai-production-issue-list
@@ -1646,7 +1646,7 @@ const adminAIProductionStyles = `
   .admin-ai-production-issue-list
   p {
     margin: 8px 0 0;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.65;
   }
 
@@ -1657,7 +1657,7 @@ const adminAIProductionStyles = `
     display: block;
     margin-top: 5px;
     color: #8c7882;
-    font-size: 8px;
+    font-size: 9.6px;
     font-style: normal;
     line-height: 1.55;
   }
@@ -1670,14 +1670,14 @@ const adminAIProductionStyles = `
     border-radius: 14px;
     color: #897580;
     background: #fffaff;
-    font-size: 9px;
+    font-size: 10.8px;
     text-align: center;
   }
 
   .admin-ai-production-empty
   strong {
     display: block;
-    font-size: 12px;
+    font-size: 14.4px;
   }
 
   .admin-ai-production-empty
@@ -1716,13 +1716,13 @@ const adminAIProductionStyles = `
   .admin-ai-production-dates
   span {
     color: #9b8791;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-ai-production-dates
   strong {
     margin-top: 4px;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-ai-production-pdf-link {
@@ -1734,7 +1734,7 @@ const adminAIProductionStyles = `
     border-radius: 11px;
     color: #ffffff;
     background: #755294;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     text-decoration: none;
   }
@@ -1749,7 +1749,7 @@ const adminAIProductionStyles = `
   > p {
     margin: 9px 0 0;
     color: #95828c;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.65;
   }
 

@@ -392,7 +392,7 @@ export default function AdminAIProductionDecisionPanel({
         header p {
           margin: 0;
           color: #a6752e;
-          font-size: 8px;
+          font-size: 9.6px;
           font-weight: 900;
           letter-spacing:
             0.11em;
@@ -421,7 +421,7 @@ export default function AdminAIProductionDecisionPanel({
           color: #8a621b;
           background:
             #fff0cb;
-          font-size: 8px;
+          font-size: 9.6px;
           white-space:
             nowrap;
         }
@@ -430,7 +430,7 @@ export default function AdminAIProductionDecisionPanel({
           margin:
             10px 0 0;
           color: #806e5e;
-          font-size: 9px;
+          font-size: 10.8px;
           line-height: 1.7;
         }
 
@@ -442,7 +442,7 @@ export default function AdminAIProductionDecisionPanel({
 
         label > span {
           color: #654f3d;
-          font-size: 9px;
+          font-size: 10.8px;
           font-weight: 900;
         }
 
@@ -455,7 +455,7 @@ export default function AdminAIProductionDecisionPanel({
           color: #4c3a2d;
           background: #ffffff;
           font: inherit;
-          font-size: 9px;
+          font-size: 10.8px;
           line-height: 1.7;
           resize: vertical;
           outline: none;
@@ -483,7 +483,7 @@ export default function AdminAIProductionDecisionPanel({
 
         label small {
           color: #9b897a;
-          font-size: 8px;
+          font-size: 9.6px;
           text-align: right;
         }
 
@@ -508,7 +508,7 @@ export default function AdminAIProductionDecisionPanel({
 
         .admin-ai-final-pdf-check span {
           color: #755b32;
-          font-size: 9px;
+          font-size: 10.8px;
           font-weight: 900;
           line-height: 1.7;
         }
@@ -530,7 +530,7 @@ export default function AdminAIProductionDecisionPanel({
           border: 0;
           border-radius: 11px;
           font: inherit;
-          font-size: 9px;
+          font-size: 10.8px;
           font-weight: 900;
           cursor: pointer;
           transition:
@@ -584,7 +584,7 @@ export default function AdminAIProductionDecisionPanel({
           margin: 10px 0 0;
           padding: 10px 12px;
           border-radius: 10px;
-          font-size: 9px;
+          font-size: 10.8px;
           line-height: 1.7;
           white-space:
             pre-line;

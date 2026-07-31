@@ -926,7 +926,7 @@ const adminAuditStyles = `
   .admin-order-audit-list-heading p {
     margin: 0;
     color: #df6550;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     letter-spacing: 0.1em;
   }
@@ -942,7 +942,7 @@ const adminAuditStyles = `
     display: block;
     margin-top: 9px;
     color: #806b62;
-    font-size: 11px;
+    font-size: 13.2px;
     line-height: 1.7;
   }
 
@@ -960,7 +960,7 @@ const adminAuditStyles = `
     border: 1px solid #d6b2a3;
     border-radius: 10px;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1016,7 +1016,7 @@ const adminAuditStyles = `
     display: block;
     margin-bottom: 6px;
     color: #775e53;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1029,7 +1029,7 @@ const adminAuditStyles = `
     border-radius: 10px;
     background: #fffdfa;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-order-audit-filter form > div {
@@ -1048,7 +1048,7 @@ const adminAuditStyles = `
     border-radius: 10px;
     background: #ffffff;
     font: inherit;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     cursor: pointer;
   }
@@ -1072,7 +1072,7 @@ const adminAuditStyles = `
 
   .admin-order-audit-list-heading > span {
     color: #947c71;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-order-audit-list {
@@ -1111,7 +1111,7 @@ const adminAuditStyles = `
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    font-size: 7px;
+    font-size: 8.4px;
     font-style: normal;
     font-weight: 900;
   }
@@ -1138,7 +1138,7 @@ const adminAuditStyles = `
 
   .admin-order-audit-card-head time {
     color: #9a8479;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-order-audit-order {
@@ -1163,37 +1163,37 @@ const adminAuditStyles = `
 
   .admin-order-audit-order a {
     color: #b95647;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
   .admin-order-audit-order strong {
     margin-top: 4px;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-order-audit-order code {
     margin-top: 4px;
     color: #8e7569;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-order-audit-order > span {
     flex: 0 0 auto;
-    font-size: 13px;
+    font-size: 15.6px;
     font-weight: 900;
   }
 
   .admin-order-audit-list h3 {
     margin: 13px 0 0;
-    font-size: 13px;
+    font-size: 15.6px;
     line-height: 1.65;
   }
 
   .admin-order-audit-actor {
     margin: 6px 0 0;
     color: #8c756a;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-order-audit-fields {
@@ -1208,7 +1208,7 @@ const adminAuditStyles = `
     border-radius: 999px;
     color: #6e584f;
     background: #eee4de;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -1238,7 +1238,7 @@ const adminAuditStyles = `
   }
 
   .admin-order-audit-json-grid section > strong {
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-order-audit-json-grid pre {
@@ -1249,7 +1249,7 @@ const adminAuditStyles = `
     border-radius: 9px;
     color: #46362f;
     background: #f5f0ed;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
@@ -1282,7 +1282,7 @@ const adminAuditStyles = `
     border: 1px solid #d8b9ac;
     border-radius: 9px;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1293,7 +1293,7 @@ const adminAuditStyles = `
 
   .admin-order-audit-pagination span {
     color: #8b7469;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 

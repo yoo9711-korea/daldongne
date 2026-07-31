@@ -1046,7 +1046,7 @@ export default function AdminOrderEmailAuditClient({
 
           .admin-order-email-audit-quick > span {
             color: #765449;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
             white-space: nowrap;
           }
@@ -1067,7 +1067,7 @@ export default function AdminOrderEmailAuditClient({
             color: #765449;
             background: #ffffff;
             font: inherit;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
             cursor: pointer;
           }
@@ -1100,7 +1100,7 @@ export default function AdminOrderEmailAuditClient({
             display: block;
             margin-bottom: 6px;
             color: #765449;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
           }
 
@@ -1114,7 +1114,7 @@ export default function AdminOrderEmailAuditClient({
             color: #4c382f;
             background: #ffffff;
             font: inherit;
-            font-size: 9px;
+            font-size: 10.8px;
             outline: none;
           }
 
@@ -1132,7 +1132,7 @@ export default function AdminOrderEmailAuditClient({
             color: #754c3e;
             background: #ffffff;
             font: inherit;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
             white-space: nowrap;
             cursor: pointer;
@@ -1171,7 +1171,7 @@ export default function AdminOrderEmailAuditClient({
             gap: 9px;
             flex-wrap: wrap;
             color: #927a70;
-            font-size: 8px;
+            font-size: 9.6px;
           }
 
           .admin-order-email-audit-filter-result strong {
@@ -1210,7 +1210,7 @@ export default function AdminOrderEmailAuditClient({
             display: inline-flex;
             align-items: center;
             border-radius: 999px;
-            font-size: 7px;
+            font-size: 8.4px;
             font-weight: 900;
           }
 
@@ -1242,14 +1242,14 @@ export default function AdminOrderEmailAuditClient({
 
           .admin-order-email-audit-top time {
             color: #9c8780;
-            font-size: 7px;
+            font-size: 8.4px;
             white-space: nowrap;
           }
 
           .admin-order-email-audit-list h3 {
             margin: 12px 0;
             color: #4c382f;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.6;
           }
 
@@ -1268,7 +1268,7 @@ export default function AdminOrderEmailAuditClient({
           .admin-order-email-audit-list dt,
           .admin-order-email-audit-list dd {
             margin: 0;
-            font-size: 8px;
+            font-size: 9.6px;
             line-height: 1.6;
           }
 
@@ -1293,7 +1293,7 @@ export default function AdminOrderEmailAuditClient({
             margin: 12px 0;
             padding: 14px;
             border-radius: 12px;
-            font-size: 8px;
+            font-size: 9.6px;
             line-height: 1.7;
             text-align: center;
           }
@@ -1336,7 +1336,7 @@ export default function AdminOrderEmailAuditClient({
             color: #754c3e;
             background: #ffffff;
             font: inherit;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
             cursor: pointer;
           }
@@ -1350,7 +1350,7 @@ export default function AdminOrderEmailAuditClient({
           .admin-order-email-audit-load-complete {
             margin: 13px 0 0;
             color: #927a70;
-            font-size: 7px;
+            font-size: 8.4px;
             text-align: center;
           }
 

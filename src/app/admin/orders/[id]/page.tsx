@@ -1000,7 +1000,7 @@ const adminOrderDetailStyles = `
   .admin-order-detail-panel-heading p {
     margin: 0;
     color: #df6550;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     letter-spacing: 0.09em;
   }
@@ -1021,7 +1021,7 @@ const adminOrderDetailStyles = `
     border-radius: 999px;
     color: #3e6388;
     background: #e8f2ff;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -1053,7 +1053,7 @@ const adminOrderDetailStyles = `
     display: block;
     margin-top: 7px;
     color: #806b62;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-order-detail-actions {
@@ -1072,7 +1072,7 @@ const adminOrderDetailStyles = `
     border-radius: 10px;
     color: #765449;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1080,7 +1080,7 @@ const adminOrderDetailStyles = `
     margin-top: 14px;
     padding: 13px 15px;
     border-radius: 12px;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 800;
   }
 
@@ -1197,14 +1197,14 @@ const adminOrderDetailStyles = `
 
   .admin-order-detail-data-box span {
     color: #947d72;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
   .admin-order-detail-data-box strong {
     margin-top: 5px;
     overflow-wrap: anywhere;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.65;
   }
 
@@ -1232,7 +1232,7 @@ const adminOrderDetailStyles = `
   .admin-order-detail-action-box p {
     margin: 0 0 11px;
     color: #7f6b62;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.7;
   }
 
@@ -1245,7 +1245,7 @@ const adminOrderDetailStyles = `
     display: block;
     margin-bottom: 5px;
     color: #7b6055;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -1259,7 +1259,7 @@ const adminOrderDetailStyles = `
     color: #4c382f;
     background: #ffffff;
     font: inherit;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
   }
 
@@ -1267,7 +1267,7 @@ const adminOrderDetailStyles = `
     display: block;
     margin-top: 9px;
     color: #997c72;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-order-detail-warning {
@@ -1277,7 +1277,7 @@ const adminOrderDetailStyles = `
     border-radius: 12px;
     color: #805c19;
     background: #fff8df;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.7;
   }
 

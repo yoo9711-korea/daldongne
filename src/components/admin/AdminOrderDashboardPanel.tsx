@@ -115,7 +115,7 @@ export default async function AdminOrderDashboardPanel() {
           .admin-order-dashboard-heading p {
             margin: 0;
             color: #df6550;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
             letter-spacing: 0.09em;
           }
@@ -134,7 +134,7 @@ export default async function AdminOrderDashboardPanel() {
             border-radius: 9px;
             color: #765449;
             background: #ffffff;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
           }
 
@@ -198,19 +198,19 @@ export default async function AdminOrderDashboardPanel() {
           }
 
           .admin-order-dashboard-item strong {
-            font-size: 9px;
+            font-size: 10.8px;
           }
 
           .admin-order-dashboard-item span {
             margin-top: 4px;
             color: #927a70;
-            font-size: 7px;
+            font-size: 8.4px;
           }
 
           .admin-order-dashboard-item em {
             flex: 0 0 auto;
             color: #c35948;
-            font-size: 8px;
+            font-size: 9.6px;
             font-style: normal;
             font-weight: 900;
           }
@@ -222,7 +222,7 @@ export default async function AdminOrderDashboardPanel() {
             border-radius: 13px;
             color: #947d72;
             background: #fffaf7;
-            font-size: 9px;
+            font-size: 10.8px;
             text-align: center;
           }
 

@@ -1753,7 +1753,7 @@ const adminHomeStyles = `
   .admin-home-hero-copy > p {
     margin: 0;
     color: #e56852;
-    font-size: 11px;
+    font-size: 13.2px;
     font-weight: 900;
     letter-spacing: 0.1em;
   }
@@ -1776,7 +1776,7 @@ const adminHomeStyles = `
     max-width: 720px;
     margin-top: 10px;
     color: #76635a;
-    font-size: 13px;
+    font-size: 15.6px;
     line-height: 1.78;
   }
 
@@ -1798,7 +1798,7 @@ const adminHomeStyles = `
     border-radius: 12px;
     color: #755247;
     background: #ffffff;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
   }
 
@@ -1824,7 +1824,7 @@ const adminHomeStyles = `
     color: inherit;
     background:
       rgba(255, 255, 255, 0.2);
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-home-hero-actions a:nth-child(2) small {
@@ -1888,7 +1888,7 @@ const adminHomeStyles = `
   .admin-home-priority-copy p {
     margin: 0;
     color: #3f7948;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     letter-spacing: 0.08em;
   }
@@ -1913,7 +1913,7 @@ const adminHomeStyles = `
     display: block;
     margin-top: 4px;
     color: #77645b;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.65;
   }
 
@@ -1934,7 +1934,7 @@ const adminHomeStyles = `
     border-radius: 9px;
     color: #755247;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2172,7 +2172,7 @@ const adminHomeStyles = `
 
   .admin-home-workflow-head a {
     color: #d2614b;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2219,7 +2219,7 @@ const adminHomeStyles = `
   .admin-home-workflow-items span {
     overflow: hidden;
     color: #7a675e;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 850;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2286,21 +2286,21 @@ const adminHomeStyles = `
   }
 
   .admin-home-quick-link strong {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-home-quick-link > div > span {
     margin-top: 4px;
     overflow: hidden;
     color: #7b685e;
-    font-size: 7px;
+    font-size: 8.4px;
     line-height: 1.55;
     text-overflow: ellipsis;
   }
 
   .admin-home-quick-link > em {
     color: #dc674f;
-    font-size: 12px;
+    font-size: 14.4px;
     font-style: normal;
     font-weight: 900;
   }
@@ -2366,14 +2366,14 @@ const adminHomeStyles = `
 
   .admin-home-list-badges small {
     color: #967e72;
-    font-size: 6px;
+    font-size: 7.2px;
   }
 
   .admin-home-list-item strong {
     display: block;
     margin-top: 6px;
     overflow: hidden;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.5;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2384,7 +2384,7 @@ const adminHomeStyles = `
     margin-top: 4px;
     overflow: hidden;
     color: #7c6960;
-    font-size: 7px;
+    font-size: 8.4px;
     line-height: 1.55;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2394,7 +2394,7 @@ const adminHomeStyles = `
   .admin-home-user-row > em {
     flex: 0 0 auto;
     color: #d4624c;
-    font-size: 7px;
+    font-size: 8.4px;
     font-style: normal;
     font-weight: 900;
     white-space: nowrap;
@@ -2410,7 +2410,7 @@ const adminHomeStyles = `
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    font-size: 6px;
+    font-size: 7.2px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2496,18 +2496,18 @@ const adminHomeStyles = `
   }
 
   .admin-home-user-row strong {
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-home-user-row > div > span {
     margin-top: 3px;
     color: #7c6960;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-home-user-row > small {
     color: #967e72;
-    font-size: 6px;
+    font-size: 7.2px;
     white-space: nowrap;
   }
 
@@ -2532,7 +2532,7 @@ const adminHomeStyles = `
   }
 
   .admin-home-empty span {
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.65;
   }
 
@@ -2660,3 +2660,5 @@ const adminHomeStyles = `
     }
   }
 `;
+
+// ADMIN_SMALL_TEXT_SCALE_120_EXCEPT_SUMMARY_V2

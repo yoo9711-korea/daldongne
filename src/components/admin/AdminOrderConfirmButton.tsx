@@ -67,7 +67,7 @@ export default function AdminOrderConfirmButton({
               #68478e
             );
             font: inherit;
-            font-size: 9px;
+            font-size: 10.8px;
             font-weight: 900;
             cursor: pointer;
             box-shadow:

@@ -520,7 +520,7 @@ const styles = `
   .manual-print-form-heading p {
     margin: 0;
     color: #c2644e;
-    font-size: 12px;
+    font-size: 14.4px;
     font-weight: 900;
     letter-spacing: 0.14em;
   }
@@ -534,7 +534,7 @@ const styles = `
     color: #8a4939;
     border-radius: 999px;
     background: #ffe8e0;
-    font-size: 12px;
+    font-size: 14.4px;
     font-weight: 900;
   }
 
@@ -555,14 +555,14 @@ const styles = `
   .manual-print-form-timeline span {
     display: block;
     color: #917c72;
-    font-size: 11px;
+    font-size: 13.2px;
     font-weight: 800;
   }
 
   .manual-print-form-timeline strong {
     margin-top: 5px;
     display: block;
-    font-size: 12px;
+    font-size: 14.4px;
   }
 
   .manual-print-form-panel fieldset {
@@ -588,7 +588,7 @@ const styles = `
 
   .manual-print-form-grid label > span {
     color: #746058;
-    font-size: 12px;
+    font-size: 14.4px;
     font-weight: 850;
   }
 
@@ -629,7 +629,7 @@ const styles = `
   .manual-print-checklist span {
     padding: 7px 10px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 13.2px;
     font-weight: 850;
   }
 
@@ -692,7 +692,7 @@ const styles = `
     margin: 17px 0 0;
     padding-left: 19px;
     color: #806d64;
-    font-size: 12px;
+    font-size: 14.4px;
     line-height: 1.8;
   }
 

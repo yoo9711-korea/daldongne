@@ -1462,19 +1462,19 @@ const productionStyles = `
 
   .admin-production-manager-empty span {
     color: #a16d57;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
   .admin-production-manager-empty strong {
     color: #5c453b;
-    font-size: 11px;
+    font-size: 13.2px;
   }
 
   .admin-production-manager-empty p {
     margin: 0;
     color: #88766d;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.55;
     word-break: keep-all;
   }
@@ -1502,20 +1502,20 @@ const productionStyles = `
 
   .admin-production-manager-heading > span {
     color: #8060aa;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     letter-spacing: 0.04em;
   }
 
   .admin-production-manager-heading strong {
-    font-size: 13px;
+    font-size: 15.6px;
     line-height: 1.4;
   }
 
   .admin-production-manager-heading small {
     overflow: hidden;
     color: #816f8e;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.5;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1537,7 +1537,7 @@ const productionStyles = `
     border-radius: 999px;
     color: #684b8c;
     background: #f1eaf8;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -1613,13 +1613,13 @@ const productionStyles = `
     border: 1px solid #d4c6df;
     border-radius: 50%;
     background: #ffffff;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
   .admin-production-manager-phases strong {
     overflow: hidden;
-    font-size: 7px;
+    font-size: 8.4px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -1686,7 +1686,7 @@ const productionStyles = `
         #9771c5,
         #704c9e
       );
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1698,13 +1698,13 @@ const productionStyles = `
 
   .admin-production-manager-group-heading strong {
     color: #513b61;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-production-manager-group-heading p {
     margin: 0;
     color: #8a7994;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.5;
     word-break: keep-all;
   }
@@ -1730,12 +1730,12 @@ const productionStyles = `
 
   .admin-production-manager-updated span {
     color: #967fa3;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-production-manager-updated strong {
     color: #654f73;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-production-manager-date-grid,
@@ -1775,13 +1775,13 @@ const productionStyles = `
 
   .admin-production-manager-field strong {
     color: #604b6b;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
   .admin-production-manager-field small {
     color: #a08eaa;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-production-manager input,
@@ -1796,7 +1796,7 @@ const productionStyles = `
     color: #4e3b58;
     background: #ffffff;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-production-manager textarea {
@@ -1822,7 +1822,7 @@ const productionStyles = `
 
   .admin-production-manager-alert p {
     margin: 0;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 800;
     line-height: 1.55;
   }
@@ -1850,7 +1850,7 @@ const productionStyles = `
 
   .admin-production-manager-footer > span {
     color: #8b7b94;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.45;
   }
 
@@ -1876,7 +1876,7 @@ const productionStyles = `
     gap: 6px;
     border-radius: 10px;
     font: inherit;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     cursor: pointer;
   }

@@ -748,7 +748,7 @@ const systemTestStyles = `
   .system-test-command p {
     margin: 0;
     color: #df6550;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
     letter-spacing: 0.11em;
   }
@@ -770,7 +770,7 @@ const systemTestStyles = `
     margin-top: 17px;
     display: block;
     color: #816e64;
-    font-size: 14px;
+    font-size: 16.8px;
     line-height: 1.8;
   }
 
@@ -801,7 +801,7 @@ const systemTestStyles = `
 
   .system-test-result span {
     margin-top: 6px;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .system-test-metrics {
@@ -874,7 +874,7 @@ const systemTestStyles = `
     margin-top: 7px;
     display: block;
     color: #8b756a;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .system-test-heading > a {
@@ -886,7 +886,7 @@ const systemTestStyles = `
     border: 1px solid #dec8bd;
     border-radius: 11px;
     color: #76564b;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -919,7 +919,7 @@ const systemTestStyles = `
   }
 
   .system-test-anomalies span {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 800;
   }
 
@@ -938,7 +938,7 @@ const systemTestStyles = `
 
   .system-test-status-grid strong small {
     margin-left: 3px;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .system-test-empty {
@@ -947,7 +947,7 @@ const systemTestStyles = `
     border-radius: 14px;
     color: #8b756a;
     background: #f8f3f0;
-    font-size: 11px;
+    font-size: 13.2px;
     text-align: center;
   }
 
@@ -985,7 +985,7 @@ const systemTestStyles = `
         #ed7a65,
         #d95c4c
       );
-    font-size: 14px;
+    font-size: 16.8px;
     font-weight: 900;
   }
 
@@ -1001,7 +1001,7 @@ const systemTestStyles = `
   .system-test-step-copy p {
     margin: 5px 0 0;
     color: #806d63;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.6;
   }
 
@@ -1009,7 +1009,7 @@ const systemTestStyles = `
     margin-top: 5px;
     display: block;
     color: #9a8277;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.6;
   }
 
@@ -1028,7 +1028,7 @@ const systemTestStyles = `
     border-radius: 10px;
     color: #76564b;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -1075,7 +1075,7 @@ const systemTestStyles = `
 
   .system-test-command code {
     color: #ffffff;
-    font-size: 12px;
+    font-size: 14.4px;
     font-weight: 800;
     white-space: nowrap;
   }

@@ -643,7 +643,7 @@ const statusPanelStyles = `
   .admin-status-eyebrow {
     display: block;
     color: #d3624e;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     letter-spacing: 0.1em;
   }
@@ -651,14 +651,14 @@ const statusPanelStyles = `
   .admin-status-panel h3 {
     margin: 5px 0 0;
     color: #4f362d;
-    font-size: 13px;
+    font-size: 15.6px;
     letter-spacing: -0.035em;
   }
 
   .admin-status-panel-header p {
     margin: 5px 0 0;
     color: #92796d;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.65;
   }
 
@@ -675,7 +675,7 @@ const statusPanelStyles = `
     border-radius: 999px;
     color: #5f453a;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -773,7 +773,7 @@ const statusPanelStyles = `
       2px solid #ded0c8;
     border-radius: 50%;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -796,7 +796,7 @@ const statusPanelStyles = `
 
   .admin-status-progress strong {
     overflow: hidden;
-    font-size: 7px;
+    font-size: 8.4px;
     line-height: 1.4;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -819,7 +819,7 @@ const statusPanelStyles = `
       rgba(126, 83, 63, 0.09);
     color: #87514a;
     background: #fff1ef;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     text-align: center;
   }
@@ -837,12 +837,12 @@ const statusPanelStyles = `
 
   .admin-status-action-heading strong {
     color: #574037;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-status-action-heading span {
     color: #9f887d;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-status-button-list {
@@ -870,7 +870,7 @@ const statusPanelStyles = `
         #6e382f
       );
     font: inherit;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     cursor: pointer;
     box-shadow:
@@ -925,20 +925,20 @@ const statusPanelStyles = `
 
   .admin-status-final-box strong {
     color: #665047;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-status-final-box span {
     margin-top: 4px;
     color: #9b867c;
-    font-size: 7px;
+    font-size: 8.4px;
     line-height: 1.6;
   }
 
   .admin-status-guide {
     margin: 10px 0 0;
     color: #9b867c;
-    font-size: 7px;
+    font-size: 8.4px;
     line-height: 1.65;
   }
 
@@ -971,7 +971,7 @@ const statusPanelStyles = `
     border-radius: 50%;
     color: #ffffff;
     background: #57936a;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -983,7 +983,7 @@ const statusPanelStyles = `
   .admin-status-feedback p {
     margin: 1px 0 0;
     white-space: pre-line;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 800;
     line-height: 1.7;
   }

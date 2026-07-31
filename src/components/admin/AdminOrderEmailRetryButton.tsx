@@ -371,7 +371,7 @@ export default function AdminOrderEmailRetryButton({
             display: block;
             margin-bottom: 6px;
             color: #765449;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
           }
 
@@ -384,7 +384,7 @@ export default function AdminOrderEmailRetryButton({
             color: #4c382f;
             background: #ffffff;
             font: inherit;
-            font-size: 9px;
+            font-size: 10.8px;
             outline: none;
           }
 
@@ -428,7 +428,7 @@ export default function AdminOrderEmailRetryButton({
           .admin-email-retry-default span,
           .admin-email-retry-default strong {
             overflow-wrap: anywhere;
-            font-size: 7px;
+            font-size: 8.4px;
           }
 
           .admin-email-retry-default span {
@@ -451,7 +451,7 @@ export default function AdminOrderEmailRetryButton({
           .admin-email-retry-override > p {
             margin: 0 0 9px;
             color: #805c19;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
           }
 
@@ -459,7 +459,7 @@ export default function AdminOrderEmailRetryButton({
             display: block;
             margin-top: 5px;
             color: #94743a;
-            font-size: 7px;
+            font-size: 8.4px;
             text-align: right;
           }
 
@@ -472,7 +472,7 @@ export default function AdminOrderEmailRetryButton({
             color: #754c3e;
             background: #ffffff;
             font: inherit;
-            font-size: 8px;
+            font-size: 9.6px;
             font-weight: 900;
             cursor: pointer;
           }
@@ -492,7 +492,7 @@ export default function AdminOrderEmailRetryButton({
             display: block;
             margin-top: 8px;
             color: #927a70;
-            font-size: 7px;
+            font-size: 8.4px;
             line-height: 1.6;
           }
 
@@ -500,7 +500,7 @@ export default function AdminOrderEmailRetryButton({
             margin: 8px 0 0;
             padding: 9px 10px;
             border-radius: 9px;
-            font-size: 8px;
+            font-size: 9.6px;
             line-height: 1.6;
           }
 

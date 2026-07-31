@@ -1388,7 +1388,7 @@ const adminBookDetailStyles = `
   .admin-book-detail-hero-copy > p {
     margin: 0;
     color: #e56852;
-    font-size: 11px;
+    font-size: 13.2px;
     font-weight: 900;
     letter-spacing: 0.08em;
   }
@@ -1408,7 +1408,7 @@ const adminBookDetailStyles = `
     border-radius: 999px;
     color: #8d5f4d;
     background: #ffede7;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1429,7 +1429,7 @@ const adminBookDetailStyles = `
     display: block;
     margin-top: 6px;
     color: #6f5b52;
-    font-size: 14px;
+    font-size: 16.8px;
     line-height: 1.55;
   }
 
@@ -1437,7 +1437,7 @@ const adminBookDetailStyles = `
     display: block;
     margin-top: 9px;
     color: #817068;
-    font-size: 11px;
+    font-size: 13.2px;
     line-height: 1.7;
   }
 
@@ -1460,7 +1460,7 @@ const adminBookDetailStyles = `
     border-radius: 11px;
     color: #755247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -1484,7 +1484,7 @@ const adminBookDetailStyles = `
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1610,7 +1610,7 @@ const adminBookDetailStyles = `
 
   .admin-book-detail-cover-empty span {
     max-width: 180px;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.6;
     text-align: center;
   }
@@ -1625,7 +1625,7 @@ const adminBookDetailStyles = `
     display: block;
     color:
       rgba(255, 255, 255, 0.78);
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1648,7 +1648,7 @@ const adminBookDetailStyles = `
     margin-top: 6px;
     color:
       rgba(255, 255, 255, 0.86);
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.6;
   }
 
@@ -1745,7 +1745,7 @@ const adminBookDetailStyles = `
     display: block;
     margin-top: 4px;
     color: #78645a;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-book-detail-owner > div:last-child {
@@ -1781,7 +1781,7 @@ const adminBookDetailStyles = `
 
   .admin-book-detail-info-box span {
     color: #8b766c;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 850;
   }
 
@@ -1789,7 +1789,7 @@ const adminBookDetailStyles = `
     margin-top: 5px;
     overflow: hidden;
     color: #4a352c;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.5;
     word-break: break-word;
   }
@@ -1802,7 +1802,7 @@ const adminBookDetailStyles = `
     min-height: 27px !important;
     padding: 0 7px !important;
     border-radius: 7px !important;
-    font-size: 7px !important;
+    font-size: 8.4px !important;
   }
 
   .admin-book-detail-summary {
@@ -1844,7 +1844,7 @@ const adminBookDetailStyles = `
   .admin-book-detail-section-heading p {
     margin: 0;
     color: #e56852;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     letter-spacing: 0.07em;
   }
@@ -1864,7 +1864,7 @@ const adminBookDetailStyles = `
     display: block;
     margin-top: 5px;
     color: #7c6960;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.65;
   }
 
@@ -1887,14 +1887,14 @@ const adminBookDetailStyles = `
 
   .admin-book-detail-copy-grid span {
     color: #8a756a;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
   .admin-book-detail-copy-grid p {
     margin: 6px 0 0;
     color: #59443a;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.7;
     white-space: pre-line;
   }
@@ -1921,7 +1921,7 @@ const adminBookDetailStyles = `
       var(--font-daldongne-serif),
       "Noto Serif KR",
       serif;
-    font-size: 12px;
+    font-size: 14.4px;
     line-height: 2;
     white-space: pre-line;
   }
@@ -1973,7 +1973,7 @@ const adminBookDetailStyles = `
     color: #ffffff;
     background:
       rgba(53, 37, 29, 0.78);
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -2007,13 +2007,13 @@ const adminBookDetailStyles = `
 
   .admin-book-detail-memory-copy > div span {
     color: #e36952;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
   .admin-book-detail-memory-copy small {
     color: #927b70;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-book-detail-memory-copy h3 {
@@ -2023,7 +2023,7 @@ const adminBookDetailStyles = `
       var(--font-daldongne-serif),
       "Noto Serif KR",
       serif;
-    font-size: 14px;
+    font-size: 16.8px;
     line-height: 1.45;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2034,7 +2034,7 @@ const adminBookDetailStyles = `
     display: -webkit-box;
     overflow: hidden;
     color: #756158;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.65;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -2052,7 +2052,7 @@ const adminBookDetailStyles = `
     display: grid;
     gap: 3px;
     color: #8c776c;
-    font-size: 7px;
+    font-size: 8.4px;
     text-align: right;
   }
 
@@ -2071,14 +2071,14 @@ const adminBookDetailStyles = `
 
   .admin-book-detail-request-message span {
     color: #8a756a;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
   .admin-book-detail-request-message p {
     margin: 6px 0 0;
     color: #715e55;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.75;
     white-space: pre-line;
     word-break: break-word;
@@ -2096,7 +2096,7 @@ const adminBookDetailStyles = `
     display: block;
     margin-bottom: 7px;
     color: #78645a;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -2127,14 +2127,14 @@ const adminBookDetailStyles = `
 
   .admin-book-detail-order-head h3 {
     margin: 7px 0 0;
-    font-size: 14px;
+    font-size: 16.8px;
     line-height: 1.45;
   }
 
   .admin-book-detail-order-head p {
     margin: 4px 0 0;
     color: #78645a;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
     white-space: pre-line;
   }
@@ -2142,7 +2142,7 @@ const adminBookDetailStyles = `
   .admin-book-detail-order-head > span {
     flex: 0 0 auto;
     color: #9d604b;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -2171,7 +2171,7 @@ const adminBookDetailStyles = `
   .admin-book-detail-order-id span {
     color:
       rgba(255, 255, 255, 0.68);
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-book-detail-order-total strong {
@@ -2180,7 +2180,7 @@ const adminBookDetailStyles = `
 
   .admin-book-detail-order-id strong {
     overflow: hidden;
-    font-size: 8px;
+    font-size: 9.6px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -2197,13 +2197,13 @@ const adminBookDetailStyles = `
 
   .admin-book-detail-no-order strong {
     display: block;
-    font-size: 12px;
+    font-size: 14.4px;
   }
 
   .admin-book-detail-no-order p {
     margin: 6px 0 0;
     color: #806b61;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.65;
   }
 
@@ -2221,7 +2221,7 @@ const adminBookDetailStyles = `
         #ff7664,
         #ed5f4f
       );
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2249,13 +2249,13 @@ const adminBookDetailStyles = `
 
   .admin-book-detail-history article > div > span:last-child {
     color: #90796e;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-book-detail-history strong {
     display: block;
     margin-top: 7px;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-book-detail-history p {
@@ -2263,7 +2263,7 @@ const adminBookDetailStyles = `
     display: -webkit-box;
     overflow: hidden;
     color: #79655c;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -2277,7 +2277,7 @@ const adminBookDetailStyles = `
     border-radius: 12px;
     color: #806b61;
     background: #fffaf7;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.7;
     text-align: center;
   }

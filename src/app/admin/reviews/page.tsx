@@ -2080,7 +2080,7 @@ const adminReviewsStyles = `
   .admin-reviews-hero p {
     margin: 0;
     color: #e56852;
-    font-size: 11px;
+    font-size: 13.2px;
     font-weight: 900;
     letter-spacing: 0.08em;
   }
@@ -2103,7 +2103,7 @@ const adminReviewsStyles = `
     max-width: 730px;
     margin-top: 10px;
     color: #76635a;
-    font-size: 13px;
+    font-size: 15.6px;
     line-height: 1.78;
   }
 
@@ -2125,7 +2125,7 @@ const adminReviewsStyles = `
     border-radius: 12px;
     color: #755247;
     background: #ffffff;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
   }
 
@@ -2193,7 +2193,7 @@ const adminReviewsStyles = `
   .admin-reviews-alert p {
     margin: 0;
     color: #3f7948;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2215,7 +2215,7 @@ const adminReviewsStyles = `
     display: block;
     margin-top: 4px;
     color: #78655c;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
   }
 
@@ -2229,7 +2229,7 @@ const adminReviewsStyles = `
     border-radius: 9px;
     color: #755247;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2329,7 +2329,7 @@ const adminReviewsStyles = `
 
   .admin-reviews-insight span {
     color: #846f65;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-reviews-insight strong {
@@ -2340,13 +2340,13 @@ const adminReviewsStyles = `
   .admin-reviews-insight small {
     margin-left: 3px;
     color: #8a756a;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-reviews-insight > p {
     margin: 0;
     color: #7a675e;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.65;
   }
 
@@ -2385,7 +2385,7 @@ const adminReviewsStyles = `
     display: block;
     margin-bottom: 6px;
     color: #6d584e;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2415,7 +2415,7 @@ const adminReviewsStyles = `
     color: #49362d;
     background: #fffdfb;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-reviews-search-form input {
@@ -2438,7 +2438,7 @@ const adminReviewsStyles = `
     border-radius: 11px;
     color: #765247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     white-space: nowrap;
     cursor: pointer;
@@ -2478,7 +2478,7 @@ const adminReviewsStyles = `
     border-radius: 10px;
     color: #72594e;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2504,7 +2504,7 @@ const adminReviewsStyles = `
     color: inherit;
     background:
       rgba(120, 82, 64, 0.1);
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-reviews-list-head {
@@ -2519,7 +2519,7 @@ const adminReviewsStyles = `
   .admin-reviews-list-head p {
     margin: 0;
     color: #e56852;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     letter-spacing: 0.07em;
   }
@@ -2539,7 +2539,7 @@ const adminReviewsStyles = `
     display: block;
     margin-top: 5px;
     color: #7a675e;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-reviews-list-head > a {
@@ -2553,7 +2553,7 @@ const adminReviewsStyles = `
     border-radius: 11px;
     color: #755247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -2610,7 +2610,7 @@ const adminReviewsStyles = `
     display: block;
     margin-top: 5px;
     color: #7e6b62;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-review-status-badge,
@@ -2620,7 +2620,7 @@ const adminReviewsStyles = `
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2664,7 +2664,7 @@ const adminReviewsStyles = `
 
   .admin-review-rating > div {
     color: #ddd3ce;
-    font-size: 14px;
+    font-size: 16.8px;
     letter-spacing: 0.03em;
     white-space: nowrap;
   }
@@ -2676,13 +2676,13 @@ const adminReviewsStyles = `
   .admin-review-rating strong {
     display: block;
     margin-top: 4px;
-    font-size: 14px;
+    font-size: 16.8px;
   }
 
   .admin-review-rating small {
     margin-left: 3px;
     color: #8a756a;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-review-body {
@@ -2707,7 +2707,7 @@ const adminReviewsStyles = `
   .admin-review-section-heading p {
     margin: 0;
     color: #e56852;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     letter-spacing: 0.07em;
   }
@@ -2726,7 +2726,7 @@ const adminReviewsStyles = `
     display: block;
     margin-top: 4px;
     color: #7e6b62;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
   }
 
@@ -2738,7 +2738,7 @@ const adminReviewsStyles = `
     border-radius: 12px;
     color: #5c453b;
     background: #fffaf2;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.85;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
@@ -2767,7 +2767,7 @@ const adminReviewsStyles = `
 
   .admin-review-info-row > span {
     color: #8a756a;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 850;
   }
 
@@ -2783,7 +2783,7 @@ const adminReviewsStyles = `
   .admin-review-info-row a {
     min-width: 0;
     overflow-wrap: anywhere;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.55;
   }
 
@@ -2799,7 +2799,7 @@ const adminReviewsStyles = `
     border-radius: 10px;
     color: #755247;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2822,7 +2822,7 @@ const adminReviewsStyles = `
   .admin-review-action-section p {
     margin: 0;
     color: #e56852;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -2839,7 +2839,7 @@ const adminReviewsStyles = `
     display: block;
     margin-top: 4px;
     color: #7e6b62;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-review-actions {
@@ -2861,7 +2861,7 @@ const adminReviewsStyles = `
       1px solid transparent;
     border-radius: 10px;
     font: inherit;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     cursor: pointer;
   }
@@ -2907,7 +2907,7 @@ const adminReviewsStyles = `
       rgba(136, 94, 74, 0.1);
     color: #8b776d;
     background: #f8f2ed;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-review-card-footer > span {
@@ -2943,7 +2943,7 @@ const adminReviewsStyles = `
     border-radius: 10px;
     color: #755247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -2987,7 +2987,7 @@ const adminReviewsStyles = `
   .admin-reviews-empty p {
     margin: 5px 0 0;
     color: #806b61;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-reviews-empty a {
@@ -3004,7 +3004,7 @@ const adminReviewsStyles = `
         #ff7664,
         #ed5f4f
       );
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 

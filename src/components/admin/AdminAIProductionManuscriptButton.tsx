@@ -229,7 +229,7 @@ export default function AdminAIProductionManuscriptButton({
               0.18
             );
           font: inherit;
-          font-size: 10px;
+          font-size: 12px;
           font-weight: 900;
           cursor: pointer;
           transition:
@@ -257,7 +257,7 @@ export default function AdminAIProductionManuscriptButton({
           margin: 0;
           padding: 10px 12px;
           border-radius: 10px;
-          font-size: 9px;
+          font-size: 10.8px;
           line-height: 1.7;
           white-space: pre-line;
         }

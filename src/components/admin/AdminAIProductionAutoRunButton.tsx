@@ -507,7 +507,7 @@ export default function AdminAIProductionAutoRunButton({
         header p {
           margin: 0;
           color: #785393;
-          font-size: 8px;
+          font-size: 9.6px;
           font-weight: 900;
           letter-spacing:
             0.11em;
@@ -532,7 +532,7 @@ export default function AdminAIProductionAutoRunButton({
           align-items: center;
           border-radius:
             999px;
-          font-size: 8px;
+          font-size: 9.6px;
           white-space:
             nowrap;
         }
@@ -553,7 +553,7 @@ export default function AdminAIProductionAutoRunButton({
           margin:
             10px 0 0;
           color: #7d6c85;
-          font-size: 9px;
+          font-size: 10.8px;
           line-height: 1.7;
         }
 
@@ -592,7 +592,7 @@ export default function AdminAIProductionAutoRunButton({
           color: #8b7895;
           background:
             #f1eaf5;
-          font-size: 9px;
+          font-size: 10.8px;
           font-weight: 900;
         }
 
@@ -603,12 +603,12 @@ export default function AdminAIProductionAutoRunButton({
 
         li strong {
           color: #5d4b67;
-          font-size: 9px;
+          font-size: 10.8px;
         }
 
         li small {
           color: #9a899f;
-          font-size: 8px;
+          font-size: 9.6px;
         }
 
         li[data-state="active"] {
@@ -674,7 +674,7 @@ export default function AdminAIProductionAutoRunButton({
               0.18
             );
           font: inherit;
-          font-size: 10px;
+          font-size: 12px;
           font-weight: 900;
           cursor: pointer;
           transition:
@@ -705,7 +705,7 @@ export default function AdminAIProductionAutoRunButton({
           margin: 10px 0 0;
           padding: 10px 12px;
           border-radius: 10px;
-          font-size: 9px;
+          font-size: 10.8px;
           line-height: 1.7;
           white-space:
             pre-line;

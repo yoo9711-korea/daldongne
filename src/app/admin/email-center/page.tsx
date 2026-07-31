@@ -924,7 +924,7 @@ const adminEmailCenterStyles = `
   .admin-email-center-hero p {
     margin: 0 0 7px;
     color: #df6550;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     letter-spacing: .12em;
   }
@@ -938,7 +938,7 @@ const adminEmailCenterStyles = `
     display: block;
     margin-top: 9px;
     color: #927a70;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.7;
   }
 
@@ -959,7 +959,7 @@ const adminEmailCenterStyles = `
     border: 1px solid #d3a693;
     border-radius: 10px;
     background: #fff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1024,7 +1024,7 @@ const adminEmailCenterStyles = `
 
   .admin-email-center-quick > span {
     color: #765449;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1041,7 +1041,7 @@ const adminEmailCenterStyles = `
     align-items: center;
     border: 1px solid #ddc6bc;
     border-radius: 999px;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1070,7 +1070,7 @@ const adminEmailCenterStyles = `
     display: block;
     margin-bottom: 6px;
     color: #765449;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1084,7 +1084,7 @@ const adminEmailCenterStyles = `
     color: #4c382f;
     background: #fff;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.8px;
     outline: none;
   }
 
@@ -1101,7 +1101,7 @@ const adminEmailCenterStyles = `
     border-radius: 10px;
     color: #984b42;
     background: #fff0ed;
-    font-size: 8px;
+    font-size: 9.6px;
     text-align: center;
   }
 
@@ -1122,7 +1122,7 @@ const adminEmailCenterStyles = `
     display: block;
     margin-top: 7px;
     color: #927a70;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.7;
   }
 
@@ -1131,7 +1131,7 @@ const adminEmailCenterStyles = `
     border-radius: 999px;
     color: #754c3e;
     background: #f5ece7;
-    font-size: 8px;
+    font-size: 9.6px;
     white-space: nowrap;
   }
 
@@ -1152,21 +1152,21 @@ const adminEmailCenterStyles = `
   .admin-email-center-bulk-toolbar > div:first-child p {
     margin: 0;
     color: #df6550;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
   .admin-email-center-bulk-toolbar > div:first-child strong {
     display: block;
     margin-top: 6px;
-    font-size: 13px;
+    font-size: 15.6px;
   }
 
   .admin-email-center-bulk-toolbar > div:first-child span {
     display: block;
     margin-top: 5px;
     color: #927a70;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.55;
   }
 
@@ -1185,7 +1185,7 @@ const adminEmailCenterStyles = `
     color: #754c3e;
     background: #ffffff;
     font: inherit;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     cursor: pointer;
   }
@@ -1218,7 +1218,7 @@ const adminEmailCenterStyles = `
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-email-center-bulk-progress progress {
@@ -1231,7 +1231,7 @@ const adminEmailCenterStyles = `
     margin: 0;
     padding: 10px;
     border-radius: 9px;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
     text-align: center;
   }
@@ -1264,7 +1264,7 @@ const adminEmailCenterStyles = `
     border-radius: 999px;
     color: #754c3e;
     background: #ffffff;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     cursor: pointer;
   }
@@ -1284,7 +1284,7 @@ const adminEmailCenterStyles = `
     border-radius: 999px;
     color: #806329;
     background: #fff3cf;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -1324,7 +1324,7 @@ const adminEmailCenterStyles = `
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
   }
 
@@ -1356,7 +1356,7 @@ const adminEmailCenterStyles = `
 
   .admin-email-center-card-top time {
     color: #9c8780;
-    font-size: 7px;
+    font-size: 8.4px;
     white-space: nowrap;
   }
 
@@ -1366,13 +1366,13 @@ const adminEmailCenterStyles = `
 
   .admin-email-center-card-main h3 {
     margin: 0;
-    font-size: 13px;
+    font-size: 15.6px;
   }
 
   .admin-email-center-card-main p {
     margin: 6px 0 0;
     color: #765f56;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.6;
   }
 
@@ -1385,7 +1385,7 @@ const adminEmailCenterStyles = `
     border: 1px solid #d3a693;
     border-radius: 9px;
     background: #fff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -1409,7 +1409,7 @@ const adminEmailCenterStyles = `
   .admin-email-center-list dt,
   .admin-email-center-list dd {
     margin: 0;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
   }
 
@@ -1431,7 +1431,7 @@ const adminEmailCenterStyles = `
     border-radius: 12px;
     color: #806329;
     background: #fff8e6;
-    font-size: 9px;
+    font-size: 10.8px;
     text-align: center;
   }
 
@@ -1454,7 +1454,7 @@ const adminEmailCenterStyles = `
     border: 1px solid #d3a693;
     border-radius: 9px;
     background: #fff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1463,7 +1463,7 @@ const adminEmailCenterStyles = `
   }
 
   .admin-email-center-pagination strong {
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   @media (max-width: 1200px) {

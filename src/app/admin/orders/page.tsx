@@ -1060,7 +1060,7 @@ const adminOrdersStyles = `
   .admin-orders-list-heading p {
     margin: 0;
     color: #df6550;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     letter-spacing: 0.1em;
   }
@@ -1080,7 +1080,7 @@ const adminOrdersStyles = `
     display: block;
     margin-top: 9px;
     color: #806b62;
-    font-size: 11px;
+    font-size: 13.2px;
     line-height: 1.7;
   }
 
@@ -1103,7 +1103,7 @@ const adminOrdersStyles = `
     border-radius: 10px;
     color: #765449;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -1190,7 +1190,7 @@ const adminOrdersStyles = `
     display: block;
     margin-bottom: 6px;
     color: #775e53;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1204,7 +1204,7 @@ const adminOrdersStyles = `
     color: #4f3a31;
     background: #fffdfa;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-orders-filter-panel form > div {
@@ -1224,7 +1224,7 @@ const adminOrdersStyles = `
     color: #765449;
     background: #ffffff;
     font: inherit;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
     cursor: pointer;
@@ -1250,7 +1250,7 @@ const adminOrdersStyles = `
 
   .admin-orders-list-heading > span {
     color: #947c71;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-orders-table-wrap {
@@ -1268,7 +1268,7 @@ const adminOrdersStyles = `
     padding: 10px;
     color: #8c7469;
     background: #fbf5f1;
-    font-size: 8px;
+    font-size: 9.6px;
     text-align: left;
   }
 
@@ -1276,7 +1276,7 @@ const adminOrdersStyles = `
     padding: 13px 10px;
     border-bottom: 1px solid #eee2dc;
     vertical-align: top;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-orders-primary-cell strong,
@@ -1296,14 +1296,14 @@ const adminOrdersStyles = `
   .admin-orders-sub-info span {
     margin-top: 4px;
     color: #927a70;
-    font-size: 7px;
+    font-size: 8.4px;
     line-height: 1.5;
   }
 
   .admin-orders-primary-cell small {
     margin-top: 5px;
     color: #ad9990;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-orders-copy-row {
@@ -1317,7 +1317,7 @@ const adminOrdersStyles = `
     max-width: 155px;
     overflow: hidden;
     color: #7b5a4d;
-    font-size: 7px;
+    font-size: 8.4px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -1326,12 +1326,12 @@ const adminOrdersStyles = `
     display: block;
     margin-bottom: 5px;
     color: #bb5848;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
   .admin-orders-money-cell strong {
-    font-size: 13px;
+    font-size: 15.6px;
   }
 
   .admin-orders-status-badge,
@@ -1343,7 +1343,7 @@ const adminOrdersStyles = `
     border-radius: 999px;
     color: #3f6388;
     background: #e8f2ff;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -1388,7 +1388,7 @@ const adminOrdersStyles = `
     border-radius: 15px;
     color: #947d72;
     background: #fffaf7;
-    font-size: 10px;
+    font-size: 12px;
     text-align: center;
   }
 
@@ -1410,7 +1410,7 @@ const adminOrdersStyles = `
     border-radius: 9px;
     color: #75564b;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1421,7 +1421,7 @@ const adminOrdersStyles = `
 
   .admin-orders-pagination span {
     color: #8b7469;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 

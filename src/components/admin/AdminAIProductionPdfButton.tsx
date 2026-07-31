@@ -264,7 +264,7 @@ export default function AdminAIProductionPdfButton({
               0.2
             );
           font: inherit;
-          font-size: 10px;
+          font-size: 12px;
           font-weight: 900;
           cursor: pointer;
           transition:
@@ -309,7 +309,7 @@ export default function AdminAIProductionPdfButton({
           border-radius: 11px;
           color: #674979;
           background: #ffffff;
-          font-size: 9px;
+          font-size: 10.8px;
           font-weight: 900;
           text-align: center;
           text-decoration: none;
@@ -326,7 +326,7 @@ export default function AdminAIProductionPdfButton({
           margin: 0;
           padding: 10px 12px;
           border-radius: 10px;
-          font-size: 9px;
+          font-size: 10.8px;
           line-height: 1.7;
           white-space: pre-line;
         }

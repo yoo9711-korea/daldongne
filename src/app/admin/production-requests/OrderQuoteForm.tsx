@@ -938,20 +938,20 @@ const quoteStyles = `
 
   .admin-quote-kicker {
     color: #e26853;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     letter-spacing: 0.04em;
   }
 
   .admin-quote-toggle-copy strong {
-    font-size: 13px;
+    font-size: 15.6px;
     line-height: 1.4;
   }
 
   .admin-quote-toggle-copy small {
     overflow: hidden;
     color: #836e64;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.5;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -973,7 +973,7 @@ const quoteStyles = `
     border-radius: 999px;
     color: #7a5d50;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -1035,7 +1035,7 @@ const quoteStyles = `
   .admin-quote-order-number span,
   .admin-quote-guide span {
     color: #d65f4c;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1043,7 +1043,7 @@ const quoteStyles = `
     min-width: 0;
     overflow: hidden;
     color: #62483d;
-    font-size: 9px;
+    font-size: 10.8px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -1062,7 +1062,7 @@ const quoteStyles = `
   .admin-quote-guide p {
     margin: 0;
     color: #765f55;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.65;
     word-break: keep-all;
   }
@@ -1077,7 +1077,7 @@ const quoteStyles = `
   .admin-quote-products legend,
   .admin-quote-field-label strong {
     color: #5c4136;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -1136,7 +1136,7 @@ const quoteStyles = `
     border-radius: 7px;
     color: #ffffff;
     background: #ffffff;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
   }
 
@@ -1147,13 +1147,13 @@ const quoteStyles = `
   }
 
   .admin-quote-products button strong {
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.4;
   }
 
   .admin-quote-products button small {
     color: #8a756b;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.5;
     word-break: keep-all;
   }
@@ -1184,7 +1184,7 @@ const quoteStyles = `
 
   .admin-quote-field-label small {
     color: #9a867d;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-quote input,
@@ -1198,7 +1198,7 @@ const quoteStyles = `
     color: #45322a;
     background: #ffffff;
     font: inherit;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-quote textarea {
@@ -1228,7 +1228,7 @@ const quoteStyles = `
     top: 50%;
     right: 10px;
     color: #8f7a70;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     transform: translateY(-50%);
     pointer-events: none;
@@ -1256,7 +1256,7 @@ const quoteStyles = `
     display: grid;
     place-items: center;
     color: #b49c90;
-    font-size: 14px;
+    font-size: 16.8px;
     font-weight: 900;
   }
 
@@ -1279,7 +1279,7 @@ const quoteStyles = `
   .admin-quote-total > span {
     color:
       rgba(255, 255, 255, 0.7);
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-quote-total strong {
@@ -1289,7 +1289,7 @@ const quoteStyles = `
 
   .admin-quote-total small {
     margin-left: 2px;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-quote-alert {
@@ -1309,7 +1309,7 @@ const quoteStyles = `
 
   .admin-quote-alert p {
     margin: 0;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 800;
     line-height: 1.55;
   }
@@ -1343,7 +1343,7 @@ const quoteStyles = `
 
   .admin-quote-change-state {
     color: #8a756b;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.45;
   }
 
@@ -1369,7 +1369,7 @@ const quoteStyles = `
     gap: 6px;
     border-radius: 10px;
     font: inherit;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     cursor: pointer;
   }

@@ -839,7 +839,7 @@ const styles = `
   .phase-two-command p {
     margin: 0;
     color: #df6550;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
     letter-spacing: .11em;
   }
@@ -861,7 +861,7 @@ const styles = `
     margin-top: 17px;
     display: block;
     color: #816e64;
-    font-size: 14px;
+    font-size: 16.8px;
     line-height: 1.8;
   }
 
@@ -878,7 +878,7 @@ const styles = `
     border: 1px solid #d9c1b5;
     border-radius: 12px;
     background: #fff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -942,12 +942,12 @@ const styles = `
   }
 
   .phase-two-notice strong {
-    font-size: 12px;
+    font-size: 14.4px;
   }
 
   .phase-two-notice span {
     margin-top: 5px;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.7;
   }
 
@@ -977,7 +977,7 @@ const styles = `
 
   .phase-two-heading > span {
     color: #8b756a;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 800;
   }
 
@@ -1014,7 +1014,7 @@ const styles = `
 
   .phase-two-issues article > div > span {
     color: #d45f50;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     letter-spacing: .08em;
   }
@@ -1027,7 +1027,7 @@ const styles = `
   .phase-two-issues p {
     margin: 5px 0 0;
     color: #7e6a60;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.65;
   }
 
@@ -1035,7 +1035,7 @@ const styles = `
     margin-top: 6px;
     display: block;
     color: #a08b80;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .phase-two-issues article > a {
@@ -1046,7 +1046,7 @@ const styles = `
     border-radius: 10px;
     color: #fff;
     background: #76564b;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -1057,7 +1057,7 @@ const styles = `
     border-radius: 14px;
     color: #7c6a61;
     background: #f8f3f0;
-    font-size: 10px;
+    font-size: 12px;
     text-align: center;
   }
 
@@ -1091,7 +1091,7 @@ const styles = `
 
   .phase-two-stages span {
     color: #8b756a;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1107,14 +1107,14 @@ const styles = `
   }
 
   .phase-two-failures strong {
-    font-size: 11px;
+    font-size: 13.2px;
   }
 
   .phase-two-failures span,
   .phase-two-failures small {
     margin-top: 5px;
     color: #8b756a;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .phase-two-command {
@@ -1147,7 +1147,7 @@ const styles = `
     margin-top: 7px;
     display: block;
     color: rgba(255, 255, 255, .74);
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .phase-two-command code {
@@ -1155,7 +1155,7 @@ const styles = `
     border: 1px solid rgba(255, 255, 255, .2);
     border-radius: 13px;
     background: rgba(0, 0, 0, .18);
-    font-size: 12px;
+    font-size: 14.4px;
     font-weight: 800;
     white-space: nowrap;
   }

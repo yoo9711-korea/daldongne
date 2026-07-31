@@ -284,7 +284,7 @@ const adminProofReviewStyles = `
   .admin-proof-review-heading p {
     margin: 0;
     color: #79559a;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     letter-spacing: 0.09em;
   }
@@ -305,7 +305,7 @@ const adminProofReviewStyles = `
     display: block;
     margin-top: 6px;
     color: #8b756a;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.65;
   }
 
@@ -322,7 +322,7 @@ const adminProofReviewStyles = `
     border-radius: 10px;
     color: #684b80;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -352,20 +352,20 @@ const adminProofReviewStyles = `
 
   .admin-proof-review-pending strong {
     color: #9a4d42;
-    font-size: 12px;
+    font-size: 14.4px;
   }
 
   .admin-proof-review-pending
   > div
   > span {
     color: #9a746d;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-proof-review-pending p {
     margin: 10px 0 0;
     color: #714d47;
-    font-size: 11px;
+    font-size: 13.2px;
     line-height: 1.75;
     white-space: pre-wrap;
   }
@@ -383,7 +383,7 @@ const adminProofReviewStyles = `
         0.2
       );
     color: #98736c;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.65;
   }
 
@@ -432,7 +432,7 @@ const adminProofReviewStyles = `
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -463,7 +463,7 @@ const adminProofReviewStyles = `
   .admin-proof-review-item-heading
   time {
     color: #9a8479;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-proof-review-list
@@ -471,7 +471,7 @@ const adminProofReviewStyles = `
   > p {
     margin: 10px 0 0;
     color: #604a41;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.75;
     white-space: pre-wrap;
   }
@@ -486,7 +486,7 @@ const adminProofReviewStyles = `
       1px solid
       #eee2dc;
     color: #957f75;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-proof-review-item-meta
@@ -504,7 +504,7 @@ const adminProofReviewStyles = `
     border-radius: 14px;
     color: #947d72;
     background: #fffaf7;
-    font-size: 9px;
+    font-size: 10.8px;
     text-align: center;
   }
 

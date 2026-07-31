@@ -307,7 +307,7 @@ const styles = `
   .manual-print-list-heading p {
     margin: 0;
     color: #c66c55;
-    font-size: 12px;
+    font-size: 14.4px;
     font-weight: 900;
     letter-spacing: 0.14em;
   }
@@ -335,7 +335,7 @@ const styles = `
     border-radius: 11px;
     color: #714f42;
     background: #fff;
-    font-size: 13px;
+    font-size: 15.6px;
     font-weight: 800;
     text-decoration: none;
   }
@@ -439,7 +439,7 @@ const styles = `
   .manual-print-order-badges span {
     padding: 5px 9px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 13.2px;
     font-weight: 900;
   }
 
@@ -468,7 +468,7 @@ const styles = `
 
   .manual-print-order-main p {
     margin: 0;
-    font-size: 13px;
+    font-size: 15.6px;
   }
 
   .manual-print-order-main small {
@@ -478,7 +478,7 @@ const styles = `
   .manual-print-order-meta {
     display: grid;
     gap: 5px;
-    font-size: 12px;
+    font-size: 14.4px;
   }
 
   .manual-print-order-links {

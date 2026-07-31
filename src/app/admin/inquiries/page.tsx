@@ -1859,7 +1859,7 @@ const adminInquiriesStyles = `
   .admin-inquiries-hero p {
     margin: 0;
     color: #e56852;
-    font-size: 11px;
+    font-size: 13.2px;
     font-weight: 900;
     letter-spacing: 0.08em;
   }
@@ -1882,7 +1882,7 @@ const adminInquiriesStyles = `
     max-width: 740px;
     margin-top: 10px;
     color: #76635a;
-    font-size: 13px;
+    font-size: 15.6px;
     line-height: 1.78;
   }
 
@@ -1904,7 +1904,7 @@ const adminInquiriesStyles = `
     border-radius: 12px;
     color: #755247;
     background: #ffffff;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
   }
 
@@ -1972,7 +1972,7 @@ const adminInquiriesStyles = `
   .admin-inquiries-alert p {
     margin: 0;
     color: #3f7948;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -1994,7 +1994,7 @@ const adminInquiriesStyles = `
     display: block;
     margin-top: 4px;
     color: #78655c;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
   }
 
@@ -2008,7 +2008,7 @@ const adminInquiriesStyles = `
     border-radius: 9px;
     color: #755247;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2123,7 +2123,7 @@ const adminInquiriesStyles = `
   .admin-inquiry-source-card p {
     margin: 0;
     color: #e56852;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     letter-spacing: 0.07em;
   }
@@ -2141,7 +2141,7 @@ const adminInquiriesStyles = `
     display: block;
     margin-top: 5px;
     color: #7a675e;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
   }
 
@@ -2186,7 +2186,7 @@ const adminInquiriesStyles = `
     border-radius: 10px;
     color: #755247;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2227,7 +2227,7 @@ const adminInquiriesStyles = `
     display: block;
     margin-bottom: 6px;
     color: #6d584e;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2257,7 +2257,7 @@ const adminInquiriesStyles = `
     color: #49362d;
     background: #fffdfb;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-inquiries-search-form input {
@@ -2280,7 +2280,7 @@ const adminInquiriesStyles = `
     border-radius: 11px;
     color: #765247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     white-space: nowrap;
     cursor: pointer;
@@ -2320,7 +2320,7 @@ const adminInquiriesStyles = `
     border-radius: 10px;
     color: #72594e;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2346,7 +2346,7 @@ const adminInquiriesStyles = `
     color: inherit;
     background:
       rgba(120, 82, 64, 0.1);
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-inquiries-list-head {
@@ -2361,7 +2361,7 @@ const adminInquiriesStyles = `
   .admin-inquiries-list-head p {
     margin: 0;
     color: #e56852;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     letter-spacing: 0.07em;
   }
@@ -2382,7 +2382,7 @@ const adminInquiriesStyles = `
     max-width: 720px;
     margin-top: 5px;
     color: #7a675e;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.65;
   }
 
@@ -2397,7 +2397,7 @@ const adminInquiriesStyles = `
     border-radius: 11px;
     color: #755247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -2454,7 +2454,7 @@ const adminInquiriesStyles = `
     display: block;
     margin-top: 5px;
     color: #7e6b62;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-inquiry-type-badge,
@@ -2464,7 +2464,7 @@ const adminInquiriesStyles = `
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2529,12 +2529,12 @@ const adminInquiriesStyles = `
 
   .admin-inquiry-dates span {
     color: #8a756a;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-inquiry-dates strong {
     margin-top: 4px;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.5;
   }
 
@@ -2559,7 +2559,7 @@ const adminInquiriesStyles = `
   .admin-inquiry-section-heading p {
     margin: 0;
     color: #e56852;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     letter-spacing: 0.07em;
   }
@@ -2578,7 +2578,7 @@ const adminInquiriesStyles = `
     display: block;
     margin-top: 4px;
     color: #7e6b62;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
   }
 
@@ -2605,7 +2605,7 @@ const adminInquiriesStyles = `
 
   .admin-inquiry-info-row > span {
     color: #8a756a;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 850;
   }
 
@@ -2621,7 +2621,7 @@ const adminInquiriesStyles = `
   .admin-inquiry-info-row a {
     min-width: 0;
     overflow-wrap: anywhere;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.55;
   }
 
@@ -2633,7 +2633,7 @@ const adminInquiriesStyles = `
     border-radius: 12px;
     color: #5c453b;
     background: #fffaf2;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.85;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
@@ -2661,7 +2661,7 @@ const adminInquiriesStyles = `
 
   .admin-inquiry-card-footer > div:first-child > span {
     color: #8b776d;
-    font-size: 7px;
+    font-size: 8.4px;
     overflow-wrap: anywhere;
   }
 
@@ -2680,7 +2680,7 @@ const adminInquiriesStyles = `
     border-radius: 9px;
     color: #755247;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2720,7 +2720,7 @@ const adminInquiriesStyles = `
   .admin-inquiries-empty p {
     margin: 5px 0 0;
     color: #806b61;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-inquiries-empty a {
@@ -2737,7 +2737,7 @@ const adminInquiriesStyles = `
         #ff7664,
         #ed5f4f
       );
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 

@@ -2140,7 +2140,7 @@ const adminFamiliesStyles = `
   .admin-families-hero p {
     margin: 0;
     color: #e56852;
-    font-size: 11px;
+    font-size: 13.2px;
     font-weight: 900;
     letter-spacing: 0.08em;
   }
@@ -2163,7 +2163,7 @@ const adminFamiliesStyles = `
     max-width: 720px;
     margin-top: 10px;
     color: #76635a;
-    font-size: 13px;
+    font-size: 15.6px;
     line-height: 1.78;
   }
 
@@ -2185,7 +2185,7 @@ const adminFamiliesStyles = `
     border-radius: 12px;
     color: #755247;
     background: #ffffff;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
   }
 
@@ -2253,7 +2253,7 @@ const adminFamiliesStyles = `
   .admin-families-alert p {
     margin: 0;
     color: #3f7948;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2275,7 +2275,7 @@ const adminFamiliesStyles = `
     display: block;
     margin-top: 4px;
     color: #78655c;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
   }
 
@@ -2296,7 +2296,7 @@ const adminFamiliesStyles = `
     border-radius: 9px;
     color: #755247;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2459,7 +2459,7 @@ const adminFamiliesStyles = `
     display: block;
     margin-bottom: 6px;
     color: #6d584e;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2489,7 +2489,7 @@ const adminFamiliesStyles = `
     color: #49362d;
     background: #fffdfb;
     font: inherit;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-families-search-form input {
@@ -2512,7 +2512,7 @@ const adminFamiliesStyles = `
     border-radius: 11px;
     color: #765247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     white-space: nowrap;
     cursor: pointer;
@@ -2552,7 +2552,7 @@ const adminFamiliesStyles = `
     border-radius: 10px;
     color: #72594e;
     background: #ffffff;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
   }
 
@@ -2578,7 +2578,7 @@ const adminFamiliesStyles = `
     color: inherit;
     background:
       rgba(120, 82, 64, 0.1);
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-families-list-head {
@@ -2593,7 +2593,7 @@ const adminFamiliesStyles = `
   .admin-families-list-head p {
     margin: 0;
     color: #e56852;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
     letter-spacing: 0.07em;
   }
@@ -2613,7 +2613,7 @@ const adminFamiliesStyles = `
     display: block;
     margin-top: 5px;
     color: #7a675e;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-families-list-head > a {
@@ -2627,7 +2627,7 @@ const adminFamiliesStyles = `
     border-radius: 11px;
     color: #755247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -2671,7 +2671,7 @@ const adminFamiliesStyles = `
 
   .admin-family-title > div > span:last-child {
     color: #927b70;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-family-title h3 {
@@ -2688,7 +2688,7 @@ const adminFamiliesStyles = `
   .admin-family-title > p {
     margin: 5px 0 0;
     color: #7e6b62;
-    font-size: 8px;
+    font-size: 9.6px;
   }
 
   .admin-family-counts {
@@ -2715,18 +2715,18 @@ const adminFamiliesStyles = `
 
   .admin-family-mini-count span {
     color: #8a756a;
-    font-size: 7px;
+    font-size: 8.4px;
   }
 
   .admin-family-mini-count strong {
     margin-top: 4px;
-    font-size: 13px;
+    font-size: 15.6px;
   }
 
   .admin-family-mini-count small {
     margin-left: 2px;
     color: #8a756a;
-    font-size: 6px;
+    font-size: 7.2px;
   }
 
   .admin-family-owner-section {
@@ -2740,7 +2740,7 @@ const adminFamiliesStyles = `
   .admin-family-section-heading p {
     margin: 0;
     color: #e56852;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     letter-spacing: 0.07em;
   }
@@ -2759,7 +2759,7 @@ const adminFamiliesStyles = `
     display: block;
     margin-top: 4px;
     color: #7e6b62;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.6;
   }
 
@@ -2834,7 +2834,7 @@ const adminFamiliesStyles = `
     display: grid;
     place-items: center;
     color: #9a6f60;
-    font-size: 12px;
+    font-size: 14.4px;
     font-weight: 900;
   }
 
@@ -2856,7 +2856,7 @@ const adminFamiliesStyles = `
   .admin-family-member strong,
   .admin-family-invitation strong {
     overflow: hidden;
-    font-size: 9px;
+    font-size: 10.8px;
     line-height: 1.45;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2867,7 +2867,7 @@ const adminFamiliesStyles = `
     margin-top: 3px;
     overflow: hidden;
     color: #7d6a61;
-    font-size: 7px;
+    font-size: 8.4px;
     line-height: 1.5;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2877,7 +2877,7 @@ const adminFamiliesStyles = `
   .admin-family-invitation small {
     margin-top: 3px;
     color: #9a8176;
-    font-size: 6px;
+    font-size: 7.2px;
   }
 
   .admin-family-status-badge,
@@ -2890,7 +2890,7 @@ const adminFamiliesStyles = `
     justify-content: center;
     flex: 0 0 auto;
     border-radius: 999px;
-    font-size: 7px;
+    font-size: 8.4px;
     font-weight: 900;
     white-space: nowrap;
   }
@@ -2965,12 +2965,12 @@ const adminFamiliesStyles = `
   }
 
   .admin-family-warning strong {
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .admin-family-warning span {
     margin-top: 3px;
-    font-size: 7px;
+    font-size: 8.4px;
     line-height: 1.55;
   }
 
@@ -2982,7 +2982,7 @@ const adminFamiliesStyles = `
     border-radius: 11px;
     color: #806b61;
     background: #fffaf7;
-    font-size: 8px;
+    font-size: 9.6px;
     line-height: 1.65;
     text-align: center;
   }
@@ -3016,7 +3016,7 @@ const adminFamiliesStyles = `
     border-radius: 10px;
     color: #755247;
     background: #ffffff;
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 
@@ -3060,7 +3060,7 @@ const adminFamiliesStyles = `
   .admin-families-empty p {
     margin: 5px 0 0;
     color: #806b61;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .admin-families-empty a {
@@ -3077,7 +3077,7 @@ const adminFamiliesStyles = `
         #ff7664,
         #ed5f4f
       );
-    font-size: 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
 

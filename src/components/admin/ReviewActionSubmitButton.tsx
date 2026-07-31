@@ -210,7 +210,7 @@ const reviewActionButtonStyles = `
     color: #664d42;
     background: #ffffff;
     font: inherit;
-    font-size: 8px;
+    font-size: 9.6px;
     font-weight: 900;
     line-height: 1;
     white-space: nowrap;

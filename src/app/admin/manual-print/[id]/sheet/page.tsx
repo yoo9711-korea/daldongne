@@ -368,7 +368,7 @@ const styles = `
   .manual-print-sheet header p {
     margin: 0;
     color: #a94f3d;
-    font-size: 12px;
+    font-size: 14.4px;
     font-weight: 900;
     letter-spacing: 0.16em;
   }
@@ -389,7 +389,7 @@ const styles = `
 
   .manual-print-sheet header span {
     color: #777;
-    font-size: 12px;
+    font-size: 14.4px;
   }
 
   .manual-print-sheet header strong {
@@ -429,7 +429,7 @@ const styles = `
   .manual-print-sheet section p a {
     padding: 9px;
     overflow-wrap: anywhere;
-    font-size: 12px;
+    font-size: 14.4px;
     line-height: 1.55;
   }
 
@@ -450,7 +450,7 @@ const styles = `
     justify-content: space-between;
     border-top: 1px solid #bbb;
     color: #666;
-    font-size: 12px;
+    font-size: 14.4px;
   }
 
   @media print {
