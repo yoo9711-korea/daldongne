@@ -256,59 +256,44 @@ export default async function DashboardPage() {
       <style>{dashboardHomeStyles}</style>
 
       <div className="dashboard-home-shell">
-        <section className="dashboard-home-hero">
-          <div className="dashboard-home-hero-copy">
-            <p className="dashboard-home-kicker">
-              {displayName}님의 기록 공간
-            </p>
-
-            <h1>달동네 스토리</h1>
-
-            <p className="dashboard-home-subtitle">
-              누구와 함께한 시간이든
-              <br />
-              소중한 기록이 됩니다
-            </p>
-
-            <div className="dashboard-home-line-art" aria-hidden="true">
-              <HouseLineArt />
-            </div>
-          </div>
-
-          <div
-            className="dashboard-home-collage"
-            aria-label="가족, 아이, 친구, 반려동물의 사진 모음"
-          >
-            {heroPhotos.map((photo) => (
-              <div
-                key={photo.src}
-                className={`dashboard-home-collage-item ${photo.className}`}
-              >
-                <Image
-                  src={photo.src}
-                  alt={photo.alt}
-                  fill
-                  priority
-                  sizes="(max-width: 760px) 38vw, 240px"
-                />
-              </div>
-            ))}
-
-            <span
-              className="dashboard-home-collage-heart"
-              aria-hidden="true"
-            >
-              ♡
-            </span>
-
-            <span
-              className="dashboard-home-collage-spark"
-              aria-hidden="true"
-            >
-              ✦
-            </span>
-          </div>
-        </section>
+      <section
+        aria-label="나의 이야기 시작하기"
+        style={{
+          width: 'min(1216px, calc(100% - 32px))',
+          margin: '26px auto 38px',
+          overflow: 'hidden',
+          border: '1px solid rgba(111, 79, 55, 0.14)',
+          borderRadius: 30,
+          background: '#fffaf4',
+          boxShadow: '0 20px 48px rgba(78, 53, 38, 0.09)',
+        }}
+      >
+        <Link
+          href="/dashboard/timeline"
+          aria-label="사진과 이야기를 기록하러 가기"
+          style={{
+            display: 'block',
+            width: '100%',
+            textDecoration: 'none',
+          }}
+        >
+          <Image
+            src="/dashboard/daldongne-dashboard-hero-bluebook-v1.webp"
+            alt="꽃이 놓인 따뜻한 공간의 파란색 나의 이야기 책"
+            width={3000}
+            height={1500}
+            priority
+            quality={95}
+            sizes="(max-width: 760px) calc(100vw - 20px), (max-width: 1280px) calc(100vw - 32px), 1216px"
+            style={{
+              display: 'block',
+              width: '100%',
+              height: 'auto',
+              objectFit: 'cover',
+            }}
+          />
+        </Link>
+      </section>
 
         <nav
           className="dashboard-home-categories"
