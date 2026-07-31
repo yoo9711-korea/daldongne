@@ -824,4 +824,60 @@ const adminLayoutStyles = `
       transition: none;
     }
   }
+
+  /* ADMIN_NAVIGATION_FONT_SCALE_125
+     관리자 사이드바 메뉴 글씨 25% 확대 */
+
+  /* 운영 관리 */
+  .admin-common-sidebar-heading p {
+    font-size: 10px;
+  }
+
+  /* 서비스 현황과 고객 요청을 관리합니다 */
+  .admin-common-sidebar-heading span {
+    font-size: 10px;
+    line-height: 1.55;
+  }
+
+  /* OVERVIEW / CUSTOMER OPERATIONS / CONTENT & MEMBERS */
+  .admin-common-navigation-title {
+    font-size: 8.75px;
+  }
+
+  /* 대시보드 / 통합 문의 / 제작 상담 등 메뉴 제목 */
+  .admin-common-navigation-text strong {
+    font-size: 11.25px;
+    line-height: 1.4;
+  }
+
+  /* 각 메뉴 아래 작은 설명 */
+  .admin-common-navigation-text span {
+    font-size: 7.5px;
+    line-height: 1.4;
+  }
+
+  /* 메뉴 오른쪽 화살표 */
+  .admin-common-navigation-arrow {
+    font-size: 12.5px;
+  }
+
+  /* 글씨 확대 후 메뉴 카드가 답답하지 않도록 최소 높이 보정 */
+  .admin-common-navigation-link {
+    min-height: 51px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  /* 태블릿·모바일 가로 메뉴 */
+  @media (max-width: 880px) {
+    .admin-common-navigation-text strong {
+      font-size: 10px;
+    }
+
+    .admin-common-navigation-link {
+      min-height: 44px;
+      padding-top: 6px;
+      padding-bottom: 6px;
+    }
+  }
 `;
