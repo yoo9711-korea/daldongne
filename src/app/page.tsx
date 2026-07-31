@@ -1,3 +1,4 @@
+import { auth } from '@/auth';
 import HomeHeroInteractiveControls from "@/components/home/HomeHeroInteractiveControls";
 import Image from "next/image";
 import Link from "next/link";
@@ -520,7 +521,24 @@ const styles = `
   }
 `;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth();
+
+  const homeStartHref = session?.user
+    ? '/dashboard/timeline'
+    : '/login?callbackUrl=/dashboard/timeline';
+
+  const homeLibraryHref = session?.user
+    ? '/dashboard/library'
+    : '/login?callbackUrl=/dashboard/library';
+
+  const homeDashboardHref = session?.user
+    ? '/dashboard'
+    : '/login?callbackUrl=/dashboard';
+
+  const homeAccountHref = session?.user
+    ? '/dashboard/account'
+    : '/login?callbackUrl=/dashboard/account';
   return (
     <>
       <style>{styles}</style>
@@ -578,7 +596,7 @@ export default function HomePage() {
 
             <p className="reference-review-note">관리자 검토 완료 후 결제</p>
 
-            <Link href="/dashboard/timeline" className="reference-cta">
+            <Link href={homeStartHref} className="reference-cta">
               <span className="reference-cta-heart" aria-hidden="true">♥</span>
               내 기록 시작하기
             </Link>
@@ -608,9 +626,9 @@ export default function HomePage() {
 
         <nav className="reference-mobile-actions" aria-label="모바일 빠른 메뉴">
           <Link href="/"><span>⌂</span>홈</Link>
-          <Link href="/dashboard/library"><span>▢</span>내 책</Link>
-          <Link href="/dashboard"><span>♧</span>알림</Link>
-          <Link href="/dashboard/account"><span>○</span>마이페이지</Link>
+          <Link href={homeLibraryHref}><span>▢</span>내 책</Link>
+          <Link href={homeDashboardHref}><span>♧</span>작업실</Link>
+          <Link href={homeAccountHref}><span>○</span>마이페이지</Link>
         </nav>
       </main>
     </>
