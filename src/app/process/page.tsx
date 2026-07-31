@@ -888,6 +888,115 @@ const styles = `
   object-position: center 58%;
 }
   }
+
+  /* PROCESS_MAIN_FONT_SCALE_120
+     제작과정 본문 글씨를 기존 크기보다 20% 확대 */
+
+  /* 스토리북 제작은 이렇게 진행돼요 */
+  .process-main > .process-main-inner
+    > .process-section-title {
+    font-size: 34.8px !important;
+  }
+
+  /* 01~06 단계 번호 */
+  .process-main .process-step-number {
+    font-size: 13.2px !important;
+  }
+
+  /* 사진 정리, 이야기 나누기 등 단계 제목 */
+  .process-main .process-step-card h3 {
+    font-size: 16.8px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* 단계별 설명 */
+  .process-main .process-step-card p {
+    font-size: 12px !important;
+    line-height: 1.7 !important;
+  }
+
+  /* 소요기간 */
+  .process-main .process-duration {
+    min-height: 33px !important;
+    padding: 7px 11px !important;
+    font-size: 10.8px !important;
+  }
+
+  /* 전체 제작 기간 안내 */
+  .process-main .process-total-duration {
+    font-size: 13.2px !important;
+    line-height: 1.65 !important;
+  }
+
+  /* 달동네 스토리북은 다릅니다 */
+  .process-main .process-strip-title {
+    font-size: 31.2px !important;
+  }
+
+  /* AI 정리, 맞춤 서비스 등의 제목 */
+  .process-main .process-difference-item h3 {
+    font-size: 13.2px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* AI 정리, 맞춤 서비스 등의 설명 */
+  .process-main .process-difference-item p {
+    font-size: 9.6px !important;
+    line-height: 1.6 !important;
+  }
+
+  /* 이런 분들께 추천드려요 */
+  .process-main .process-recommend-heading
+    .process-section-title {
+    font-size: 31.2px !important;
+  }
+
+  /* 부모님께, 결혼기념일 등의 제목 */
+  .process-main .process-recommend-card h3 {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* 추천 카드의 작은 설명 */
+  .process-main .process-recommend-card p {
+    font-size: 10.8px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* 세상에 하나뿐인 선물로 문구 */
+  .process-main .process-quote-card blockquote {
+    font-size: 27.6px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* 글씨가 커진 만큼 카드 높이 보정 */
+  .process-main .process-step-card {
+    min-height: 310px !important;
+    padding-top: 21px !important;
+    padding-bottom: 18px !important;
+  }
+
+  .process-main .process-recommend-card {
+    min-height: 145px !important;
+  }
+
+  /* 휴대전화에서는 기존 모바일 크기에서 20% 확대 */
+  @media (max-width: 560px) {
+    .process-main > .process-main-inner
+      > .process-section-title,
+    .process-main .process-strip-title {
+      font-size: 30px !important;
+    }
+
+    .process-main .process-recommend-heading
+      .process-section-title {
+      font-size: 31.2px !important;
+    }
+
+    .process-main .process-step-card {
+      min-height: 290px !important;
+    }
+  }
 `;
 
 export default async function ProcessPage() {
