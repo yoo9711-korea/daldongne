@@ -259,23 +259,6 @@ export default async function RootLayout({
                 홈
               </Link>
 
-              <Link
-                href="/about"
-                style={{
-                  ...linkStyle,
-                  minHeight: 38,
-                  padding: '0 12px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid #ead8cd',
-                  borderRadius: 999,
-                  background: '#fffaf5',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                스토리 소개
-              </Link>
 
               <Link
                 href="/process"
