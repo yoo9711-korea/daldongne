@@ -2933,3 +2933,78 @@ body [aria-disabled="true"] {
     justify-content: flex-end !important;
   }
 }
+/* Daldongne public header pill navigation start */
+
+/*
+ * 공개 페이지 상단 메뉴를
+ * 홈페이지의 둥근 버튼 디자인과 통일합니다.
+ */
+.storybook-nav {
+  gap: 10px !important;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.storybook-nav a {
+  min-height: 38px !important;
+  padding: 0 15px !important;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #ead8cd !important;
+  border-radius: 999px !important;
+
+  background: #fffaf5 !important;
+  color: #4f382d !important;
+
+  box-shadow: none !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* 기존 선택 메뉴 밑줄 제거 */
+.storybook-nav a::before,
+.storybook-nav a::after {
+  display: none !important;
+}
+
+/* 마우스를 올렸을 때 */
+.storybook-nav a:hover {
+  border-color: #e7b6a6 !important;
+  background: #fff1eb !important;
+  color: #a95340 !important;
+  transform: translateY(-1px);
+}
+
+/* 현재 선택된 메뉴 */
+.storybook-nav a[aria-current="page"],
+.storybook-nav a.active,
+.storybook-nav a.is-active,
+.storybook-nav a[data-active="true"] {
+  border-color: #e7b6a6 !important;
+  background: #fff1eb !important;
+  color: #a95340 !important;
+}
+
+/* 작은 노트북 화면 */
+@media (max-width: 1180px) {
+  .storybook-nav {
+    gap: 7px !important;
+  }
+
+  .storybook-nav a {
+    min-height: 36px !important;
+    padding: 0 11px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Daldongne public header pill navigation end */
