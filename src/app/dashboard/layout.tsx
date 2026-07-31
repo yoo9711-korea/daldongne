@@ -116,6 +116,7 @@ function BrandIcon() {
 }
 
 const dashboardLayoutStyles = `
+  /* DASHBOARD_MENU_FONT_SCALE_115 */
   .storybook-dashboard-shell,
   .storybook-dashboard-shell * {
     box-sizing: border-box;
@@ -244,7 +245,7 @@ const dashboardLayoutStyles = `
       transparent;
     border-radius: 12px;
     color: #725b50;
-    font-size: 12px;
+    font-size: 13.8px;
     font-weight: 800;
     text-decoration: none;
     transition:
@@ -380,13 +381,13 @@ const dashboardLayoutStyles = `
   .easy-dashboard-menu-label small {
     margin-bottom: 2px;
     color: #d1785f;
-    font-size: 9px;
+    font-size: 10.35px;
     font-weight: 900;
   }
 
   .easy-dashboard-menu-label strong {
     overflow: hidden;
-    font-size: 12px;
+    font-size: 13.8px;
     line-height: 1.3;
     letter-spacing: -0.025em;
     text-overflow: ellipsis;
@@ -424,7 +425,7 @@ const dashboardLayoutStyles = `
 
     .storybook-dashboard-utility a {
       padding: 0 10px;
-      font-size: 11px;
+      font-size: 12.65px;
     }
 
     .easy-dashboard-primary-menu {
@@ -486,7 +487,7 @@ const dashboardLayoutStyles = `
       min-height: 35px;
       padding: 0 10px;
       display: inline-flex;
-      font-size: 10px;
+      font-size: 11.5px;
     }
 
     .storybook-dashboard-progress-inner {
@@ -528,7 +529,7 @@ const dashboardLayoutStyles = `
     }
 
     .easy-dashboard-menu-label strong {
-      font-size: 11px;
+      font-size: 12.65px;
     }
 
     .storybook-dashboard-content {
