@@ -3,6 +3,7 @@ import { recordBookOrderAudit } from '@/lib/order-audit';
 import { sendOrderPaymentCompletedEmail } from '@/lib/order-email';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { createHash } from 'node:crypto';
 import {
   NextRequest,
   NextResponse,
@@ -320,11 +321,27 @@ export async function POST(
       isCustomerVisible: true,
     });
 
-    const authorization =
+       const authorization =
       Buffer.from(
         `${secretKey}:`,
         'utf8',
       ).toString('base64');
+
+    /*
+     * 같은 주문과 paymentKey의 승인 요청은
+     * 항상 같은 멱등키를 사용합니다.
+     *
+     * 브라우저 재요청이나 네트워크 재시도 때문에
+     * 승인 API가 여러 번 호출되더라도
+     * 토스에서 중복 승인되지 않도록 보호합니다.
+     */
+    const confirmIdempotencyKey =
+      createHash('sha256')
+        .update(
+          `daldongne-payment-confirm:${order.id}:${paymentKey}`,
+          'utf8',
+        )
+        .digest('hex');
 
     let tossResponse: Response;
 
@@ -333,11 +350,13 @@ export async function POST(
         'https://api.tosspayments.com/v1/payments/confirm',
         {
           method: 'POST',
-          headers: {
+                    headers: {
             Authorization:
               `Basic ${authorization}`,
             'Content-Type':
               'application/json',
+            'Idempotency-Key':
+              confirmIdempotencyKey,
           },
           body: JSON.stringify({
             paymentKey,
@@ -349,22 +368,42 @@ export async function POST(
           cache: 'no-store',
         },
       );
-    } catch (error) {
+       } catch (error) {
       console.error(
         '[TOSS_PAYMENT_CONFIRM_NETWORK_ERROR]',
         error,
       );
 
-      await markOrderFailed(order.id, userId);
-
+      /*
+       * 네트워크 오류는 결제 실패를 의미하지 않습니다.
+       *
+       * 토스에서 승인은 완료됐지만 응답만 받지 못한
+       * 경우가 있을 수 있으므로 주문을 FAILED로
+       * 변경하지 않고 PAYMENT_PENDING으로 유지합니다.
+       *
+       * 이후 웹훅 또는 관리자 결제정보 재조회 기능으로
+       * 실제 토스 상태를 확인합니다.
+       */
       return NextResponse.json(
         {
-          ok: false,
+          ok: true,
+          paymentCompleted: false,
+          alreadyApproved: false,
+          bookId: order.bookId,
+          orderId: order.orderId,
+          totalAmount:
+            order.totalAmount,
+          status:
+            'PAYMENT_PENDING',
+          paymentMethod:
+            order.paymentMethod,
+          paidAt:
+            order.paidAt,
           message:
-            '결제 승인 서버에 연결하지 못했습니다.',
+            '결제 승인 결과를 확인 중입니다. 결제를 다시 시도하지 말고 주문 화면에서 결제정보를 다시 확인해 주세요.',
         },
         {
-          status: 502,
+          status: 202,
         },
       );
     }
@@ -384,6 +423,63 @@ export async function POST(
         tossBody as
           | TossErrorResponse
           | null;
+
+          const tossErrorCode =
+        cleanText(
+          tossError?.code,
+        );
+
+      /*
+       * 토스 서버 오류와 이미 처리된 결제 응답은
+       * 실패로 확정할 수 없습니다.
+       *
+       * 주문을 PAYMENT_PENDING으로 유지하고
+       * 웹훅 또는 결제정보 재조회로 정합성을 맞춥니다.
+       */
+      if (
+        tossResponse.status >= 500 ||
+        tossErrorCode ===
+          'ALREADY_PROCESSED_PAYMENT'
+      ) {
+        console.warn(
+          '[TOSS_PAYMENT_CONFIRM_UNCERTAIN]',
+          {
+            orderId:
+              order.orderId,
+            status:
+              tossResponse.status,
+            code:
+              tossErrorCode,
+          },
+        );
+
+        return NextResponse.json(
+          {
+            ok: true,
+            paymentCompleted: false,
+            alreadyApproved:
+              tossErrorCode ===
+              'ALREADY_PROCESSED_PAYMENT',
+            bookId:
+              order.bookId,
+            orderId:
+              order.orderId,
+            totalAmount:
+              order.totalAmount,
+            status:
+              'PAYMENT_PENDING',
+            paymentMethod:
+              order.paymentMethod,
+            paidAt:
+              order.paidAt,
+            message:
+              '결제 처리 결과를 토스 서버에서 다시 확인하고 있습니다. 중복 결제를 방지하기 위해 결제를 다시 시도하지 마세요.',
+          },
+          {
+            status: 202,
+          },
+        );
+      }
 
       const errorMessage =
         cleanText(
