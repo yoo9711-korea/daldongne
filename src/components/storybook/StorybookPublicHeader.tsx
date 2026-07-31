@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { signOut } from '@/auth';
 
 export type StorybookNavKey =
+  | 'home'
   | 'about'
   | 'pricing'
   | 'process'
@@ -19,16 +21,20 @@ const NAV_ITEMS: ReadonlyArray<{
   href: string;
   label: string;
 }> = [
-  
+  {
+    key: 'home',
+    href: '/',
+    label: '홈',
+  },
   {
     key: 'process',
     href: '/process',
     label: '제작과정',
   },
   {
-    key: 'trial',
-    href: '/trial',
-    label: '작품소개',
+    key: 'guide',
+    href: '/guide',
+    label: '이용안내',
   },
   {
     key: 'reviews',
@@ -36,22 +42,16 @@ const NAV_ITEMS: ReadonlyArray<{
     label: '이용후기',
   },
   {
-    key: 'guide',
-    href: '/guide#faq',
-    label: 'FAQ',
-  },
-  {
     key: 'contact',
     href: '/guide#contact',
     label: '문의하기',
   },
- {
+  {
     key: 'pricing',
     href: '/pricing',
     label: '상품안내',
   },
 ];
-
 const styles = `
   body:has(.storybook-public-page) > [role='banner'],
   body:has(.storybook-public-page) > footer {
@@ -422,6 +422,114 @@ const styles = `
     }
   }
 
+
+  /* UNIFIED_PUBLIC_HEADER_20260801 */
+
+  .storybook-public-nav {
+    gap: 8px;
+  }
+
+  .storybook-public-nav-link {
+    min-height: 38px;
+    padding: 0 14px;
+    border: 1px solid #ead8cd;
+    border-radius: 999px;
+    background: #fffaf5;
+    box-shadow: none;
+    color: #4a352a !important;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .storybook-public-nav-link::after {
+    display: none;
+    content: none;
+  }
+
+  .storybook-public-nav-link:hover,
+  .storybook-public-nav-link:focus-visible {
+    border-color: #e5b6a7;
+    background: #fff3ee;
+    color: #c45e49 !important;
+    transform: translateY(-1px);
+  }
+
+  .storybook-public-nav-link.is-active {
+    border-color: #e7b3a4;
+    background: #fff0ea;
+    color: #df654f !important;
+  }
+
+  .storybook-public-header-actions {
+    gap: 8px;
+  }
+
+  .storybook-public-logout-form {
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+  }
+
+  .storybook-public-login,
+  .storybook-public-logout {
+    min-height: 42px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e7b3a4;
+    border-radius: 999px;
+    background: #fffaf5;
+    box-shadow: none;
+    color: #b75b47 !important;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .storybook-public-logout {
+    cursor: pointer;
+  }
+
+  .storybook-public-login:hover,
+  .storybook-public-login:focus-visible,
+  .storybook-public-logout:hover,
+  .storybook-public-logout:focus-visible {
+    background: #fff0ea;
+  }
+
+  @media (max-width: 930px) {
+    .storybook-public-mobile-nav {
+      gap: 8px;
+    }
+
+    .storybook-public-mobile-nav
+      .storybook-public-nav-link {
+      min-height: 36px;
+      padding: 0 12px;
+      font-size: 13px;
+    }
+
+    .storybook-public-login,
+    .storybook-public-logout,
+    .storybook-public-cta {
+      min-height: 39px;
+      padding-right: 12px;
+      padding-left: 12px;
+      font-size: 12px;
+    }
+  }
 `;
 
 function HeaderNavigation({
@@ -463,13 +571,6 @@ export default function StorybookPublicHeader({
   const isLoggedIn =
     !ctaHref.startsWith('/login');
 
-  const accountHref = isLoggedIn
-    ? '/dashboard'
-    : '/login';
-
-  const accountLabel = isLoggedIn
-    ? '내 작업실'
-    : '로그인';
 
   return (
     <header className="storybook-public-header">
@@ -514,20 +615,46 @@ export default function StorybookPublicHeader({
         </nav>
 
         <div className="storybook-public-header-actions">
-  <Link
-    href={accountHref}
-    className="storybook-public-login"
-  >
-    {accountLabel}
-  </Link>
+          {isLoggedIn ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="storybook-public-login"
+              >
+                내 작업실
+              </Link>
 
-  <Link
-    href={ctaHref}
-    className="storybook-public-cta"
-  >
-    스토리북 만들기&nbsp; ♡
-  </Link>
-</div>
+              <form
+                action={async () => {
+                  'use server';
+                  await signOut({ redirectTo: '/' });
+                }}
+                className="storybook-public-logout-form"
+              >
+                <button
+                  type="submit"
+                  className="storybook-public-logout"
+                >
+                  로그아웃
+                </button>
+              </form>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="storybook-public-login"
+            >
+              로그인
+            </Link>
+          )}
+
+          <Link
+            href={ctaHref}
+            className="storybook-public-cta"
+          >
+            스토리북 만들기&nbsp; ♡
+          </Link>
+        </div>
       </div>
 
       <nav
