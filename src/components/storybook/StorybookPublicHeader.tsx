@@ -530,6 +530,144 @@ const styles = `
       font-size: 12px;
     }
   }
+
+  /* PUBLIC_HEADER_ACTION_OVERLAP_FIX_20260801
+     상품안내와 내 작업실 버튼 겹침 방지 */
+
+  .storybook-public-header-inner {
+    min-width: 0;
+  }
+
+  .storybook-public-nav {
+    min-width: 0;
+  }
+
+  .storybook-public-header-actions {
+    min-width: max-content;
+    width: max-content;
+    justify-self: end;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .storybook-public-nav-link,
+  .storybook-public-login,
+  .storybook-public-logout,
+  .storybook-public-cta {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  /*
+   * 데스크톱:
+   * 브랜드 / 메뉴 / 로그인 버튼 영역을 서로 침범하지 않도록 분리
+   */
+  @media (min-width: 1241px) {
+    .storybook-public-header-inner {
+      width: min(1600px, 100%);
+      padding-right: clamp(18px, 2vw, 32px);
+      padding-left: clamp(18px, 2vw, 32px);
+
+      grid-template-columns:
+        minmax(235px, 0.62fr)
+        minmax(0, 1fr)
+        max-content;
+
+      column-gap: clamp(10px, 1.1vw, 18px);
+    }
+
+    .storybook-public-nav {
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .storybook-public-nav-link {
+      min-height: 38px;
+      padding-right: 11px;
+      padding-left: 11px;
+      font-size: 13px;
+    }
+
+    .storybook-public-header-actions {
+      gap: 7px;
+    }
+
+    .storybook-public-login,
+    .storybook-public-logout {
+      min-height: 40px;
+      padding-right: 13px;
+      padding-left: 13px;
+      font-size: 13px;
+    }
+
+    .storybook-public-cta {
+      min-height: 42px;
+      padding-right: 18px;
+      padding-left: 18px;
+      font-size: 13px;
+    }
+  }
+
+  /*
+   * 화면이 조금 좁은 데스크톱:
+   * 글자와 버튼 여백을 한 단계 더 줄여 겹침 방지
+   */
+  @media (min-width: 1241px) and (max-width: 1450px) {
+    .storybook-public-header-inner {
+      grid-template-columns:
+        minmax(205px, 0.52fr)
+        minmax(0, 1fr)
+        max-content;
+
+      column-gap: 9px;
+      padding-right: 15px;
+      padding-left: 15px;
+    }
+
+    .storybook-public-brand {
+      gap: 7px;
+    }
+
+    .storybook-public-brand-name {
+      font-size: 25px;
+    }
+
+    .storybook-public-brand-mark {
+      width: 30px;
+      height: 34px;
+    }
+
+    .storybook-public-brand-heart {
+      display: none;
+    }
+
+    .storybook-public-nav {
+      gap: 4px;
+    }
+
+    .storybook-public-nav-link {
+      padding-right: 9px;
+      padding-left: 9px;
+      font-size: 12px;
+    }
+
+    .storybook-public-header-actions {
+      gap: 5px;
+    }
+
+    .storybook-public-login,
+    .storybook-public-logout {
+      padding-right: 10px;
+      padding-left: 10px;
+      font-size: 12px;
+    }
+
+    .storybook-public-cta {
+      padding-right: 14px;
+      padding-left: 14px;
+      font-size: 12px;
+    }
+  }
 `;
 
 function HeaderNavigation({
