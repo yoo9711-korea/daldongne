@@ -544,67 +544,43 @@ export default async function HomePage() {
       <style>{styles}</style>
 
       <main className="reference-home">
-        <section className="reference-hero">
-          <div className="reference-shell">
-            <div className="reference-main-image">
-              <Image
-                src="/home/reference-home-v1/home-main-reference-v2.webp"
-                alt="달동네 스토리의 나, 가족, 친구, 연인, 강아지, 고양이 기록 화면과 모바일 화면을 함께 보여주는 메인 이미지"
-                fill
-                priority
-                quality={100}
-          unoptimized
-          sizes="(max-width: 700px) calc(100vw - 28px), (max-width: 1100px) calc(100vw - 40px), 1500px"
-              />
-<HomeHeroInteractiveControls />
-            </div>
-
-            <h1 className="reference-title">
-              오늘의 사진 한 장이
-              <br />
-              <span>한 권의 책이 됩니다</span>
-            </h1>
-
-            <p className="reference-subtitle">
-              사진과 이야기를 차곡차곡 모아 세상에 하나뿐인 나의 책을 만들어보세요.
-            </p>
-
-            <div className="reference-process">
-              {steps.map((step) => (
-                <article key={step.number} className="reference-step">
-                  <span className="reference-step-number">{step.number}</span>
-
-                  <div className="reference-step-visual">
-                    <Image
-                      src={step.image}
-                      alt=""
-                      fill
-                      sizes="(max-width: 700px) 47px, (max-width: 1100px) 45vw, 25vw"
-                    />
-                  </div>
-
-                  <p className="reference-step-kicker">
-                    {step.number}. {step.eyebrow}
-                  </p>
-                  <h2>{step.title}</h2>
-                  <p>{step.description}</p>
-
-                  <Link href={step.href}>{step.title} 화면으로 이동</Link>
-                </article>
-              ))}
-            </div>
-
-            <p className="reference-review-note">관리자 검토 완료 후 결제</p>
-
-            <Link href={homeStartHref} className="reference-cta">
-              <span className="reference-cta-heart" aria-hidden="true">♥</span>
-              내 기록 시작하기
-            </Link>
-
-            <p className="reference-cta-caption">
-              나와 소중한 존재들의 시간을 남겨보세요
-            </p>
-          </div>
+        <section
+          aria-label="달동네 스토리북 메인 소개"
+          style={{
+            width: 'min(1720px, calc(100% - 32px))',
+            margin: '16px auto 34px',
+            overflow: 'hidden',
+            border: '1px solid rgba(116, 78, 53, 0.14)',
+            borderRadius: 28,
+            background: '#fffaf4',
+            boxShadow: '0 18px 45px rgba(93, 61, 41, 0.08)',
+          }}
+        >
+          <Link
+            href={homeStartHref}
+            aria-label="나의 이야기 시작하기"
+            style={{
+              display: 'block',
+              width: '100%',
+              textDecoration: 'none',
+            }}
+          >
+            <Image
+              src="/home/reference-home-v1/daldongne-main-hero-v3.webp"
+              alt="달동네 스토리북으로 가족, 연인, 반려동물의 사진과 이야기를 책으로 만드는 모습"
+              width={3000}
+              height={1500}
+              priority
+              quality={95}
+              sizes="(max-width: 700px) calc(100vw - 20px), (max-width: 1200px) calc(100vw - 32px), 1720px"
+              style={{
+                display: 'block',
+                width: '100%',
+                height: 'auto',
+                objectFit: 'cover',
+              }}
+            />
+          </Link>
         </section>
 
         <HomeServiceJourney />
