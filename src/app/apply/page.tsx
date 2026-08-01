@@ -28,7 +28,7 @@ const PRODUCT_IMAGES: Record<
   MONTHLY_RECORD_BASIC:
     '/home/storybook/process-hero-bright-v2.webp',
   MONTHLY_RECORD_QUARTERLY_POSTCARD:
-    '/home/storybook/example-3.webp',
+    '/images/apply-quarterly-postcard-hero-sharp-v2.png',
   MONTHLY_RECORD_MONTHLY_POSTCARD:
     '/home/storybook/example-4.webp',
   MONTHLY_RECORD_PREMIUM:
@@ -275,6 +275,64 @@ const pageStyles = `
     font-size: 11px;
     line-height: 1.45;
   }
+  /* Daldongne apply hero desktop sharp 85 v1 */
+  @media (min-width: 861px) {
+    .apply-storybook-hero {
+      width: 85%;
+      min-height: 255px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .apply-storybook-hero-inner {
+      min-height: 255px;
+      padding: 32px clamp(20px, 3.4vw, 46px);
+    }
+
+    .apply-storybook-title {
+      font-size: clamp(37px, 3.4vw, 48px);
+      line-height: 1.15;
+    }
+
+    .apply-storybook-label {
+      font-size: 12px;
+    }
+
+    .apply-storybook-description {
+      font-size: 14px;
+      line-height: 1.65;
+    }
+  }
+  /* Daldongne apply hero final desktop size 85 v2 */
+  @media (min-width: 861px) {
+    .apply-storybook-hero {
+      width: min(1207px, 100%) !important;
+      min-height: 255px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+
+    .apply-storybook-hero-inner {
+      min-height: 255px !important;
+      padding: 32px clamp(20px, 3.4vw, 46px) !important;
+    }
+
+    .apply-storybook-title {
+      font-size: clamp(37px, 3.4vw, 48px) !important;
+      line-height: 1.15 !important;
+    }
+
+    .apply-storybook-label {
+      font-size: 12px !important;
+    }
+
+    .apply-storybook-description {
+      font-size: 14px !important;
+      line-height: 1.65 !important;
+    }
+  }
+
+
 
   @media (max-width: 860px) {
     .apply-storybook-hero {
@@ -419,7 +477,19 @@ export default async function ApplyPage({
                 alt={`${product.name} 스토리북 예시`}
                 fill
                 priority
+                quality={95}
+                unoptimized={
+                  product.code ===
+                  'MONTHLY_RECORD_QUARTERLY_POSTCARD'
+                }
                 sizes="(max-width: 860px) 100vw, 50vw"
+                /* quarterly postcard image position */
+                style={
+                  product.code ===
+                  'MONTHLY_RECORD_QUARTERLY_POSTCARD'
+                    ? { objectPosition: 'right center' }
+                    : undefined
+                }
               />
             </div>
 

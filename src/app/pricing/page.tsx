@@ -289,7 +289,7 @@ const styles = `
 
   .simple-pricing-hero-image img {
     object-fit: cover;
-    object-position: center 55%;
+    object-position: 82% 55%;
   }
 
   .simple-pricing-main {
@@ -669,8 +669,67 @@ const styles = `
     line-height: 1.7;
     text-align: center;
   }
+  /* Daldongne pricing hero fitted layout v2 */
+  @media (min-width: 981px) {
+    .simple-pricing-hero {
+      width: min(1420px, calc(100% - 48px));
+      min-height: 374px;
+    }
 
-  @media (max-width: 980px) {
+    .simple-pricing-hero-copy {
+      padding: clamp(34px, 3.8vw, 52px);
+    }
+
+    .simple-pricing-title {
+      font-size: clamp(42px, 3.2vw, 52px);
+      line-height: 1.12;
+    }
+
+    .simple-pricing-hero-image {
+      min-height: 374px;
+    }
+  }
+
+  /* Daldongne pricing hero final fitted layout v3 */
+  @media (min-width: 981px) {
+    .simple-pricing-hero {
+      width: min(1420px, calc(100% - 48px)) !important;
+      min-height: 374px !important;
+      zoom: 1 !important;
+    }
+
+    .simple-pricing-hero-copy {
+      padding: clamp(32px, 3vw, 48px) !important;
+    }
+
+    .simple-pricing-title {
+      font-size: clamp(40px, 3vw, 48px) !important;
+      line-height: 1.12 !important;
+    }
+
+    .simple-pricing-hero-description {
+      margin-top: 18px !important;
+      font-size: 15px !important;
+      line-height: 1.7 !important;
+    }
+
+    .simple-pricing-hero-note {
+      margin-top: 14px !important;
+      font-size: 12px !important;
+      line-height: 1.6 !important;
+    }
+
+    .simple-pricing-hero-image {
+      min-height: 374px !important;
+    }
+
+    .simple-pricing-hero-image img {
+      object-fit: cover !important;
+      object-position: 82% 55% !important;
+    }
+  }
+
+@media (max-width: 980px) {
     .simple-pricing-hero {
       grid-template-columns: 1fr;
     }
@@ -824,10 +883,11 @@ export default async function PricingPage() {
 
           <div className="simple-pricing-hero-image">
             <Image
-              src="/home/storybook/detail-hero-bright-v2.webp"
-              alt="가족사진과 이야기를 담아 완성한 인생책"
+              src="/images/pricing-monthly-record-hero-hq.png"
+              alt="엄마와 딸이 함께 가족사진이 담긴 인생책을 보는 모습"
               fill
               priority
+              quality={95}
               sizes="(max-width: 980px) 100vw, 56vw"
             />
           </div>
