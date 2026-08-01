@@ -10,6 +10,8 @@ const files = {
   panel: "src/components/admin/AdminPaymentManagementPanel.tsx",
   confirm: "src/app/api/payments/confirm/route.ts",
   webhook: "src/app/api/payments/webhook/route.ts",
+  liveTest: "scripts/check-payment-live-readiness.cjs",
+  orderTest: "scripts/check-payment-order-reconciliation.cjs",
 };
 
 let failed = false;
@@ -57,6 +59,8 @@ const actions = read(files.actions);
 const panel = read(files.panel);
 const confirm = read(files.confirm);
 const webhook = read(files.webhook);
+const liveTest = read(files.liveTest);
+const orderTest = read(files.orderTest);
 
 requireText(
   schema,
@@ -104,19 +108,44 @@ requireText(
   "administrator payment ledger UI",
 );
 requireText(
-  panel,
-  "refundAccountNumber",
-  "virtual-account refund form",
-);
-requireText(
   confirm,
-  "wasPaid: isPaid",
-  "confirm reconciliation context",
+  "Idempotency-Key",
+  "payment confirmation idempotency",
 );
 requireText(
   webhook,
-  "order.approvedAmount",
-  "webhook reconciliation context",
+  '"PAYMENT_STATUS_CHANGED"',
+  "standard payment webhook",
+);
+requireText(
+  webhook,
+  '"DEPOSIT_CALLBACK"',
+  "virtual account deposit webhook",
+);
+requireText(
+  webhook,
+  '"CANCEL_STATUS_CHANGED"',
+  "asynchronous cancel webhook",
+);
+requireText(
+  webhook,
+  "/v1/payments/orders/",
+  "orderId payment lookup fallback",
+);
+requireText(
+  webhook,
+  "tosspayments-webhook-transmission-id",
+  "webhook transmission deduplication",
+);
+requireText(
+  liveTest,
+  "PAYMENT_LIVE_READINESS_CHECK_PASSED",
+  "live readiness smoke test",
+);
+requireText(
+  orderTest,
+  "PAYMENT_ORDER_RECONCILIATION_PASSED",
+  "single-order reconciliation test",
 );
 
 if (/refund(AccountNumber|HolderName|Bank)\s+String/.test(schema)) {

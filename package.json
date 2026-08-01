@@ -30,7 +30,10 @@
     "test:home-hero-buttons": "node scripts/check-home-hero-live-buttons.cjs",
     "test:payment:static": "node scripts/check-payment-system-static.cjs",
     "test:payment:data": "node scripts/check-payment-ledger-data.cjs",
-    "test:payment:all": "pnpm test:payment:static && pnpm test:payment:data"
+    "test:payment:all": "pnpm test:payment:static && pnpm test:payment:data",
+    "test:payment:live": "node scripts/check-payment-live-readiness.cjs",
+    "test:payment:order": "node scripts/check-payment-order-reconciliation.cjs",
+    "test:payment:readiness": "pnpm test:payment:static && pnpm test:payment:data && pnpm test:payment:live"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.7.4",

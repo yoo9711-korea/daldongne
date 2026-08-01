@@ -1,27 +1,30 @@
-import { recordBookOrderAudit } from '@/lib/order-audit';
-import { sendOrderPaymentCompletedEmail } from '@/lib/order-email';
+import { recordBookOrderAudit } from "@/lib/order-audit";
+import { sendOrderPaymentCompletedEmail } from "@/lib/order-email";
 import {
   calculatePaymentAmounts,
   createPaymentEventKey,
   recordPaymentEvent,
-} from '@/lib/payment-ledger';
-import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
-import {
-  BookOrderStatus,
-} from '@prisma/client';
+} from "@/lib/payment-ledger";
+import { prisma } from "@/lib/prisma";
+import { validatePaymentStatusTransition } from "@/lib/order-workflow-policy";
+import { BookOrderStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 import {
   NextRequest,
   NextResponse,
-} from 'next/server';
-import { validatePaymentStatusTransition } from "@/lib/order-workflow-policy";
+} from "next/server";
 
-
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 type PaymentWebhookBody = {
   eventType?: unknown;
+  createdAt?: unknown;
   data?: unknown;
+  orderId?: unknown;
+  status?: unknown;
+  transactionKey?: unknown;
+  secret?: unknown;
 };
 
 type TossPaymentData = {
@@ -35,6 +38,12 @@ type TossPaymentData = {
   lastTransactionKey?: unknown;
 };
 
+const SUPPORTED_EVENT_TYPES = new Set([
+  "PAYMENT_STATUS_CHANGED",
+  "DEPOSIT_CALLBACK",
+  "CANCEL_STATUS_CHANGED",
+]);
+
 export async function POST(
   request: NextRequest,
 ) {
@@ -46,31 +55,93 @@ export async function POST(
         | PaymentWebhookBody
         | null;
 
-    const eventType =
-      cleanText(body?.eventType);
+    if (!body) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            "웹훅 본문을 확인할 수 없습니다.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    const explicitEventType =
+      cleanText(body.eventType);
 
     /*
-     * 이번 엔드포인트에서는
-     * 결제 상태 변경 이벤트만 처리합니다.
+     * DEPOSIT_CALLBACK 본문에는 eventType이 없을 수 있습니다.
+     * top-level orderId와 status가 있으면 가상계좌 콜백으로 판별합니다.
      */
-    if (
-      eventType !==
-      'PAYMENT_STATUS_CHANGED'
-    ) {
+    const eventType =
+      explicitEventType ||
+      (cleanText(body.orderId) &&
+      cleanText(body.status)
+        ? "DEPOSIT_CALLBACK"
+        : "");
+
+    if (!SUPPORTED_EVENT_TYPES.has(eventType)) {
       return NextResponse.json({
         ok: true,
         ignored: true,
+        eventType:
+          eventType || "UNKNOWN",
         message:
-          '처리 대상이 아닌 웹훅입니다.',
+          "처리 대상이 아닌 웹훅입니다.",
       });
     }
 
-    if (!isRecord(body?.data)) {
+    let eventOrderId = "";
+    let eventPaymentKey = "";
+    let eventStatus = "";
+    let eventTransactionKey = "";
+
+    if (eventType === "DEPOSIT_CALLBACK") {
+      eventOrderId =
+        cleanText(body.orderId);
+      eventStatus =
+        cleanText(body.status);
+      eventTransactionKey =
+        cleanText(body.transactionKey);
+    } else {
+      if (!isRecord(body.data)) {
+        return NextResponse.json(
+          {
+            ok: false,
+            eventType,
+            message:
+              "웹훅 결제정보가 없습니다.",
+          },
+          {
+            status: 400,
+          },
+        );
+      }
+
+      const eventData =
+        body.data as TossPaymentData;
+
+      eventOrderId =
+        cleanText(eventData.orderId);
+      eventPaymentKey =
+        cleanText(eventData.paymentKey);
+      eventStatus =
+        cleanText(eventData.status);
+      eventTransactionKey =
+        cleanText(
+          eventData.lastTransactionKey,
+        );
+    }
+
+    if (!isValidOrderId(eventOrderId)) {
       return NextResponse.json(
         {
           ok: false,
+          eventType,
           message:
-            '웹훅 결제정보가 없습니다.',
+            "웹훅 주문번호가 올바르지 않습니다.",
         },
         {
           status: 400,
@@ -78,29 +149,16 @@ export async function POST(
       );
     }
 
-    const eventPayment =
-      body.data as TossPaymentData;
-
-    const paymentKey =
-      cleanText(
-        eventPayment.paymentKey,
-      );
-
-    const orderId =
-      cleanText(
-        eventPayment.orderId,
-      );
-
     if (
-      !paymentKey ||
-      paymentKey.length > 200 ||
-      !isValidOrderId(orderId)
+      eventPaymentKey &&
+      eventPaymentKey.length > 200
     ) {
       return NextResponse.json(
         {
           ok: false,
+          eventType,
           message:
-            '웹훅 주문정보가 올바르지 않습니다.',
+            "웹훅 결제키가 올바르지 않습니다.",
         },
         {
           status: 400,
@@ -108,14 +166,10 @@ export async function POST(
       );
     }
 
-    /*
-     * 달동네 주문번호와 연결된 주문만
-     * 처리합니다.
-     */
     const order =
       await prisma.bookOrder.findUnique({
         where: {
-          orderId,
+          orderId: eventOrderId,
         },
         select: {
           id: true,
@@ -155,36 +209,41 @@ export async function POST(
 
     if (!order) {
       console.warn(
-        '[TOSS_WEBHOOK_ORDER_NOT_FOUND]',
+        "[TOSS_WEBHOOK_ORDER_NOT_FOUND]",
         {
-          orderId,
+          eventType,
+          orderId: eventOrderId,
         },
       );
 
       return NextResponse.json({
         ok: true,
         ignored: true,
+        eventType,
         message:
-          '연결된 달동네 주문이 없습니다.',
+          "연결된 달동네 주문이 없습니다.",
       });
     }
 
     if (
       order.paymentKey &&
-      order.paymentKey !== paymentKey
+      eventPaymentKey &&
+      order.paymentKey !== eventPaymentKey
     ) {
       console.error(
-        '[TOSS_WEBHOOK_PAYMENT_KEY_CONFLICT]',
+        "[TOSS_WEBHOOK_PAYMENT_KEY_CONFLICT]",
         {
-          orderId,
+          eventType,
+          orderId: eventOrderId,
         },
       );
 
       return NextResponse.json(
         {
           ok: false,
+          eventType,
           message:
-            '기존 결제키와 웹훅 결제키가 일치하지 않습니다.',
+            "기존 결제키와 웹훅 결제키가 일치하지 않습니다.",
         },
         {
           status: 409,
@@ -197,14 +256,15 @@ export async function POST(
 
     if (!secretKey) {
       console.error(
-        '[TOSS_WEBHOOK_SECRET_KEY_MISSING]',
+        "[TOSS_WEBHOOK_SECRET_KEY_MISSING]",
       );
 
       return NextResponse.json(
         {
           ok: false,
+          eventType,
           message:
-            '결제 서버 설정이 없습니다.',
+            "결제 서버 설정이 없습니다.",
         },
         {
           status: 500,
@@ -215,41 +275,53 @@ export async function POST(
     const authorization =
       Buffer.from(
         `${secretKey}:`,
-        'utf8',
-      ).toString('base64');
+        "utf8",
+      ).toString("base64");
 
-    /*
-     * 웹훅 본문만 믿지 않고
-     * 토스 결제 조회 API로 현재 상태를
-     * 다시 확인합니다.
-     */
+    const lookupPaymentKey =
+      eventPaymentKey ||
+      order.paymentKey ||
+      "";
+
+    const lookupPath =
+      lookupPaymentKey
+        ? `/v1/payments/${encodeURIComponent(
+            lookupPaymentKey,
+          )}`
+        : `/v1/payments/orders/${encodeURIComponent(
+            order.orderId,
+          )}`;
+
     let tossResponse: Response;
 
     try {
       tossResponse = await fetch(
-        `https://api.tosspayments.com/v1/payments/${encodeURIComponent(
-          paymentKey,
-        )}`,
+        `https://api.tosspayments.com${lookupPath}`,
         {
-          method: 'GET',
+          method: "GET",
           headers: {
             Authorization:
               `Basic ${authorization}`,
           },
-          cache: 'no-store',
+          cache: "no-store",
         },
       );
     } catch (error) {
       console.error(
-        '[TOSS_WEBHOOK_PAYMENT_LOOKUP_NETWORK_ERROR]',
-        error,
+        "[TOSS_WEBHOOK_PAYMENT_LOOKUP_NETWORK_ERROR]",
+        {
+          eventType,
+          orderId: order.orderId,
+          error,
+        },
       );
 
       return NextResponse.json(
         {
           ok: false,
+          eventType,
           message:
-            '토스 결제정보 조회에 실패했습니다.',
+            "토스 결제정보 조회에 실패했습니다.",
         },
         {
           status: 502,
@@ -264,24 +336,23 @@ export async function POST(
         | TossPaymentData
         | null;
 
-    if (
-      !tossResponse.ok ||
-      !tossBody
-    ) {
+    if (!tossResponse.ok || !tossBody) {
       console.error(
-        '[TOSS_WEBHOOK_PAYMENT_LOOKUP_REJECTED]',
+        "[TOSS_WEBHOOK_PAYMENT_LOOKUP_REJECTED]",
         {
+          eventType,
           status:
             tossResponse.status,
-          orderId,
+          orderId: order.orderId,
         },
       );
 
       return NextResponse.json(
         {
           ok: false,
+          eventType,
           message:
-            '토스 결제정보를 확인하지 못했습니다.',
+            "토스 결제정보를 확인하지 못했습니다.",
         },
         {
           status: 502,
@@ -290,51 +361,34 @@ export async function POST(
     }
 
     const verifiedPaymentKey =
-      cleanText(
-        tossBody.paymentKey,
-      );
-
+      cleanText(tossBody.paymentKey);
     const verifiedOrderId =
-      cleanText(
-        tossBody.orderId,
-      );
-
+      cleanText(tossBody.orderId);
     const verifiedTossStatus =
-      cleanText(
-        tossBody.status,
-      );
-
+      cleanText(tossBody.status);
     const verifiedMethod =
-      cleanText(
-        tossBody.method,
-      );
-
+      cleanText(tossBody.method);
     const verifiedAmount =
-      toInteger(
-        tossBody.totalAmount,
-      );
-
+      toInteger(tossBody.totalAmount);
     const verifiedBalanceAmount =
-      toInteger(
-        tossBody.balanceAmount,
-      );
-
+      toInteger(tossBody.balanceAmount);
     const verifiedTransactionKey =
       cleanText(
         tossBody.lastTransactionKey,
       );
 
     if (
-      verifiedPaymentKey !==
-        paymentKey ||
-      verifiedOrderId !==
-        order.orderId
+      !verifiedPaymentKey ||
+      verifiedOrderId !== order.orderId ||
+      (lookupPaymentKey &&
+        verifiedPaymentKey !==
+          lookupPaymentKey)
     ) {
       console.error(
-        '[TOSS_WEBHOOK_PAYMENT_ID_MISMATCH]',
+        "[TOSS_WEBHOOK_PAYMENT_ID_MISMATCH]",
         {
-          orderId:
-            order.orderId,
+          eventType,
+          orderId: order.orderId,
           verifiedOrderId,
         },
       );
@@ -342,8 +396,27 @@ export async function POST(
       return NextResponse.json(
         {
           ok: false,
+          eventType,
           message:
-            '조회된 결제정보가 주문과 일치하지 않습니다.',
+            "조회된 결제정보가 주문과 일치하지 않습니다.",
+        },
+        {
+          status: 409,
+        },
+      );
+    }
+
+    if (
+      order.paymentKey &&
+      order.paymentKey !==
+        verifiedPaymentKey
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          eventType,
+          message:
+            "저장된 결제키와 조회된 결제키가 일치하지 않습니다.",
         },
         {
           status: 409,
@@ -353,14 +426,13 @@ export async function POST(
 
     if (
       verifiedAmount === null ||
-      verifiedAmount !==
-        order.totalAmount
+      verifiedAmount !== order.totalAmount
     ) {
       console.error(
-        '[TOSS_WEBHOOK_AMOUNT_MISMATCH]',
+        "[TOSS_WEBHOOK_AMOUNT_MISMATCH]",
         {
-          orderId:
-            order.orderId,
+          eventType,
+          orderId: order.orderId,
           expectedAmount:
             order.totalAmount,
           verifiedAmount,
@@ -370,8 +442,9 @@ export async function POST(
       return NextResponse.json(
         {
           ok: false,
+          eventType,
           message:
-            '조회된 결제금액이 주문금액과 일치하지 않습니다.',
+            "조회된 결제금액이 주문금액과 일치하지 않습니다.",
         },
         {
           status: 409,
@@ -387,10 +460,11 @@ export async function POST(
 
     if (!nextStatus) {
       console.warn(
-        '[TOSS_WEBHOOK_STATUS_IGNORED]',
+        "[TOSS_WEBHOOK_STATUS_IGNORED]",
         {
-          orderId:
-            order.orderId,
+          eventType,
+          orderId: order.orderId,
+          eventStatus,
           tossStatus:
             verifiedTossStatus,
         },
@@ -399,11 +473,12 @@ export async function POST(
       return NextResponse.json({
         ok: true,
         ignored: true,
+        eventType,
         message:
-          '변경할 필요가 없는 결제 상태입니다.',
+          "변경할 필요가 없는 결제 상태입니다.",
       });
     }
-    /* PHASE_TWO_WEBHOOK_REGRESSION_GUARD */
+
     const paymentTransition =
       validatePaymentStatusTransition(
         order.status,
@@ -414,8 +489,8 @@ export async function POST(
       console.warn(
         "[TOSS_WEBHOOK_REGRESSION_IGNORED]",
         {
-          orderId:
-            order.orderId,
+          eventType,
+          orderId: order.orderId,
           currentStatus:
             order.status,
           nextStatus,
@@ -427,12 +502,11 @@ export async function POST(
       return NextResponse.json({
         ok: true,
         ignored: true,
+        eventType,
         message:
           "이전 결제 상태로 되돌리는 웹훅을 무시했습니다.",
       });
     }
-
-
 
     const paymentAmounts =
       calculatePaymentAmounts({
@@ -493,8 +567,7 @@ export async function POST(
           paymentMethod:
             verifiedMethod ||
             order.paymentMethod,
-          status:
-            nextStatus,
+          status: nextStatus,
           paidAt,
           canceledAt,
           tossStatus:
@@ -538,52 +611,75 @@ export async function POST(
               (order.approvedAmount || 0),
           );
 
+    const transmissionId =
+      cleanText(
+        request.headers.get(
+          "tosspayments-webhook-transmission-id",
+        ),
+      );
+
+    const webhookCreatedAt =
+      parseDate(body.createdAt);
+
     await recordPaymentEvent({
       orderId: order.id,
-      eventType: isRefundEvent
-        ? 'REFUND_STATUS'
-        : 'PAYMENT_STATUS',
+      eventType:
+        `WEBHOOK_${eventType}`,
       status:
         verifiedTossStatus,
       amount: eventAmount,
       balanceAmount:
         paymentAmounts.balanceAmount,
       transactionKey:
-        verifiedTransactionKey || null,
+        verifiedTransactionKey ||
+        eventTransactionKey ||
+        null,
       idempotencyKey:
         createPaymentEventKey([
-          'webhook',
+          "webhook-v3",
+          transmissionId || "none",
+          eventType,
           verifiedPaymentKey,
           verifiedTossStatus,
           paymentAmounts.balanceAmount,
           verifiedTransactionKey ||
-            'none',
+            eventTransactionKey ||
+            "none",
+          cleanText(body.createdAt) ||
+            "none",
         ]),
-      source: 'WEBHOOK',
+      reason:
+        eventStatus
+          ? `eventStatus=${eventStatus}`
+          : null,
+      source: "WEBHOOK",
       occurredAt:
-        paidAt || canceledAt ||
+        webhookCreatedAt ||
+        paidAt ||
+        canceledAt ||
         paymentSyncedAt,
     });
 
     await recordBookOrderAudit({
       orderId: order.id,
-      source: 'WEBHOOK',
+      source: "WEBHOOK",
       category:
         updatedOrder.status ===
           BookOrderStatus.REFUNDED ||
         updatedOrder.status ===
-          BookOrderStatus.PARTIALLY_REFUNDED ||
+          BookOrderStatus
+            .PARTIALLY_REFUNDED ||
         updatedOrder.status ===
           BookOrderStatus.CANCELED
-          ? 'REFUND'
-          : 'PAYMENT',
+          ? "REFUND"
+          : "PAYMENT",
       action:
-        'PAYMENT_STATUS_WEBHOOK',
+        `TOSS_${eventType}`,
       summary:
         order.status ===
         updatedOrder.status
-          ? `토스 웹훅으로 결제 상태 ${updatedOrder.status}을(를) 확인했습니다.`
-          : `토스 웹훅으로 결제 상태가 ${order.status}에서 ${updatedOrder.status}(으)로 변경되었습니다.`,
+          ? `토스 ${eventType} 웹훅으로 결제 상태 ${updatedOrder.status}을(를) 확인했습니다.`
+          : `토스 ${eventType} 웹훅으로 결제 상태가 ${order.status}에서 ${updatedOrder.status}(으)로 변경되었습니다.`,
       before: {
         status: order.status,
         paymentMethod:
@@ -591,6 +687,14 @@ export async function POST(
         paidAt: order.paidAt,
         canceledAt:
           order.canceledAt,
+        tossStatus:
+          order.tossStatus,
+        approvedAmount:
+          order.approvedAmount,
+        refundedAmount:
+          order.refundedAmount,
+        balanceAmount:
+          order.balanceAmount,
       },
       after: {
         status:
@@ -613,11 +717,15 @@ export async function POST(
           updatedOrder.balanceAmount,
         paymentSyncedAt:
           updatedOrder.paymentSyncedAt,
+        eventType,
+        transmissionId:
+          transmissionId || null,
       },
       isCustomerVisible:
         order.status !==
         updatedOrder.status,
     });
+
     if (
       order.status !==
         BookOrderStatus.PAID &&
@@ -653,19 +761,24 @@ export async function POST(
     }
 
     revalidatePath(
-      '/dashboard/orders',
+      "/dashboard/orders",
     );
-
     revalidatePath(
       `/dashboard/orders/${order.id}`,
     );
-
     revalidatePath(
       `/dashboard/library/${order.bookId}`,
     );
+    revalidatePath(
+      `/admin/orders/${order.id}`,
+    );
+
     console.info(
-      '[TOSS_WEBHOOK_ORDER_UPDATED]',
+      "[TOSS_WEBHOOK_ORDER_UPDATED]",
       {
+        eventType,
+        transmissionId:
+          transmissionId || null,
         orderId:
           updatedOrder.orderId,
         tossStatus:
@@ -678,6 +791,7 @@ export async function POST(
     return NextResponse.json({
       ok: true,
       ignored: false,
+      eventType,
       orderId:
         updatedOrder.orderId,
       status:
@@ -695,7 +809,7 @@ export async function POST(
     });
   } catch (error) {
     console.error(
-      '[TOSS_PAYMENT_WEBHOOK_ERROR]',
+      "[TOSS_PAYMENT_WEBHOOK_ERROR]",
       error,
     );
 
@@ -703,7 +817,7 @@ export async function POST(
       {
         ok: false,
         message:
-          '결제 웹훅 처리 중 오류가 발생했습니다.',
+          "결제 웹훅 처리 중 오류가 발생했습니다.",
       },
       {
         status: 500,
@@ -716,32 +830,32 @@ function mapBookOrderStatus(
   tossStatus: string,
   currentStatus: BookOrderStatus,
 ): BookOrderStatus | null {
-  if (tossStatus === 'DONE') {
+  if (tossStatus === "DONE") {
     return BookOrderStatus.PAID;
   }
 
   if (
     tossStatus ===
-      'WAITING_FOR_DEPOSIT' ||
-    tossStatus === 'IN_PROGRESS'
+      "WAITING_FOR_DEPOSIT" ||
+    tossStatus === "IN_PROGRESS"
   ) {
     return BookOrderStatus
       .PAYMENT_PENDING;
   }
 
-  if (tossStatus === 'READY') {
+  if (tossStatus === "READY") {
     return BookOrderStatus.READY;
   }
 
   if (
     tossStatus ===
-    'PARTIAL_CANCELED'
+    "PARTIAL_CANCELED"
   ) {
     return BookOrderStatus
       .PARTIALLY_REFUNDED;
   }
 
-  if (tossStatus === 'CANCELED') {
+  if (tossStatus === "CANCELED") {
     const wasPaid =
       currentStatus ===
         BookOrderStatus.PAID ||
@@ -757,8 +871,8 @@ function mapBookOrderStatus(
   }
 
   if (
-    tossStatus === 'ABORTED' ||
-    tossStatus === 'EXPIRED'
+    tossStatus === "ABORTED" ||
+    tossStatus === "EXPIRED"
   ) {
     return BookOrderStatus.FAILED;
   }
@@ -769,8 +883,8 @@ function mapBookOrderStatus(
 function cleanText(
   value: unknown,
 ) {
-  if (typeof value !== 'string') {
-    return '';
+  if (typeof value !== "string") {
+    return "";
   }
 
   return value.trim();
@@ -780,23 +894,20 @@ function toInteger(
   value: unknown,
 ) {
   if (
-    typeof value === 'number' &&
+    typeof value === "number" &&
     Number.isSafeInteger(value)
   ) {
     return value;
   }
 
   if (
-    typeof value === 'string' &&
+    typeof value === "string" &&
     value.trim()
   ) {
-    const parsed =
-      Number(value);
+    const parsed = Number(value);
 
     if (
-      Number.isSafeInteger(
-        parsed,
-      )
+      Number.isSafeInteger(parsed)
     ) {
       return parsed;
     }
@@ -846,11 +957,12 @@ function isRecord(
   unknown
 > {
   return (
-    typeof value === 'object' &&
+    typeof value === "object" &&
     value !== null &&
     !Array.isArray(value)
   );
 }
-// PAYMENT_LEDGER_INTEGRATION_V1
 
+// PAYMENT_LEDGER_INTEGRATION_V1
 // PAYMENT_REFUND_WORKFLOW_V2
+// PAYMENT_WEBHOOK_COVERAGE_V3
