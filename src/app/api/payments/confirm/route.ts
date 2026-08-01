@@ -632,6 +632,7 @@ export async function POST(
           confirmedStatus,
         balanceAmount:
           confirmedBalanceAmount,
+        wasPaid: isPaid,
       });
 
     const paymentSyncedAt =
@@ -986,3 +987,5 @@ async function markOrderFailed(
 }
 
 // PAYMENT_LEDGER_INTEGRATION_V1
+
+// PAYMENT_REFUND_WORKFLOW_V2

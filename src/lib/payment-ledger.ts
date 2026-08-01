@@ -11,6 +11,7 @@ type CalculatePaymentAmountsInput = {
   totalAmount: number;
   tossStatus: string;
   balanceAmount: number | null;
+  wasPaid?: boolean;
 };
 
 type RecordPaymentEventInput = {
@@ -50,6 +51,7 @@ export function calculatePaymentAmounts({
   totalAmount,
   tossStatus,
   balanceAmount,
+  wasPaid = false,
 }: CalculatePaymentAmountsInput) {
   const safeTotalAmount = Math.max(
     0,
@@ -75,11 +77,13 @@ export function calculatePaymentAmounts({
           ),
         );
 
-  const isApproved = [
-    "DONE",
-    "PARTIAL_CANCELED",
-    "CANCELED",
-  ].includes(normalizedStatus);
+  const isApproved =
+    [
+      "DONE",
+      "PARTIAL_CANCELED",
+    ].includes(normalizedStatus) ||
+    (normalizedStatus === "CANCELED" &&
+      wasPaid);
 
   const approvedAmount = isApproved
     ? safeTotalAmount
@@ -178,3 +182,5 @@ export async function recordPaymentEvent({
 }
 
 // PAYMENT_LEDGER_INTEGRATION_V1
+
+// PAYMENT_REFUND_WORKFLOW_V2

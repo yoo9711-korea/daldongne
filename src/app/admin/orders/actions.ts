@@ -20,6 +20,16 @@ type TossPaymentResponse = {
   totalAmount?: unknown;
   balanceAmount?: unknown;
   lastTransactionKey?: unknown;
+  cancels?: unknown;
+};
+
+type TossCancelResponse = {
+  cancelAmount?: unknown;
+  refundableAmount?: unknown;
+  canceledAt?: unknown;
+  transactionKey?: unknown;
+  cancelReason?: unknown;
+  cancelStatus?: unknown;
 };
 
 type TossErrorResponse = {
@@ -195,6 +205,10 @@ export async function syncOrderPayment(
           verifiedStatus,
         balanceAmount:
           verifiedBalanceAmount,
+        wasPaid: Boolean(
+          order.paidAt ||
+          order.approvedAmount,
+        ),
       });
 
     const now = new Date();
@@ -305,6 +319,10 @@ export async function syncOrderPayment(
     successMessage =
       "토스 결제정보를 다시 확인해 주문 상태를 갱신했습니다.";
   } catch (error) {
+    if (isNextRedirectError(error)) {
+      throw error;
+    }
+
     console.error(
       "[ADMIN_ORDER_PAYMENT_SYNC_ERROR]",
       error,
@@ -344,11 +362,49 @@ export async function cancelOrRefundOrder(
     ) ||
     "관리자 요청에 의한 주문 취소";
 
+  const requestedAmountText =
+    cleanText(
+      formData.get("cancelAmount"),
+    );
+
+  const refundRequestKey =
+    cleanText(
+      formData.get("refundRequestKey"),
+    );
+
+  const refundBank = cleanText(
+    formData.get("refundBank"),
+  );
+
+  const refundAccountNumber =
+    cleanText(
+      formData.get(
+        "refundAccountNumber",
+      ),
+    ).replace(/\D/g, "");
+
+  const refundHolderName =
+    cleanText(
+      formData.get("refundHolderName"),
+    );
+
   if (!orderRecordId) {
     redirectWithResult(
       "",
       "error",
       "주문 정보를 찾을 수 없습니다.",
+    );
+  }
+
+  if (
+    !/^[A-Za-z0-9_-]{16,100}$/.test(
+      refundRequestKey,
+    )
+  ) {
+    redirectWithResult(
+      orderRecordId,
+      "error",
+      "취소·환불 요청 식별자를 확인할 수 없습니다. 화면을 새로고침한 뒤 다시 시도해 주세요.",
     );
   }
 
@@ -396,20 +452,52 @@ export async function cancelOrRefundOrder(
       redirectWithResult(
         orderRecordId,
         "message",
-        "이미 취소 또는 환불된 주문입니다.",
+        "이미 취소 또는 환불이 완료된 주문입니다.",
       );
     }
 
-    if (
-      order.status ===
-      "PARTIALLY_REFUNDED"
-    ) {
-      throw new Error(
-        "부분 환불된 주문은 토스 관리자센터에서 잔여 금액을 확인한 뒤 처리해 주세요.",
+    const currentRefundedAmount =
+      Math.max(
+        0,
+        order.refundedAmount || 0,
       );
-    }
+
+    const availableAmount =
+      order.balanceAmount === null
+        ? Math.max(
+            0,
+            order.totalAmount -
+              currentRefundedAmount,
+          )
+        : Math.min(
+            order.totalAmount,
+            Math.max(
+              0,
+              order.balanceAmount,
+            ),
+          );
+
+    const requestedCancelAmount =
+      requestedAmountText
+        ? toInteger(
+            requestedAmountText,
+          )
+        : availableAmount;
 
     if (!order.paymentKey) {
+      if (
+        requestedCancelAmount === null ||
+        requestedCancelAmount !==
+          availableAmount
+      ) {
+        throw new Error(
+          "미결제 주문은 부분 취소할 수 없습니다.",
+        );
+      }
+
+      const paymentSyncedAt =
+        new Date();
+
       const updatedOrder =
         await prisma.bookOrder.update({
           where: {
@@ -417,15 +505,15 @@ export async function cancelOrRefundOrder(
           },
           data: {
             status: "CANCELED",
-            canceledAt: new Date(),
+            canceledAt:
+              order.canceledAt ||
+              paymentSyncedAt,
             tossStatus:
               "LOCAL_CANCELED",
             approvedAmount: 0,
             refundedAmount: 0,
-            balanceAmount:
-              order.totalAmount,
-            paymentSyncedAt:
-              new Date(),
+            balanceAmount: 0,
+            paymentSyncedAt,
           },
           select: {
             id: true,
@@ -442,6 +530,26 @@ export async function cancelOrRefundOrder(
           },
         });
 
+      await recordPaymentEvent({
+        orderId: order.id,
+        eventType:
+          "ORDER_CANCELED",
+        status:
+          "LOCAL_CANCELED",
+        amount: 0,
+        balanceAmount: 0,
+        idempotencyKey:
+          createPaymentEventKey([
+            "local-cancel-v3",
+            order.id,
+            refundRequestKey,
+          ]),
+        reason: cancelReason,
+        source: "ADMIN",
+        occurredAt:
+          paymentSyncedAt,
+      });
+
       await recordBookOrderAudit({
         orderId: order.id,
         actorId: admin.id,
@@ -457,46 +565,66 @@ export async function cancelOrRefundOrder(
         isCustomerVisible: true,
       });
 
-      await recordPaymentEvent({
-        orderId: order.id,
-        eventType:
-          "ORDER_CANCELED",
-        status:
-          "LOCAL_CANCELED",
-        amount: 0,
-        balanceAmount:
-          order.totalAmount,
-        idempotencyKey:
-          createPaymentEventKey([
-            "local-cancel",
-            order.id,
-            cancelReason.slice(
-              0,
-              200,
-            ),
-          ]),
-        reason: cancelReason,
-        source: "ADMIN",
-      });
-
       successMessage =
         "미결제 주문을 취소했습니다.";
     } else {
-      const paymentMethod =
-        (order.paymentMethod || "")
-          .toUpperCase();
+      if (availableAmount <= 0) {
+        throw new Error(
+          "환불 가능한 잔액이 없습니다.",
+        );
+      }
 
       if (
-        paymentMethod.includes(
-          "VIRTUAL",
-        ) ||
-        paymentMethod.includes(
-          "가상",
-        )
+        requestedCancelAmount === null ||
+        requestedCancelAmount < 1 ||
+        requestedCancelAmount >
+          availableAmount
       ) {
         throw new Error(
-          "가상계좌 환불은 고객 환불계좌 정보가 필요합니다. 토스 관리자센터에서 처리해 주세요.",
+          `환불 금액은 1원 이상 ${availableAmount.toLocaleString()}원 이하로 입력해 주세요.`,
         );
+      }
+
+      if (
+        !order.paidAt &&
+        requestedCancelAmount !==
+          availableAmount
+      ) {
+        throw new Error(
+          "입금 또는 결제 완료 전에는 부분 취소할 수 없습니다.",
+        );
+      }
+
+      const isVirtualAccount =
+        isVirtualAccountPayment(
+          order.paymentMethod,
+        );
+
+      const needsRefundAccount =
+        isVirtualAccount &&
+        Boolean(order.paidAt);
+
+      if (needsRefundAccount) {
+        if (
+          !refundBank ||
+          !refundAccountNumber ||
+          !refundHolderName
+        ) {
+          throw new Error(
+            "가상계좌 환불은 은행 코드, 계좌번호, 예금주명을 모두 입력해야 합니다.",
+          );
+        }
+
+        if (
+          refundBank.length > 10 ||
+          refundAccountNumber.length < 6 ||
+          refundAccountNumber.length > 30 ||
+          refundHolderName.length > 100
+        ) {
+          throw new Error(
+            "가상계좌 환불계좌 정보를 다시 확인해 주세요.",
+          );
+        }
       }
 
       const secretKey =
@@ -510,14 +638,42 @@ export async function cancelOrRefundOrder(
 
       const cancelIdempotencyKey =
         createPaymentEventKey([
-          "admin-full-cancel",
+          "admin-refund-v3",
           order.id,
           order.paymentKey,
+          refundRequestKey,
+        ]);
+
+      const cancelRequestBody: {
+        cancelReason: string;
+        cancelAmount?: number;
+        refundReceiveAccount?: {
+          bank: string;
+          accountNumber: string;
+          holderName: string;
+        };
+      } = {
+        cancelReason:
           cancelReason.slice(
             0,
             200,
           ),
-        ]);
+      };
+
+      if (order.paidAt) {
+        cancelRequestBody.cancelAmount =
+          requestedCancelAmount;
+      }
+
+      if (needsRefundAccount) {
+        cancelRequestBody.refundReceiveAccount = {
+          bank: refundBank,
+          accountNumber:
+            refundAccountNumber,
+          holderName:
+            refundHolderName,
+        };
+      }
 
       const response = await fetch(
         `https://api.tosspayments.com/v1/payments/${encodeURIComponent(
@@ -535,13 +691,9 @@ export async function cancelOrRefundOrder(
             "Idempotency-Key":
               cancelIdempotencyKey,
           },
-          body: JSON.stringify({
-            cancelReason:
-              cancelReason.slice(
-                0,
-                200,
-              ),
-          }),
+          body: JSON.stringify(
+            cancelRequestBody,
+          ),
           cache: "no-store",
         },
       );
@@ -609,27 +761,32 @@ export async function cancelOrRefundOrder(
         );
       }
 
-      const nextStatus =
-        mapTossStatus(
-          canceledStatus,
-          order.status,
+      const latestCancel =
+        getLatestTossCancel(
+          canceledPayment?.cancels,
+          canceledTransactionKey,
         );
 
-      if (
-        !nextStatus ||
-        ![
-          "CANCELED",
-          "REFUNDED",
-          "PARTIALLY_REFUNDED",
-        ].includes(nextStatus)
-      ) {
-        throw new Error(
-          `토스 취소 결과 상태를 확인할 수 없습니다: ${
-            canceledStatus ||
-            "상태 없음"
-          }`,
+      const responseCancelAmount =
+        toInteger(
+          latestCancel?.cancelAmount,
         );
-      }
+
+      const responseRefundableAmount =
+        toInteger(
+          latestCancel?.refundableAmount,
+        );
+
+      const responseTransactionKey =
+        cleanText(
+          latestCancel?.transactionKey,
+        ) ||
+        canceledTransactionKey;
+
+      const responseCanceledAt =
+        parseDate(
+          latestCancel?.canceledAt,
+        );
 
       const paymentAmounts =
         calculatePaymentAmounts({
@@ -639,7 +796,58 @@ export async function cancelOrRefundOrder(
             canceledStatus,
           balanceAmount:
             canceledBalanceAmount,
+          wasPaid: Boolean(
+            order.paidAt ||
+            order.approvedAmount,
+          ),
         });
+
+      const actualCancelAmount =
+        responseCancelAmount ??
+        Math.max(
+          0,
+          paymentAmounts.refundedAmount -
+            currentRefundedAmount,
+        );
+
+      if (
+        actualCancelAmount !==
+          requestedCancelAmount
+      ) {
+        throw new Error(
+          "토스에서 처리된 환불 금액이 요청 금액과 일치하지 않습니다.",
+        );
+      }
+
+      if (
+        responseRefundableAmount !== null &&
+        responseRefundableAmount !==
+          paymentAmounts.balanceAmount
+      ) {
+        throw new Error(
+          "토스 환불 가능 잔액이 결제 잔액과 일치하지 않습니다.",
+        );
+      }
+
+      const expectedRefundedAmount =
+        currentRefundedAmount +
+        actualCancelAmount;
+
+      if (
+        paymentAmounts.refundedAmount !==
+          expectedRefundedAmount
+      ) {
+        throw new Error(
+          "토스 누적 환불 금액이 저장된 환불 이력과 일치하지 않습니다.",
+        );
+      }
+
+      const nextStatus =
+        order.paidAt
+          ? paymentAmounts.balanceAmount === 0
+            ? "REFUNDED"
+            : "PARTIALLY_REFUNDED"
+          : "CANCELED";
 
       const paymentSyncedAt =
         new Date();
@@ -653,6 +861,7 @@ export async function cancelOrRefundOrder(
             status: nextStatus,
             canceledAt:
               order.canceledAt ||
+              responseCanceledAt ||
               paymentSyncedAt,
             tossStatus:
               canceledStatus,
@@ -689,22 +898,32 @@ export async function cancelOrRefundOrder(
               ? "FULL_REFUND"
               : "PAYMENT_CANCELED",
         status: canceledStatus,
-        amount: Math.max(
-          0,
-          paymentAmounts.refundedAmount -
-            (order.refundedAmount || 0),
-        ),
+        amount:
+          actualCancelAmount,
         balanceAmount:
           paymentAmounts.balanceAmount,
         transactionKey:
-          canceledTransactionKey || null,
+          responseTransactionKey ||
+          null,
         idempotencyKey:
           cancelIdempotencyKey,
         reason: cancelReason,
         source: "ADMIN",
         occurredAt:
+          responseCanceledAt ||
           paymentSyncedAt,
       });
+
+      const refundAccountAudit =
+        needsRefundAccount
+          ? {
+              bank: refundBank,
+              accountNumber:
+                maskAccountNumber(
+                  refundAccountNumber,
+                ),
+            }
+          : null;
 
       await recordBookOrderAudit({
         orderId: order.id,
@@ -714,21 +933,43 @@ export async function cancelOrRefundOrder(
         source: "ADMIN",
         category: "REFUND",
         action:
-          order.paidAt
-            ? "PAYMENT_REFUNDED"
-            : "PAYMENT_CANCELED",
+          nextStatus ===
+          "PARTIALLY_REFUNDED"
+            ? "PAYMENT_PARTIALLY_REFUNDED"
+            : order.paidAt
+              ? "PAYMENT_REFUNDED"
+              : "PAYMENT_CANCELED",
         summary:
-          `${order.paidAt ? "결제를 전액 환불" : "결제를 취소"}했습니다. 사유: ${cancelReason.slice(0, 200)}`,
+          `${actualCancelAmount.toLocaleString()}원을 ${
+            nextStatus ===
+            "PARTIALLY_REFUNDED"
+              ? "부분 환불"
+              : order.paidAt
+                ? "전액 환불"
+                : "취소"
+          }했습니다. 사유: ${cancelReason.slice(0, 200)}`,
         before: order,
-        after: updatedOrder,
+        after: {
+          ...updatedOrder,
+          refundAccount:
+            refundAccountAudit,
+        },
         isCustomerVisible: true,
       });
 
-      successMessage = order.paidAt
-        ? "토스 결제를 전액 환불했습니다."
-        : "토스 결제를 취소했습니다.";
+      successMessage =
+        nextStatus ===
+        "PARTIALLY_REFUNDED"
+          ? `${actualCancelAmount.toLocaleString()}원을 부분 환불했습니다.`
+          : order.paidAt
+            ? `${actualCancelAmount.toLocaleString()}원을 전액 환불했습니다.`
+            : "토스 결제를 취소했습니다.";
     }
   } catch (error) {
+    if (isNextRedirectError(error)) {
+      throw error;
+    }
+
     console.error(
       "[ADMIN_ORDER_CANCEL_ERROR]",
       error,
@@ -753,6 +994,102 @@ export async function cancelOrRefundOrder(
     "message",
     successMessage,
   );
+}
+
+function isNextRedirectError(
+  error: unknown,
+) {
+  if (
+    !error ||
+    typeof error !== "object" ||
+    !("digest" in error)
+  ) {
+    return false;
+  }
+
+  const digest =
+    (error as {
+      digest?: unknown;
+    }).digest;
+
+  return (
+    typeof digest === "string" &&
+    digest.startsWith(
+      "NEXT_REDIRECT",
+    )
+  );
+}
+
+function isVirtualAccountPayment(
+  paymentMethod: string | null,
+) {
+  const normalized =
+    (paymentMethod || "")
+      .trim()
+      .toUpperCase();
+
+  return (
+    normalized.includes(
+      "VIRTUAL",
+    ) ||
+    normalized.includes(
+      "가상",
+    )
+  );
+}
+
+function getLatestTossCancel(
+  value: unknown,
+  transactionKey: string,
+): TossCancelResponse | null {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+
+  const cancelRecords = value.filter(
+    (item): item is Record<
+      string,
+      unknown
+    > =>
+      Boolean(item) &&
+      typeof item === "object" &&
+      !Array.isArray(item),
+  );
+
+  if (transactionKey) {
+    const matched =
+      [...cancelRecords]
+        .reverse()
+        .find(
+          (item) =>
+            cleanText(
+              item.transactionKey,
+            ) === transactionKey,
+        );
+
+    if (matched) {
+      return matched;
+    }
+  }
+
+  return (
+    cancelRecords.at(-1) || null
+  );
+}
+
+function maskAccountNumber(
+  accountNumber: string,
+) {
+  const digits = accountNumber.replace(
+    /\D/g,
+    "",
+  );
+
+  if (digits.length <= 4) {
+    return "****";
+  }
+
+  return `****${digits.slice(-4)}`;
 }
 
 async function requireAdmin() {
@@ -939,3 +1276,5 @@ function redirectWithResult(
   );
 }
 // PAYMENT_LEDGER_INTEGRATION_V1
+
+// PAYMENT_REFUND_WORKFLOW_V2

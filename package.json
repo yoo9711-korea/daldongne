@@ -27,7 +27,10 @@
     "test:print-readiness:static": "node scripts/check-print-readiness-static.cjs",
     "test:print-readiness:data": "node scripts/check-print-readiness-data.cjs",
     "test:print-readiness:all": "pnpm test:print-readiness:static && pnpm test:print-readiness:data",
-    "test:home-hero-buttons": "node scripts/check-home-hero-live-buttons.cjs"
+    "test:home-hero-buttons": "node scripts/check-home-hero-live-buttons.cjs",
+    "test:payment:static": "node scripts/check-payment-system-static.cjs",
+    "test:payment:data": "node scripts/check-payment-ledger-data.cjs",
+    "test:payment:all": "pnpm test:payment:static && pnpm test:payment:data"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.7.4",

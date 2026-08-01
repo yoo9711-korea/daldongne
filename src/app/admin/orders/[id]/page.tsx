@@ -6,7 +6,7 @@ import {
 import AdminOrderAuditSummary from "@/components/admin/AdminOrderAuditSummary";
 import AdminOrderEmailAuditSummary from "@/components/admin/AdminOrderEmailAuditSummary";
 import AdminAIProductionPanel from "@/components/admin/AdminAIProductionPanel";
-import AdminOrderConfirmButton from "@/components/admin/AdminOrderConfirmButton";
+import AdminPaymentManagementPanel from "@/components/admin/AdminPaymentManagementPanel";
 import AdminProofReviewPanel from "@/components/admin/AdminProofReviewPanel";
 import CopyTextButton from "@/components/admin/CopyTextButton";
 import { prisma } from "@/lib/prisma";
@@ -583,103 +583,9 @@ export default async function AdminOrderDetailPage({
               </div>
             </Panel>
 
-            <Panel
-              eyebrow="결제 관리"
-              title="조회·취소·환불"
-            >
-              <div className="admin-order-detail-action-box">
-                <p>
-                  토스 서버의 실제 결제
-                  상태를 다시 조회해 주문
-                  정보를 갱신합니다.
-                </p>
-
-                <form
-                  action={
-                    syncOrderPayment
-                  }
-                >
-                  <input
-                    type="hidden"
-                    name="orderRecordId"
-                    value={order.id}
-                  />
-
-                  <AdminOrderConfirmButton
-                    label="토스 결제정보 다시 조회"
-                    pendingLabel="결제정보 확인 중..."
-                    confirmMessage="토스 서버에서 실제 결제상태를 다시 조회할까요?"
-                  />
-                </form>
-              </div>
-
-              <div
-                className="admin-order-detail-action-box"
-                data-danger="true"
-              >
-                <p>
-                  미결제 주문은 취소하고,
-                  결제 완료 주문은 전액
-                  환불합니다.
-                </p>
-
-                <form
-                  action={
-                    cancelOrRefundOrder
-                  }
-                >
-                  <input
-                    type="hidden"
-                    name="orderRecordId"
-                    value={order.id}
-                  />
-
-                  <label>
-                    <span>
-                      취소·환불 사유
-                    </span>
-
-                    <textarea
-                      name="cancelReason"
-                      defaultValue="관리자 요청에 의한 주문 취소"
-                      maxLength={200}
-                    />
-                  </label>
-
-                  <AdminOrderConfirmButton
-                    label={
-                      order.paidAt
-                        ? "전액 환불 처리"
-                        : "주문 취소 처리"
-                    }
-                    pendingLabel="취소 처리 중..."
-                    confirmMessage={
-                      order.paidAt
-                        ? "결제된 금액을 실제로 전액 환불합니다. 계속할까요?"
-                        : "이 주문을 취소할까요?"
-                    }
-                    tone="danger"
-                    disabled={
-                      cancelDisabled
-                    }
-                  />
-                </form>
-
-                {cancelDisabled ? (
-                  <span className="admin-order-detail-disabled-notice">
-                    이미 취소 또는 환불된
-                    주문입니다.
-                  </span>
-                ) : null}
-              </div>
-
-              <div className="admin-order-detail-warning">
-                가상계좌 결제는 고객
-                환불계좌 정보가 필요하므로
-                토스 관리자센터에서 직접
-                처리해야 합니다.
-              </div>
-            </Panel>
+            <AdminPaymentManagementPanel
+              orderRecordId={order.id}
+            />
           </aside>
         </section>
       </div>
@@ -1328,3 +1234,4 @@ const adminOrderDetailStyles = `
     }
   }
 `;
+// PAYMENT_REFUND_WORKFLOW_V2

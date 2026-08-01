@@ -442,6 +442,10 @@ export async function POST(
           verifiedTossStatus,
         balanceAmount:
           verifiedBalanceAmount,
+        wasPaid: Boolean(
+          order.paidAt ||
+          order.approvedAmount,
+        ),
       });
 
     const paymentSyncedAt =
@@ -848,3 +852,5 @@ function isRecord(
   );
 }
 // PAYMENT_LEDGER_INTEGRATION_V1
+
+// PAYMENT_REFUND_WORKFLOW_V2
