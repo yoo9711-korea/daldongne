@@ -1,6 +1,11 @@
 import { auth } from '@/auth';
 import { recordBookOrderAudit } from '@/lib/order-audit';
 import { sendOrderPaymentCompletedEmail } from '@/lib/order-email';
+import {
+  calculatePaymentAmounts,
+  createPaymentEventKey,
+  recordPaymentEvent,
+} from '@/lib/payment-ledger';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { createHash } from 'node:crypto';
@@ -24,6 +29,8 @@ type TossPaymentResponse = {
   method?: unknown;
   approvedAt?: unknown;
   totalAmount?: unknown;
+  balanceAmount?: unknown;
+  lastTransactionKey?: unknown;
 };
 
 type TossErrorResponse = {
@@ -132,6 +139,11 @@ export async function POST(
           paymentKey: true,
           paymentMethod: true,
           paidAt: true,
+          tossStatus: true,
+          approvedAmount: true,
+          refundedAmount: true,
+          balanceAmount: true,
+          paymentSyncedAt: true,
           book: {
             select: {
               title: true,
@@ -536,6 +548,16 @@ export async function POST(
         payment?.totalAmount,
       );
 
+    const confirmedBalanceAmount =
+      toInteger(
+        payment?.balanceAmount,
+      );
+
+    const confirmedTransactionKey =
+      cleanText(
+        payment?.lastTransactionKey,
+      );
+
     if (
       confirmedPaymentKey !==
         paymentKey ||
@@ -602,6 +624,19 @@ export async function POST(
           )
         : null;
 
+    const paymentAmounts =
+      calculatePaymentAmounts({
+        totalAmount:
+          order.totalAmount,
+        tossStatus:
+          confirmedStatus,
+        balanceAmount:
+          confirmedBalanceAmount,
+      });
+
+    const paymentSyncedAt =
+      new Date();
+
     const updatedOrder =
       await prisma.bookOrder.update({
         where: {
@@ -618,6 +653,15 @@ export async function POST(
           status: isPaid
             ? 'PAID'
             : 'PAYMENT_PENDING',
+          tossStatus:
+            confirmedStatus,
+          approvedAmount:
+            paymentAmounts.approvedAmount,
+          refundedAmount:
+            paymentAmounts.refundedAmount,
+          balanceAmount:
+            paymentAmounts.balanceAmount,
+          paymentSyncedAt,
         },
         select: {
           bookId: true,
@@ -626,8 +670,40 @@ export async function POST(
           status: true,
           paymentMethod: true,
           paidAt: true,
+          tossStatus: true,
+          approvedAmount: true,
+          refundedAmount: true,
+          balanceAmount: true,
+          paymentSyncedAt: true,
         },
       });
+
+    await recordPaymentEvent({
+      orderId: order.id,
+      eventType: isPaid
+        ? 'APPROVAL'
+        : 'WAITING_DEPOSIT',
+      status: confirmedStatus,
+      amount: isPaid
+        ? paymentAmounts.approvedAmount
+        : 0,
+      balanceAmount:
+        paymentAmounts.balanceAmount,
+      transactionKey:
+        confirmedTransactionKey || null,
+      idempotencyKey:
+        createPaymentEventKey([
+          'confirm',
+          confirmedPaymentKey,
+          confirmedStatus,
+          paymentAmounts.balanceAmount,
+          confirmedTransactionKey ||
+            'none',
+        ]),
+      source: 'CUSTOMER',
+      occurredAt:
+        approvedAt || paymentSyncedAt,
+    });
 
     await recordBookOrderAudit({
       orderId: order.id,
@@ -657,6 +733,16 @@ export async function POST(
           updatedOrder.paidAt,
         totalAmount:
           updatedOrder.totalAmount,
+        tossStatus:
+          updatedOrder.tossStatus,
+        approvedAmount:
+          updatedOrder.approvedAmount,
+        refundedAmount:
+          updatedOrder.refundedAmount,
+        balanceAmount:
+          updatedOrder.balanceAmount,
+        paymentSyncedAt:
+          updatedOrder.paymentSyncedAt,
       },
       isCustomerVisible: true,
     });
@@ -716,6 +802,16 @@ export async function POST(
         updatedOrder.paymentMethod,
       paidAt:
         updatedOrder.paidAt,
+      tossStatus:
+        updatedOrder.tossStatus,
+      approvedAmount:
+        updatedOrder.approvedAmount,
+      refundedAmount:
+        updatedOrder.refundedAmount,
+      balanceAmount:
+        updatedOrder.balanceAmount,
+      paymentSyncedAt:
+        updatedOrder.paymentSyncedAt,
       message: isPaid
         ? '결제가 완료되었습니다.'
         : '가상계좌가 발급되었습니다. 입금 완료 후 결제가 확정됩니다.',
@@ -888,3 +984,5 @@ async function markOrderFailed(
       true,
   });
 }
+
+// PAYMENT_LEDGER_INTEGRATION_V1

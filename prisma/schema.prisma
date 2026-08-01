@@ -227,6 +227,13 @@ model BookOrder {
   paidAt              DateTime?
   canceledAt          DateTime?
 
+  // PAYMENT_LEDGER_INTEGRATION_V1
+  tossStatus      String?   @map("toss_status")
+  approvedAmount  Int?      @map("approved_amount")
+  refundedAmount  Int       @default(0) @map("refunded_amount")
+  balanceAmount   Int?      @map("balance_amount")
+  paymentSyncedAt DateTime? @map("payment_synced_at")
+
   productionStage          BookProductionStage @default(PREPARING)
   productionStageUpdatedAt DateTime            @default(now())
   manuscriptReceivedAt     DateTime?
@@ -252,12 +259,13 @@ model BookOrder {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  productionRequest BookProductionRequest  @relation(fields: [productionRequestId], references: [id], onDelete: Cascade)
-  book              Book                   @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  author            User                   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  productionRequest BookProductionRequest   @relation(fields: [productionRequestId], references: [id], onDelete: Cascade)
+  book              Book                    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  author            User                    @relation(fields: [authorId], references: [id], onDelete: Cascade)
   auditLogs         BookOrderAuditLog[]
   proofReviews      BookOrderProofReview[]
   aiProductionRuns  AIBookProductionRun[]
+  paymentEvents     BookOrderPaymentEvent[]
 
   manualPrintJob BookOrderManualPrintJob?
 
@@ -270,6 +278,27 @@ model BookOrder {
   @@index([productionStage])
   @@index([trackingNumber])
   @@map("book_orders")
+}
+
+model BookOrderPaymentEvent {
+  id             String   @id @default(cuid())
+  orderId        String   @map("order_id")
+  eventType      String   @map("event_type")
+  status         String
+  amount         Int
+  balanceAmount  Int?     @map("balance_amount")
+  transactionKey String?  @map("transaction_key")
+  idempotencyKey String   @unique @map("idempotency_key")
+  reason         String?
+  source         String
+  occurredAt     DateTime @default(now()) @map("occurred_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  order BookOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, occurredAt])
+  @@index([eventType, status, occurredAt])
+  @@map("book_order_payment_events")
 }
 
 model BookOrderProofReview {

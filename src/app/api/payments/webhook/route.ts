@@ -1,5 +1,10 @@
 import { recordBookOrderAudit } from '@/lib/order-audit';
 import { sendOrderPaymentCompletedEmail } from '@/lib/order-email';
+import {
+  calculatePaymentAmounts,
+  createPaymentEventKey,
+  recordPaymentEvent,
+} from '@/lib/payment-ledger';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import {
@@ -26,6 +31,8 @@ type TossPaymentData = {
   method?: unknown;
   approvedAt?: unknown;
   totalAmount?: unknown;
+  balanceAmount?: unknown;
+  lastTransactionKey?: unknown;
 };
 
 export async function POST(
@@ -121,6 +128,11 @@ export async function POST(
           paymentMethod: true,
           paidAt: true,
           canceledAt: true,
+          tossStatus: true,
+          approvedAmount: true,
+          refundedAmount: true,
+          balanceAmount: true,
+          paymentSyncedAt: true,
           book: {
             select: {
               title: true,
@@ -302,6 +314,16 @@ export async function POST(
         tossBody.totalAmount,
       );
 
+    const verifiedBalanceAmount =
+      toInteger(
+        tossBody.balanceAmount,
+      );
+
+    const verifiedTransactionKey =
+      cleanText(
+        tossBody.lastTransactionKey,
+      );
+
     if (
       verifiedPaymentKey !==
         paymentKey ||
@@ -412,6 +434,19 @@ export async function POST(
 
 
 
+    const paymentAmounts =
+      calculatePaymentAmounts({
+        totalAmount:
+          order.totalAmount,
+        tossStatus:
+          verifiedTossStatus,
+        balanceAmount:
+          verifiedBalanceAmount,
+      });
+
+    const paymentSyncedAt =
+      new Date();
+
     const isPaid =
       nextStatus ===
       BookOrderStatus.PAID;
@@ -458,6 +493,15 @@ export async function POST(
             nextStatus,
           paidAt,
           canceledAt,
+          tossStatus:
+            verifiedTossStatus,
+          approvedAmount:
+            paymentAmounts.approvedAmount,
+          refundedAmount:
+            paymentAmounts.refundedAmount,
+          balanceAmount:
+            paymentAmounts.balanceAmount,
+          paymentSyncedAt,
         },
         select: {
           orderId: true,
@@ -466,8 +510,56 @@ export async function POST(
           paymentMethod: true,
           paidAt: true,
           canceledAt: true,
+          tossStatus: true,
+          approvedAmount: true,
+          refundedAmount: true,
+          balanceAmount: true,
+          paymentSyncedAt: true,
         },
       });
+
+    const isRefundEvent =
+      isRefunded || isCanceled;
+
+    const eventAmount =
+      isRefundEvent
+        ? Math.max(
+            0,
+            paymentAmounts.refundedAmount -
+              (order.refundedAmount || 0),
+          )
+        : Math.max(
+            0,
+            paymentAmounts.approvedAmount -
+              (order.approvedAmount || 0),
+          );
+
+    await recordPaymentEvent({
+      orderId: order.id,
+      eventType: isRefundEvent
+        ? 'REFUND_STATUS'
+        : 'PAYMENT_STATUS',
+      status:
+        verifiedTossStatus,
+      amount: eventAmount,
+      balanceAmount:
+        paymentAmounts.balanceAmount,
+      transactionKey:
+        verifiedTransactionKey || null,
+      idempotencyKey:
+        createPaymentEventKey([
+          'webhook',
+          verifiedPaymentKey,
+          verifiedTossStatus,
+          paymentAmounts.balanceAmount,
+          verifiedTransactionKey ||
+            'none',
+        ]),
+      source: 'WEBHOOK',
+      occurredAt:
+        paidAt || canceledAt ||
+        paymentSyncedAt,
+    });
 
     await recordBookOrderAudit({
       orderId: order.id,
@@ -507,6 +599,16 @@ export async function POST(
           updatedOrder.canceledAt,
         totalAmount:
           updatedOrder.totalAmount,
+        tossStatus:
+          updatedOrder.tossStatus,
+        approvedAmount:
+          updatedOrder.approvedAmount,
+        refundedAmount:
+          updatedOrder.refundedAmount,
+        balanceAmount:
+          updatedOrder.balanceAmount,
+        paymentSyncedAt:
+          updatedOrder.paymentSyncedAt,
       },
       isCustomerVisible:
         order.status !==
@@ -576,6 +678,16 @@ export async function POST(
         updatedOrder.orderId,
       status:
         updatedOrder.status,
+      tossStatus:
+        updatedOrder.tossStatus,
+      approvedAmount:
+        updatedOrder.approvedAmount,
+      refundedAmount:
+        updatedOrder.refundedAmount,
+      balanceAmount:
+        updatedOrder.balanceAmount,
+      paymentSyncedAt:
+        updatedOrder.paymentSyncedAt,
     });
   } catch (error) {
     console.error(
@@ -735,3 +847,4 @@ function isRecord(
     !Array.isArray(value)
   );
 }
+// PAYMENT_LEDGER_INTEGRATION_V1

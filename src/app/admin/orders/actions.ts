@@ -2,8 +2,12 @@
 
 import { auth } from "@/auth";
 import { recordBookOrderAudit } from "@/lib/order-audit";
+import {
+  calculatePaymentAmounts,
+  createPaymentEventKey,
+  recordPaymentEvent,
+} from "@/lib/payment-ledger";
 import { prisma } from "@/lib/prisma";
-import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -14,6 +18,8 @@ type TossPaymentResponse = {
   method?: unknown;
   approvedAt?: unknown;
   totalAmount?: unknown;
+  balanceAmount?: unknown;
+  lastTransactionKey?: unknown;
 };
 
 type TossErrorResponse = {
@@ -55,6 +61,11 @@ export async function syncOrderPayment(
           paymentMethod: true,
           paidAt: true,
           canceledAt: true,
+          tossStatus: true,
+          approvedAmount: true,
+          refundedAmount: true,
+          balanceAmount: true,
+          paymentSyncedAt: true,
         },
       });
 
@@ -137,6 +148,14 @@ export async function syncOrderPayment(
     const verifiedAmount =
       toInteger(payment?.totalAmount);
 
+    const verifiedBalanceAmount =
+      toInteger(payment?.balanceAmount);
+
+    const verifiedTransactionKey =
+      cleanText(
+        payment?.lastTransactionKey,
+      );
+
     if (
       verifiedOrderId !== order.orderId
     ) {
@@ -167,6 +186,16 @@ export async function syncOrderPayment(
         }`,
       );
     }
+
+    const paymentAmounts =
+      calculatePaymentAmounts({
+        totalAmount:
+          order.totalAmount,
+        tossStatus:
+          verifiedStatus,
+        balanceAmount:
+          verifiedBalanceAmount,
+      });
 
     const now = new Date();
 
@@ -202,6 +231,15 @@ export async function syncOrderPayment(
           paidAt: nextPaidAt,
           canceledAt:
             nextCanceledAt,
+          tossStatus:
+            verifiedStatus,
+          approvedAmount:
+            paymentAmounts.approvedAmount,
+          refundedAmount:
+            paymentAmounts.refundedAmount,
+          balanceAmount:
+            paymentAmounts.balanceAmount,
+          paymentSyncedAt: now,
         },
         select: {
           id: true,
@@ -212,6 +250,11 @@ export async function syncOrderPayment(
           paymentMethod: true,
           paidAt: true,
           canceledAt: true,
+          tossStatus: true,
+          approvedAmount: true,
+          refundedAmount: true,
+          balanceAmount: true,
+          paymentSyncedAt: true,
         },
       });
 
@@ -233,6 +276,30 @@ export async function syncOrderPayment(
       isCustomerVisible:
         order.status !==
         updatedOrder.status,
+    });
+
+    await recordPaymentEvent({
+      orderId: order.id,
+      eventType: "PAYMENT_SYNC",
+      status: verifiedStatus,
+      amount: 0,
+      balanceAmount:
+        paymentAmounts.balanceAmount,
+      transactionKey:
+        verifiedTransactionKey || null,
+      idempotencyKey:
+        createPaymentEventKey([
+          "admin-sync",
+          verifiedPaymentKey ||
+            order.paymentKey ||
+            order.orderId,
+          verifiedStatus,
+          paymentAmounts.balanceAmount,
+          verifiedTransactionKey ||
+            now.toISOString(),
+        ]),
+      source: "ADMIN",
+      occurredAt: now,
     });
 
     successMessage =
@@ -298,11 +365,17 @@ export async function cancelOrRefundOrder(
         select: {
           id: true,
           orderId: true,
+          totalAmount: true,
           status: true,
           paymentKey: true,
           paymentMethod: true,
           paidAt: true,
           canceledAt: true,
+          tossStatus: true,
+          approvedAmount: true,
+          refundedAmount: true,
+          balanceAmount: true,
+          paymentSyncedAt: true,
         },
       });
 
@@ -345,6 +418,14 @@ export async function cancelOrRefundOrder(
           data: {
             status: "CANCELED",
             canceledAt: new Date(),
+            tossStatus:
+              "LOCAL_CANCELED",
+            approvedAmount: 0,
+            refundedAmount: 0,
+            balanceAmount:
+              order.totalAmount,
+            paymentSyncedAt:
+              new Date(),
           },
           select: {
             id: true,
@@ -353,6 +434,11 @@ export async function cancelOrRefundOrder(
             paymentMethod: true,
             paidAt: true,
             canceledAt: true,
+            tossStatus: true,
+            approvedAmount: true,
+            refundedAmount: true,
+            balanceAmount: true,
+            paymentSyncedAt: true,
           },
         });
 
@@ -369,6 +455,28 @@ export async function cancelOrRefundOrder(
         before: order,
         after: updatedOrder,
         isCustomerVisible: true,
+      });
+
+      await recordPaymentEvent({
+        orderId: order.id,
+        eventType:
+          "ORDER_CANCELED",
+        status:
+          "LOCAL_CANCELED",
+        amount: 0,
+        balanceAmount:
+          order.totalAmount,
+        idempotencyKey:
+          createPaymentEventKey([
+            "local-cancel",
+            order.id,
+            cancelReason.slice(
+              0,
+              200,
+            ),
+          ]),
+        reason: cancelReason,
+        source: "ADMIN",
       });
 
       successMessage =
@@ -400,6 +508,17 @@ export async function cancelOrRefundOrder(
         );
       }
 
+      const cancelIdempotencyKey =
+        createPaymentEventKey([
+          "admin-full-cancel",
+          order.id,
+          order.paymentKey,
+          cancelReason.slice(
+            0,
+            200,
+          ),
+        ]);
+
       const response = await fetch(
         `https://api.tosspayments.com/v1/payments/${encodeURIComponent(
           order.paymentKey,
@@ -414,7 +533,7 @@ export async function cancelOrRefundOrder(
             "Content-Type":
               "application/json",
             "Idempotency-Key":
-              randomUUID(),
+              cancelIdempotencyKey,
           },
           body: JSON.stringify({
             cancelReason:
@@ -449,18 +568,101 @@ export async function cancelOrRefundOrder(
         );
       }
 
+      const canceledPayment =
+        responseBody as
+          | TossPaymentResponse
+          | null;
+
+      const canceledOrderId =
+        cleanText(
+          canceledPayment?.orderId,
+        );
+
+      const canceledStatus =
+        cleanText(
+          canceledPayment?.status,
+        );
+
+      const canceledTotalAmount =
+        toInteger(
+          canceledPayment?.totalAmount,
+        );
+
+      const canceledBalanceAmount =
+        toInteger(
+          canceledPayment?.balanceAmount,
+        );
+
+      const canceledTransactionKey =
+        cleanText(
+          canceledPayment?.lastTransactionKey,
+        );
+
+      if (
+        canceledOrderId !==
+          order.orderId ||
+        canceledTotalAmount !==
+          order.totalAmount
+      ) {
+        throw new Error(
+          "토스 취소 결과가 저장된 주문정보와 일치하지 않습니다.",
+        );
+      }
+
+      const nextStatus =
+        mapTossStatus(
+          canceledStatus,
+          order.status,
+        );
+
+      if (
+        !nextStatus ||
+        ![
+          "CANCELED",
+          "REFUNDED",
+          "PARTIALLY_REFUNDED",
+        ].includes(nextStatus)
+      ) {
+        throw new Error(
+          `토스 취소 결과 상태를 확인할 수 없습니다: ${
+            canceledStatus ||
+            "상태 없음"
+          }`,
+        );
+      }
+
+      const paymentAmounts =
+        calculatePaymentAmounts({
+          totalAmount:
+            order.totalAmount,
+          tossStatus:
+            canceledStatus,
+          balanceAmount:
+            canceledBalanceAmount,
+        });
+
+      const paymentSyncedAt =
+        new Date();
+
       const updatedOrder =
         await prisma.bookOrder.update({
           where: {
             id: order.id,
           },
           data: {
-            status: order.paidAt
-              ? "REFUNDED"
-              : "CANCELED",
+            status: nextStatus,
             canceledAt:
               order.canceledAt ||
-              new Date(),
+              paymentSyncedAt,
+            tossStatus:
+              canceledStatus,
+            approvedAmount:
+              paymentAmounts.approvedAmount,
+            refundedAmount:
+              paymentAmounts.refundedAmount,
+            balanceAmount:
+              paymentAmounts.balanceAmount,
+            paymentSyncedAt,
           },
           select: {
             id: true,
@@ -469,8 +671,40 @@ export async function cancelOrRefundOrder(
             paymentMethod: true,
             paidAt: true,
             canceledAt: true,
+            tossStatus: true,
+            approvedAmount: true,
+            refundedAmount: true,
+            balanceAmount: true,
+            paymentSyncedAt: true,
           },
         });
+
+      await recordPaymentEvent({
+        orderId: order.id,
+        eventType:
+          nextStatus ===
+          "PARTIALLY_REFUNDED"
+            ? "PARTIAL_REFUND"
+            : order.paidAt
+              ? "FULL_REFUND"
+              : "PAYMENT_CANCELED",
+        status: canceledStatus,
+        amount: Math.max(
+          0,
+          paymentAmounts.refundedAmount -
+            (order.refundedAmount || 0),
+        ),
+        balanceAmount:
+          paymentAmounts.balanceAmount,
+        transactionKey:
+          canceledTransactionKey || null,
+        idempotencyKey:
+          cancelIdempotencyKey,
+        reason: cancelReason,
+        source: "ADMIN",
+        occurredAt:
+          paymentSyncedAt,
+      });
 
       await recordBookOrderAudit({
         orderId: order.id,
@@ -704,3 +938,4 @@ function redirectWithResult(
     )}`,
   );
 }
+// PAYMENT_LEDGER_INTEGRATION_V1
