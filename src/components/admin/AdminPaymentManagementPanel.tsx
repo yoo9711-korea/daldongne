@@ -63,16 +63,18 @@ export default async function AdminPaymentManagementPanel({
     );
 
   const refundableAmount =
-    order.balanceAmount === null
-      ? Math.max(
-          0,
-          order.totalAmount -
-            refundedAmount,
-        )
-      : Math.max(
-          0,
-          order.balanceAmount,
-        );
+    !order.paymentKey
+      ? 0
+      : order.balanceAmount === null
+        ? Math.max(
+            0,
+            (order.approvedAmount ?? 0) -
+              refundedAmount,
+          )
+        : Math.max(
+            0,
+            order.balanceAmount,
+          );
 
   const terminal = [
     "CANCELED",
@@ -125,20 +127,22 @@ export default async function AdminPaymentManagementPanel({
           </span>
         </div>
 
-        <form action={syncOrderPayment}>
-          <input
-            type="hidden"
-            name="orderRecordId"
-            value={order.id}
-          />
-
-          <AdminOrderConfirmButton
-            label="토스 결제정보 다시 조회"
-            pendingLabel="결제정보 확인 중..."
-            confirmMessage="토스 서버에서 실제 결제상태를 다시 조회할까요?"
-            tone="neutral"
-          />
-        </form>
+        {order.paymentKey ? (
+          <form action={syncOrderPayment}>
+            <input
+              type="hidden"
+              name="orderRecordId"
+              value={order.id}
+            />
+  
+            <AdminOrderConfirmButton
+              label="토스 결제정보 다시 조회"
+              pendingLabel="결제정보 확인 중..."
+              confirmMessage="토스 서버에서 실제 결제상태를 다시 조회할까요?"
+              tone="neutral"
+            />
+          </form>
+        ) : null}
       </div>
 
       <div className="admin-payment-summary">
