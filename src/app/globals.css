@@ -3092,3 +3092,56 @@ body [aria-disabled="true"] {
     font-size: 15px !important;
   }
 }
+
+/* DALDONGNE PUBLIC VERTICAL 80 START */
+
+/*
+ * 제작과정과 내 작업실의 가로 폭은 유지하고
+ * 데스크톱 세로 높이와 위아래 여백만 약 20% 줄입니다.
+ */
+@media (min-width: 1201px) {
+  body:not(:has(.admin-common-frame)) .process-hero {
+    min-height: 260px !important;
+  }
+
+  body:not(:has(.admin-common-frame)) .process-hero-inner {
+    min-height: 260px !important;
+    padding-top: 36px !important;
+    padding-bottom: 32px !important;
+  }
+
+  body:not(:has(.admin-common-frame)) .dashboard-home-hero {
+    min-height: 344px !important;
+    padding-top: 43px !important;
+    padding-bottom: 34px !important;
+  }
+
+  body:not(:has(.admin-common-frame)) .dashboard-home-hero-copy {
+    padding-top: 18px !important;
+  }
+}
+
+/* 노트북과 작은 데스크톱 */
+@media (min-width: 981px) and (max-width: 1200px) {
+  body:not(:has(.admin-common-frame)) .process-hero {
+    min-height: 260px !important;
+  }
+
+  body:not(:has(.admin-common-frame)) .process-hero-inner {
+    min-height: 260px !important;
+    padding-top: 36px !important;
+    padding-bottom: 32px !important;
+  }
+
+  body:not(:has(.admin-common-frame)) .dashboard-home-hero {
+    min-height: 312px !important;
+    padding-top: 34px !important;
+    padding-bottom: 34px !important;
+  }
+
+  body:not(:has(.admin-common-frame)) .dashboard-home-hero-copy {
+    padding-top: 18px !important;
+  }
+}
+
+/* DALDONGNE PUBLIC VERTICAL 80 END */

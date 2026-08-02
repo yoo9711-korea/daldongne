@@ -30,9 +30,9 @@ const PRODUCT_IMAGES: Record<
   MONTHLY_RECORD_QUARTERLY_POSTCARD:
     '/images/apply-quarterly-postcard-hero-sharp-v2.png',
   MONTHLY_RECORD_MONTHLY_POSTCARD:
-    '/home/storybook/example-4.webp',
+    '/images/apply-monthly-postcard-hero-hq.png',
   MONTHLY_RECORD_PREMIUM:
-    '/home/storybook/detail-hero-bright-v2.webp',
+    '/images/apply-premium-love-diary-hero-hq.png',
   BOOK_PUBLISHING_BASIC:
     '/home/storybook/example-1.webp',
   BOOK_PUBLISHING_STANDARD:
@@ -331,6 +331,38 @@ const pageStyles = `
       line-height: 1.65 !important;
     }
   }
+  /* Daldongne apply heroes match pricing size v3 */
+  @media (min-width: 861px) {
+    .apply-storybook-hero {
+      width: min(1420px, 100%) !important;
+      max-width: 1420px !important;
+      min-height: 374px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      zoom: 1 !important;
+    }
+
+    .apply-storybook-hero-inner {
+      min-height: 374px !important;
+      padding: clamp(32px, 3vw, 48px) !important;
+    }
+
+    .apply-storybook-title {
+      font-size: clamp(40px, 3vw, 48px) !important;
+      line-height: 1.12 !important;
+    }
+
+    .apply-storybook-description {
+      margin-top: 18px !important;
+      font-size: 15px !important;
+      line-height: 1.7 !important;
+    }
+
+    .apply-storybook-hero-image {
+      min-height: 374px !important;
+    }
+  }
+
 
 
 
@@ -403,7 +435,230 @@ const pageStyles = `
       font-size: 13px;
     }
   }
-`;
+
+/* MONTHLY_RECORD_BASIC PRICING SIZE V1 */
+@media (min-width: 981px) {
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_BASIC'] {
+    width: min(1420px, 100%) !important;
+    max-width: 1420px !important;
+    height: 374px !important;
+    min-height: 374px !important;
+    max-height: 374px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    overflow: hidden !important;
+    border-radius: 34px !important;
+    box-sizing: border-box;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_BASIC']
+  .apply-storybook-hero-inner {
+    height: 374px !important;
+    min-height: 374px !important;
+    padding: 24px clamp(24px, 4vw, 54px) !important;
+    box-sizing: border-box;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_BASIC']
+  .apply-storybook-hero-copy {
+    width: min(640px, 48%) !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_BASIC']
+  .apply-storybook-title {
+    font-size: clamp(34px, 3vw, 46px) !important;
+    line-height: 1.08 !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_BASIC']
+  .apply-storybook-description {
+    margin-top: 12px !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_BASIC']
+  .apply-storybook-product-chip {
+    margin-top: 14px !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_BASIC'] {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    border-radius: 24px !important;
+  }
+}
+/* PREMIUM HERO FULL IMAGE START */
+@media (min-width: 861px) {
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_PREMIUM']
+  .apply-storybook-hero-image {
+    inset: 0 !important;
+    background: #fffaf4 !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_PREMIUM']
+  .apply-storybook-hero-image img {
+    object-fit: contain !important;
+    object-position: center center !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+/* PREMIUM HERO FULL IMAGE END */
+/* BASIC HERO FULL IMAGE START */
+@media (min-width: 861px) {
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_BASIC']
+  .apply-storybook-hero-image {
+    inset: 0 !important;
+    background: #fffaf4 !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_BASIC']
+  .apply-storybook-hero-image img {
+    object-fit: contain !important;
+    object-position: center center !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+/* BASIC HERO FULL IMAGE END */
+/* QUARTERLY HERO COMPACT FULL IMAGE START */
+@media (min-width: 981px) {
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD'] {
+    height: 496px !important;
+    min-height: 496px !important;
+    max-height: 496px !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD']
+  .apply-storybook-hero-image {
+    inset: 0 !important;
+    background: #fffaf4 !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD']
+  .apply-storybook-hero-image img {
+    object-fit: contain !important;
+    object-position: center center !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD']
+  .apply-storybook-hero-inner {
+    height: 496px !important;
+    min-height: 496px !important;
+    padding-top: 26px !important;
+    padding-bottom: 26px !important;
+    box-sizing: border-box;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD']
+  .apply-storybook-hero-copy {
+    width: min(610px, 45%) !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD']
+  .apply-storybook-title {
+    margin-top: 8px !important;
+    font-size: clamp(38px, 3.4vw, 52px) !important;
+    line-height: 1.08 !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD']
+  .apply-storybook-description {
+    margin-top: 12px !important;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD']
+  .apply-storybook-product-chip {
+    margin-top: 14px !important;
+  }
+}
+
+/* 모바일에서는 기존 반응형 레이아웃 유지 */
+@media (max-width: 980px) {
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD'] {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+}
+/* QUARTERLY HERO COMPACT FULL IMAGE END */
+/* MONTHLY POSTCARD COMPACT IMAGE START */
+@media (min-width: 981px) {
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD'] {
+    height: 496px !important;
+    min-height: 496px !important;
+    max-height: 496px !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD']
+  .apply-storybook-hero-image {
+    inset: 0 !important;
+    background: #fffaf4 !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD']
+  .apply-storybook-hero-image img {
+    object-fit: contain !important;
+    object-position: center center !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD']
+  .apply-storybook-hero-inner {
+    height: 496px !important;
+    min-height: 496px !important;
+    padding-top: 26px !important;
+    padding-bottom: 26px !important;
+    box-sizing: border-box;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD']
+  .apply-storybook-hero-copy {
+    width: min(610px, 45%) !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD']
+  .apply-storybook-title {
+    margin-top: 8px !important;
+    font-size: clamp(38px, 3.4vw, 52px) !important;
+    line-height: 1.08 !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD']
+  .apply-storybook-description {
+    margin-top: 12px !important;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+  }
+
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD']
+  .apply-storybook-product-chip {
+    margin-top: 14px !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .apply-storybook-hero[data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD'] {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+}
+/* MONTHLY POSTCARD COMPACT IMAGE END */`;
 
 export default async function ApplyPage({
   searchParams,
@@ -470,7 +725,10 @@ export default async function ApplyPage({
             </span>
           </div>
 
-          <section className="apply-storybook-hero">
+          <section
+              className="apply-storybook-hero"
+              data-product-code={product.code}
+            >
             <div className="apply-storybook-hero-image">
               <Image
                 src={PRODUCT_IMAGES[product.code]}
