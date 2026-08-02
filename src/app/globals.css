@@ -3145,3 +3145,477 @@ body [aria-disabled="true"] {
 }
 
 /* DALDONGNE PUBLIC VERTICAL 80 END */
+
+/* DALDONGNE HERO VERTICAL 15 START */
+
+/* 공개 페이지 데스크톱: 약 15% 축소 */
+@media (min-width: 1241px) {
+  body main :is(
+    .storybook-hero,
+    .pricing-hero,
+    .guide-hero,
+    .process-hero,
+    .trial-hero,
+    .apply-storybook-hero
+  ) {
+    height: 457px !important;
+    min-height: 457px !important;
+  }
+
+  body main :is(
+    .storybook-hero-inner,
+    .pricing-hero-inner,
+    .guide-hero-inner,
+    .process-hero-inner,
+    .trial-hero-inner,
+    .apply-storybook-hero-inner,
+    .storybook-hero-copy,
+    .pricing-hero-copy,
+    .guide-hero-copy,
+    .process-hero-copy,
+    .trial-hero-copy,
+    .apply-storybook-hero-copy,
+    .storybook-hero-art,
+    .pricing-hero-image,
+    .guide-hero-image,
+    .process-hero-image,
+    .trial-hero-image,
+    .apply-storybook-hero-image
+  ) {
+    height: 457px !important;
+    min-height: 457px !important;
+  }
+
+  body main :is(
+    .storybook-hero-copy,
+    .pricing-hero-copy,
+    .guide-hero-copy,
+    .process-hero-copy,
+    .trial-hero-copy,
+    .apply-storybook-hero-copy
+  ) {
+    padding-top: 46px !important;
+    padding-bottom: 43px !important;
+    box-sizing: border-box !important;
+  }
+
+  body main :is(
+    .about-hero,
+    .about-hero-inner,
+    .about-hero-art
+  ) {
+    height: 425px !important;
+    min-height: 425px !important;
+  }
+
+  body main .about-hero-inner {
+    padding-top: 44px !important;
+    padding-bottom: 39px !important;
+  }
+}
+
+/* 공개 페이지 태블릿: 약 10% 축소 */
+@media (min-width: 1025px) and (max-width: 1240px) {
+  body main :is(
+    .storybook-hero,
+    .pricing-hero,
+    .guide-hero,
+    .process-hero,
+    .trial-hero,
+    .apply-storybook-hero,
+    .storybook-hero-inner,
+    .pricing-hero-inner,
+    .guide-hero-inner,
+    .process-hero-inner,
+    .trial-hero-inner,
+    .apply-storybook-hero-inner,
+    .storybook-hero-copy,
+    .pricing-hero-copy,
+    .guide-hero-copy,
+    .process-hero-copy,
+    .trial-hero-copy,
+    .apply-storybook-hero-copy,
+    .storybook-hero-art,
+    .pricing-hero-image,
+    .guide-hero-image,
+    .process-hero-image,
+    .trial-hero-image,
+    .apply-storybook-hero-image
+  ) {
+    height: 432px !important;
+    min-height: 432px !important;
+  }
+
+  body main :is(
+    .storybook-hero-copy,
+    .pricing-hero-copy,
+    .guide-hero-copy,
+    .process-hero-copy,
+    .trial-hero-copy,
+    .apply-storybook-hero-copy
+  ) {
+    padding-top: 38px !important;
+    padding-bottom: 38px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* 소개 페이지 태블릿 */
+@media (min-width: 861px) and (max-width: 1240px) {
+  body main :is(
+    .about-hero,
+    .about-hero-inner,
+    .about-hero-art
+  ) {
+    height: 450px !important;
+    min-height: 450px !important;
+  }
+
+  body main .about-hero-inner {
+    padding-top: 40px !important;
+    padding-bottom: 36px !important;
+  }
+}
+
+/* 내 작업실 메인 */
+@media (min-width: 1081px) {
+  body main .dashboard-home-hero {
+    min-height: 366px !important;
+    padding-top: 46px !important;
+    padding-bottom: 36px !important;
+  }
+}
+
+@media (min-width: 821px) and (max-width: 1080px) {
+  body main .dashboard-home-hero {
+    min-height: 351px !important;
+    padding-top: 38px !important;
+    padding-bottom: 38px !important;
+  }
+}
+
+/* 내 작업실 내부 페이지 */
+@media (min-width: 1201px) {
+  body main :is(.applications-hero, .family-hero) {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+  }
+
+  body main :is(
+    .book-detail-reference-hero,
+    .user-order-detail-hero,
+    .user-orders-hero
+  ) {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+  }
+
+  body main .library-reference-hero {
+    min-height: 332px !important;
+    padding-top: 41px !important;
+    padding-bottom: 41px !important;
+  }
+}
+
+@media (min-width: 821px) and (max-width: 1200px) {
+  body main :is(.applications-hero, .family-hero) {
+    padding-top: 34px !important;
+    padding-bottom: 34px !important;
+  }
+
+  body main :is(
+    .book-detail-reference-hero,
+    .user-order-detail-hero,
+    .user-orders-hero
+  ) {
+    padding-top: 25px !important;
+    padding-bottom: 25px !important;
+  }
+
+  body main .library-reference-hero {
+    min-height: 351px !important;
+    padding-top: 43px !important;
+    padding-bottom: 43px !important;
+  }
+}
+
+/* 분기엽서·매달엽서·프리미엄 신청 페이지: 15% 기준 */
+@media (min-width: 981px) {
+  body main.apply-storybook-main
+  .apply-storybook-hero:is(
+    [data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD'],
+    [data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD'],
+    [data-product-code='MONTHLY_RECORD_PREMIUM']
+  ) {
+    height: 527px !important;
+    min-height: 527px !important;
+    max-height: 527px !important;
+  }
+
+  body main.apply-storybook-main
+  .apply-storybook-hero:is(
+    [data-product-code='MONTHLY_RECORD_QUARTERLY_POSTCARD'],
+    [data-product-code='MONTHLY_RECORD_MONTHLY_POSTCARD'],
+    [data-product-code='MONTHLY_RECORD_PREMIUM']
+  ) :is(
+    .apply-storybook-hero-inner,
+    .apply-storybook-hero-image
+  ) {
+    height: 527px !important;
+    min-height: 527px !important;
+  }
+}
+
+/* 세로 축소 시 이미지 잘림 방지 */
+@media (min-width: 861px) {
+  body main :is(
+    .storybook-hero-art,
+    .pricing-hero-image,
+    .guide-hero-image,
+    .process-hero-image,
+    .trial-hero-image,
+    .apply-storybook-hero-image,
+    .about-hero-art
+  ) img {
+    object-fit: contain !important;
+    object-position: center center !important;
+    transform: none !important;
+  }
+}
+
+/* DALDONGNE HERO VERTICAL 15 END */
+
+/* DALDONGNE GUIDE HERO IMAGE V2 START */
+
+/* 데스크톱: 원래 538px에서 약 15% 축소 */
+@media (min-width: 1241px) {
+  body main .guide-hero,
+  body main .guide-hero-inner {
+    height: 457px !important;
+    min-height: 457px !important;
+  }
+
+  body main .guide-hero-copy {
+    position: relative !important;
+    z-index: 3 !important;
+    width: 50% !important;
+    height: 457px !important;
+    min-height: 457px !important;
+    padding: 12px 42px 12px 64px !important;
+    align-self: stretch !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  body main .guide-hero-image {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    height: 457px !important;
+    min-height: 457px !important;
+    background: #fffaf4 !important;
+  }
+
+  body main .guide-hero-image img {
+    object-fit: contain !important;
+    object-position: right center !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* 태블릿: 약 10% 축소 */
+@media (min-width: 1025px) and (max-width: 1240px) {
+  body main .guide-hero,
+  body main .guide-hero-inner {
+    height: 432px !important;
+    min-height: 432px !important;
+  }
+
+  body main .guide-hero-copy {
+    position: relative !important;
+    z-index: 3 !important;
+    width: 50% !important;
+    height: 432px !important;
+    min-height: 432px !important;
+    padding: 8px 28px !important;
+    align-self: stretch !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  body main .guide-hero-image {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    height: 432px !important;
+    min-height: 432px !important;
+    background: #fffaf4 !important;
+  }
+
+  body main .guide-hero-image img {
+    object-fit: contain !important;
+    object-position: right center !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* DALDONGNE GUIDE HERO IMAGE V2 END */
+
+/* DALDONGNE PRICING CARD 70 START */
+
+/* 상품안내 카드: 원래 크기 기준 세로 30% 축소 */
+@media (min-width: 681px) {
+  body main .simple-pricing-choice {
+    min-height: 157px !important;
+    padding: 18px !important;
+    box-sizing: border-box !important;
+  }
+
+  body main .simple-pricing-plan {
+    min-height: 237px !important;
+    padding: 18px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* DALDONGNE PRICING CARD 70 END */
+/* DALDONGNE NON PRICING CARD 80 START
+   상품안내·관리자·모바일 제외
+   카드 가로폭과 콘텐츠 크기는 유지하고 세로만 20% 축소
+*/
+@media (min-width: 861px) {
+  body .about-review-card {
+    min-height: 120px !important;
+    padding-block: 25px 14px !important;
+  }
+
+  body .guide-review-card {
+    min-height: 134px !important;
+    padding-block: 24px 13px !important;
+  }
+
+  body .process-main .process-step-card {
+    min-height: 248px !important;
+    padding-block: 17px 14px !important;
+  }
+
+  body .process-main .process-recommend-card {
+    min-height: 116px !important;
+    padding-block: 10px 8px !important;
+  }
+
+  body .trial-artwork-card {
+    min-height: 120px !important;
+  }
+
+  body .library-new-book-card {
+    min-height: 204px !important;
+    padding-block: 22px !important;
+  }
+
+  body .simple-application-fields-panel {
+    padding-block: 26px !important;
+  }
+
+  body :is(
+    .simple-application-summary,
+    .family-create-card
+  ) {
+    padding-block: 24px !important;
+  }
+
+  body .invite-card {
+    padding-block: 34px !important;
+  }
+
+  body :is(
+    .applications-summary-card,
+    .application-detail-box,
+    .book-builder-cover-card,
+    .book-revision-card,
+    .book-draft-find-panel
+  ) {
+    padding-block: 14px !important;
+  }
+
+  body :is(
+    .application-card,
+    .dashboard-home-guide-panel
+  ) {
+    padding-block: 21px !important;
+  }
+
+  body :is(
+    .family-client-card,
+    .library-new-book-card
+  ) {
+    padding-block: 22px !important;
+  }
+
+  body .application-info-box {
+    padding-block: 11px !important;
+  }
+
+  body .book-detail-reference-order-box {
+    padding-block: 13px !important;
+  }
+
+  body :is(
+    .review-guide-card,
+    .user-order-detail-panel,
+    .user-order-proof-panel,
+    .user-proof-review-panel
+  ) {
+    padding-block: 18px !important;
+  }
+
+  body .user-orders-list-panel {
+    padding-block: 17px !important;
+  }
+
+  body :is(
+    .user-order-card,
+    .process-quote-card
+  ) {
+    padding-block: 15px !important;
+  }
+
+  body :is(
+    .user-order-data-box,
+    .user-order-card-information
+  ) {
+    padding-block: 10px !important;
+  }
+
+  body :is(
+    .dashboard-home-summary-card,
+    .library-book-card
+  ) {
+    padding-block: 12px !important;
+  }
+
+  body .dashboard-user-order-panel {
+    padding-block: 19px !important;
+  }
+
+  body .dashboard-home-memory-card {
+    padding-block: 6px 8px !important;
+  }
+
+  body .auth-card {
+    padding-block:
+      clamp(22px, 3.2vw, 32px)
+      !important;
+  }
+}
+
+@media (min-width: 861px) and (max-width: 1080px) {
+  body .dashboard-home-guide-panel {
+    min-height: 256px !important;
+  }
+}
+/* DALDONGNE NON PRICING CARD 80 END */
