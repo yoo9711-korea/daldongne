@@ -233,6 +233,7 @@ export default async function DashboardPage() {
         aria-label="나의 이야기 시작하기"
         style={{
           width: 'min(1216px, calc(100% - 32px))',
+          aspectRatio: '15 / 8',
           margin: '26px auto 38px',
           overflow: 'hidden',
           border: '1px solid rgba(111, 79, 55, 0.14)',
@@ -247,6 +248,7 @@ export default async function DashboardPage() {
           style={{
             display: 'block',
             width: '100%',
+            height: '100%',
             textDecoration: 'none',
           }}
         >
@@ -261,8 +263,9 @@ export default async function DashboardPage() {
             style={{
               display: 'block',
               width: '100%',
-              height: 'auto',
+              height: '100%',
               objectFit: 'cover',
+              objectPosition: 'center center',
             }}
           />
         </Link>
