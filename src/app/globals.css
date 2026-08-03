@@ -3619,3 +3619,233 @@ body [aria-disabled="true"] {
   }
 }
 /* DALDONGNE NON PRICING CARD 80 END */
+/* DALDONGNE DASHBOARD HERO 80 FINAL START
+   /dashboard 전용
+   가로폭과 글씨는 유지하고 세로만 원래 기준 20% 축소
+*/
+
+/* 일반 데스크톱 */
+@media (min-width: 1081px) {
+  body main.dashboard-home .dashboard-home-hero {
+    min-height: 344px !important;
+    padding:
+      43px
+      58px
+      34px !important;
+  }
+
+  body main.dashboard-home .dashboard-home-hero-copy {
+    padding-top: 18px !important;
+  }
+
+  body main.dashboard-home .dashboard-home-collage {
+    height: 276px !important;
+  }
+}
+
+/* 태블릿과 작은 데스크톱 */
+@media (min-width: 821px) and (max-width: 1080px) {
+  body main.dashboard-home .dashboard-home-hero {
+    min-height: 312px !important;
+    padding:
+      34px
+      42px !important;
+  }
+
+  body main.dashboard-home .dashboard-home-hero-copy {
+    padding-top: 18px !important;
+  }
+
+  body main.dashboard-home .dashboard-home-collage {
+    height: 276px !important;
+  }
+}
+
+/* 모바일 */
+@media (min-width: 561px) and (max-width: 820px) {
+  body main.dashboard-home .dashboard-home-hero {
+    min-height: 560px !important;
+    padding:
+      27px
+      28px
+      24px !important;
+  }
+
+  body main.dashboard-home .dashboard-home-hero-copy {
+    min-height: 196px !important;
+    padding-top: 0 !important;
+  }
+
+  body main.dashboard-home .dashboard-home-collage {
+    height: 272px !important;
+    margin-top: 13px !important;
+  }
+}
+
+/* 작은 모바일 */
+@media (max-width: 560px) {
+  body main.dashboard-home .dashboard-home-hero {
+    min-height: 472px !important;
+    padding:
+      21px
+      20px
+      18px !important;
+  }
+
+  body main.dashboard-home .dashboard-home-hero-copy {
+    min-height: 164px !important;
+    padding-top: 0 !important;
+  }
+
+  body main.dashboard-home .dashboard-home-collage {
+    height: 228px !important;
+    margin-top: 13px !important;
+  }
+}
+
+/* DALDONGNE DASHBOARD HERO 80 FINAL END */
+/* DALDONGNE CARD TEXT EMPHASIS START
+   관리자와 인쇄 페이지를 제외한 카드 글자 가독성 강화
+*/
+
+/* 카드 컨테이너 */
+body:not(:has(.admin-common-frame))
+main:not(.print-preview-main)
+:is(
+  [class*="-card"],
+  [class*="-panel"],
+  [class*="-box"],
+  .simple-pricing-choice,
+  .simple-pricing-plan,
+  .simple-pricing-order,
+  .dashboard-home-primary-action,
+  .guide-faq-item,
+  .process-step
+) {
+  color: #49372f;
+  text-rendering: optimizeLegibility;
+}
+
+/* 카드 제목 */
+body:not(:has(.admin-common-frame))
+main:not(.print-preview-main)
+:is(
+  [class*="-card"],
+  [class*="-panel"],
+  [class*="-box"],
+  .simple-pricing-choice,
+  .simple-pricing-plan,
+  .simple-pricing-order,
+  .dashboard-home-primary-action,
+  .guide-faq-item,
+  .process-step
+) :is(h2, h3, h4) {
+  color: #33231d !important;
+  font-weight: 800 !important;
+}
+
+/* strong으로 작성된 카드 제목과 가격 */
+body:not(:has(.admin-common-frame))
+main:not(.print-preview-main)
+:is(
+  [class*="-card"],
+  [class*="-panel"],
+  [class*="-box"],
+  .simple-pricing-choice,
+  .simple-pricing-plan,
+  .simple-pricing-order,
+  .dashboard-home-primary-action,
+  .guide-faq-item,
+  .process-step
+) strong {
+  font-weight: 800 !important;
+}
+
+/* 카드 본문 */
+body:not(:has(.admin-common-frame))
+main:not(.print-preview-main)
+:is(
+  [class*="-card"],
+  [class*="-panel"],
+  [class*="-box"],
+  .simple-pricing-choice,
+  .simple-pricing-plan,
+  .simple-pricing-order,
+  .dashboard-home-primary-action,
+  .guide-faq-item,
+  .process-step
+) :is(p, li, dt, dd)
+:not([class*="label"])
+:not([class*="badge"])
+:not([class*="price"])
+:not([class*="kicker"])
+:not([class*="eyebrow"]) {
+  color: #4b3931 !important;
+  font-weight: 650 !important;
+}
+
+/* 설명·날짜·보조 문구 */
+body:not(:has(.admin-common-frame))
+main:not(.print-preview-main)
+:is(
+  [class*="-card"],
+  [class*="-panel"],
+  [class*="-box"],
+  .simple-pricing-choice,
+  .simple-pricing-plan,
+  .simple-pricing-order,
+  .dashboard-home-primary-action,
+  .guide-faq-item,
+  .process-step
+) :is(span, small, label) {
+  font-weight: 650 !important;
+}
+
+/* 카드 안의 버튼과 링크 */
+body:not(:has(.admin-common-frame))
+main:not(.print-preview-main)
+:is(
+  [class*="-card"],
+  [class*="-panel"],
+  [class*="-box"],
+  .simple-pricing-choice,
+  .simple-pricing-plan,
+  .simple-pricing-order,
+  .dashboard-home-primary-action,
+  .guide-faq-item,
+  .process-step
+) :is(a, button) {
+  font-weight: 800 !important;
+}
+
+/* 버튼 내부 글자는 버튼의 원래 색상 유지 */
+body:not(:has(.admin-common-frame))
+main:not(.print-preview-main)
+:is(
+  [class*="-card"],
+  [class*="-panel"],
+  [class*="-box"],
+  .simple-pricing-choice,
+  .simple-pricing-plan,
+  .simple-pricing-order,
+  .dashboard-home-primary-action,
+  .guide-faq-item,
+  .process-step
+) :is(a, button) * {
+  color: inherit !important;
+  font-weight: 800 !important;
+}
+
+/* 카드 내부 입력 글자 */
+body:not(:has(.admin-common-frame))
+main:not(.print-preview-main)
+:is(
+  [class*="-card"],
+  [class*="-panel"],
+  [class*="-box"]
+) :is(input, textarea, select) {
+  color: #382a24 !important;
+  font-weight: 600 !important;
+}
+
+/* DALDONGNE CARD TEXT EMPHASIS END */

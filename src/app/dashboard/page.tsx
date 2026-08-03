@@ -74,33 +74,6 @@ const sampleMemories = [
   },
 ];
 
-const categories = [
-  {
-    label: "나",
-    icon: "person",
-    tone: "mint",
-  },
-  {
-    label: "가족",
-    icon: "family",
-    tone: "sky",
-  },
-  {
-    label: "친구",
-    icon: "friends",
-    tone: "yellow",
-  },
-  {
-    label: "강아지",
-    icon: "dog",
-    tone: "rose",
-  },
-  {
-    label: "고양이",
-    icon: "cat",
-    tone: "blue",
-  },
-] as const;
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -278,7 +251,7 @@ export default async function DashboardPage() {
           }}
         >
           <Image
-            src="/dashboard/daldongne-dashboard-hero-bluebook-v1.webp"
+            src="/dashboard/daldongne-dashboard-hero-bluebook-v1.png"
             alt="꽃이 놓인 따뜻한 공간의 파란색 나의 이야기 책"
             width={3000}
             height={1500}
@@ -295,24 +268,6 @@ export default async function DashboardPage() {
         </Link>
       </section>
 
-        <nav
-          className="dashboard-home-categories"
-          aria-label="기록 주제"
-        >
-          {categories.map((category) => (
-            <Link
-              key={category.label}
-              href="/dashboard/timeline"
-              className="dashboard-home-category"
-              data-tone={category.tone}
-            >
-              <span aria-hidden="true">
-                <CategoryIcon name={category.icon} />
-              </span>
-              <strong>{category.label}</strong>
-            </Link>
-          ))}
-        </nav>
 
         <section
           className="dashboard-home-primary-actions"
@@ -685,109 +640,6 @@ function formatDate(value: Date | string) {
   }).format(date);
 }
 
-function CategoryIcon({
-  name,
-}: {
-  name:
-    | "person"
-    | "family"
-    | "friends"
-    | "dog"
-    | "cat";
-}) {
-  if (name === "person") {
-    return (
-      <svg viewBox="0 0 42 42" fill="none">
-        <circle
-          cx="21"
-          cy="13"
-          r="7"
-          stroke="currentColor"
-          strokeWidth="2.2"
-        />
-        <path
-          d="M8 36c0-8 5.2-12 13-12s13 4 13 12"
-          stroke="currentColor"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (name === "family" || name === "friends") {
-    return (
-      <svg viewBox="0 0 42 42" fill="none">
-        <circle
-          cx="14"
-          cy="14"
-          r="5"
-          stroke="currentColor"
-          strokeWidth="2.1"
-        />
-        <circle
-          cx="29"
-          cy="14"
-          r="5"
-          stroke="currentColor"
-          strokeWidth="2.1"
-        />
-        <path
-          d="M4 34c0-6 3.8-10 10-10s10 4 10 10M19 34c0-6 3.8-10 10-10s9 4 9 10"
-          stroke="currentColor"
-          strokeWidth="2.1"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (name === "dog") {
-    return (
-      <svg viewBox="0 0 42 42" fill="none">
-        <path
-          d="M12 15 6 10v10c0 4 2 6 5 7M30 15l6-5v10c0 4-2 6-5 7"
-          stroke="currentColor"
-          strokeWidth="2.1"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M11 21c0-7 4-11 10-11s10 4 10 11v5c0 7-4 11-10 11s-10-4-10-11v-5Z"
-          stroke="currentColor"
-          strokeWidth="2.1"
-        />
-        <path
-          d="M17 22h.01M25 22h.01M18 29c2 2 4 2 6 0"
-          stroke="currentColor"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 42 42" fill="none">
-      <path
-        d="m12 15-1-8 7 5M30 15l1-8-7 5"
-        stroke="currentColor"
-        strokeWidth="2.1"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M11 22c0-8 4-12 10-12s10 4 10 12v4c0 7-4 11-10 11s-10-4-10-11v-4Z"
-        stroke="currentColor"
-        strokeWidth="2.1"
-      />
-      <path
-        d="M17 22h.01M25 22h.01M18 29c2 2 4 2 6 0M8 26H3M34 26h5M8 31H4M34 31h4"
-        stroke="currentColor"
-        strokeWidth="2.1"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 function PrimaryActionIcon({
   name,
@@ -1185,81 +1037,6 @@ const dashboardHomeStyles = `
     font-size: 30px;
   }
 
-  .dashboard-home-categories {
-    position: relative;
-    z-index: 4;
-    margin:
-      -28px
-      32px
-      0;
-    padding: 18px;
-    display: grid;
-    grid-template-columns:
-      repeat(5, minmax(0, 1fr));
-    gap: 14px;
-    border:
-      1px solid
-      rgba(95, 72, 61, 0.1);
-    border-radius: 25px;
-    background:
-      rgba(255, 255, 255, 0.96);
-    box-shadow:
-      0 17px 37px
-      rgba(91, 61, 47, 0.09);
-  }
-
-  .dashboard-home-category {
-    min-width: 0;
-    min-height: 72px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 13px;
-    border-radius: 16px;
-  }
-
-  .dashboard-home-category > span {
-    width: 43px;
-    height: 43px;
-    flex: 0 0 auto;
-  }
-
-  .dashboard-home-category svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  .dashboard-home-category strong {
-    font-size: 16px;
-    line-height: 1.3;
-    white-space: nowrap;
-  }
-
-  .dashboard-home-category[data-tone="mint"] {
-    color: #174d3d;
-    background: #e7f5ef;
-  }
-
-  .dashboard-home-category[data-tone="sky"] {
-    color: #224d74;
-    background: #eaf4fc;
-  }
-
-  .dashboard-home-category[data-tone="yellow"] {
-    color: #785519;
-    background: #fff6d8;
-  }
-
-  .dashboard-home-category[data-tone="rose"] {
-    color: #8a382d;
-    background: #fff0ee;
-  }
-
-  .dashboard-home-category[data-tone="blue"] {
-    color: #243f78;
-    background: #edf4ff;
-  }
 
   .dashboard-home-primary-actions {
     margin-top: 24px;
@@ -1702,30 +1479,6 @@ const dashboardHomeStyles = `
       margin-top: 16px;
     }
 
-    .dashboard-home-categories {
-      margin:
-        -20px
-        12px
-        0;
-      padding: 12px;
-      gap: 8px;
-      overflow-x: auto;
-    }
-
-    .dashboard-home-category {
-      min-width: 125px;
-      min-height: 58px;
-      gap: 8px;
-    }
-
-    .dashboard-home-category > span {
-      width: 34px;
-      height: 34px;
-    }
-
-    .dashboard-home-category strong {
-      font-size: 13px;
-    }
 
     .dashboard-home-primary-actions {
       padding: 0;
@@ -1815,30 +1568,6 @@ const dashboardHomeStyles = `
       font-size: 22px;
     }
 
-    .dashboard-home-categories {
-      margin:
-        -15px
-        7px
-        0;
-      padding: 9px;
-      border-radius: 17px;
-    }
-
-    .dashboard-home-category {
-      min-width: 104px;
-      min-height: 47px;
-      padding: 7px 10px;
-      border-radius: 11px;
-    }
-
-    .dashboard-home-category > span {
-      width: 28px;
-      height: 28px;
-    }
-
-    .dashboard-home-category strong {
-      font-size: 11px;
-    }
 
     .dashboard-home-primary-actions {
       margin-top: 15px;
