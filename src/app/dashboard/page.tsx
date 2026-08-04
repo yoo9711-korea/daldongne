@@ -232,7 +232,7 @@ export default async function DashboardPage() {
       <section
         aria-label="나의 이야기 시작하기"
         style={{
-          width: 'min(1216px, calc(100% - 32px))',
+          width: 'min(1034px, calc(85% - 27px))',
           aspectRatio: '75 / 34',
           margin: '26px auto 38px',
           overflow: 'hidden',
@@ -253,7 +253,7 @@ export default async function DashboardPage() {
           }}
         >
           <Image
-            src="/dashboard/daldongne-dashboard-hero-bluebook-v1.png"
+            src="/dashboard/daldongne-dashboard-bluebook-hero-v2.png"
             alt="꽃이 놓인 따뜻한 공간의 파란색 나의 이야기 책"
             width={3000}
             height={1500}
