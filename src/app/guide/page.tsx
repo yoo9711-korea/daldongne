@@ -335,12 +335,12 @@ const styles = `
 
   .guide-hero-image {
     position: absolute;
-    inset: 0 0 0 50%;
+    inset: 0;
   }
 
   .guide-hero-image img {
     object-fit: cover;
-    object-position: center 58%;
+    object-position: center center;
   }
 
   .guide-hero-inner {
@@ -1199,14 +1199,15 @@ export default async function GuidePage({
           </div>
 
           <div className="guide-hero-image">
-            <Image
-              src="/home/storybook/detail-hero-bright-v2.webp"
-              alt="가족사진을 담은 밝은 아이보리 스토리북"
-              fill
-              priority
-              sizes="(max-width: 860px) 100vw, 60vw"
-            />
-          </div>
+        <Image
+          src="/images/guide-hero-daldongne-usage-v1.png"
+          alt="밝은 꽃밭에서 강아지와 함께 뛰노는 아이들"
+          fill
+          priority
+          quality={95}
+          sizes="100vw"
+        />
+      </div>
 
           <div className="guide-hero-inner">
             <div className="guide-hero-copy">
