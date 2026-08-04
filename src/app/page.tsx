@@ -548,7 +548,7 @@ export default async function HomePage() {
           aria-label="달동네 스토리북 메인 소개"
           style={{
             width: 'min(1720px, calc(100% - 32px))',
-            aspectRatio: '5 / 2',
+            aspectRatio: '40 / 17',
             margin: '16px auto 34px',
             overflow: 'hidden',
             border: '1px solid rgba(116, 78, 53, 0.14)',
@@ -594,6 +594,8 @@ export default async function HomePage() {
                   src={memory.image}
                   alt={memory.alt}
                   fill
+                  data-visual-search="disable"
+                  draggable={false}
                   sizes="(max-width: 700px) 33vw, (max-width: 1100px) 25vw, 14vw"
                 />
               </div>
