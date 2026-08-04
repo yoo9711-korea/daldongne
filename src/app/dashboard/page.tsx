@@ -233,7 +233,7 @@ export default async function DashboardPage() {
         aria-label="나의 이야기 시작하기"
         style={{
           width: 'min(1216px, calc(100% - 32px))',
-          aspectRatio: '15 / 8',
+          aspectRatio: '75 / 34',
           margin: '26px auto 38px',
           overflow: 'hidden',
           border: '1px solid rgba(111, 79, 55, 0.14)',
