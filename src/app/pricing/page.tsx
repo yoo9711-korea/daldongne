@@ -290,6 +290,8 @@ const styles = `
   .simple-pricing-hero-image img {
     object-fit: cover;
     object-position: 82% 55%;
+    transform: scale(1.1);
+    transform-origin: 82% 55%;
   }
 
   .simple-pricing-main {
