@@ -290,8 +290,6 @@ const styles = `
   .simple-pricing-hero-image img {
     object-fit: cover;
     object-position: 82% 55%;
-    transform: scale(1.1);
-    transform-origin: 82% 55%;
   }
 
   .simple-pricing-main {
@@ -675,7 +673,7 @@ const styles = `
   @media (min-width: 981px) {
     .simple-pricing-hero {
       width: min(1420px, calc(100% - 48px));
-      min-height: 374px;
+      min-height: 411.4px;
     }
 
     .simple-pricing-hero-copy {
@@ -688,7 +686,7 @@ const styles = `
     }
 
     .simple-pricing-hero-image {
-      min-height: 374px;
+      min-height: 411.4px;
     }
   }
 
@@ -696,7 +694,7 @@ const styles = `
   @media (min-width: 981px) {
     .simple-pricing-hero {
       width: min(1420px, calc(100% - 48px)) !important;
-      min-height: 374px !important;
+      min-height: 411.4px !important;
       zoom: 1 !important;
     }
 
@@ -722,7 +720,7 @@ const styles = `
     }
 
     .simple-pricing-hero-image {
-      min-height: 374px !important;
+      min-height: 411.4px !important;
     }
 
     .simple-pricing-hero-image img {
