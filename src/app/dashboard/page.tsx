@@ -232,7 +232,7 @@ export default async function DashboardPage() {
       <section
         aria-label="나의 이야기 시작하기"
         style={{
-          width: 'min(1034px, calc(85% - 27px))',
+          width: 'min(1137.4px, calc(93.5% - 29.7px))',
           aspectRatio: '75 / 34',
           margin: '26px auto 38px',
           overflow: 'hidden',
